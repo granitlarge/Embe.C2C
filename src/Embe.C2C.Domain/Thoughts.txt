@@ -1,0 +1,19 @@
+# Use cases / Features
+
+## Add payment method
+## Add funds
+
+## Register
+## Sign In
+## Sign Out
+
+## Partner Search
+
+* Age Range
+* Location
+* Languages
+* Activities
+
+## Tinder Swipe Mode
+## Random Match Mode
+## 1-on-1 Conversations
