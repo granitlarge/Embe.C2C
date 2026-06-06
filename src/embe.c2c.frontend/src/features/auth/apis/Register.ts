@@ -3,8 +3,7 @@
 import { SendRequest } from "@/src/shared/api";
 import { User } from "@/src/shared/types/aggregates";
 import { CreateDto } from "@/src/shared/types/dto";
-import { FileDetails } from "@/src/shared/types/entities";
-import { Gender, DatingPreferences } from "@/src/shared/types/value-objects";
+import { Gender, DatingPreferences, FileDetails } from "@/src/shared/types/value-objects";
 
 export type RegisterRequest = {
     email: string,

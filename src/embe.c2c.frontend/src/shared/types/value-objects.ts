@@ -1,5 +1,6 @@
 export type Distance = {
     value: number;
+    unit: LengthUnit;
 }
 
 export type Location = {
@@ -11,12 +12,28 @@ export type DatingPreferences = {
     interestedInGenders: Gender[];
     ageRangeMin: number;
     ageRangeMax: number;
-    maximumDistance: Distance
+    maximumDistance: Distance;
+}
+
+export type FileDetails = {
+    url: string;
+    mimeType: string;
+}
+
+export type Currency = {
+    code: string;
+    name: string;
+    symbol: string;
+}
+
+export type Money = {
+    amount: number;
+    currency: Currency;
 }
 
 export enum LengthUnit {
-    Kilometer = 0,
-    Mile = 1,
+    Kilometers = 0,
+    Miles = 1,
 }
 
 export enum Gender {
@@ -25,4 +42,17 @@ export enum Gender {
     TransMale = 2,
     TransFemale = 3,
     Other = 4,
+}
+
+export enum TransactionType {
+    Deposit = 0,
+    Withdrawal = 1,
+}
+
+export enum TransactionReason {
+    Purchase = 1,
+    Sale = 2,
+    Refund = 3,
+    Withdrawal = 4,
+    Deposit = 5,
 }
