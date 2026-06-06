@@ -1,12 +1,13 @@
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 
-namespace Embe.C2C.Domain.Entities;
+namespace Embe.C2C.Domain.Aggregates.Transactions;
 
-public class Transaction
+public class Transaction : Aggregate
 {
     private Transaction
     (
+        Guid accountId,
         Money amount,
         TransactionType type,
         TransactionReason reason,
@@ -25,6 +26,8 @@ public class Transaction
             throw new DomainException($"Transaction date cannot be in the future. Provided date: {transactionDate}");
         }
 
+        Id = Guid.CreateVersion7();
+        AccountId = accountId;
         Amount = amount;
         Type = type;
         Reason = reason;
@@ -40,6 +43,8 @@ public class Transaction
         // For ORM
     }
 
+    public Guid Id { get; private set; }
+    public Guid AccountId { get; private set; }
     public Money Amount { get; private set; }
     public TransactionType Type { get; private set; }
     public TransactionReason Reason { get; private set; }
@@ -48,17 +53,9 @@ public class Transaction
 
     public DateTimeOffset CreatedAt { get; private set; }
 
-    public record ConstructorParameters
+    internal static Transaction Create
     (
-        Money Amount,
-        TransactionType Type,
-        TransactionReason Reason,
-        DateTimeOffset TransactionDate,
-        string? Note = null
-    );
-
-    public static Transaction Create
-    (
+        Guid AccountId,
         Money amount,
         TransactionType type,
         TransactionReason reason,
@@ -66,6 +63,6 @@ public class Transaction
         string? note = null
     )
     {
-        return new Transaction(amount, type, reason, transactionDate, note);
+        return new Transaction(AccountId, amount, type, reason, transactionDate, note);
     }
 }

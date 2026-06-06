@@ -5,6 +5,7 @@ using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,15 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class UpdateHandler
 {
-    private readonly C2CContext _context;
+    private readonly IC2CContext _context;
     private readonly UserAuthorizationPolicy _authorizationPolicy;
     private readonly IFileService _fileService;
     private readonly DomainEventHandler _domainEventHandler;
     private readonly IWorkItemService _workItemService;
 
-    internal UpdateHandler
+    public UpdateHandler
     (
-        C2CContext context,
+        IC2CContext context,
         UserAuthorizationPolicy authorizationPolicy,
         IFileService fileService,
         DomainEventHandler domainEventHandler,
@@ -51,7 +52,7 @@ public class UpdateHandler
         HashSet<string> uploadedFileUrls = [];
         try
         {
-            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            using var transaction = await _context.BeginTransactionAsync(cancellationToken);
 
             var email = Email.Create(command.Email);
             var birthDate = new BirthDate(command.BirthDate);
@@ -61,11 +62,11 @@ public class UpdateHandler
                 [.. command.DatingPreferences.InterestedInGenders],
                 new Age(command.DatingPreferences.AgeRangeMin),
                 new Age(command.DatingPreferences.AgeRangeMax),
-                command.DatingPreferences.MaximumDistance
+                new Distance(command.DatingPreferences.MaximumDistance.Value, command.DatingPreferences.MaximumDistance.Unit)
             );
             var location = command.Location;
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+            var user = await _context.DomainUsers.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
             if (user == null)
             {
                 return Result<HandlerReturnType>.Failure(FailureReason.NotFound, "User not found.");
@@ -86,7 +87,7 @@ public class UpdateHandler
 
             foreach (var file in command.FilesToAdd)
             {
-                var url = await _fileService.UploadFileAsync(file.Content, file.MimeType, cancellationToken);
+                var url = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
                 user.AddFile(actorId, new FileDetails(file.MimeType, url));
                 uploadedFileUrls.Add(url);
             }

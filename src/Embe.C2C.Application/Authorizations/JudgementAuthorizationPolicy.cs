@@ -9,7 +9,7 @@ public class JudgementAuthorizationPolicy
 
     }
 
-    public async Task<ImmutableHashSet<JudgementPermission>> GetPermissionsAsync
+    public Task<ImmutableHashSet<JudgementPermission>> GetPermissionsAsync
     (
         Guid targetJudgementId, 
         CancellationToken cancellationToken = default
@@ -18,8 +18,8 @@ public class JudgementAuthorizationPolicy
         var permissions = new HashSet<JudgementPermission>()
         {
             JudgementPermission.Judge
-        };
-        return [.. permissions];
+        }.ToImmutableHashSet();
+        return Task.FromResult(permissions);
     }
 
 }

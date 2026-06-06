@@ -1,16 +1,13 @@
-import RegisterForm from "@/src/features/auth/components/RegisterFlow"
+import RegisterForm from "@/src/features/auth/components/RegisterForm"
 
 export type RegisterPageProps = {
 
 }
-
 export default async function RegisterPage({ }: RegisterPageProps) {
     return (
-        <div className="w-full h-full flex justify-center">
-            <div className="flex flex-col gap-6 items-center w-full">
-                <h1>register</h1>
-                <RegisterForm className="w-[600px] h-[600px]-6"/>
-            </div>
+        <div className="flex justify-start flex-col items-center">
+            <h1>register</h1>
+            <RegisterForm className="w-[600px] max-w-[100%]" />
         </div>
     )
 }

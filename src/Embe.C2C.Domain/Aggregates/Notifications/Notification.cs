@@ -13,6 +13,11 @@ public abstract class Notification : Aggregate
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
+    protected Notification()
+    {
+
+    }
+
     public Guid Id { get; }
     public Guid RecipientUserId { get; }
     public bool IsRead => ReadAt.HasValue;

@@ -4,10 +4,10 @@ using Embe.C2C.Application.Abstractions.Services;
 
 public class MatchingAuthorizationPolicy
 {
-    private readonly C2CContext _context;
-    private readonly IUserService _userService;
+    private readonly IC2CContext _context;
+    private readonly IAuthenticatedUserService _userService;
 
-    public MatchingAuthorizationPolicy(C2CContext context, IUserService userService)
+    public MatchingAuthorizationPolicy(IC2CContext context, IAuthenticatedUserService userService)
     {
         _context = context;
         _userService = userService;
@@ -33,7 +33,7 @@ public class MatchingAuthorizationPolicy
             permissions.Add(MatchingPermission.Unmatch);
         }
         return [.. permissions];
-    } 
+    }
 }
 
 public enum MatchingPermission

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations.Schema;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
@@ -15,7 +16,8 @@ public class User : Aggregate
         Gender gender,
         DatingPreferences datingPreferences,
         Location location,
-        ImmutableHashSet<FileDetails> files
+        ImmutableHashSet<FileDetails> files,
+        string identityUserId
     )
     {
         if (files.Count < 2 || files.Count > 10)
@@ -29,6 +31,7 @@ public class User : Aggregate
         }
 
         Id = Guid.CreateVersion7();
+        IdentityUserId = identityUserId;
         Email = email;
         UserName = userName;
         BirthDate = birthDate;
@@ -47,7 +50,15 @@ public class User : Aggregate
         AddDomainEvent(new UserCreatedEvent(this));
     }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private User()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+
+    }
+
     public Guid Id { get; }
+    public string IdentityUserId { get; }
     public Email Email { get; private set; }
     public UserName UserName { get; private set; }
     public BirthDate BirthDate { get; private set; }
@@ -57,6 +68,7 @@ public class User : Aggregate
     public Location Location { get; private set; }
 
     private readonly List<Entities.File> _files;
+    [NotMapped]
     public IReadOnlyCollection<Entities.File> Files => _files.AsReadOnly();
 
     public DateTimeOffset CreatedAt { get; }
@@ -153,7 +165,8 @@ public class User : Aggregate
         Gender gender,
         DatingPreferences datingPreferences,
         Location location,
-        ImmutableHashSet<FileDetails> files
+        ImmutableHashSet<FileDetails> files,
+        string identityUserId
     )
     {
         return new User
@@ -164,7 +177,8 @@ public class User : Aggregate
             gender,
             datingPreferences,
             location,
-            files
+            files,
+            identityUserId
         );
     }
 }

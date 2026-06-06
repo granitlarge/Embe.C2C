@@ -1,4 +1,4 @@
-using Embe.C2C.Domain.Entities;
+using Embe.C2C.Domain.Aggregates.Transactions;
 
 namespace Embe.C2C.Domain.Aggregates.Accounts.Events;
 

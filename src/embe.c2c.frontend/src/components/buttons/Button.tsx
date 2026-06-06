@@ -2,15 +2,15 @@ export type ButtonProps = {
     children?: React.ReactNode;
     onClick?: () => void;
     className?: string;
+    disabled?: boolean;
 }
 
-export default function Button({ children, onClick, className }: ButtonProps) {
+export default function Button({ children, onClick, className, disabled = false}: ButtonProps) {
     const classNames = [
-        "button",
         className
     ].filter(Boolean).join(" ");
     return (
-        <button className={classNames} onClick={onClick}>
+        <button disabled={disabled} className={`${classNames} button w-full`} onClick={onClick}>
             {children}
         </button>
     );

@@ -41,6 +41,6 @@ public record Distance
 
 public enum LengthUnit
 {
-    Kilometers,
-    Miles
+    Kilometers = 0,
+    Miles = 1
 }

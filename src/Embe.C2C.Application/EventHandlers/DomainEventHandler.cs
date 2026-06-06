@@ -9,7 +9,7 @@ namespace Embe.C2C.Application.EventHandlers;
 
 public class DomainEventHandler : ApplicationEventCollector
 {
-    public async Task HandleAsync(C2CContext context, DomainEvent domainEvent, CancellationToken cancellationToken = default)
+    public async Task HandleAsync(IC2CContext context, DomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
         switch (domainEvent)
         {
@@ -29,7 +29,7 @@ public class DomainEventHandler : ApplicationEventCollector
 
     private async Task HandleUserCreatedEventAsync
     (
-        C2CContext context,
+        IC2CContext context,
         UserCreatedEvent userCreatedEvent,
         CancellationToken cancellationToken
     )
@@ -39,7 +39,7 @@ public class DomainEventHandler : ApplicationEventCollector
 
     private Task HandleMatchingCreatedEventAsync
     (
-        C2CContext context,
+        IC2CContext context,
         MatchingCreatedEvent matchingCreatedEvent,
         CancellationToken cancellationToken
     )
@@ -48,14 +48,14 @@ public class DomainEventHandler : ApplicationEventCollector
         var userIdToNotify = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
 
         var notification = new MatchingCreated(userIdToNotify, matching.Id);
-        context.Add(notification);
+        context.Notifications.Add(notification);
         AddApplicationEvent(new NotificationCreatedEvent(notification));
         return Task.CompletedTask;
     }
 
     private Task HandleMatchingRemovedEventAsync
     (
-        C2CContext context,
+        IC2CContext context,
         MatchingRemovedEvent matchingRemovedEvent,
         CancellationToken cancellationToken
     )
@@ -64,7 +64,7 @@ public class DomainEventHandler : ApplicationEventCollector
         var userIdToNotify = matchingRemovedEvent.RemoverUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
 
         var notification = new MatchingRemoved(userIdToNotify, matching.Id);
-        context.Add(notification);
+        context.Notifications.Add(notification);
         AddApplicationEvent(new NotificationCreatedEvent(notification));
         return Task.CompletedTask;
     }

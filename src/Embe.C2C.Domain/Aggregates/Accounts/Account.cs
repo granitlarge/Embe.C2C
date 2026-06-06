@@ -1,5 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Accounts.Events;
-using Embe.C2C.Domain.Entities;
+using Embe.C2C.Domain.Aggregates.Transactions;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 
@@ -13,9 +13,17 @@ public class Account : Aggregate
         Currency currency
     )
     {
+        Id = Guid.CreateVersion7();
         UserId = userId;
         Balance = Money.Create(0, currency);
         Open();
+    }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private Account()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+
     }
 
     public static Account Open(Guid userId, Currency currency)
@@ -23,6 +31,7 @@ public class Account : Aggregate
         return new Account(userId, currency);
     }
 
+    public Guid Id { get; private set; }
     public Guid UserId { get; }
     public Money Balance { get; private set; }
     public Currency Currency => Balance.Currency;
@@ -53,6 +62,7 @@ public class Account : Aggregate
         Balance = Money.Create(Balance.Amount - amount.Amount, Balance.Currency);
         var transaction = Transaction.Create
         (
+            Id,
             amount,
             TransactionType.Withdrawal,
             TransactionReason.Withdrawal,
@@ -83,6 +93,7 @@ public class Account : Aggregate
         Balance = Money.Create(Balance.Amount + amount.Amount, Balance.Currency);
         var transaction = Transaction.Create
         (
+            Id,
             amount,
             TransactionType.Deposit,
             TransactionReason.Deposit,

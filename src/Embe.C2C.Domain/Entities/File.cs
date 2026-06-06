@@ -18,6 +18,13 @@ public class File
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private File()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+
+    }
+
     public Guid Id { get; }
     public Guid OwnerUserId { get; }
     public FileDetails FileDetails { get; }

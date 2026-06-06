@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
-:root {
-
-  --color-primary: #120b10;
-  --color-secondary: #f83529;
-  --color-tertiary: #f8f8f8;
-  --color-quaternary: #c87b7b;
-
-  --fs-1: 7rem;
-  --fs-2: 6rem;
-  --fs-3: 5rem;
-  --fs-4: 4rem;
-  --fs-5: 3rem;
-  --fs-6: 2rem;
-  --fs-lg: calc(var(--fs-6) * .95);
-  --fs-md: calc(var(--fs-6) * 0.75);
-  --fs-sm: calc(var(--fs-6) * 0.5);
-
-}
-
 @layer base {
+  :root {
+
+    --color-primary: #120b10;
+    --color-secondary: #f83529;
+    --color-tertiary: #f8f8f8;
+    --color-quaternary: #452b2b;
+
+    --fs-1: 7rem;
+    --fs-2: calc(var(--fs-1) * .8);
+    --fs-3: calc(var(--fs-2) * .8);
+    --fs-4: calc(var(--fs-3) * .8);
+    --fs-5: calc(var(--fs-4) * .8);
+    --fs-6: calc(var(--fs-5) * .8);
+    --fs-lg: calc(var(--fs-6) * .8);
+    --fs-md: calc(var(--fs-lg) * 0.8);
+    --fs-sm: calc(var(--fs-md) * 0.8);
+
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -64,7 +64,6 @@
   .form {
     background-color: var(--color-quaternary);
     border-radius: 0.5rem;
-    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -93,6 +92,12 @@
     gap: 5px;
     justify-content: center;
     align-items: center;
+  }
+
+  .error-message {
+    color: red;
+    font-size: var(--fs-sm);
+
   }
 
   .label-text {
@@ -134,5 +139,16 @@
 
   select option {
     background-color: var(--color-quaternary);
+  }
+
+  a {
+    color: var(--color-secondary);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 400px) {
+    :root {
+      --fs-1: 5rem;
+    }
   }
 }

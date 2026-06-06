@@ -12,20 +12,20 @@ namespace Embe.C2C.Application.Commands.Judgements.Handlers;
 
 public class JudgeHandler
 {
-    private readonly C2CContext _context;
+    private readonly IC2CContext _context;
     private readonly JudgementAuthorizationPolicy _authorizationPolicy;
     private readonly JudgementService _judgementService;
     private readonly DomainEventHandler _domainEventHandler;
-    private readonly IUserService _userService;
+    private readonly IAuthenticatedUserService _userService;
     private readonly MatchingAuthorizationPolicy _matchingAuthorizationPolicy;
 
     public JudgeHandler
     (
-        C2CContext context,
+        IC2CContext context,
         JudgementAuthorizationPolicy authorizationPolicy,
         JudgementService judgementService,
         DomainEventHandler domainEventHandler,
-        IUserService userService,
+        IAuthenticatedUserService userService,
         MatchingAuthorizationPolicy matchingAuthorizationPolicy
     )
     {
@@ -53,15 +53,15 @@ public class JudgeHandler
         try
         {
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _context.BeginTransactionAsync();
 
-            var judge = await _context.Users.FindAsync([userId], cancellationToken);
+            var judge = await _context.DomainUsers.FindAsync([userId], cancellationToken);
             if (judge == null)
             {
                 return Result<ResultType>.Failure(FailureReason.NotFound, "User not found.");
             }
 
-            var judgee = await _context.Users.FindAsync([command.JudgeeUserId], cancellationToken);
+            var judgee = await _context.DomainUsers.FindAsync([command.JudgeeUserId], cancellationToken);
             if (judgee == null)
             {
                 return Result<ResultType>.Failure(FailureReason.NotFound, "Judgee not found.");

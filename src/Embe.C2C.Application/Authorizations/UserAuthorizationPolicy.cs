@@ -3,11 +3,11 @@ using Embe.C2C.Application.Abstractions.Services;
 
 namespace Embe.C2C.Application.Authorizations;
 
-internal class UserAuthorizationPolicy
+public class UserAuthorizationPolicy
 {
-    private readonly IUserService _userService;
+    private readonly IAuthenticatedUserService _userService;
 
-    internal UserAuthorizationPolicy(IUserService userService)
+    public UserAuthorizationPolicy(IAuthenticatedUserService userService)
     {
         _userService = userService;
     }

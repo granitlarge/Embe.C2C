@@ -1,13 +1,13 @@
 namespace Embe.C2C.Application.Abstractions;
 
-public class Result
+public class ResultBase<T_FailureReason>
 {
-    protected Result()
+    protected ResultBase()
     {
         IsSuccess = true;
     }
 
-    protected Result(FailureReason reason, string message)
+    protected ResultBase(T_FailureReason reason, string message)
     {
         Reason = reason;
         IsSuccess = false;
@@ -15,29 +15,51 @@ public class Result
     }
 
     public bool IsSuccess { get; }
-
-    public FailureReason? Reason {get;}
+    public T_FailureReason? Reason { get; }
     public string? Message { get; }
-
-    public static Result Success() => new();
-    public static Result Failure(FailureReason reason, string message) => new(reason, message);
+    public static ResultBase<T_FailureReason> Success() => new();
+    public static ResultBase<T_FailureReason> Failure(T_FailureReason reason, string message) => new(reason, message);
 }
 
-public class Result<T> : Result
+public class Result : ResultBase<FailureReason>
 {
-    private Result(T value) : base()
+    protected Result() : base() { }
+    protected Result(FailureReason reason, string message) : base(reason, message) { }
+
+    new public static Result Success() => new();
+    new public static Result Failure(FailureReason reason, string message) => new(reason, message);
+}
+
+public class TypedResult<T_FailureReason, T> : ResultBase<T_FailureReason>
+{
+    protected TypedResult(T value) : base()
     {
         Value = value;
     }
 
-    private Result(FailureReason reason, string message) : base(reason, message)
+    protected TypedResult(T_FailureReason reason, string message) : base(reason, message)
     {
         Value = default;
     }
 
     public T? Value { get; }
+    public static TypedResult<T_FailureReason, T> Success(T value) => new(value);
+    new public static TypedResult<T_FailureReason, T> Failure(T_FailureReason reason, string message) => new(reason, message);
+}
 
-    public static Result<T> Success(T value) => new(value);
+public class Result<T> : TypedResult<FailureReason, T>
+{
+    private Result(T value) : base(value)
+    {
+
+    }
+
+    private Result(FailureReason reason, string message) : base(reason, message)
+    {
+
+    }
+
+    new public static Result<T> Success(T value) => new(value);
     new public static Result<T> Failure(FailureReason reason, string message) => new(reason, message);
 }
 

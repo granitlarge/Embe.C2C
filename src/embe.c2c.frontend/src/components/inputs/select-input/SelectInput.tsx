@@ -12,9 +12,11 @@ export type SelectInputProps = {
     label: string;
     className?: string;
     multiple?: boolean;
+    valid?: boolean;
+    errorMessage?: string;
 }
 
-export default function SelectInput({ options, value, onChange, label, className, multiple = false }: SelectInputProps) {
+export default function SelectInput({ options, value, onChange, label, className, multiple = false, valid, errorMessage }: SelectInputProps) {
 
     const classNames = [
         className
@@ -46,6 +48,7 @@ export default function SelectInput({ options, value, onChange, label, className
                             />)
                     }
                 </div>
+                {!valid && errorMessage && <span className="error-message">{errorMessage}</span>}
             </label>
         </div>
     )

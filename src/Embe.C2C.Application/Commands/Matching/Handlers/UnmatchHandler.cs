@@ -7,17 +7,17 @@ namespace Embe.C2C.Application.Commands.Matching.Handlers;
 
 public class UnmatchHandler
 {
-    private readonly C2CContext _context;
+    private readonly IC2CContext _context;
     private readonly DomainEventHandler _domainEventHandler;
     private readonly MatchingAuthorizationPolicy _authorizationPolicy;
-    private readonly IUserService _userService;
+    private readonly IAuthenticatedUserService _userService;
 
     public UnmatchHandler
     (
-        C2CContext context,
+        IC2CContext context,
         DomainEventHandler domainEventHandler,
         MatchingAuthorizationPolicy authorizationPolicy,
-        IUserService userService
+        IAuthenticatedUserService userService
     )
     {
         _context = context;
@@ -41,7 +41,7 @@ public class UnmatchHandler
         var actorId = _userService.UserId ?? throw new InvalidOperationException("Unauthorized"); ;
         try
         {
-            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            using var transaction = await _context.BeginTransactionAsync(cancellationToken);
             var matching = await _context.Matchings.FindAsync([command.MatchingId], cancellationToken);
             if (matching == null)
             {
@@ -53,7 +53,7 @@ public class UnmatchHandler
             {
                 await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
             }
-            _context.Remove(matching);
+            _context.Matchings.Remove(matching);
             await _context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         }

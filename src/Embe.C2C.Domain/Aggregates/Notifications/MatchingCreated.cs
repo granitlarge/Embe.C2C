@@ -1,10 +1,16 @@
 namespace Embe.C2C.Domain.Aggregates.Notifications;
 
-public class MatchingCreated
-(
-    Guid recipientUserId,
-    Guid matchingId
-) : Notification(recipientUserId)
+public class MatchingCreated : Notification
 {
-    public Guid MatchingId { get; } = matchingId;
+    public MatchingCreated(Guid recipientUserId, Guid matchingId) : base(recipientUserId)
+    {
+        MatchingId = matchingId;
+    }
+
+    private MatchingCreated()
+    {
+
+    }
+
+    public Guid MatchingId { get; }
 }

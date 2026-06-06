@@ -1,6 +1,16 @@
 namespace Embe.C2C.Domain.Aggregates.Notifications;
 
-public class MatchingRemoved(Guid RecipientUserId, Guid MatchingId) : Notification(RecipientUserId)
+public class MatchingRemoved : Notification
 {
-    public Guid MatchingId { get; } = MatchingId;
+    public MatchingRemoved(Guid recipientUserId, Guid matchingId) : base(recipientUserId)
+    {
+        MatchingId = matchingId;
+    }
+
+    private MatchingRemoved()
+    {
+
+    }
+
+    public Guid MatchingId { get; }
 }

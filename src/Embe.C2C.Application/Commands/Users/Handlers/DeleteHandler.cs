@@ -10,14 +10,14 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class DeleteHandler
 {
-    private readonly C2CContext _context;
+    private readonly IC2CContext _context;
     private readonly UserAuthorizationPolicy _authorizationPolicy;
     private readonly UserService _userService;
     private readonly DomainEventHandler _domainEventHandler;
 
-    internal DeleteHandler
+    public DeleteHandler
     (
-        C2CContext context,
+        IC2CContext context,
         UserAuthorizationPolicy authorizationPolicy,
         UserService userService,
         DomainEventHandler domainEventHandler
@@ -43,11 +43,17 @@ public class DeleteHandler
 
         try
         {
-            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-            var user = await _context.Users.FindAsync([command.UserId], cancellationToken);
+            using var transaction = await _context.BeginTransactionAsync(cancellationToken);
+            var user = await _context.DomainUsers.FindAsync([command.UserId], cancellationToken);
             if (user is null)
             {
                 return Result.Failure(FailureReason.NotFound, "User not found.");
+            }
+
+            var deleteIdentityUserResult = await _context.DeleteUserAsync(user.IdentityUserId, cancellationToken);
+            if (!deleteIdentityUserResult.IsSuccess)
+            {
+                return Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!);
             }
 
             var accounts = await _context.Accounts.Where(a => a.UserId == command.UserId).ToListAsync(cancellationToken);
@@ -59,7 +65,7 @@ public class DeleteHandler
                 await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
             }
 
-            _context.Users.Remove(user);
+            _context.DomainUsers.Remove(user);
             foreach (var account in accounts)
             {
                 _context.Accounts.Remove(account);

@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
-public class GetMatchingsHandler(C2CContext context, IUserService userService)
+public class GetMatchingsHandler(IC2CContext context, IAuthenticatedUserService userService)
 {
-    private readonly C2CContext _context = context;
-    private readonly IUserService _userService = userService;
+    private readonly IC2CContext _context = context;
+    private readonly IAuthenticatedUserService _userService = userService;
 
     public async Task<Result<List<Matching>>> HandleAsync
     (
