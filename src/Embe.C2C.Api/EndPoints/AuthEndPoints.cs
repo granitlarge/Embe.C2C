@@ -21,17 +21,10 @@ public static class AuthEndPoints
         group.MapPost("/refresh", Refresh).RequireAuthorization();
     }
 
-    private static async Task<IResult> AccountExists([FromServices] ServiceProvider services)
+    private static async Task<IResult> AccountExists([FromBody] AccountExistsQuery query, [FromServices] AccountExistsHandler handler, CancellationToken cancellationToken = default)
     {
-        Console.WriteLine("Before service injection");
-        var handler = services.GetService<AccountExistsHandler>();
-        if (handler == null)
-        {
-            Console.WriteLine("Handler is null");
-            return Results.Problem("Handler not found");
-        }
-        Console.WriteLine("After service injection");
-        return Results.Ok();
+        var result = await handler.HandleAsync(query, cancellationToken);
+        return result.ToResult();
     }
 
     private static async Task<IResult> SignIn([FromBody] SignInCommand command, [FromServices] SignInHandler handler, CancellationToken cancellationToken = default)
