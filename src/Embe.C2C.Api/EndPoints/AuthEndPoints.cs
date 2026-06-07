@@ -21,27 +21,34 @@ public static class AuthEndPoints
         group.MapPost("/refresh", Refresh).RequireAuthorization();
     }
 
-    private static async Task<IResult> AccountExists([FromBody] string email, [FromServices] AccountExistsHandler handler)
+    private static async Task<IResult> AccountExists([FromServices] ServiceProvider services)
     {
-        var result = await handler.HandleAsync(new AccountExistsQuery(email));
+        Console.WriteLine("Before service injection");
+        var handler = services.GetService<AccountExistsHandler>();
+        if (handler == null)
+        {
+            Console.WriteLine("Handler is null");
+            return Results.Problem("Handler not found");
+        }
+        Console.WriteLine("After service injection");
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> SignIn([FromBody] SignInCommand command, [FromServices] SignInHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 
-    private static async Task<IResult> SignIn([FromBody] SignInCommand command, [FromServices] SignInHandler handler)
+    private static async Task<IResult> SignOut([FromBody] SignOutCommand command, [FromServices] SignOutHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 
-    private static async Task<IResult> SignOut([FromBody] SignOutCommand command, [FromServices] SignOutHandler handler)
+    private static async Task<IResult> Refresh([FromBody] RefreshCommand command, [FromServices] RefreshHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command);
-        return result.ToResult();
-    }
-
-    private static async Task<IResult> Refresh([FromBody] RefreshCommand command, [FromServices] RefreshHandler handler)
-    {
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 }

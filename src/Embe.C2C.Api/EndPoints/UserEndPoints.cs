@@ -18,21 +18,21 @@ public static class UserEndPoints
         group.MapDelete("/delete", Delete).RequireAuthorization();
     }
 
-    private static async Task<IResult> Register([FromBody]RegisterCommand command, [FromServices]RegisterHandler handler)
+    private static async Task<IResult> Register([FromBody]RegisterCommand command, [FromServices]RegisterHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 
-    private static async Task<IResult> Update([FromBody]UpdateCommand command, [FromServices]UpdateHandler handler)
+    private static async Task<IResult> Update([FromBody]UpdateCommand command, [FromServices]UpdateHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 
-    private static async Task<IResult> Delete([FromBody]DeleteCommand command, [FromServices]DeleteHandler handler)
+    private static async Task<IResult> Delete([FromBody]DeleteCommand command, [FromServices]DeleteHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 }

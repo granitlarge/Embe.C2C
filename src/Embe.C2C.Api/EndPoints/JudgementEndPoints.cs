@@ -16,9 +16,9 @@ public static class JudgementEndPoints
         group.MapPost("/", Judge);
     }
 
-    private static async Task<IResult> Judge([FromBody] JudgeCommand command, [FromServices] JudgeHandler handler)
+    private static async Task<IResult> Judge([FromBody] JudgeCommand command, [FromServices] JudgeHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 }

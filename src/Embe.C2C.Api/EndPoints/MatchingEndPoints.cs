@@ -17,9 +17,9 @@ public static class MatchingEndPoints
         group.MapPost("/unmatch", Unmatch);
     }
 
-    private static async Task<IResult> Unmatch([FromBody] UnmatchCommand command, [FromServices] UnmatchHandler handler)
+    private static async Task<IResult> Unmatch([FromBody] UnmatchCommand command, [FromServices] UnmatchHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 }
