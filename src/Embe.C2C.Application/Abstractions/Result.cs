@@ -65,8 +65,8 @@ public class Result<T> : TypedResult<FailureReason, T>
 
 public enum FailureReason
 {
-    NotFound,
-    Forbidden,
-    DomainError,
-    Unknown
+    NotFound = 0,
+    Forbidden = 1,
+    DomainError = 2,
+    Unknown = 3
 }

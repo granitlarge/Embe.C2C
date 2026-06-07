@@ -15,7 +15,7 @@ public class User : Aggregate
         BirthDate birthDate,
         Gender gender,
         DatingPreferences datingPreferences,
-        Location location,
+        Location? location,
         ImmutableHashSet<FileDetails> files,
         string identityUserId
     )
@@ -65,7 +65,7 @@ public class User : Aggregate
     public Age Age => new(BirthDate);
     public Gender Gender { get; private set; }
     public DatingPreferences DatingPreferences { get; private set; }
-    public Location Location { get; private set; }
+    public Location? Location { get; private set; }
 
     private readonly List<Entities.File> _files;
     [NotMapped]
@@ -164,7 +164,7 @@ public class User : Aggregate
         BirthDate birthDate,
         Gender gender,
         DatingPreferences datingPreferences,
-        Location location,
+        Location? location,
         ImmutableHashSet<FileDetails> files,
         string identityUserId
     )

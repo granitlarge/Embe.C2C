@@ -141,7 +141,7 @@
     background-color: var(--color-quaternary);
   }
 
-  a {
+  a, Link {
     color: var(--color-secondary);
     text-decoration: underline;
   }

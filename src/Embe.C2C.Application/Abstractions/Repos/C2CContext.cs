@@ -13,7 +13,6 @@ namespace Embe.C2C.Application.Abstractions.Repos
     {
         string Id { get; set; }
         string? Email { get; set; }
-        string? PasswordHash { get; set; }
     }
 
     public interface IC2CContext
@@ -25,8 +24,8 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public DbSet<Notification> Notifications { get; set; }
 
         public Task<TypedResult<RegisterUserFailureReason, IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default);
-        public Task<ResultBase<ResetPasswordFailureReason>> ResetPasswordAsync(string userId, string newPassword, CancellationToken cancellationToken = default);
-        public Task<ResultBase<DeleteUserFailureReason>> DeleteUserAsync(string userId, CancellationToken cancellationToken = default);
+        public Task<ResultBase<ResetPasswordFailureReason>> ResetPasswordAsync(string identityUserId, string newPassword, CancellationToken cancellationToken = default);
+        public Task<ResultBase<DeleteUserFailureReason>> DeleteUserAsync(string identityUserId, CancellationToken cancellationToken = default);
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

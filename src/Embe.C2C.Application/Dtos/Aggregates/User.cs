@@ -14,7 +14,7 @@ public record UserDto
     DateOnly BirthDate,
     Gender Gender,
     DatingPreferencesDto DatingPreferences,
-    LocationDto Location,
+    LocationDto? Location,
     ImmutableHashSet<FileDto> Files,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt
@@ -32,7 +32,7 @@ public static class UserDtoExtensions
             user.BirthDate.Value,
             user.Gender,
             user.DatingPreferences.ToDto(),
-            user.Location.ToDto(),
+            user.Location?.ToDto(),
             [.. user.Files.Select(f => f.ToDto())],
             user.CreatedAt,
             user.UpdatedAt

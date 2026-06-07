@@ -12,7 +12,7 @@ public class BlobStorageFileService : IFileService
     public BlobStorageFileService(IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("AzureBlobStorage");
-        _blobServiceClient = new BlobServiceClient(connectionString);
+        _blobServiceClient = new BlobServiceClient(connectionString, new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05));
     }
 
     public async Task DeleteFileAsync(string url, CancellationToken cancellationToken = default)
@@ -23,6 +23,7 @@ public class BlobStorageFileService : IFileService
     public async Task<string> UploadFileAsync(byte[] content, string mimeType, CancellationToken cancellationToken = default)
     {
         var blobContainerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+        await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
         var blobClient = blobContainerClient.GetBlobClient(Guid.CreateVersion7().ToString());
 
         using var stream = new MemoryStream(content);

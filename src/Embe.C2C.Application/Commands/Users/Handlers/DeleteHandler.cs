@@ -41,44 +41,36 @@ public class DeleteHandler
             return Result.Failure(FailureReason.Forbidden, "You are not authorized to delete this user.");
         }
 
-        try
+        using var transaction = await _context.BeginTransactionAsync(cancellationToken);
+        var user = await _context.DomainUsers.FindAsync([command.UserId], cancellationToken);
+        if (user is null)
         {
-            using var transaction = await _context.BeginTransactionAsync(cancellationToken);
-            var user = await _context.DomainUsers.FindAsync([command.UserId], cancellationToken);
-            if (user is null)
-            {
-                return Result.Failure(FailureReason.NotFound, "User not found.");
-            }
-
-            var deleteIdentityUserResult = await _context.DeleteUserAsync(user.IdentityUserId, cancellationToken);
-            if (!deleteIdentityUserResult.IsSuccess)
-            {
-                return Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!);
-            }
-
-            var accounts = await _context.Accounts.Where(a => a.UserId == command.UserId).ToListAsync(cancellationToken);
-            _userService.Delete(user, [.. accounts]);
-
-            var domainEventCollectors = new DomainEventCollector[] { user, _userService }.Concat(accounts);
-            foreach (var domainEvent in domainEventCollectors.SelectMany(c => c.DomainEvents))
-            {
-                await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
-            }
-
-            _context.DomainUsers.Remove(user);
-            foreach (var account in accounts)
-            {
-                _context.Accounts.Remove(account);
-            }
-
-            await _context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure(FailureReason.Unknown, "An unknown error occurred");
+            return Result.Failure(FailureReason.NotFound, "User not found.");
         }
 
+        var deleteIdentityUserResult = await _context.DeleteUserAsync(user.IdentityUserId, cancellationToken);
+        if (!deleteIdentityUserResult.IsSuccess)
+        {
+            return Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!);
+        }
+
+        var accounts = await _context.Accounts.Where(a => a.UserId == command.UserId).ToListAsync(cancellationToken);
+        _userService.Delete(user, [.. accounts]);
+
+        var domainEventCollectors = new DomainEventCollector[] { user, _userService }.Concat(accounts);
+        foreach (var domainEvent in domainEventCollectors.SelectMany(c => c.DomainEvents))
+        {
+            await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
+        }
+
+        _context.DomainUsers.Remove(user);
+        foreach (var account in accounts)
+        {
+            _context.Accounts.Remove(account);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         return Result.Success();
     }
 }

@@ -26,7 +26,7 @@ function MyImage({ id, src, onRemove }: ImageProps) {
 }
 
 type ImageSelectorProps = {
-    onImageSelected?: (src: string) => void;
+    onImageSelected?: (image: { url: string, mimeType: string }) => void;
 }
 function ImageSelector({ onImageSelected }: ImageSelectorProps) {
 
@@ -39,7 +39,7 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const imageSrc = e.target?.result as string;
-                onImageSelected?.(imageSrc);
+                onImageSelected?.({ url: imageSrc, mimeType: file.type });
             }
             reader.readAsDataURL(file);
         }
@@ -61,7 +61,8 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
 }
 
 export type Image = {
-    src: string;
+    url: string;
+    mimeType: string;
 }
 
 export type ImageGalleryProps = {
@@ -98,10 +99,10 @@ export default function ImageGallery({ value, className, onChange, valid, errorM
             <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center`}>
                 {
                     imagesWithIds.map((image, index) => (
-                        <MyImage key={image.__id} id={image.__id} src={image.src} onRemove={() => onChange?.(value.filter((_, i) => i !== index))} />
+                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(value.filter((_, i) => i !== index))} />
                     ))
                 }
-                <ImageSelector onImageSelected={(src) => onChange?.([...value, { src }])} />
+                <ImageSelector onImageSelected={(image) => onChange?.([...value, image])} />
             </div>
             {!valid && errorMessage && <span className="error-message">{errorMessage}</span>}
         </DragDropProvider>

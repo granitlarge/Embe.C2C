@@ -11,7 +11,6 @@ public interface IAuthService
 
 public enum InvalidateRefreshTokenFailureReason
 {
-    UnknownError = 0,
     Unauthorized = 1
 }
 
@@ -21,12 +20,10 @@ public enum SignInFailureReason
     UserNotFound = 1,
     UserNotConfirmed = 2,
     TooManyAttempts = 3,
-    UnknownError = 4
 }
 
 public enum SignOutFailureReason
 {
-    UnknownError = 0,
     Unauthorized = 1
 }
 
@@ -34,5 +31,4 @@ public enum RefreshFailureReason
 {
     InvalidRefreshToken = 0,
     ExpiredRefreshToken = 1,
-    UnknownError = 5
 }

@@ -18,10 +18,10 @@ namespace Embe.C2C.Infrastructure.Ef.Contexts;
 public class C2CContext
 (
     DbContextOptions<C2CContext> options,
-    IPasswordHasher<MyIdentityUser> passwordHasher
+    UserManager<MyIdentityUser> userManager
 ) : IdentityDbContext<MyIdentityUser>(options), IC2CContext
 {
-    private readonly IPasswordHasher<MyIdentityUser> _passwordHasher = passwordHasher;
+    private readonly UserManager<MyIdentityUser> _userManager = userManager;
 
     public DbSet<User> DomainUsers { get; set; }
     public DbSet<Account> Accounts { get; set; }
@@ -30,51 +30,6 @@ public class C2CContext
     public DbSet<Notification> Notifications { get; set; }
 
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
-
-    public async Task<TypedResult<RegisterUserFailureReason, IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default)
-    {
-        var emailExists = await Users.AsNoTracking().AnyAsync(u => u.Email == email, cancellationToken);
-        if (emailExists)
-        {
-            return TypedResult<RegisterUserFailureReason, IIdentityUser>.Failure(RegisterUserFailureReason.EmailAlreadyExists, "Email already exists.");
-        }
-
-        var identityUser = new MyIdentityUser
-        {
-            UserName = email,
-            Email = email,
-        };
-
-        var passwordHash = _passwordHasher.HashPassword(identityUser, password);
-        identityUser.PasswordHash = passwordHash;
-
-        Users.Add(identityUser);
-        return TypedResult<RegisterUserFailureReason, IIdentityUser>.Success(identityUser);
-    }
-
-    public async Task<ResultBase<ResetPasswordFailureReason>> ResetPasswordAsync(string userId, string newPassword, CancellationToken cancellationToken = default)
-    {
-        var user = await Users.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        if (user == null)
-        {
-            return ResultBase<ResetPasswordFailureReason>.Failure(ResetPasswordFailureReason.UserNotFound, "User not found.");
-        }
-        var newPasswordHash = _passwordHasher.HashPassword(user, newPassword);
-        user.PasswordHash = newPasswordHash;
-        return ResultBase<ResetPasswordFailureReason>.Success();
-    }
-
-    public async Task<ResultBase<DeleteUserFailureReason>> DeleteUserAsync(string userId, CancellationToken cancellationToken = default)
-    {
-        var user = await Users.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        if (user == null)
-        {
-            return ResultBase<DeleteUserFailureReason>.Failure(DeleteUserFailureReason.UserNotFound, "User not found.");
-        }
-
-        Users.Remove(user);
-        return ResultBase<DeleteUserFailureReason>.Success();
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -90,5 +45,66 @@ public class C2CContext
     public Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
         return Database.CommitTransactionAsync(cancellationToken);
+    }
+
+    public async Task<TypedResult<RegisterUserFailureReason, IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default)
+    {
+        var identityUser = new MyIdentityUser { UserName = email, Email = email };
+        var result = await _userManager.CreateAsync(identityUser, password);
+        if (result.Succeeded)
+        {
+            return TypedResult<RegisterUserFailureReason, IIdentityUser>.Success(identityUser);
+        }
+        else
+        {
+            var failureReason = result.Errors.Any(e => e.Code == "PasswordTooShort" || e.Code == "PasswordRequiresNonAlphanumeric" || e.Code == "PasswordRequiresDigit" || e.Code == "PasswordRequiresUpper" || e.Code == "PasswordRequiresLower")
+                ? RegisterUserFailureReason.WeakPassword
+                : RegisterUserFailureReason.UnknownError;
+
+            return TypedResult<RegisterUserFailureReason, IIdentityUser>.Failure(failureReason, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+        }
+    }
+
+    public async Task<ResultBase<ResetPasswordFailureReason>> ResetPasswordAsync(string identityUserId, string newPassword, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(identityUserId);
+        if (user is null)
+        {
+            return ResultBase<ResetPasswordFailureReason>.Failure(ResetPasswordFailureReason.UserNotFound, "User not found.");
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        if (result.Succeeded)
+        {
+            return ResultBase<ResetPasswordFailureReason>.Success();
+        }
+        else
+        {
+            var failureReason = result.Errors.Any(e => e.Code == "PasswordTooShort" || e.Code == "PasswordRequiresNonAlphanumeric" || e.Code == "PasswordRequiresDigit" || e.Code == "PasswordRequiresUpper" || e.Code == "PasswordRequiresLower")
+                ? ResetPasswordFailureReason.WeakPassword
+                : ResetPasswordFailureReason.UnknownError;
+
+            return ResultBase<ResetPasswordFailureReason>.Failure(failureReason, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+        }
+    }
+
+    public async Task<ResultBase<DeleteUserFailureReason>> DeleteUserAsync(string identityUserId, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(identityUserId);
+        if (user is null)
+        {
+            return ResultBase<DeleteUserFailureReason>.Failure(DeleteUserFailureReason.UserNotFound, "User not found.");
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        if (result.Succeeded)
+        {
+            return ResultBase<DeleteUserFailureReason>.Success();
+        }
+        else
+        {
+            return ResultBase<DeleteUserFailureReason>.Failure(DeleteUserFailureReason.UnknownError, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+        }
     }
 }

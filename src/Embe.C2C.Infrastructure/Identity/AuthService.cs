@@ -7,7 +7,6 @@ using Embe.C2C.Infrastructure.Ef.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Embe.C2C.Infrastructure.Identity;
@@ -16,14 +15,12 @@ public class AuthService
 (
     IConfiguration configuration,
     Ef.Contexts.C2CContext context,
-    IOptions<IdentityOptions> identityOptions,
-    IPasswordHasher<MyIdentityUser> passwordHasher,
-    IAuthenticatedUserService userService
+    IAuthenticatedUserService userService,
+    SignInManager<MyIdentityUser> signInManager
 ) : IAuthService
 {
     private readonly Ef.Contexts.C2CContext _context = context;
-    private readonly IOptions<IdentityOptions> _identityOptions = identityOptions;
-    private readonly IPasswordHasher<MyIdentityUser> _passwordHasher = passwordHasher;
+    private readonly SignInManager<MyIdentityUser> _signInManager = signInManager;
     private readonly IAuthenticatedUserService _userService = userService;
     private readonly string _jwtAudience = configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT audience is not configured.");
     private readonly string _jwtIssuer = configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT issuer is not configured.");
@@ -97,41 +94,24 @@ public class AuthService
     public async Task<TypedResult<SignInFailureReason, Credentials>> SignInAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-        var identityUser = await _context.Users.SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
-        if (identityUser == null)
+
+        var signInResult = await _signInManager.PasswordSignInAsync(email, password, false, true);
+        if (!signInResult.Succeeded)
         {
-            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotFound, "User not found.");
+            return signInResult switch
+            {
+                { IsLockedOut: true } => TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.TooManyAttempts, "Too many failed attempts. Please try again later."),
+                { IsNotAllowed: true } => TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotConfirmed, "User account is not confirmed."),
+                _ => TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.InvalidCredentials, "Invalid email or password.")
+            };
         }
 
+        var identityUser = await _context.Users.SingleAsync(u => u.Email == email, cancellationToken);
         var user = await _context.DomainUsers.SingleAsync(u => u.Email.Value == email, cancellationToken);
         if (user == null)
         {
             return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotFound, "User not found.");
         }
-
-        var isLockedOut = identityUser.LockoutEnabled && identityUser.LockoutEnd > DateTimeOffset.UtcNow;
-        if (isLockedOut)
-        {
-            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.TooManyAttempts, "Too many failed attempts. Account is locked. Reset your password.");
-        }
-
-        var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(identityUser, identityUser.PasswordHash ?? string.Empty, password);
-        if (passwordVerificationResult == PasswordVerificationResult.Failed)
-        {
-            identityUser.AccessFailedCount++;
-            identityUser.LockoutEnabled = identityUser.AccessFailedCount >= _identityOptions.Value.Lockout.MaxFailedAccessAttempts;
-            identityUser.LockoutEnd = identityUser.LockoutEnabled ? DateTimeOffset.UtcNow.Add(_identityOptions.Value.Lockout.DefaultLockoutTimeSpan) : null;
-            await _context.SaveChangesAsync(cancellationToken);
-            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.InvalidCredentials, "Invalid credentials.");
-        }
-        else if (passwordVerificationResult == PasswordVerificationResult.SuccessRehashNeeded)
-        {
-            identityUser.PasswordHash = _passwordHasher.HashPassword(identityUser, password);
-        }
-
-        identityUser.AccessFailedCount = 0;
-        identityUser.LockoutEnabled = false;
-        identityUser.LockoutEnd = null;
 
         var credentials = GenerateCredentials(identityUser, user);
         var refreshTokenEntity = new RefreshTokenEntity(credentials.RefreshToken.Id, user.Id, credentials.RefreshToken.ExpiresAt);

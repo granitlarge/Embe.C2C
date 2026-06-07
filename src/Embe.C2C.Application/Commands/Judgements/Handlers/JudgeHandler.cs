@@ -50,46 +50,37 @@ public class JudgeHandler
         }
 
         var userId = _userService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-        try
+        using var transaction = await _context.BeginTransactionAsync();
+
+        var judge = await _context.DomainUsers.FindAsync([userId], cancellationToken);
+        if (judge == null)
         {
-
-            using var transaction = await _context.BeginTransactionAsync();
-
-            var judge = await _context.DomainUsers.FindAsync([userId], cancellationToken);
-            if (judge == null)
-            {
-                return Result<ResultType>.Failure(FailureReason.NotFound, "User not found.");
-            }
-
-            var judgee = await _context.DomainUsers.FindAsync([command.JudgeeUserId], cancellationToken);
-            if (judgee == null)
-            {
-                return Result<ResultType>.Failure(FailureReason.NotFound, "Judgee not found.");
-            }
-
-            var existingJudgement = await _context.Judgements.FindAsync([userId, command.JudgeeUserId], cancellationToken);
-            var oppositeJudgement = await _context.Judgements.FindAsync([command.JudgeeUserId, userId], cancellationToken);
-
-            var match = _judgementService.Judge(judge, judgee, command.IsPositive, existingJudgement, oppositeJudgement);
-            if (match != null)
-            {
-                _context.Matchings.Add(match);
-            }
-
-            await ProcessDomainEvents(cancellationToken, judge, judgee, existingJudgement, oppositeJudgement, match);
-
-            await _context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-
-            var matchingPermissions = match != null ? await _matchingAuthorizationPolicy.GetPermissionsAsync(match.Id, cancellationToken) : [];
-
-            return Result<ResultType>.Success(new ResultType(match, matchingPermissions));
-
+            return Result<ResultType>.Failure(FailureReason.NotFound, "User not found.");
         }
-        catch (Exception)
+
+        var judgee = await _context.DomainUsers.FindAsync([command.JudgeeUserId], cancellationToken);
+        if (judgee == null)
         {
-            return Result<ResultType>.Failure(FailureReason.Unknown, "An error occurred while processing the judgement.");
+            return Result<ResultType>.Failure(FailureReason.NotFound, "Judgee not found.");
         }
+
+        var existingJudgement = await _context.Judgements.FindAsync([userId, command.JudgeeUserId], cancellationToken);
+        var oppositeJudgement = await _context.Judgements.FindAsync([command.JudgeeUserId, userId], cancellationToken);
+
+        var match = _judgementService.Judge(judge, judgee, command.IsPositive, existingJudgement, oppositeJudgement);
+        if (match != null)
+        {
+            _context.Matchings.Add(match);
+        }
+
+        await ProcessDomainEvents(cancellationToken, judge, judgee, existingJudgement, oppositeJudgement, match);
+
+        await _context.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
+        var matchingPermissions = match != null ? await _matchingAuthorizationPolicy.GetPermissionsAsync(match.Id, cancellationToken) : [];
+
+        return Result<ResultType>.Success(new ResultType(match, matchingPermissions));
 
         async Task ProcessDomainEvents(CancellationToken cancellationToken = default, params DomainEventCollector?[] collectors)
         {

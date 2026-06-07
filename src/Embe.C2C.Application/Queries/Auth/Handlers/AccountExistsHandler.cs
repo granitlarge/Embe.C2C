@@ -12,16 +12,9 @@ public class AccountExistsHandler
         _authService = authService;
     }
 
-    public async Task<Result<bool>> HandleAsync(AccountExistsQuery query)
+    public async Task<Result<bool>> HandleAsync(AccountExistsQuery query, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var exists = await _authService.AccountExistsAsync(query.Email);
-            return Result<bool>.Success(exists);
-        }
-        catch (Exception)
-        {
-            return Result<bool>.Failure(FailureReason.Unknown, "An error occurred while checking if the account exists.");
-        }
+        var exists = await _authService.AccountExistsAsync(query.Email, cancellationToken);
+        return Result<bool>.Success(exists);
     }
 }

@@ -106,10 +106,6 @@ public class UpdateHandler
         {
             return Result<HandlerReturnType>.Failure(FailureReason.DomainError, "Invalid input data.");
         }
-        catch (Exception)
-        {
-            return Result<HandlerReturnType>.Failure(FailureReason.Unknown, "An unexpected error occurred.");
-        }
         finally
         {
             if (!success)

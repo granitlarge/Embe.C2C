@@ -5,9 +5,9 @@ import TextInput from "@/src/components/inputs/text-input/TextInput";
 import Link from "next/link";
 import { useState } from "react";
 import * as z from "zod";
-import { Login } from "../apis/Login";
 import { useRouter } from "next/navigation";
-import { LoginError } from "../types/login-error";
+import { SignIn } from "../actions/sign-in/actions";
+import { SignInError } from "../actions/sign-in/types";
 
 export default function LoginForm() {
 
@@ -33,15 +33,20 @@ export default function LoginForm() {
             setPasswordError(properties?.password?.errors?.[0]);
             return;
         } else {
-            clearErrors();
-            const response = await Login(userName!, password!);
-            if (response.success) {
-                router.replace("/home");
-                return;
+
+            const error = await SignIn(userName!, password!);
+            if (error) {
+                switch (error) {
+                    case SignInError.InvalidCredentials:
+                        setError("invalid credentials");
+                        break;
+                    default:
+                        setError("an unknown error occurred");
+                }
             } else {
-                const errorMessage = response.error === LoginError.InvalidCredentials ? "the username or password is incorrect" : "an unknown error occurred";
-                setError(errorMessage);
+                router.replace("/home");
             }
+
         }
 
     }

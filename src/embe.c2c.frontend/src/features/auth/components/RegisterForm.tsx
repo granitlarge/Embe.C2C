@@ -9,11 +9,11 @@ import DualRangeInput from "@/src/components/inputs/dual-range-input/DualRangeIn
 import ProgressBar from "@/src/components/progress-bar/ProgressBar";
 import ImageGallery from "@/src/components/inputs/image/gallery/ImageGallery";
 import * as z from "zod";
-import { checkAccountExists as checkAccountExists } from "../apis/AccountExists";
+import { accountExists as accountExists } from "../actions/account-exists/actions";
 import { useRouter } from "next/navigation";
 import TextInput from "@/src/components/inputs/text-input/TextInput";
-import { register } from "@/src/features/auth/apis/Register";
-import { Gender } from "@/src/shared/types/value-objects";
+import { register } from "@/src/features/auth/actions/register/actions";
+import { FileDetails, Gender, LengthUnit } from "@/src/shared/types/domain/value-objects";
 
 export type RegisterFormProps = {
     className?: string;
@@ -38,6 +38,7 @@ function EmailStep({ navigate, setEmail, value }: EmailStepProps) {
     const emailSchema = z.email({ message: "please enter a valid email" });
     const [email, setEmailState] = useState<string | undefined>(value);
     const [emailError, setEmailError] = useState<string | undefined>(undefined);
+    const [error, setError] = useState<string | undefined>(undefined);
 
     async function onNavigate() {
         const result = await emailSchema.safeParseAsync(email);
@@ -45,13 +46,16 @@ function EmailStep({ navigate, setEmail, value }: EmailStepProps) {
             setEmailError(result.error.issues[0].message);
             return;
         } else {
-            const accountExists = await checkAccountExists(email!);
-            if (accountExists) {
-                navigate("account exists")
+            const response = await accountExists(email!);
+            if (response.success) {
+                if (response.value!) {
+                    navigate("account exists")
+                } else {
+                    setEmail(result.data);
+                    navigate("password");
+                }
             } else {
-                setEmailError(undefined);
-                setEmail(result.data);
-                navigate("password");
+                setError("an unknown error occurred");
             }
         }
     }
@@ -59,6 +63,7 @@ function EmailStep({ navigate, setEmail, value }: EmailStepProps) {
     return (
         <div className="flex flex-col gap-3">
             <EmailInput value={email} onChange={setEmailState} valid={emailError === undefined} errorMessage={emailError} />
+            {error && <span className="error-message">{error}</span>}
             <Button className="max-w-xs" onClick={() => onNavigate()}>next</Button>
         </div>
     )
@@ -104,10 +109,14 @@ function PasswordStep({ navigate, setPassword }: PasswordStepProps) {
         }
     }
 
+    function clearErrors() {
+        setError(undefined);
+    }
+
     return (
         <div className="flex flex-col gap-3">
-            <TextInput label="password" type="password" value={password} onChange={setPasswordState} valid={error === undefined} errorMessage={undefined} />
-            <TextInput label="confirm password" type="password" value={confirmPassword} onChange={setConfirmPasswordState} valid={error === undefined} errorMessage={error} />
+            <TextInput label="password" type="password" value={password} onChange={(pw) => { setPasswordState(pw); clearErrors(); }} valid={error === undefined} errorMessage={undefined} />
+            <TextInput label="confirm password" type="password" value={confirmPassword} onChange={(pw) => { setConfirmPasswordState(pw); clearErrors(); }} valid={error === undefined} errorMessage={error} />
             <Button className="max-w-xs" onClick={next}>next</Button>
         </div>
     )
@@ -261,18 +270,17 @@ function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceRangeCha
 }
 
 type ImagesStepProps = {
-    navigate: (step: Step) => void;
-    setImages?: (images: { src: string }[]) => void;
+    finish?: (images: FileDetails[]) => void;
 }
-function ImagesStep({ navigate, setImages }: ImagesStepProps) {
-
+function ImagesStep({ finish }: ImagesStepProps) {
 
     const validationSchema = z.array(z.object({
-        src: z.url()
-    })).min(1, { message: "please add at least one image" })
+        url: z.url(),
+        mimeType: z.string(),
+    })).min(2, { message: "please add at least two images" })
         .max(10, { message: "you can add up to 10 images" });
 
-    const [images, setImagesState] = useState<{ src: string }[]>([]);
+    const [images, setImagesState] = useState<FileDetails[]>([]);
     const [imagesError, setImagesError] = useState<string | undefined>(undefined);
     function onNext() {
         const result = validationSchema.safeParse(images);
@@ -281,8 +289,7 @@ function ImagesStep({ navigate, setImages }: ImagesStepProps) {
             return;
         } else {
             setImagesError(undefined);
-            setImages?.(images);
-            navigate("success");
+            finish?.(images);
         }
     }
 
@@ -292,10 +299,12 @@ function ImagesStep({ navigate, setImages }: ImagesStepProps) {
             <Button className="max-w-xs" onClick={onNext}>next</Button>
         </div>
     )
+
 }
 
 export default function RegisterForm({ className }: RegisterFormProps) {
 
+    const router = useRouter();
     const classNames = [
         className
     ].filter(Boolean).join(" ");
@@ -309,7 +318,6 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     const [preferredGenders, setPreferredGenders] = useState<Gender[]>([]);
     const [preferredAgeRange, setPreferredAgeRange] = useState<{ lower: number, higher: number }>({ lower: 18, higher: 100 });
     const [preferredDistanceRange, setPreferredDistanceRange] = useState<{ lower: number, higher: number }>({ lower: 1, higher: 160 });
-    const [images, setImages] = useState<{ src: string }[]>([]);
 
     const steps = [
         "email",
@@ -320,9 +328,32 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     ]
 
     async function navigate(step: Step) {
+
         setStep(step);
-        if (step === "success") {
-            throw new Error("Not Implemented");
+    }
+
+    async function finish(images: FileDetails[]) {
+        const response = await register({
+            email,
+            password,
+            birthDate,
+            gender,
+            datingPreferences: {
+                interestedInGenders: preferredGenders,
+                ageRangeMin: preferredAgeRange.lower,
+                ageRangeMax: preferredAgeRange.higher,
+                maximumDistance: {
+                    value: preferredDistanceRange.higher,
+                    unit: LengthUnit.Kilometers
+                }
+            },
+            files: images
+        });
+
+        if (response.success) {
+            router.push("/login");
+        } else {
+
         }
     }
 
@@ -335,7 +366,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
                 step === "password" && <PasswordStep navigate={navigate} setPassword={setPassword} /> ||
                 step === "profile" && <ProfileStep navigate={navigate} setGender={setGender} setBirthDate={setBirthDate} /> ||
                 step === "dating preferences" && <PreferencesStep navigate={navigate} onGendersChange={setPreferredGenders} onAgeRangeChange={setPreferredAgeRange} onDistanceRangeChange={setPreferredDistanceRange} /> ||
-                step === "images" && <ImagesStep navigate={navigate} setImages={setImages} /> ||
+                step === "images" && <ImagesStep finish={finish} /> ||
                 step === "account exists" && <AccountExistsStep />
             }
         </div>

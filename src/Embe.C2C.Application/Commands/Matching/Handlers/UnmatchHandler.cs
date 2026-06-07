@@ -39,28 +39,22 @@ public class UnmatchHandler
         }
 
         var actorId = _userService.UserId ?? throw new InvalidOperationException("Unauthorized"); ;
-        try
+        using var transaction = await _context.BeginTransactionAsync(cancellationToken);
+        var matching = await _context.Matchings.FindAsync([command.MatchingId], cancellationToken);
+        if (matching == null)
         {
-            using var transaction = await _context.BeginTransactionAsync(cancellationToken);
-            var matching = await _context.Matchings.FindAsync([command.MatchingId], cancellationToken);
-            if (matching == null)
-            {
-                return Result.Failure(FailureReason.NotFound, "Matching not found.");
-            }
+            return Result.Failure(FailureReason.NotFound, "Matching not found.");
+        }
 
-            matching.Remove(actorId);
-            foreach (var domainEvent in matching.DomainEvents)
-            {
-                await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
-            }
-            _context.Matchings.Remove(matching);
-            await _context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch (Exception)
+        matching.Remove(actorId);
+        foreach (var domainEvent in matching.DomainEvents)
         {
-            return Result.Failure(FailureReason.Unknown, "An error occurred while unmatching.");
+            await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
         }
+        _context.Matchings.Remove(matching);
+        await _context.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
 
         return Result.Success();
     }

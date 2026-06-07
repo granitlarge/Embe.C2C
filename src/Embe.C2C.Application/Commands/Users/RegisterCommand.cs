@@ -11,6 +11,5 @@ public sealed record RegisterCommand
     DateOnly BirthDate,
     Gender Gender,
     DatingPreferencesDto DatingPreferences,
-    LocationDto Location,
     ImmutableHashSet<FileDetailsDto> Files
 );

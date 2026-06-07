@@ -56,7 +56,6 @@ public class RegisterHandler
                 new Age(command.DatingPreferences.AgeRangeMax),
                 new Distance(command.DatingPreferences.MaximumDistance.Value, command.DatingPreferences.MaximumDistance.Unit)
             );
-            var location = new Location(command.Location.Latitude, command.Location.Longitude);
             var files = new HashSet<FileDetails>();
             var identityUserId = registerUserResult.Value!.Id;
 
@@ -68,7 +67,7 @@ public class RegisterHandler
             }
 
             success = true;
-            var user = User.Register(email, birthDate, gender, datingPreferences, location, [.. files], identityUserId);
+            var user = User.Register(email, birthDate, gender, datingPreferences, location: null, [.. files], identityUserId);
             _context.DomainUsers.Add(user);
             foreach (var domainEvent in user.DomainEvents)
             {
@@ -83,10 +82,6 @@ public class RegisterHandler
         catch (DomainException ex)
         {
             return TypedResult<RegisterUserFailureReason, User>.Failure(RegisterUserFailureReason.DomainError, ex.Message);
-        }
-        catch (Exception)
-        {
-            return TypedResult<RegisterUserFailureReason, User>.Failure(RegisterUserFailureReason.Unknown, $"An unexpected error occurred.");
         }
         finally
         {
@@ -115,5 +110,6 @@ public enum RegisterUserFailureReason
     EmailAlreadyExists,
     DomainError,
     WeakPassword,
-    Unknown
+    Unknown,
+    UnknownError
 }

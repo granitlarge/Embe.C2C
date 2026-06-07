@@ -66,10 +66,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Location)
             .HasConversion(
-                location => new Point(location.Longitude, location.Latitude),
-                value => new Domain.ValueObjects.Location(value.Y, value.X)
-            )
-            .IsRequired();
+                location => location == null ? null : new Point(location.Longitude, location.Latitude),
+                value => value == null ? null : new Domain.ValueObjects.Location(value.Y, value.X)
+            );
 
         builder.HasIndex(u => u.Email).IsUnique();
         builder.HasIndex(u => u.IdentityUserId).IsUnique();
