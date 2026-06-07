@@ -2,6 +2,7 @@ using System.Data;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.EventHandlers;
@@ -17,19 +18,22 @@ public class RegisterHandler
     private readonly IFileService _fileService;
     private readonly DomainEventHandler _domainEventHandler;
     private readonly IWorkItemService _workItemService;
+    private readonly IAuthService _authService;
 
     public RegisterHandler
     (
         IC2CContext context,
         IFileService fileService,
         DomainEventHandler domainEventHandler,
-        IWorkItemService workItemService
+        IWorkItemService workItemService,
+        IAuthService authService
     )
     {
         _context = context;
         _fileService = fileService;
         _domainEventHandler = domainEventHandler;
         _workItemService = workItemService;
+        _authService = authService;
     }
 
     public async Task<TypedResult<RegisterUserFailureReason, User>> HandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
@@ -40,7 +44,7 @@ public class RegisterHandler
         try
         {
             using var transaction = await _context.BeginTransactionAsync(cancellationToken);
-            var registerUserResult = await _context.RegisterUserAsync(command.Email, command.Password, cancellationToken);
+            var registerUserResult = await _authService.RegisterUserAsync(command.Email, command.Password, cancellationToken);
             if (!registerUserResult.IsSuccess)
             {
                 return TypedResult<RegisterUserFailureReason, User>.Failure(registerUserResult.Reason, registerUserResult.Message!);

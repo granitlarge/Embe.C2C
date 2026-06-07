@@ -1,5 +1,6 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
+using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
@@ -14,19 +15,22 @@ public class DeleteHandler
     private readonly UserAuthorizationPolicy _authorizationPolicy;
     private readonly UserService _userService;
     private readonly DomainEventHandler _domainEventHandler;
+    private readonly IAuthService _authService;
 
     public DeleteHandler
     (
         IC2CContext context,
         UserAuthorizationPolicy authorizationPolicy,
         UserService userService,
-        DomainEventHandler domainEventHandler
+        DomainEventHandler domainEventHandler,
+        IAuthService authService
     )
     {
         _context = context;
         _authorizationPolicy = authorizationPolicy;
         _userService = userService;
         _domainEventHandler = domainEventHandler;
+        _authService = authService;
     }
 
     public async Task<Result> HandleAsync
@@ -48,7 +52,7 @@ public class DeleteHandler
             return Result.Failure(FailureReason.NotFound, "User not found.");
         }
 
-        var deleteIdentityUserResult = await _context.DeleteUserAsync(user.IdentityUserId, cancellationToken);
+        var deleteIdentityUserResult = await _authService.DeleteUserAsync(user.IdentityUserId, cancellationToken);
         if (!deleteIdentityUserResult.IsSuccess)
         {
             return Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!);

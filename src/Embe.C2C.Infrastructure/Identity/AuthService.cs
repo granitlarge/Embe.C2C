@@ -2,7 +2,9 @@ using System.Text;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
+using Embe.C2C.Application.Commands.Users.Handlers;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,15 +18,18 @@ public class AuthService
     IConfiguration configuration,
     Ef.Contexts.C2CContext context,
     IAuthenticatedUserService userService,
-    SignInManager<MyIdentityUser> signInManager
+    SignInManager<MyIdentityUser> signInManager,
+    UserManager<MyIdentityUser> userManager
 ) : IAuthService
 {
     private readonly Ef.Contexts.C2CContext _context = context;
     private readonly SignInManager<MyIdentityUser> _signInManager = signInManager;
+    private readonly UserManager<MyIdentityUser> _userManager = userManager;
     private readonly IAuthenticatedUserService _userService = userService;
     private readonly string _jwtAudience = configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT audience is not configured.");
     private readonly string _jwtIssuer = configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT issuer is not configured.");
-    private readonly string _jwtSecret = configuration["Jwt:Secret"] ?? throw new InvalidOperationException("JWT secret is not configured.");
+    private readonly string _jwtSecretAccessToken = configuration["Jwt:Secrets:AccessToken"] ?? throw new InvalidOperationException("JWT secret is not configured.");
+    private readonly string _jwtSecretRefreshToken = configuration["Jwt:Secrets:RefreshToken"] ?? throw new InvalidOperationException("JWT secret is not configured.");
 
     private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan _refreshTokenLifetime = TimeSpan.FromDays(7);
@@ -32,7 +37,7 @@ public class AuthService
     public async Task<TypedResult<RefreshFailureReason, Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
     {
         var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecretAccessToken));
         try
         {
 
@@ -107,7 +112,7 @@ public class AuthService
         }
 
         var identityUser = await _context.Users.SingleAsync(u => u.Email == email, cancellationToken);
-        var user = await _context.DomainUsers.SingleAsync(u => u.Email.Value == email, cancellationToken);
+        var user = await _context.DomainUsers.SingleAsync(u => u.Email == Email.Create(email), cancellationToken);
         if (user == null)
         {
             return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotFound, "User not found.");
@@ -153,7 +158,7 @@ public class AuthService
 
     private AccessToken GenerateAccessToken(RefreshToken refreshToken, IdentityUser identityUser, User user)
     {
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecretAccessToken));
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
@@ -178,7 +183,7 @@ public class AuthService
     private RefreshToken GenerateRefreshToken(IdentityUser identityUser, User user)
     {
         var tokenId = Guid.CreateVersion7();
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecretRefreshToken));
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
@@ -221,10 +226,9 @@ public class AuthService
         return TypedResult<InvalidateRefreshTokenFailureReason, bool>.Success(true);
     }
 
-    private RefreshToken ParseRefreshToken(string refreshTokenValue)
+    private static RefreshToken ParseRefreshToken(string refreshTokenValue)
     {
         var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
         var principal = tokenHandler.ReadJwtToken(refreshTokenValue);
 
         var refreshTokenIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "tokenId");
@@ -240,5 +244,66 @@ public class AuthService
     public async Task<bool> AccountExistsAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _context.Users.AnyAsync(u => u.Email == email, cancellationToken);
+    }
+
+    public async Task<TypedResult<RegisterUserFailureReason, IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default)
+    {
+        var identityUser = new MyIdentityUser { UserName = email, Email = email };
+        var result = await _userManager.CreateAsync(identityUser, password);
+        if (result.Succeeded)
+        {
+            return TypedResult<RegisterUserFailureReason, IIdentityUser>.Success(identityUser);
+        }
+        else
+        {
+            var failureReason = result.Errors.Any(e => e.Code == "PasswordTooShort" || e.Code == "PasswordRequiresNonAlphanumeric" || e.Code == "PasswordRequiresDigit" || e.Code == "PasswordRequiresUpper" || e.Code == "PasswordRequiresLower")
+                ? RegisterUserFailureReason.WeakPassword
+                : RegisterUserFailureReason.UnknownError;
+
+            return TypedResult<RegisterUserFailureReason, IIdentityUser>.Failure(failureReason, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+        }
+    }
+
+    public async Task<ResultBase<ResetPasswordFailureReason>> ResetPasswordAsync(string identityUserId, string newPassword, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(identityUserId);
+        if (user is null)
+        {
+            return ResultBase<ResetPasswordFailureReason>.Failure(ResetPasswordFailureReason.UserNotFound, "User not found.");
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        if (result.Succeeded)
+        {
+            return ResultBase<ResetPasswordFailureReason>.Success();
+        }
+        else
+        {
+            var failureReason = result.Errors.Any(e => e.Code == "PasswordTooShort" || e.Code == "PasswordRequiresNonAlphanumeric" || e.Code == "PasswordRequiresDigit" || e.Code == "PasswordRequiresUpper" || e.Code == "PasswordRequiresLower")
+                ? ResetPasswordFailureReason.WeakPassword
+                : ResetPasswordFailureReason.UnknownError;
+
+            return ResultBase<ResetPasswordFailureReason>.Failure(failureReason, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+        }
+    }
+
+    public async Task<ResultBase<DeleteUserFailureReason>> DeleteUserAsync(string identityUserId, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(identityUserId);
+        if (user is null)
+        {
+            return ResultBase<DeleteUserFailureReason>.Failure(DeleteUserFailureReason.UserNotFound, "User not found.");
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        if (result.Succeeded)
+        {
+            return ResultBase<DeleteUserFailureReason>.Success();
+        }
+        else
+        {
+            return ResultBase<DeleteUserFailureReason>.Failure(DeleteUserFailureReason.UnknownError, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+        }
     }
 }

@@ -6,14 +6,14 @@ import { AccessTokenName, RefreshTokenName } from "@/src/shared/security/constan
 import { saveToken } from "@/src/shared/security/functions";
 import { SignInError } from "./types";
 
-export async function SignIn(username: string, password: string): Promise<SignInError | undefined> {
+export async function SignIn(email: string, password: string): Promise<SignInError | undefined> {
 
     const response = await SendRequest<Credentials, SignInError>(new Request(`${process.env.API_URL}/api/auth/signin`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
     }), false);
 
     if (response.success) {
