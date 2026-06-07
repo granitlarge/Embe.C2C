@@ -23,6 +23,6 @@ export async function SignIn(email: string, password: string): Promise<SignInErr
         ]);
     }
 
-    return response.success ? undefined : response.error;
+    return response.success ? undefined : response.reason;
 
 }

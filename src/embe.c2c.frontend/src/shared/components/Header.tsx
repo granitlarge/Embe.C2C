@@ -1,4 +1,4 @@
-export default function Header() {
+export default async function Header() {
     return (
         <header>
             HEADER

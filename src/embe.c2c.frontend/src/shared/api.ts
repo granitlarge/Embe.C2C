@@ -9,6 +9,20 @@ type RefreshAccessTokenResponse = {
     accessToken: Token;
 }
 
+async function parseResponse<T>(response: Response) : Promise<T | undefined>
+{
+    try {
+        const contentType = response.headers.get("Content-Type");
+        if (contentType && contentType.includes("application/json")) {
+            const responseBody = await response.json();
+            return responseBody as T;
+        }
+    } catch (error) {
+
+    }
+    return undefined;
+}
+
 async function refreshAccessToken(): Promise<Token | undefined> {
     const refreshToken = await getRefreshToken();
     if (!refreshToken) {
@@ -49,7 +63,8 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
 
     const response = await fetch(request);
     if (response.ok) {
-        return await parseResponse(response);
+        const parsedResponse = await parseResponse<T>(response);
+        return parsedResponse!;
     }
 
     if (response.status === 401) {
@@ -62,7 +77,8 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
         request.headers.set("Authorization", `Bearer ${newAccessToken.token}`);
         const retryResponse = await fetch(request);
         if (retryResponse.ok) {
-            return await parseResponse(retryResponse);
+            const parsedRetryResponse = await parseResponse<T>(retryResponse);
+            return parsedRetryResponse!;
         }
 
         if (retryResponse.status === 401) {
@@ -72,22 +88,21 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
         }
     }
 
+    const parsedErrorResponse = await parseResponse<T>(response);
+    if (parsedErrorResponse) {
+        return parsedErrorResponse;
+    }
+
     const error = await ApiError.fromResponse(response);
     throw error;
-
-    async function parseResponse<T>(response: Response): Promise<T> {
-        const responseBody = await response.json();;
-        return responseBody as T;
-    }
 }
 
 async function SendUnauthenticatedRequest<T>(request: Request): Promise<T> {
     const response = await fetch(request);
-    if (response.ok) {
-        const responseBody = await response.json();
-        return responseBody as T;
+    const parsedResponse = await parseResponse<T>(response);
+    if (parsedResponse) {
+        return parsedResponse;
     }
-
     const error = await ApiError.fromResponse(response);
     throw error;
 }
@@ -95,7 +110,8 @@ async function SendUnauthenticatedRequest<T>(request: Request): Promise<T> {
 export type ApiResponse<T_Value, T_Error> = {
     success: boolean;
     value?: T_Value;
-    error?: T_Error;
+    reason?: T_Error;
+    message?: string;
 }
 
 export enum FailureReason {

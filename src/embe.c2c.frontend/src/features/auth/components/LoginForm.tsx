@@ -1,7 +1,7 @@
 "use client";
 
-import Button from "@/src/components/buttons/Button";
-import TextInput from "@/src/components/inputs/text-input/TextInput";
+import Button from "@/src/shared/components/buttons/Button";
+import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import Link from "next/link";
 import { useState } from "react";
 import * as z from "zod";
@@ -35,7 +35,7 @@ export default function LoginForm() {
         } else {
 
             const error = await SignIn(userName!, password!);
-            if (error) {
+            if (error !== undefined) {
                 switch (error) {
                     case SignInError.InvalidCredentials:
                         setError("invalid credentials");
@@ -69,7 +69,7 @@ export default function LoginForm() {
                 clearErrors();
             }} />
             {error && <span className="error-message">{error}</span>}
-            <Button className="max-w-xs" onClick={login} disabled={usernameError !== undefined || passwordError !== undefined || error !== undefined}>login</Button>
+            <Button className="max-w-xs" onClick={login}>login</Button>
         </div>
     )
 

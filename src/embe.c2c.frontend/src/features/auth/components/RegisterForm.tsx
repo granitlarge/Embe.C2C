@@ -1,19 +1,19 @@
 "use client";
 
-import Button from "@/src/components/buttons/Button";
-import { EmailInput } from "@/src/components/inputs/email-input/EmailInput";
+import Button from "@/src/shared/components/buttons/Button";
+import { EmailInput } from "@/src/shared/components/inputs/email-input/EmailInput";
 import { useState } from "react";
-import DateInput from "@/src/components/inputs/date-input/DateInput";
-import SelectInput from "@/src/components/inputs/select-input/SelectInput";
-import DualRangeInput from "@/src/components/inputs/dual-range-input/DualRangeInput";
-import ProgressBar from "@/src/components/progress-bar/ProgressBar";
-import ImageGallery from "@/src/components/inputs/image/gallery/ImageGallery";
+import ProgressBar from "@/src/shared/components/progress-bar/ProgressBar";
+import ImageGallery from "@/src/shared/components/inputs/image/gallery/ImageGallery";
 import * as z from "zod";
 import { accountExists as accountExists } from "../actions/account-exists/actions";
 import { useRouter } from "next/navigation";
-import TextInput from "@/src/components/inputs/text-input/TextInput";
+import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { register } from "@/src/features/auth/actions/register/actions";
 import { FileDetails, Gender, LengthUnit } from "@/src/shared/types/domain/value-objects";
+import ProfileForm, { ProfileFormData } from "./ProfileForm";
+import DatingPreferencesForm, { DatingPreferencesFormData } from "./DatingPreferencesForm";
+import { ImagesFormData } from "./ImagesForm";
 
 export type RegisterFormProps = {
     className?: string;
@@ -136,40 +136,21 @@ function ProfileStep({ navigate, setGender, setBirthDate }: ProfileStepProps) {
 
     const minDate = `${year - 120}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
     const maxDate = `${year - 18}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
-    const [birthDate, setBirthDateState] = useState(maxDate);
-
-    const genders = [
-        { value: Gender.Male.toString(), label: "male" },
-        { value: Gender.Female.toString(), label: "female" },
-        { value: Gender.TransMale.toString(), label: "trans male" },
-        { value: Gender.TransFemale.toString(), label: "trans female" },
-        { value: Gender.Other.toString(), label: "other" },
-    ];
-    const [gender, setGenderState] = useState(genders[0].value);
+    const [profileData, setProfileData] = useState<ProfileFormData>({
+        birthDateRange: { lower: minDate, higher: maxDate },
+        birthDate: maxDate,
+        gender: Gender.Male
+    });
 
     function onNext() {
-        setGender
-            (
-                gender === "male" ? Gender.Male :
-                    gender === "female" ? Gender.Female :
-                        gender === "trans male" ? Gender.TransMale :
-                            gender === "trans female" ? Gender.TransFemale :
-                                Gender.Other
-            );
-        setBirthDate(birthDate);
+        setGender(profileData.gender);
+        setBirthDate(profileData.birthDate);
         navigate("dating preferences");
     }
 
     return (
         <div className="flex flex-col gap-3 items-center w-full">
-            <DateInput
-                label={"date of birth"}
-                minDate={minDate}
-                maxDate={maxDate}
-                value={birthDate}
-                onChange={setBirthDateState}
-            />
-            <SelectInput className="w-full" label="gender" options={genders} value={[gender]} onChange={(genders) => setGenderState(genders[0])} />
+            <ProfileForm data={profileData} onChange={setProfileData} />
             <Button className="max-w-xs" onClick={onNext}>next</Button>
         </div>
     )
@@ -184,87 +165,41 @@ type PreferencesStepProps = {
 function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceRangeChange, navigate }: PreferencesStepProps) {
 
     const validationSchema = z.object({
-        preferredGenders: z.array(z.nativeEnum(Gender)).min(1, { message: "please select at least one gender" }),
+        genders: z.array(z.enum(Gender)).min(1, { message: "please select at least one gender" }),
     });
-
-    const [gendersError, setGendersError] = useState<string | undefined>(undefined);
-
-    const genders = [
-        { value: Gender.Male.toString(), label: "male" },
-        { value: Gender.Female.toString(), label: "female" },
-        { value: Gender.TransMale.toString(), label: "trans male" },
-        { value: Gender.TransFemale.toString(), label: "trans female" },
-        { value: Gender.Other.toString(), label: "other" },
-    ];
 
     const minAgeRange = 18;
     const maxAgeRange = 100;
-    const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
-    const [ageRange, setAgeRange] = useState<{ lower: number, higher: number }>({ lower: minAgeRange, higher: maxAgeRange });
     const minDistanceRange = 0;
     const maxDistanceRange = 160;
-    const [distanceRange, setDistanceRange] = useState<{ lower: number, higher: number }>({ lower: minDistanceRange, higher: maxDistanceRange });
+
+    const [datingPreferencesData, setDatingPreferencesData] = useState<DatingPreferencesFormData>({
+        genders: [],
+        ageRange: { lower: minAgeRange, higher: maxAgeRange },
+        distanceRange: { lower: minDistanceRange, higher: maxDistanceRange },
+        gendersError: undefined
+    });
 
     function next() {
 
-        const result = validationSchema.safeParse({
-            preferredGenders: selectedGenders.map(g => g === "male" ? Gender.Male :
-                g === "female" ? Gender.Female :
-                    g === "trans male" ? Gender.TransMale :
-                        g === "trans female" ? Gender.TransFemale :
-                            Gender.Other
-            )
-        });
+        const result = validationSchema.safeParse(datingPreferencesData);
 
         if (!result.success) {
-            setGendersError(result.error.issues[0].message);
+            const properties = z.treeifyError(result.error).properties;
+            setDatingPreferencesData(prev => ({ ...prev, gendersError: properties?.genders?.errors?.[0] }));
             return;
         }
 
-        onGendersChange?.(
-            selectedGenders.map(g => g === "male" ? Gender.Male :
-                g === "female" ? Gender.Female :
-                    g === "trans male" ? Gender.TransMale :
-                        g === "trans female" ? Gender.TransFemale :
-                            Gender.Other
-            )
-        );
-        onAgeRangeChange?.(ageRange);
-        onDistanceRangeChange?.(distanceRange);
+        onGendersChange?.(datingPreferencesData.genders);
+        onAgeRangeChange?.(datingPreferencesData.ageRange);
+        onDistanceRangeChange?.(datingPreferencesData.distanceRange);
         navigate("images");
     }
 
     return (
         <div className="flex flex-col gap-3 w-full items-center">
-            <SelectInput
-                options={genders}
-                multiple={true}
-                value={selectedGenders}
-                onChange={setSelectedGenders} label={"genders"}
-                valid={gendersError === undefined}
-                errorMessage={gendersError}
-            />
-            <div className="flex flex-col gap-8 w-full items-center">
-                <DualRangeInput
-                    label={"age"}
-                    min={minAgeRange}
-                    max={maxAgeRange}
-                    step={1}
-                    value={[ageRange.lower, ageRange.higher]}
-                    minStepsBetweenThumbs={1}
-                    onChange={(value: [number, number]) => setAgeRange({ lower: value[0], higher: value[1] })}
-                />
-                <DualRangeInput
-                    label={"distance (km)"}
-                    min={minDistanceRange}
-                    max={maxDistanceRange}
-                    step={1}
-                    value={[distanceRange.lower, distanceRange.higher]}
-                    minStepsBetweenThumbs={1}
-                    onChange={(value: [number, number]) => setDistanceRange({ lower: value[0], higher: value[1] })}
-                />
-                <Button className="max-w-xs" onClick={next}>next</Button>
-            </div>
+            <DatingPreferencesForm data={datingPreferencesData} onChange={setDatingPreferencesData} />
+            <Button className="max-w-xs" onClick={next}>next</Button>
         </div>
     )
 }
@@ -280,22 +215,24 @@ function ImagesStep({ finish }: ImagesStepProps) {
     })).min(2, { message: "please add at least two images" })
         .max(10, { message: "you can add up to 10 images" });
 
-    const [images, setImagesState] = useState<FileDetails[]>([]);
-    const [imagesError, setImagesError] = useState<string | undefined>(undefined);
+    const [imagesData, setImagesData] = useState<ImagesFormData>({
+        images: [],
+        imagesError: undefined
+    });
+
     function onNext() {
-        const result = validationSchema.safeParse(images);
+        const result = validationSchema.safeParse(imagesData.images);
         if (!result.success) {
-            setImagesError(result.error.issues[0].message);
+            setImagesData(prev => ({ ...prev, imagesError: result.error.issues[0].message }));
             return;
         } else {
-            setImagesError(undefined);
-            finish?.(images);
+            finish?.(imagesData.images);
         }
     }
 
     return (
         <div className="flex flex-col gap-3 w-full items-center">
-            <ImageGallery value={images} onChange={(newImages) => setImagesState(newImages)} valid={imagesError === undefined} errorMessage={imagesError} />
+            <ImageGallery value={imagesData.images} onChange={(newImages) => setImagesData(prev => ({ ...prev, images: newImages }))} valid={imagesData.imagesError === undefined} errorMessage={imagesData.imagesError} />
             <Button className="max-w-xs" onClick={onNext}>next</Button>
         </div>
     )
