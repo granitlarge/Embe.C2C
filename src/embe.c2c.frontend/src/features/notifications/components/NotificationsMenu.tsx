@@ -1,5 +1,4 @@
 "use client";
-
 import { Bell } from "@deemlol/next-icons"
 import { useEffect, useRef, useState } from "react";
 import useNotificationStore from "../stores";
@@ -10,11 +9,8 @@ import { MatchingCreatedNotificationIntegrationEntity } from "@/src/shared/types
 import { formatTimeAgo } from "@/src/shared/time";
 import Link from "next/link";
 import Image from "next/image";
-
-type NotificationProps = {
-    remove: () => void;
-    notification: NotificationTypeDef;
-}
+import Mail from "@/src/shared/components/icons/Mail";
+import Trash from "@/src/shared/components/icons/Trash";
 
 type NotificationContent = {
     title: string;
@@ -22,7 +18,6 @@ type NotificationContent = {
     imageUrl?: string
     linkUrl?: string
 }
-
 function getNotificationContent(notification: NotificationTypeDef): NotificationContent {
 
     let title = "";
@@ -50,13 +45,21 @@ function getNotificationContent(notification: NotificationTypeDef): Notification
 
 }
 
-function Notification({ remove, notification }: NotificationProps) {
+type NotificationProps = {
+    remove: () => void;
+    markAsUnread: () => void;
+    markAsRead: () => void;
+    notification: NotificationTypeDef;
+}
+
+function Notification({ markAsRead, remove, markAsUnread, notification }: NotificationProps) {
 
     const timeAgo = formatTimeAgo(notification.createdAt);
     const { title, content, imageUrl, linkUrl } = getNotificationContent(notification);
 
     const classNames = [
         "flex flex-row gap-0 p-3 w-full border border-(--color-tertiary) rounded-lg",
+        notification.isRead ? "bg-(--color-quaternary)" : "bg-(--color-quaternary-light)",
         linkUrl ? "cursor-pointer" : "",
     ].filter(Boolean).join(" ");
 
@@ -76,11 +79,18 @@ function Notification({ remove, notification }: NotificationProps) {
             <div className="flex flex-row gap-5 items-center">
                 {imageUrl && <Image src={imageUrl} alt="notification image" width={0} height={0} className="w-20 h-20 rounded-full" />}
                 <div className="flex flex-col gap-0">
-                    <span className="text-(--color-secondary) text-(length:--fs-7)">{title}</span>
-                    <span className="text-(length:--fs-md) text-(--color-tertiary)">{content}</span>
+                    <span className="text-(--color-secondary) text-(length:--fs-6)">{title}</span>
+                    <span className="text-(length:--fs-lg) text-(--color-tertiary)">{content}</span>
                 </div>
             </div>
-            <div className="ml-auto mt-auto text-(--color-tertiary) text-(length:--fs-sm)">{timeAgo}</div>
+            <div className="ml-auto flex flex-col gap-2 mt-auto mb-auto items-center">
+                <div className="flex flex-row gap-2">
+                    {!notification.isRead && <Mail title="mark as read" color="white" unread={false} className="cursor-pointer" onClick={markAsRead} />}
+                    {notification.isRead && <Mail title="mark as unread" color="white" unread={true} className="cursor-pointer" onClick={markAsUnread} />}
+                    <Trash title="remove" className="text-(--color-secondary) cursor-pointer" onClick={remove} />
+                </div>
+                <div className="ml-auto text-(--color-tertiary) text-(length:--fs-md)">{timeAgo}</div>
+            </div>
         </>
     )
 
@@ -106,9 +116,6 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
         if (hidden) {
             dialog.current?.close();
         } else {
-            if (notifications.some((notification) => !notification.isRead)) {
-                setNotifications(notifications.map((notification) => ({ ...notification, isRead: true })));
-            }
             dialog.current?.showModal();
         }
         dialog.current?.addEventListener("close", close);
@@ -117,8 +124,26 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
         }
     }, [hidden, closed, setNotifications, notifications]);
 
-    async function removeNotification(id: string) {
-        setNotifications(notifications.filter((notification) => notification.id !== id));
+    async function remove(notificationId: string) {
+        setNotifications(notifications.filter((notification) => notification.id !== notificationId));
+    }
+
+    async function markAsUnread(notificationId: string) {
+        setNotifications(notifications.map((notification) => {
+            if (notification.id === notificationId) {
+                return { ...notification, isRead: false };
+            }
+            return notification;
+        }));
+    }
+
+    async function markAsRead(notificationId: string) {
+        setNotifications(notifications.map((notification) => {
+            if (notification.id === notificationId) {
+                return { ...notification, isRead: true,};
+            }
+            return notification;
+        }));
     }
 
     const classNames = [
@@ -128,7 +153,7 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
     return (
         <div className={`${classNames} fixed top-0 left-0 w-[100dvw] h-[100dvh] flex flex-col items-center justify-center backdrop-blur-xs`}>
             <Modal ref={dialog} className={`
-                flex flex-col items-center
+                flex flex-col items-center gap-5
                 ${styles.modal}
                 z-1000 
                 p-5 
@@ -141,12 +166,14 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
                 `} closedby="any">
                 <h2 className="mr-auto ml-auto text-(--color-tertiary)">notifications</h2>
                 {
-                    notifications.length === 0 ? <span>no notifications yet</span> :
+                    notifications.length === 0 ? <span className="text-(length:--fs-6)">no notifications</span> :
                         notifications.map((notification) => (
                             <Notification
                                 key={notification.id}
                                 notification={notification}
-                                remove={() => removeNotification(notification.id)}
+                                remove={() => remove(notification.id)}
+                                markAsUnread={() => markAsUnread(notification.id)}
+                                markAsRead={() => markAsRead(notification.id)}
                             />
                         ))
                 }

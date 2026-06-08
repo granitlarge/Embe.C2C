@@ -102,9 +102,9 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
 
 public enum RegisterUserFailureReason
 {
-    EmailAlreadyExists,
-    DomainError,
-    WeakPassword,
-    Unknown,
-    UnknownError
+    EmailAlreadyExists = 0,
+    DomainError = 1,
+    WeakPassword = 2,
+    Unknown = 3,
+    UnknownError = 4
 }

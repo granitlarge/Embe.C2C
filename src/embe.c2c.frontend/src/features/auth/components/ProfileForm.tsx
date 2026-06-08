@@ -13,9 +13,10 @@ export type ProfileFormData = {
 export type ProfileFormProps = {
     data: ProfileFormData;
     onChange: (data: ProfileFormData) => void;
+    errorMessage?: string;
 }
 
-export default function ProfileForm({ data, onChange }: ProfileFormProps) {
+export default function ProfileForm({ data, onChange, errorMessage }: ProfileFormProps) {
 
     const year = new Date().getFullYear();
     const month = new Date().getMonth() + 1;
@@ -40,8 +41,9 @@ export default function ProfileForm({ data, onChange }: ProfileFormProps) {
                 className="w-full" label="gender"
                 options={genders}
                 value={[gender]}
-                onChange={(genders) => onChange({ ...data, gender: parse(Gender, genders[0]) })}
+                onChange={(genders) => onChange({ ...data, gender: parse(Gender, genders[0])! })}
             />
+            {errorMessage && <span className="error-message">{errorMessage}</span>}
         </div>
     )
 }

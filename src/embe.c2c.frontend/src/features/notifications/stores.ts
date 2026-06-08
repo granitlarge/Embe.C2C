@@ -14,17 +14,19 @@ function sort(notifications: Notification[]) {
 
 const useNotificationStore = create<NotificationStore>((set, get) => ({
 
-    notifications: [{
-        createdAt: new Date().toISOString(),
-        id: "1",
-        isRead: false,
-        type: NotificationType.MatchingCreated,
-        matchingId: "1",
-        partnerUserName: "test",
-        recipientUserId: "1",
-        readAt: null,
-        partnerProfileImageUrl: "https://avatars.dicebear.com/api/initials/test.svg"
-    } as MatchingCreatedNotificationIntegrationEntity],
+    notifications: Array.from({ length: 10 }, (_, index) => index).map((index) => (
+        {
+            createdAt: new Date().toISOString(),
+            id: index.toString(),
+            isRead: false,
+            type: NotificationType.MatchingCreated,
+            matchingId: index.toString(),
+            partnerUserName: `test${index}`,
+            recipientUserId: index.toString(),
+            readAt: null,
+            partnerProfileImageUrl: "https://avatars.dicebear.com/api/initials/test.svg"
+        } as MatchingCreatedNotificationIntegrationEntity
+    )),
 
     hasUnread: () => get().notifications.some((notification) => !notification.isRead),
     setNotifications: (notifications: Notification[]) =>

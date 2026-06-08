@@ -2,11 +2,11 @@
 
 import { ApiResponse, FailureReason, SendRequest } from "@/src/shared/api";
 import { User } from "@/src/shared/types/domain/aggregates";
-import { RegisterRequest } from "./types";
+import { RegisterRequest, RegisterUserFailureReason } from "./types";
 
-export async function register(request: RegisterRequest): Promise<ApiResponse<User, FailureReason>> {
+export async function register(request: RegisterRequest): Promise<ApiResponse<User, RegisterUserFailureReason>> {
 
-    const response = await SendRequest<User>(new Request(`${process.env.API_URL}/api/user/register`, {
+    const response = await SendRequest<User, RegisterUserFailureReason>(new Request(`${process.env.API_URL}/api/user/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

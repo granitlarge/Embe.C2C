@@ -8,3 +8,11 @@ export type RegisterRequest = {
     datingPreferences: DatingPreferences,
     files: FileDetails[]
 }
+
+export enum RegisterUserFailureReason {
+    EmailAlreadyExists = 0,
+    DomainError = 1,
+    WeakPassword = 2,
+    Unknown = 3,
+    UnknownError = 4
+}

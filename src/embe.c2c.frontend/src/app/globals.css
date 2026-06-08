@@ -7,9 +7,10 @@
     --color-secondary: #f83529;
     --color-tertiary: #f8f8f8;
     --color-quaternary: #452b2b;
+    --color-quaternary-light: #453636;
     --color-quinternary: #f8f8f8;
 
-    --fs-1: 7rem;
+    --fs-1: 4rem;
     --fs-2: calc(var(--fs-1) * .8);
     --fs-3: calc(var(--fs-2) * .8);
     --fs-4: calc(var(--fs-3) * .8);
@@ -76,9 +77,10 @@
 
   .input {
     border: solid 3px white;
-    padding: 5px;
-    border-radius: 20px;
-    font-size: var(--fs-md);
+    padding-inline: 20px;
+    padding-block: 5px;
+    border-radius: 15px;
+    font-size: var(--fs-6);
     text-align: center;
   }
 
@@ -100,17 +102,17 @@
 
   .error-message {
     color: red;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-6);
 
   }
 
   .label-text {
-    font-size: var(--fs-lg);
+    font-size: var(--fs-4);
   }
 
-  .form-title {
-    font-size: var(--fs-5);
-  }
+    .form-title {
+      font-size: var(--fs-3);
+    }
 
   .separator {
     width: 100%;
@@ -125,7 +127,7 @@
   }
 
   .input::placeholder {
-    font-size: var(--fs-md);
+    font-size: var(--fs-6);
     text-align: center;
   }
 
@@ -138,7 +140,7 @@
     padding: 10px 20px;
     border-radius: 0.5rem;
     cursor: pointer;
-    font-size: var(--fs-md);
+    font-size: var(--fs-6);
   }
 
   select option {
@@ -149,17 +151,5 @@
   Link {
     color: var(--color-secondary);
     text-decoration: underline;
-  }
-
-  @media (max-width: 582px) {
-    :root {
-      --fs-1: 5rem;
-    }
-  }
-
-  @media (max-width: 450px) {
-    :root {
-      --fs-1: 4rem;
-    }
   }
 }

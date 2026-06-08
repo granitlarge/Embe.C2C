@@ -14,9 +14,10 @@ export type DatingPreferencesFormData = {
 export type DatingPreferencesFormProps = {
     data: DatingPreferencesFormData;
     onChange: (data: DatingPreferencesFormData) => void;
+    errorMessage?: string;
 }
 
-export default function DatingPreferencesForm({ data, onChange }: DatingPreferencesFormProps) {
+export default function DatingPreferencesForm({ data, onChange, errorMessage }: DatingPreferencesFormProps) {
 
     const genders = enumerate(Gender).map(value => { return { value: value.key, label: value.key } });
     const selectedGenders = enumerate(Gender)
@@ -58,6 +59,7 @@ export default function DatingPreferencesForm({ data, onChange }: DatingPreferen
                     onChange={(value: [number, number]) => onChange({ ...data, distanceRange: { lower: value[0], higher: value[1] } })}
                 />
             </div>
+            {errorMessage && <span className="error-message">{errorMessage}</span>}
         </div>
     )
 }

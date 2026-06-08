@@ -6,6 +6,7 @@
 @media (max-width: 832px) {
     .modal {
         min-width:0px;
+        height:80%;
         width: 100%;
     }
 }
