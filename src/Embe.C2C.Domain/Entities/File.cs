@@ -2,7 +2,7 @@ using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Domain.Entities;
 
-public class File
+public class File : Entity
 {
     private File
     (

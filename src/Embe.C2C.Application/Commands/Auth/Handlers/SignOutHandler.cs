@@ -1,18 +1,33 @@
 using Embe.C2C.Application.Abstractions;
+using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
+using Embe.C2C.Application.EventHandlers;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 
-public class SignOutHandler(IAuthService authService)
+public class SignOutHandler : TransactionalCommandHandler<SignOutCommand, TypedResult<SignOutFailureReason, bool>>
 {
-    private readonly IAuthService _authService = authService;
+    private readonly IAuthService _authService;
 
-    public async Task<TypedResult<SignOutFailureReason, bool>> HandleAsync
+    public SignOutHandler
     (
+        IC2CContext context,
+        DomainEventHandler domainEventHandler,
+        IntegrationEventHandler integrationEventHandler,
+        IAuthService authService
+    ) : base(context, domainEventHandler, integrationEventHandler)
+    {
+        _authService = authService;
+    }
+
+    protected override async Task<TransactionalCommandResult<TypedResult<SignOutFailureReason, bool>>> HandleAsync
+    (
+        ISparseC2CContext context,
         SignOutCommand command,
         CancellationToken cancellationToken = default
     )
     {
-        return await _authService.SignOutAsync(command.RefreshToken, cancellationToken);
+        var result = await _authService.SignOutAsync(command.RefreshToken, cancellationToken);
+        return new TransactionalCommandResult<TypedResult<SignOutFailureReason, bool>>(result.IsSuccess, result);
     }
 }

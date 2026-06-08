@@ -12,11 +12,9 @@ using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class RegisterHandler
+public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, TypedResult<RegisterUserFailureReason, User>>
 {
-    private readonly IC2CContext _context;
     private readonly IFileService _fileService;
-    private readonly DomainEventHandler _domainEventHandler;
     private readonly IWorkItemService _workItemService;
     private readonly IAuthService _authService;
 
@@ -25,29 +23,27 @@ public class RegisterHandler
         IC2CContext context,
         IFileService fileService,
         DomainEventHandler domainEventHandler,
+        IntegrationEventHandler integrationEventHandler,
         IWorkItemService workItemService,
         IAuthService authService
-    )
+    ) : base(context, domainEventHandler, integrationEventHandler)
     {
-        _context = context;
         _fileService = fileService;
-        _domainEventHandler = domainEventHandler;
         _workItemService = workItemService;
         _authService = authService;
     }
 
-    public async Task<TypedResult<RegisterUserFailureReason, User>> HandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<TypedResult<RegisterUserFailureReason, User>>> HandleAsync(ISparseC2CContext context, RegisterCommand command, CancellationToken cancellationToken = default)
     {
         var success = false;
         var uploadedFileUrls = new List<string>();
 
         try
         {
-            using var transaction = await _context.BeginTransactionAsync(cancellationToken);
             var registerUserResult = await _authService.RegisterUserAsync(command.Email, command.Password, cancellationToken);
             if (!registerUserResult.IsSuccess)
             {
-                return TypedResult<RegisterUserFailureReason, User>.Failure(registerUserResult.Reason, registerUserResult.Message!);
+                return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, User>>(false, TypedResult<RegisterUserFailureReason, User>.Failure(registerUserResult.Reason, registerUserResult.Message!));
             }
 
             var email = Email.Create(command.Email);
@@ -71,21 +67,15 @@ public class RegisterHandler
             }
 
             success = true;
+
             var user = User.Register(email, birthDate, gender, datingPreferences, location: null, [.. files], identityUserId);
-            _context.DomainUsers.Add(user);
-            foreach (var domainEvent in user.DomainEvents)
-            {
-                await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
-            }
+            context.DomainUsers.Add(user);
 
-            await _context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-
-            return TypedResult<RegisterUserFailureReason, User>.Success(user);
+            return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, User>>(true, TypedResult<RegisterUserFailureReason, User>.Success(user));
         }
         catch (DomainException ex)
         {
-            return TypedResult<RegisterUserFailureReason, User>.Failure(RegisterUserFailureReason.DomainError, ex.Message);
+            return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, User>>(false, TypedResult<RegisterUserFailureReason, User>.Failure(RegisterUserFailureReason.DomainError, ex.Message));
         }
         finally
         {
@@ -106,6 +96,7 @@ public class RegisterHandler
                 await Task.WhenAll(uploadedFileUrls.Select(url => _workItemService.PerformAsync(new DeleteFile(url))));
             }
         }
+
     }
 }
 

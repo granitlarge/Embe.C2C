@@ -2,7 +2,7 @@ using Embe.C2C.Domain.Exceptions;
 
 namespace Embe.C2C.Domain.Entities;
 
-public class Conversation
+public class Conversation : Entity
 {
     private Conversation
     (

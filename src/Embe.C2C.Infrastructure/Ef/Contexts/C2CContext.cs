@@ -1,6 +1,6 @@
-using Embe.C2C.Application.Abstractions;
+using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Repos;
-using Embe.C2C.Application.Commands.Users.Handlers;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
@@ -10,6 +10,7 @@ using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Embe.C2C.Infrastructure.Ef.Contexts;
@@ -24,8 +25,19 @@ public class C2CContext
     public DbSet<Judgement> Judgements { get; set; }
     public DbSet<Matching> Matchings { get; set; }
     public DbSet<Notification> Notifications { get; set; }
-
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+
+    public IImmutableList<DomainEvent> DomainEvents
+    {
+        get
+        {
+            return ChangeTracker.Entries()
+                .Select(e => e.Entity)
+                .OfType<DomainEventCollector>()
+                .SelectMany(c => c.DomainEvents)
+                .ToImmutableList();
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,10 +49,4 @@ public class C2CContext
     {
         return Database.BeginTransactionAsync(cancellationToken);
     }
-
-    public Task CommitTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        return Database.CommitTransactionAsync(cancellationToken);
-    }
-
 }

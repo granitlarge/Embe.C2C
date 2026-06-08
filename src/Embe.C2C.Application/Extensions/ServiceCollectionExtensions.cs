@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Queries.Auth.Handlers;
@@ -26,14 +27,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UserAuthorizationPolicy>();
 
         services.AddScoped<DomainEventHandler>();
-        services.AddScoped<ApplicationEventHandler>();
+        services.AddScoped<IntegrationEventHandler>();
 
         services.AddScoped<UserService>();
         services.AddScoped<MatchingService>();
         services.AddScoped<JudgementService>();
 
         services.AddScoped<AccountExistsHandler>();
-
         return services;
     }
 }

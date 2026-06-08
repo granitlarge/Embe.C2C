@@ -1,0 +1,11 @@
+.modal {
+    min-width: 768px;
+    position: relative;
+}
+
+@media (max-width: 832px) {
+    .modal {
+        min-width:0px;
+        width: 100%;
+    }
+}

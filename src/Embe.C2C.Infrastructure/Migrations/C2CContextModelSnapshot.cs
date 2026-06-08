@@ -33,6 +33,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<bool>("IsOpen")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -87,6 +91,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Guid>("JudgeeUserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("JudgeUserId");
@@ -101,6 +109,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<Guid>("UserId1")
                         .HasColumnType("uniqueidentifier");
@@ -134,6 +146,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Guid>("RecipientUserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RecipientUserId");
@@ -162,6 +178,10 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Property<int>("Reason")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTimeOffset>("TransactionDate")
                         .HasColumnType("datetimeoffset");
@@ -224,6 +244,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Point>("Location")
                         .HasColumnType("geography");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -275,6 +299,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<long>("MessageCount")
                         .HasColumnType("bigint");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -306,6 +334,10 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Property<Guid>("OwnerUserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "FileDetails", "Embe.C2C.Domain.Entities.File.FileDetails#FileDetails", b1 =>
                         {

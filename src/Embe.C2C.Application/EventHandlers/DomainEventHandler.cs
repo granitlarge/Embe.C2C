@@ -1,26 +1,45 @@
-using Embe.C2C.Application.Abstractions.Events;
 using Embe.C2C.Application.Abstractions.Repos;
+using Embe.C2C.Application.Dtos.Aggregates;
+using Embe.C2C.Application.Events;
+using Embe.C2C.Application.Events.Notifications;
+using Embe.C2C.Application.IntegrationEntities.Notifications;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Users.Events;
+using Microsoft.EntityFrameworkCore;
+using NotificationUpdatedEvent = Embe.C2C.Domain.Aggregates.Notifications.Events.NotificationUpdatedEvent;
 
 namespace Embe.C2C.Application.EventHandlers;
 
-public class DomainEventHandler : ApplicationEventCollector
+public class DomainEventHandler : IntegrationEventCollector
 {
-    public async Task HandleAsync(IC2CContext context, DomainEvent domainEvent, CancellationToken cancellationToken = default)
+    private readonly IC2CContext _context;
+
+    public DomainEventHandler(IC2CContext context)
+    {
+        _context = context;
+    }
+
+    public async Task HandleAsync(DomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
         switch (domainEvent)
         {
             case UserCreatedEvent userCreatedEvent:
-                await HandleUserCreatedEventAsync(context, userCreatedEvent, cancellationToken);
+                await HandleUserCreatedEventAsync(userCreatedEvent, cancellationToken);
                 break;
             case MatchingCreatedEvent matchingCreatedEvent:
-                await HandleMatchingCreatedEventAsync(context, matchingCreatedEvent, cancellationToken);
+                await HandleMatchingCreatedEventAsync(matchingCreatedEvent, cancellationToken);
                 break;
             case MatchingRemovedEvent matchingRemovedEvent:
-                await HandleMatchingRemovedEventAsync(context, matchingRemovedEvent, cancellationToken);
+                await HandleMatchingRemovedEventAsync(matchingRemovedEvent, cancellationToken);
+                break;
+            case NotificationUpdatedEvent notificationUpdatedEvent:
+                await HandleNotificationUpdatedEventAsync(notificationUpdatedEvent, cancellationToken);
+                break;
+            case NotificationRemovedEvent notificationRemovedEvent:
+                await HandleNotificationRemovedEventAsync(notificationRemovedEvent, cancellationToken);
                 break;
             default:
                 break;
@@ -29,7 +48,6 @@ public class DomainEventHandler : ApplicationEventCollector
 
     private async Task HandleUserCreatedEventAsync
     (
-        IC2CContext context,
         UserCreatedEvent userCreatedEvent,
         CancellationToken cancellationToken
     )
@@ -37,25 +55,40 @@ public class DomainEventHandler : ApplicationEventCollector
         return;
     }
 
-    private Task HandleMatchingCreatedEventAsync
+    private async Task HandleMatchingCreatedEventAsync
     (
-        IC2CContext context,
         MatchingCreatedEvent matchingCreatedEvent,
         CancellationToken cancellationToken
     )
     {
         var matching = matchingCreatedEvent.Matching;
         var userIdToNotify = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
+        var userIdThatCausedEvent = matchingCreatedEvent.LastJudgeUserId;
 
-        var notification = new MatchingCreated(userIdToNotify, matching.Id);
-        context.Notifications.Add(notification);
-        AddApplicationEvent(new NotificationCreatedEvent(notification));
-        return Task.CompletedTask;
+        var notification = new MatchingCreated(userIdToNotify, matching.Id, matchingCreatedEvent.LastJudgeUserId);
+
+        _context.Notifications.Add(notification);
+
+        var partnerUserName = (await _context.DomainUsers.SingleAsync(u => u.Id == userIdThatCausedEvent, cancellationToken)).UserName.Value;
+        var notificationDto = notification.ToDto();
+        var integrationEntity = new MatchingCreatedNotificationIntegrationEntity
+        (
+            notificationDto.Id,
+            notificationDto.RecipientUserId,
+            notificationDto.IsRead,
+            notificationDto.ReadAt,
+            notificationDto.CreatedAt,
+            notificationDto.UpdatedAt,
+            matching.Id,
+            partnerUserName
+        );
+
+        var integrationEvent = new NotificationCreatedEvent(notificationDto);
+        AddIntegrationEvent(integrationEvent);
     }
 
     private Task HandleMatchingRemovedEventAsync
     (
-        IC2CContext context,
         MatchingRemovedEvent matchingRemovedEvent,
         CancellationToken cancellationToken
     )
@@ -63,9 +96,31 @@ public class DomainEventHandler : ApplicationEventCollector
         var matching = matchingRemovedEvent.Matching;
         var userIdToNotify = matchingRemovedEvent.RemoverUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
 
-        var notification = new MatchingRemoved(userIdToNotify, matching.Id);
-        context.Notifications.Add(notification);
-        AddApplicationEvent(new NotificationCreatedEvent(notification));
+        var notification = new MatchingRemoved(userIdToNotify, matching.Id, matchingRemovedEvent.RemoverUserId);
+        _context.Notifications.Add(notification);
+        AddIntegrationEvent(new NotificationCreatedEvent(notification.ToDto()));
+        return Task.CompletedTask;
+    }
+
+    private Task HandleNotificationUpdatedEventAsync
+    (
+        NotificationUpdatedEvent notificationUpdatedEvent,
+        CancellationToken cancellationToken
+    )
+    {
+        var notification = notificationUpdatedEvent.Notification;
+        AddIntegrationEvent(new Events.Notifications.NotificationUpdatedEvent(notification.ToDto()));
+        return Task.CompletedTask;
+    }
+
+    private Task HandleNotificationRemovedEventAsync
+    (
+        NotificationRemovedEvent notificationRemovedEvent,
+        CancellationToken cancellationToken
+    )
+    {
+        var notification = notificationRemovedEvent.Notification;
+        AddIntegrationEvent(new NotificationDeletedEvent(notification.Id));
         return Task.CompletedTask;
     }
 }

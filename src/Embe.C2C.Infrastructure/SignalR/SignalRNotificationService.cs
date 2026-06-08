@@ -1,5 +1,5 @@
 using Embe.C2C.Application.Abstractions.Services;
-using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Application.Dtos.Aggregates;
 
 namespace Embe.C2C.Infrastructure.SignalR;
 
@@ -10,7 +10,8 @@ public class SignalRNotificationService : INotificationService
 
     }
 
-    public Task SendNotificationAsync(Notification notification, CancellationToken cancellationToken = default)
+    public Task SendNotificationAsync<T>(T notification, CancellationToken cancellationToken = default)
+    where T : NotificationDto
     {
         throw new NotImplementedException();
     }

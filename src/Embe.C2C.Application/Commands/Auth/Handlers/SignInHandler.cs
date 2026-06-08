@@ -1,19 +1,17 @@
 using Embe.C2C.Application.Abstractions;
+using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
+using Embe.C2C.Application.EventHandlers;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 
-public class SignInHandler(IAuthService authService)
+public class SignInHandler(IAuthService authService, IC2CContext context, DomainEventHandler domainEventHandler, IntegrationEventHandler integrationEventHandler) : TransactionalCommandHandler<SignInCommand, TypedResult<SignInFailureReason, Credentials>>(context, domainEventHandler, integrationEventHandler)
 {
     private readonly IAuthService _authService = authService;
 
-    public async Task<TypedResult<SignInFailureReason, Credentials>> HandleAsync
-    (
-        SignInCommand command, 
-        CancellationToken cancellationToken = default
-    )
+    protected override async Task<TransactionalCommandResult<TypedResult<SignInFailureReason, Credentials>>> HandleAsync(ISparseC2CContext context, SignInCommand command, CancellationToken cancellationToken = default)
     {
         var result = await _authService.SignInAsync(command.Email, command.Password, cancellationToken);
-        return result;
+        return new TransactionalCommandResult<TypedResult<SignInFailureReason, Credentials>>(result.IsSuccess, result);
     }
 }
