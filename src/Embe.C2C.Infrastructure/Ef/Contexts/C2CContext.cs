@@ -47,6 +47,6 @@ public class C2CContext
 
     public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
-        return Database.BeginTransactionAsync(cancellationToken);
+        return Database.BeginTransactionAsync(System.Data.IsolationLevel.Snapshot, cancellationToken);
     }
 }

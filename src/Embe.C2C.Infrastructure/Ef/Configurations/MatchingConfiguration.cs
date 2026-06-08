@@ -1,11 +1,12 @@
+using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Embe.C2C.Infrastructure.Ef.Configurations;
 
-public class MatchingConfiguration : IEntityTypeConfiguration<Domain.Aggregates.Matchings.Matching>
+public class MatchingConfiguration : AggregateConfiguration<Domain.Aggregates.Matchings.Matching>
 {
-    public void Configure(EntityTypeBuilder<Domain.Aggregates.Matchings.Matching> builder)
+    public override void Configure(EntityTypeBuilder<Domain.Aggregates.Matchings.Matching> builder)
     {
         builder.HasKey(m => m.Id);
         builder.HasOne<Domain.Aggregates.Users.User>()
@@ -22,5 +23,6 @@ public class MatchingConfiguration : IEntityTypeConfiguration<Domain.Aggregates.
             .WithOne()
             .HasForeignKey<Domain.Entities.Conversation>(c => c.MatchingId)
             .OnDelete(DeleteBehavior.Cascade);
+        base.Configure(builder);
     }
 }

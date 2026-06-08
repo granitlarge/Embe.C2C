@@ -66,10 +66,11 @@ public class DomainEventHandler : IntegrationEventCollector
         var userIdThatCausedEvent = matchingCreatedEvent.LastJudgeUserId;
 
         var notification = new MatchingCreated(userIdToNotify, matching.Id, matchingCreatedEvent.LastJudgeUserId);
-
         _context.Notifications.Add(notification);
 
-        var partnerUserName = (await _context.DomainUsers.SingleAsync(u => u.Id == userIdThatCausedEvent, cancellationToken)).UserName.Value;
+        var partnerUser = await _context.DomainUsers.SingleAsync(u => u.Id == userIdThatCausedEvent, cancellationToken);
+        var partnerUserName = partnerUser.UserName.Value;
+        var partnerProfileImageUrl = partnerUser.Files.OrderBy(f => f.FileDetails.Order).First().FileDetails.Url;
         var notificationDto = notification.ToDto();
         var integrationEntity = new MatchingCreatedNotificationIntegrationEntity
         (
@@ -80,7 +81,8 @@ public class DomainEventHandler : IntegrationEventCollector
             notificationDto.CreatedAt,
             notificationDto.UpdatedAt,
             matching.Id,
-            partnerUserName
+            partnerUserName,
+            partnerProfileImageUrl
         );
 
         var integrationEvent = new NotificationCreatedEvent(notificationDto);

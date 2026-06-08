@@ -2,6 +2,7 @@ import { MatchingCreatedNotification, MatchingRemovedNotification } from "../dom
 
 export type MatchingCreatedNotificationIntegrationEntity = MatchingCreatedNotification & {
     partnerUserName: string;
+    partnerProfileImageUrl: string
 }
 
 export type MatchingRemovedNotificationIntegrationEntity = MatchingRemovedNotification & {

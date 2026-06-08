@@ -127,6 +127,14 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
+    public void ChangeFileOrder(Guid actorId, Guid fileId, int newOrder)
+    {
+        EnsureActorIsOwner(actorId);
+        var file = _files.FirstOrDefault(f => f.Id == fileId) ?? throw new DomainException("File not found.");
+        file.ChangeOrder(newOrder);
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
     public void RemoveFile(Guid actorId, Guid fileId)
     {
         EnsureActorIsOwner(actorId);

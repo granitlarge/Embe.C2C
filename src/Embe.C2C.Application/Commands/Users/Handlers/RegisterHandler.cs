@@ -63,7 +63,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
             {
                 var url = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
                 uploadedFileUrls.Add(url);
-                files.Add(new FileDetails(file.MimeType, url));
+                files.Add(new FileDetails(file.MimeType, url, file.Order));
             }
 
             success = true;

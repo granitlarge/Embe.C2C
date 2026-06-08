@@ -11,5 +11,6 @@ public record MatchingCreatedNotificationIntegrationEntity
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
     Guid MatchingId,
-    string PartnerUserName
+    string PartnerUserName,
+    string PartnerProfileImageUrl
 ) : MatchingCreatedNotificationDto(Id, RecipientUserId, IsRead, ReadAt, CreatedAt, UpdatedAt, MatchingId);

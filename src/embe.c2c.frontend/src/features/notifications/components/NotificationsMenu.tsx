@@ -3,27 +3,85 @@
 import { Bell } from "@deemlol/next-icons"
 import { useEffect, useRef, useState } from "react";
 import useNotificationStore from "../stores";
-import { Notification as NotificationTypeDef } from "../../../shared/types/domain/aggregates";
+import { NotificationType, Notification as NotificationTypeDef } from "../../../shared/types/domain/aggregates";
 import Modal from "@/src/shared/components/modal/Modal";
 import styles from "./NotificationsMenu.module.css";
+import { MatchingCreatedNotificationIntegrationEntity } from "@/src/shared/types/integration/notifications";
+import { formatTimeAgo } from "@/src/shared/time";
+import Link from "next/link";
+import Image from "next/image";
 
 type NotificationProps = {
     remove: () => void;
     notification: NotificationTypeDef;
 }
 
+type NotificationContent = {
+    title: string;
+    content: string;
+    imageUrl?: string
+    linkUrl?: string
+}
+
+function getNotificationContent(notification: NotificationTypeDef): NotificationContent {
+
+    let title = "";
+    let content = "";
+    let imageUrl: string | undefined = undefined;
+    let linkUrl: string | undefined = undefined;
+
+    switch (notification.type) {
+        case NotificationType.MatchingCreated: {
+            const matchingCreatedNotification = notification as MatchingCreatedNotificationIntegrationEntity;
+            title = "new match!";
+            content = `you matched with ${matchingCreatedNotification.partnerUserName}`;
+            imageUrl = matchingCreatedNotification.partnerProfileImageUrl;
+            break;
+        }
+        case NotificationType.MatchingRemoved: {
+            const matchingRemovedNotification = notification as MatchingCreatedNotificationIntegrationEntity;
+            title = "match removed";
+            content = `your match with ${matchingRemovedNotification.partnerUserName} has been removed`;
+            break;
+        }
+    }
+
+    return { title, content, imageUrl, linkUrl };
+
+}
+
 function Notification({ remove, notification }: NotificationProps) {
 
-    let loaded = false;
-    let title: string = "";
-    let content: string = "";
+    const timeAgo = formatTimeAgo(notification.createdAt);
+    const { title, content, imageUrl, linkUrl } = getNotificationContent(notification);
 
-    return (
+    const classNames = [
+        "flex flex-row gap-0 p-3 w-full border border-(--color-tertiary) rounded-lg",
+        linkUrl ? "cursor-pointer" : "",
+    ].filter(Boolean).join(" ");
 
-        <div>
+    function getTsx(children: React.ReactNode) {
 
-        </div>
+        if (linkUrl) {
+            return <Link className={classNames} href={linkUrl}>{children}</Link>;
+        } else {
+            return <div className={classNames}>{children}</div>;
+        }
 
+    }
+
+    return getTsx
+    (
+        <>
+            <div className="flex flex-row gap-5 items-center">
+                {imageUrl && <Image src={imageUrl} alt="notification image" width={0} height={0} className="w-20 h-20 rounded-full" />}
+                <div className="flex flex-col gap-0">
+                    <span className="text-(--color-secondary) text-(length:--fs-7)">{title}</span>
+                    <span className="text-(length:--fs-md) text-(--color-tertiary)">{content}</span>
+                </div>
+            </div>
+            <div className="ml-auto mt-auto text-(--color-tertiary) text-(length:--fs-sm)">{timeAgo}</div>
+        </>
     )
 
 }
@@ -32,6 +90,7 @@ type NotificationsModalProps = {
     hidden: boolean;
     closed: () => void;
 }
+
 function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
 
     const notifications = useNotificationStore((state) => state.notifications);
@@ -58,6 +117,10 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
         }
     }, [hidden, closed, setNotifications, notifications]);
 
+    async function removeNotification(id: string) {
+        setNotifications(notifications.filter((notification) => notification.id !== id));
+    }
+
     const classNames = [
         hidden ? "hidden" : "",
     ].filter(Boolean).join(" ");
@@ -74,7 +137,7 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
                 w-[70%] h-[70%] 
                 m-auto 
                 rounded-lg 
-                bg-(--color-quaternary-light)
+                bg-(--color-quaternary)
                 `} closedby="any">
                 <h2 className="mr-auto ml-auto text-(--color-tertiary)">notifications</h2>
                 {
@@ -83,12 +146,11 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
                             <Notification
                                 key={notification.id}
                                 notification={notification}
-                                remove={() => setNotifications(notifications.filter((n) => n.id !== notification.id))}
+                                remove={() => removeNotification(notification.id)}
                             />
                         ))
                 }
             </Modal>
-
         </div>
     )
 }

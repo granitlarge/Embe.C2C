@@ -27,7 +27,7 @@ public class File : Entity
 
     public Guid Id { get; }
     public Guid OwnerUserId { get; }
-    public FileDetails FileDetails { get; }
+    public FileDetails FileDetails { get; private set; }
     public DateTimeOffset? MarkedForDeletionAt { get; private set; }
     public DateTimeOffset? DeletedAt { get; private set; }
     public DateTimeOffset CreatedAt { get; }
@@ -42,8 +42,14 @@ public class File : Entity
         DeletedAt = DateTimeOffset.UtcNow;
     }
 
+    internal void ChangeOrder(int newOrder)
+    {
+        FileDetails = FileDetails with { Order = newOrder };
+    }
+
     internal static File Create(Guid ownerUserId, FileDetails fileDetails)
     {
         return new File(ownerUserId, fileDetails);
     }
+
 }

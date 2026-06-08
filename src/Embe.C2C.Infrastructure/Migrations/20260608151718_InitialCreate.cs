@@ -167,12 +167,13 @@ namespace Embe.C2C.Infrastructure.Migrations
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<int>(type: "int", nullable: false),
-                    Location = table.Column<Point>(type: "geography", nullable: false),
+                    Location = table.Column<Point>(type: "geography", nullable: true),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DatingPreferences_AgeRangeMax = table.Column<int>(type: "int", nullable: false),
                     DatingPreferences_AgeRangeMin = table.Column<int>(type: "int", nullable: false),
                     DatingPreferences_InterestedInGenders = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DatingPreferences_MaximumDistance = table.Column<double>(type: "float", nullable: false)
+                    DatingPreferences_MaximumDistance = table.Column<double>(type: "float", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -194,7 +195,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     Balance_Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Balance_Currency_Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Balance_Currency_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Balance_Currency_Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Balance_Currency_Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -214,7 +216,11 @@ namespace Embe.C2C.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OwnerUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MarkedForDeletionAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    FileDetails_MimeType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileDetails_Order = table.Column<int>(type: "int", nullable: false),
+                    FileDetails_Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -235,7 +241,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     JudgeUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     JudgeeUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsPositive = table.Column<bool>(type: "bit", nullable: false),
-                    EditedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    EditedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,7 +266,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId2 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId2 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,7 +318,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     Amount_Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Amount_Currency_Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Amount_Currency_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Amount_Currency_Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Amount_Currency_Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -333,7 +342,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     UserId2 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LastMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     MessageCount = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -354,7 +364,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     RecipientUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReadAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     NotificationType = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
-                    MatchingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    MatchingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {

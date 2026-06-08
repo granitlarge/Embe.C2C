@@ -1,12 +1,13 @@
 using Embe.C2C.Domain.Aggregates.Judgements;
+using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Embe.C2C.Infrastructure.Ef.Configurations;
 
-public class JudgementConfiguration : IEntityTypeConfiguration<Judgement>
+public class JudgementConfiguration : AggregateConfiguration<Judgement>
 {
-    public void Configure(EntityTypeBuilder<Judgement> builder)
+    public override void Configure(EntityTypeBuilder<Judgement> builder)
     {
         builder.HasKey(j => j.Id);
 
@@ -19,5 +20,6 @@ public class JudgementConfiguration : IEntityTypeConfiguration<Judgement>
             .WithMany()
             .HasForeignKey(j => j.JudgeeUserId)
             .OnDelete(DeleteBehavior.ClientCascade);
+        base.Configure(builder);
     }
 }

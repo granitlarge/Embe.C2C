@@ -1,20 +1,17 @@
 using System.Collections.Immutable;
-using Embe.C2C.Domain.Aggregates.Accounts;
-using Embe.C2C.Domain.Aggregates.Judgements;
-using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.ValueObjects;
+using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Embe.C2C.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NetTopologySuite.Geometries;
 
 namespace Embe.C2C.Infrastructure.Ef.Configurations;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : AggregateConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public override void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(u => u.Id);
 
@@ -83,5 +80,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne()
             .HasForeignKey(f => f.OwnerUserId)
             .OnDelete(DeleteBehavior.Cascade);
+        base.Configure(builder);
     }
 }

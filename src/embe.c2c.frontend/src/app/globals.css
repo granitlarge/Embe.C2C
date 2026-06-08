@@ -7,7 +7,7 @@
     --color-secondary: #f83529;
     --color-tertiary: #f8f8f8;
     --color-quaternary: #452b2b;
-    --color-quaternary-light: #493b3b;
+    --color-quinternary: #f8f8f8;
 
     --fs-1: 7rem;
     --fs-2: calc(var(--fs-1) * .8);
@@ -15,9 +15,12 @@
     --fs-4: calc(var(--fs-3) * .8);
     --fs-5: calc(var(--fs-4) * .8);
     --fs-6: calc(var(--fs-5) * .8);
-    --fs-lg: calc(var(--fs-6) * .8);
+    --fs-7: calc(var(--fs-6) * .8);
+
+    --fs-lg: calc(var(--fs-7) * .8);
     --fs-md: calc(var(--fs-lg) * 0.8);
     --fs-sm: calc(var(--fs-md) * 0.8);
+    --fs-xs: calc(var(--fs-sm) * 0.8);
 
   }
 

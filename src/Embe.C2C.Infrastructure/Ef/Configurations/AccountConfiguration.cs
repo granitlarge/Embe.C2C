@@ -1,12 +1,13 @@
 using Embe.C2C.Domain.Aggregates.Transactions;
+using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Embe.C2C.Infrastructure.Ef.Configurations;
 
-public class AccountConfiguration : IEntityTypeConfiguration<Domain.Aggregates.Accounts.Account>
+public class AccountConfiguration : AggregateConfiguration<Domain.Aggregates.Accounts.Account>
 {
-    public void Configure(EntityTypeBuilder<Domain.Aggregates.Accounts.Account> builder)
+    public override void Configure(EntityTypeBuilder<Domain.Aggregates.Accounts.Account> builder)
     {
         builder.HasKey(a => a.Id);
 
@@ -31,5 +32,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Domain.Aggregates.A
             .WithOne()
             .HasForeignKey<Domain.Aggregates.Accounts.Account>(a => a.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        base.Configure(builder);
     }
 }

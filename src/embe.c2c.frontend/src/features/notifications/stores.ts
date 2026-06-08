@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { Notification } from "../../shared/types/domain/aggregates";
+import { Notification, NotificationType } from "../../shared/types/domain/aggregates";
+import { MatchingCreatedNotificationIntegrationEntity } from "@/src/shared/types/integration/notifications";
 
 export type NotificationStore = {
     notifications: Notification[];
@@ -12,7 +13,19 @@ function sort(notifications: Notification[]) {
 }
 
 const useNotificationStore = create<NotificationStore>((set, get) => ({
-    notifications: [],
+
+    notifications: [{
+        createdAt: new Date().toISOString(),
+        id: "1",
+        isRead: false,
+        type: NotificationType.MatchingCreated,
+        matchingId: "1",
+        partnerUserName: "test",
+        recipientUserId: "1",
+        readAt: null,
+        partnerProfileImageUrl: "https://avatars.dicebear.com/api/initials/test.svg"
+    } as MatchingCreatedNotificationIntegrationEntity],
+
     hasUnread: () => get().notifications.some((notification) => !notification.isRead),
     setNotifications: (notifications: Notification[]) =>
         set({

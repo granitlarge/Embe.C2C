@@ -83,7 +83,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
             foreach (var file in command.FilesToAdd)
             {
                 var url = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
-                user.AddFile(actorId, new FileDetails(file.MimeType, url));
+                user.AddFile(actorId, new FileDetails(file.MimeType, url, file.Order));
                 uploadedFileUrls.Add(url);
             }
 

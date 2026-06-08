@@ -59,7 +59,9 @@ public class AuthService
                 return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
             }
 
-            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
+            var ownsTransaction = _context.Database.CurrentTransaction == null;
+
             var refreshTokenEntity = await _context.RefreshTokens.AsNoTracking().SingleOrDefaultAsync(rt => rt.Id == refreshTokenId, cancellationToken);
             if (refreshTokenEntity == null)
             {
@@ -88,6 +90,13 @@ public class AuthService
             var accessToken = GenerateAccessToken(refreshToken, identityUser, user);
             var credentials = new Credentials(accessToken, refreshToken);
 
+            await _context.SaveChangesAsync(cancellationToken);
+            if (ownsTransaction)
+            {
+                await transaction.CommitAsync(cancellationToken);
+                await transaction.DisposeAsync();
+            }
+
             return TypedResult<RefreshFailureReason, Credentials>.Success(credentials);
         }
         catch (Exception)
@@ -98,7 +107,8 @@ public class AuthService
 
     public async Task<TypedResult<SignInFailureReason, Credentials>> SignInAsync(string email, string password, CancellationToken cancellationToken = default)
     {
-        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
+        var ownsTransaction = _context.Database.CurrentTransaction == null;
 
         var signInResult = await _signInManager.PasswordSignInAsync(email, password, false, true);
         if (!signInResult.Succeeded)
@@ -123,7 +133,11 @@ public class AuthService
         _context.RefreshTokens.Add(refreshTokenEntity);
 
         await _context.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
+        if (ownsTransaction)
+        {
+            await transaction.CommitAsync(cancellationToken);
+            await transaction.DisposeAsync();
+        }
 
         return TypedResult<SignInFailureReason, Credentials>.Success(credentials);
     }
@@ -136,7 +150,9 @@ public class AuthService
             return TypedResult<SignOutFailureReason, bool>.Failure(SignOutFailureReason.Unauthorized, "User is not authenticated.");
         }
 
-        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
+        var ownsTransaction = _context.Database.CurrentTransaction == null;
+
         var refreshToken = ParseRefreshToken(refreshTokenValue);
         var refreshTokenEntity = await _context.RefreshTokens.SingleOrDefaultAsync(rt => rt.Id == refreshToken.Id && rt.UserId == userId, cancellationToken);
         if (refreshTokenEntity == null)
@@ -145,7 +161,11 @@ public class AuthService
         }
         _context.RefreshTokens.Remove(refreshTokenEntity);
         await _context.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
+        if (ownsTransaction)
+        {
+            await transaction.CommitAsync(cancellationToken);
+            await transaction.DisposeAsync();
+        }
         return TypedResult<SignOutFailureReason, bool>.Success(true);
     }
 
@@ -213,7 +233,8 @@ public class AuthService
             return TypedResult<InvalidateRefreshTokenFailureReason, bool>.Failure(InvalidateRefreshTokenFailureReason.Unauthorized, "User is not authenticated.");
         }
 
-        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
+        var ownsTransaction = _context.Database.CurrentTransaction == null;
         var refreshToken = ParseRefreshToken(refreshTokenValue);
         var refreshTokenEntity = await _context.RefreshTokens.SingleOrDefaultAsync(rt => rt.Id == refreshToken.Id && rt.UserId == userId, cancellationToken);
         if (refreshTokenEntity == null)
@@ -222,7 +243,11 @@ public class AuthService
         }
         _context.RefreshTokens.Remove(refreshTokenEntity);
         await _context.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
+        if (ownsTransaction)
+        {
+            await transaction.CommitAsync(cancellationToken);
+            await transaction.DisposeAsync();
+        }
         return TypedResult<InvalidateRefreshTokenFailureReason, bool>.Success(true);
     }
 
