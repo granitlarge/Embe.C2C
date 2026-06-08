@@ -1,13 +1,14 @@
-using Embe.C2C.Application.Abstractions.Events;
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Events;
+using Embe.C2C.Application.Events.Notifications;
 
 namespace Embe.C2C.Application.EventHandlers;
 
-public class ApplicationEventHandler
+public class IntegrationEventHandler
 {
     private readonly INotificationService _notificationService;
 
-    public ApplicationEventHandler
+    public IntegrationEventHandler
     (
         INotificationService notificationService
     )
@@ -15,14 +16,20 @@ public class ApplicationEventHandler
         _notificationService = notificationService;
     }
 
-    public async Task HandleAsync(ApplicationEvent applicationEvent, CancellationToken cancellationToken = default)
+    public async Task HandleAsync(IntegrationEventCollector eventCollector, CancellationToken cancellationToken = default)
     {
-        switch (applicationEvent)
+        var events = eventCollector.CollectedEvents;
+        await Task.WhenAll(events.Select(e => HandleAsync(e, cancellationToken)));
+    }
+
+    private async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
+    {
+        switch (integrationEvent)
         {
             case NotificationCreatedEvent notificationCreatedEvent:
                 await HandleNotificationCreatedEventAsync(notificationCreatedEvent, cancellationToken);
                 break;
-            default: 
+            default:
                 break;
         }
     }

@@ -7,6 +7,7 @@
     --color-secondary: #f83529;
     --color-tertiary: #f8f8f8;
     --color-quaternary: #452b2b;
+    --color-quaternary-light: #493b3b;
 
     --fs-1: 7rem;
     --fs-2: calc(var(--fs-1) * .8);
@@ -141,14 +142,21 @@
     background-color: var(--color-quaternary);
   }
 
-  a, Link {
+  a,
+  Link {
     color: var(--color-secondary);
     text-decoration: underline;
   }
 
-  @media (max-width: 400px) {
+  @media (max-width: 582px) {
     :root {
       --fs-1: 5rem;
+    }
+  }
+
+  @media (max-width: 450px) {
+    :root {
+      --fs-1: 4rem;
     }
   }
 }

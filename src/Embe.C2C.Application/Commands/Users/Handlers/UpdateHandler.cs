@@ -14,12 +14,10 @@ using HandlerReturnType = Embe.C2C.Application.Abstractions.EntityWithPermission
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class UpdateHandler
+public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<HandlerReturnType>>
 {
-    private readonly IC2CContext _context;
     private readonly UserAuthorizationPolicy _authorizationPolicy;
     private readonly IFileService _fileService;
-    private readonly DomainEventHandler _domainEventHandler;
     private readonly IWorkItemService _workItemService;
 
     public UpdateHandler
@@ -28,22 +26,21 @@ public class UpdateHandler
         UserAuthorizationPolicy authorizationPolicy,
         IFileService fileService,
         DomainEventHandler domainEventHandler,
+        IntegrationEventHandler integrationEventHandler,
         IWorkItemService workItemService
-    )
+    ) : base(context, domainEventHandler, integrationEventHandler)
     {
-        _context = context;
         _authorizationPolicy = authorizationPolicy;
         _fileService = fileService;
-        _domainEventHandler = domainEventHandler;
         _workItemService = workItemService;
     }
 
-    public async Task<Result<HandlerReturnType>> HandleAsync(UpdateCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<Result<HandlerReturnType>>> HandleAsync(ISparseC2CContext context, UpdateCommand command, CancellationToken cancellationToken = default)
     {
         var permissions = await _authorizationPolicy.GetPermissionsAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Update))
         {
-            return Result<HandlerReturnType>.Failure(FailureReason.Forbidden, "User is not authorized to update this profile.");
+            return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.Forbidden, "User is not authorized to update this profile."));
         }
 
         var actorId = _authorizationPolicy.GetActorId();
@@ -52,8 +49,6 @@ public class UpdateHandler
         HashSet<string> uploadedFileUrls = [];
         try
         {
-            using var transaction = await _context.BeginTransactionAsync(cancellationToken);
-
             var email = Email.Create(command.Email);
             var birthDate = new BirthDate(command.BirthDate);
             var gender = command.Gender;
@@ -66,10 +61,10 @@ public class UpdateHandler
             );
             var location = command.Location;
 
-            var user = await _context.DomainUsers.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+            var user = await context.DomainUsers.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
             if (user == null)
             {
-                return Result<HandlerReturnType>.Failure(FailureReason.NotFound, "User not found.");
+                return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.NotFound, "User not found."));
             }
 
             user.UpdateEmail(actorId, email);
@@ -92,19 +87,12 @@ public class UpdateHandler
                 uploadedFileUrls.Add(url);
             }
 
-            foreach (var domainEvent in user.DomainEvents)
-            {
-                await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
-            }
-
-            await _context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
             success = true;
-            return Result<HandlerReturnType>.Success(new HandlerReturnType(user, permissions));
+            return new TransactionalCommandResult<Result<HandlerReturnType>>(true, Result<HandlerReturnType>.Success(new HandlerReturnType(user, permissions)));
         }
         catch (DomainException)
         {
-            return Result<HandlerReturnType>.Failure(FailureReason.DomainError, "Invalid input data.");
+            return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.DomainError, "Invalid input data."));
         }
         finally
         {

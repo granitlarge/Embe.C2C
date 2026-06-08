@@ -1,8 +1,8 @@
-using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Application.Dtos.Aggregates;
 
 namespace Embe.C2C.Application.Abstractions.Services;
 
 public interface INotificationService
 {
-    Task SendNotificationAsync(Notification notification, CancellationToken cancellationToken = default);
+    Task SendNotificationAsync<T>(T notification, CancellationToken cancellationToken = default) where T : NotificationDto;
 }

@@ -24,15 +24,17 @@ public abstract class Notification : Aggregate
 
     public DateTimeOffset? ReadAt { get; private set; }
     public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset UpdatedAt => ReadAt ?? CreatedAt;
 
-    public void MarkAsRead()
+    public void MarkAsRead(bool isRead)
     {
-        if (ReadAt.HasValue)
+        if (isRead == IsRead)
         {
             return;
         }
 
-        ReadAt = DateTimeOffset.UtcNow;
+        ReadAt = isRead ? DateTimeOffset.UtcNow : null;
+        AddDomainEvent(new NotificationUpdatedEvent(this));
     }
 
     public void Remove()

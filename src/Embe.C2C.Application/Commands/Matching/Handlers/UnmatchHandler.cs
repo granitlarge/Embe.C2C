@@ -5,10 +5,8 @@ using Embe.C2C.Application.EventHandlers;
 
 namespace Embe.C2C.Application.Commands.Matching.Handlers;
 
-public class UnmatchHandler
+public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result>
 {
-    private readonly IC2CContext _context;
-    private readonly DomainEventHandler _domainEventHandler;
     private readonly MatchingAuthorizationPolicy _authorizationPolicy;
     private readonly IAuthenticatedUserService _userService;
 
@@ -16,18 +14,18 @@ public class UnmatchHandler
     (
         IC2CContext context,
         DomainEventHandler domainEventHandler,
+        IntegrationEventHandler integrationEventHandler,
         MatchingAuthorizationPolicy authorizationPolicy,
         IAuthenticatedUserService userService
-    )
+    ) : base(context, domainEventHandler, integrationEventHandler)
     {
-        _context = context;
-        _domainEventHandler = domainEventHandler;
         _authorizationPolicy = authorizationPolicy;
         _userService = userService;
     }
 
-    public async Task<Result> HandleAsync
+    protected override async Task<TransactionalCommandResult<Result>> HandleAsync
     (
+        ISparseC2CContext context,
         UnmatchCommand command,
         CancellationToken cancellationToken = default
     )
@@ -35,27 +33,17 @@ public class UnmatchHandler
         var permissions = await _authorizationPolicy.GetPermissionsAsync(command.MatchingId, cancellationToken);
         if (!permissions.Contains(MatchingPermission.Unmatch))
         {
-            return Result.Failure(FailureReason.Forbidden, "You do not have permission to unmatch this matching.");
+            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You do not have permission to unmatch this matching."));
         }
 
         var actorId = _userService.UserId ?? throw new InvalidOperationException("Unauthorized"); ;
-        using var transaction = await _context.BeginTransactionAsync(cancellationToken);
-        var matching = await _context.Matchings.FindAsync([command.MatchingId], cancellationToken);
+        var matching = await context.Matchings.FindAsync([command.MatchingId], cancellationToken);
         if (matching == null)
         {
-            return Result.Failure(FailureReason.NotFound, "Matching not found.");
+            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found."));
         }
 
         matching.Remove(actorId);
-        foreach (var domainEvent in matching.DomainEvents)
-        {
-            await _domainEventHandler.HandleAsync(_context, domainEvent, cancellationToken);
-        }
-        _context.Matchings.Remove(matching);
-        await _context.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
-
-
-        return Result.Success();
+        return new TransactionalCommandResult<Result>(true, Result.Success());
     }
 }

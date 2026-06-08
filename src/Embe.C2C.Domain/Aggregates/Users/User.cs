@@ -137,6 +137,7 @@ public class User : Aggregate
         }
 
         file.MarkForDeletion();
+        file.MarkAsDeleted();
         UpdatedAt = DateTimeOffset.UtcNow;
         AddDomainEvent(new UserFileRemovedEvent(file));
     }

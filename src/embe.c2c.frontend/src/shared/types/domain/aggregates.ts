@@ -72,7 +72,13 @@ export type Message = {
     editedAt: string;
 }
 
+export enum NotificationType {
+    MatchingCreated = 0,
+    MatchingRemoved = 1,
+}
+
 export type Notification = {
+    type: NotificationType;
     id: string;
     recipientUserId: string;
     isRead: boolean;
