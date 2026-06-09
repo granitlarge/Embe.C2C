@@ -1,12 +1,12 @@
 import { getRefreshToken } from "./security/functions";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export type AuthenticatedUser = {
     id: string;
     userId: string;
 };
 
-export async function getAuthenticatedUser() : Promise<AuthenticatedUser | undefined> {
+export async function getAuthenticatedUser(): Promise<AuthenticatedUser | undefined> {
     const refreshToken = await getRefreshToken();
     if (!refreshToken) {
         return undefined;

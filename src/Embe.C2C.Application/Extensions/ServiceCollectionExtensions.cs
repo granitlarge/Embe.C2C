@@ -1,6 +1,5 @@
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
-using Embe.C2C.Application.Queries.Auth.Handlers;
 using Embe.C2C.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +20,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Auth.Handlers.SignOutHandler>();
         services.AddScoped<Commands.Auth.Handlers.RefreshHandler>();
 
+        services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
+
+        services.AddScoped<Queries.Auth.Handlers.AccountExistsHandler>();
+        services.AddScoped<Queries.Notifications.Handlers.GetNotificationsHandler>();
+
         services.AddScoped<JudgementAuthorizationPolicy>();
         services.AddScoped<MatchingAuthorizationPolicy>();
         services.AddScoped<UserAuthorizationPolicy>();
@@ -32,7 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MatchingService>();
         services.AddScoped<JudgementService>();
 
-        services.AddScoped<AccountExistsHandler>();
+
         return services;
     }
 }

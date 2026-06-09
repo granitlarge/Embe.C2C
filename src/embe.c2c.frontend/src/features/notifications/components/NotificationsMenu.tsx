@@ -185,6 +185,7 @@ export type NotificationsMenuProps = {
     className?: string;
     notifications?: NotificationTypeDef[];
 };
+
 export default function NotificationsMenu({ className, notifications: initialNotifications }: NotificationsMenuProps) {
 
     const notifications = useNotificationStore((state) => state.notifications);

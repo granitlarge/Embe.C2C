@@ -17,7 +17,7 @@ public class GetNotificationsHandler
         _authenticatedUserService = authenticatedUserService;
     }
 
-    public async Task<Result<List<NotificationDto>>> Handle(PagedQuery query, CancellationToken cancellationToken)
+    public async Task<Result<List<NotificationDto>>> HandleAsync(PagedQuery query, CancellationToken cancellationToken = default)
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("Authenticated user must have a user id.");
         var notifications = await _context.NotificationsQuery

@@ -1,9 +1,12 @@
 import RegisterForm from "@/src/features/auth/components/RegisterForm"
 
+
 export type RegisterPageProps = {
 
 }
+
 export default async function RegisterPage({ }: RegisterPageProps) {
+
     return (
         <div className="flex justify-start flex-col items-center">
             <h1>register</h1>
