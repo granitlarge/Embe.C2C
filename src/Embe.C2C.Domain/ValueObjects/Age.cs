@@ -6,19 +6,15 @@ public record Age : IComparable<Age>
 {
     public Age(BirthDate birthDate)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var age = today.Year - birthDate.Value.Year;
-        if (birthDate.Value > today.AddYears(-age))
-        {
-            age--;
-        }
-
+        var today = DateOnly.FromDateTime(DateTime.UtcNow).ToDateTime(TimeOnly.MinValue);
+        var birthDateTime = birthDate.Value.ToDateTime(TimeOnly.MinValue);
+        var difference = today - birthDateTime;
+        var age = difference.TotalDays / 365.25;
         if (age < 0)
         {
             throw new DomainException("Birth date cannot be in the future.");
         }
-
-        Value = age;
+        Value = (int)age;
     }
 
     public Age(int age)

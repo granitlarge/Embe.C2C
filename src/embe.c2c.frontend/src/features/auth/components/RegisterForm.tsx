@@ -63,7 +63,7 @@ function EmailStep({ finish, setEmail, value, errorMessage }: EmailStepProps) {
     }
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 items-center justify-center">
             <EmailInput value={email} onChange={setEmailState} valid={emailError === undefined} errorMessage={emailError} />
             {error && <span className="error-message">{error}</span>}
             <Button className="max-w-xs" onClick={onNavigate}>next</Button>
@@ -230,7 +230,7 @@ type ImagesStepProps = {
     errorMessage?: string;
     images?: FileDetails[]
 }
-function ImagesStep({ finish: finish, errorMessage, images: initialImages }: ImagesStepProps) {
+function ImagesStep({ finish: finish, errorMessage: initialErrorMessage, images: initialImages }: ImagesStepProps) {
 
     const validationSchema = z.array(z.object({
         url: z.url(),
@@ -240,7 +240,7 @@ function ImagesStep({ finish: finish, errorMessage, images: initialImages }: Ima
 
     const [imagesData, setImagesData] = useState<ImagesFormData>({
         images: initialImages || [],
-        imagesError: errorMessage
+        imagesError: initialErrorMessage
     });
 
     function onNext() {
@@ -253,9 +253,11 @@ function ImagesStep({ finish: finish, errorMessage, images: initialImages }: Ima
         }
     }
 
+    const isValid = imagesData.imagesError === undefined && initialErrorMessage === undefined;
+    const errorMessage = imagesData.imagesError || initialErrorMessage;
     return (
         <div className="flex flex-col gap-3 w-full items-center">
-            <ImageGallery value={imagesData.images} onChange={(newImages) => setImagesData(prev => ({ ...prev, images: newImages }))} valid={imagesData.imagesError === undefined} errorMessage={imagesData.imagesError} />
+            <ImageGallery value={imagesData.images} onChange={(newImages) => setImagesData(prev => ({ ...prev, images: newImages }))} valid={isValid} errorMessage={errorMessage} />
             <Button className="max-w-xs" onClick={onNext}>finish</Button>
         </div>
     )
@@ -318,11 +320,12 @@ export default function RegisterForm({ className }: RegisterFormProps) {
             files: images
         });
 
+        console.log("register response", response);
+
         if (response.success) {
             router.push("/login");
         } else {
-            const reason = response.reason;
-            switch (reason) {
+            switch (response.reason) {
                 case RegisterUserFailureReason.EmailAlreadyExists:
                     setErrorMessage(response.message?.toLowerCase() || "email already exists");
                     setStep("account exists");
@@ -341,6 +344,10 @@ export default function RegisterForm({ className }: RegisterFormProps) {
                     break;
                 case RegisterUserFailureReason.UnknownError:
                     setErrorMessage(response.message?.toLowerCase() || "an unknown error occurred");
+                    setStep("images");
+                    break;
+                default:
+                    setErrorMessage("an unknown error occurred");
                     setStep("images");
                     break;
             }
