@@ -12,7 +12,7 @@ public static class ResultExtensions
         return statusCode switch
         {
             HttpStatusCode.BadRequest => Results.BadRequest(new { success = false, reason = failureReason, message }),
-            HttpStatusCode.NotFound => Results.NotFound(),
+            HttpStatusCode.NotFound => Results.NotFound(new { success = false, reason = failureReason, message }),
             HttpStatusCode.Forbidden => Results.Forbid(),
             HttpStatusCode.Unauthorized => Results.Unauthorized(),
             HttpStatusCode.TooManyRequests => Results.StatusCode((int)HttpStatusCode.TooManyRequests),

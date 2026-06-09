@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
     )
     {
         services.AddScoped<Settings>();
-        services.AddIdentity<MyIdentityUser, IdentityRole>(options =>
+        services.AddIdentityCore<MyIdentityUser>(options =>
         {
             options.Password.RequireDigit = true;
             options.Password.RequireLowercase = true;
@@ -34,8 +34,9 @@ public static class ServiceCollectionExtensions
             options.Password.RequiredLength = 8;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.MaxValue;
             options.Lockout.MaxFailedAccessAttempts = 5;
-        }).AddEntityFrameworkStores<C2CContext>()
-        .AddDefaultTokenProviders();
+        })
+            .AddEntityFrameworkStores<C2CContext>()
+            .AddDefaultTokenProviders();
 
         services.AddDbContext<IRepository, C2CContext>
         (

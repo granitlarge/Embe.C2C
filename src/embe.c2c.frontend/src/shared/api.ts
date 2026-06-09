@@ -2,12 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { ApiError } from "./api-errors";
-import { AccessTokenName, RefreshTokenName } from "./security/constants";
-import { clearTokens, deleteToken, getAccessToken, getRefreshToken, saveToken, Token } from "./security/functions";
+import { AccessTokenName } from "./security/constants";
+import { clearTokens, getAccessToken, getRefreshToken, saveToken, Token } from "./security/functions";
 
-type RefreshAccessTokenResponse = {
-    accessToken: Token;
-}
+type RefreshAccessTokenResponse = ApiResponse<{ accessToken: Token }, FailureReason>;
 
 async function parseResponse<T>(response: Response): Promise<T | undefined> {
     try {
@@ -25,7 +23,6 @@ async function parseResponse<T>(response: Response): Promise<T | undefined> {
 async function refreshAccessToken(): Promise<Token | undefined> {
     const refreshToken = await getRefreshToken();
     if (!refreshToken) {
-        console.log("No refresh token found, cannot refresh access token.");
         return undefined;
     }
 
@@ -33,33 +30,29 @@ async function refreshAccessToken(): Promise<Token | undefined> {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Refresh ${refreshToken}`
+            "Authorization": `Bearer ${refreshToken}`
         },
         body: JSON.stringify({ refreshToken })
     });
 
     if (!response.ok) {
-        console.log(`Failed to refresh access token. Status: ${response.status}`);
         return undefined;
     }
 
     const responseBody = await response.json();
-    const { accessToken } = responseBody as RefreshAccessTokenResponse;
-    return accessToken;
+    const refreshAccessTokenResponse = responseBody as RefreshAccessTokenResponse;
+    return refreshAccessTokenResponse.value?.accessToken;
 }
 
 async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
 
     let accessToken = await getAccessToken();
     if (!accessToken) {
-        console.log("No access token found, attempting to refresh...");
         const newAccessToken = await refreshAccessToken();
         if (!newAccessToken) {
-            console.log("Failed to refresh access token, redirecting to login...");
             await clearTokens();
             return redirect("/login", "push");
         }
-        console.log("Successfully refreshed access token, retrying request...");
         await saveToken(AccessTokenName, newAccessToken);
         accessToken = newAccessToken.token;
     }
@@ -73,7 +66,6 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
     }
 
     if (response.status === 401) {
-        console.log("Received 401 Unauthorized, attempting to refresh access token...");
         const newAccessToken = await refreshAccessToken();
         if (!newAccessToken) {
             console.log("Failed to refresh access token after 401, redirecting to login...");
@@ -90,7 +82,6 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
         }
 
         if (retryResponse.status === 401) {
-            console.log("Received 401 Unauthorized after retry, redirecting to login...");
             await clearTokens();
             return redirect("/login", "push");
         }

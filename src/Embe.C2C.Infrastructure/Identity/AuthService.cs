@@ -17,16 +17,14 @@ public class AuthService
     Settings settings,
     Ef.Contexts.C2CContext context,
     IAuthenticatedUserService userService,
-    SignInManager<MyIdentityUser> signInManager,
     UserManager<MyIdentityUser> userManager
 ) : IAuthService
 {
     private readonly Ef.Contexts.C2CContext _context = context;
-    private readonly SignInManager<MyIdentityUser> _signInManager = signInManager;
     private readonly UserManager<MyIdentityUser> _userManager = userManager;
     private readonly IAuthenticatedUserService _userService = userService;
     private readonly Settings _settings = settings;
-    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan _refreshTokenLifetime = TimeSpan.FromDays(7);
 
     public async Task<TypedResult<RefreshFailureReason, Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
@@ -105,20 +103,20 @@ public class AuthService
         var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
         var ownsTransaction = _context.Database.CurrentTransaction == null;
 
-        var signInResult = await _signInManager.PasswordSignInAsync(email, password, false, true);
-        if (!signInResult.Succeeded)
+        var identityUser = await _userManager.FindByEmailAsync(email);
+        if (identityUser == null)
         {
-            return signInResult switch
-            {
-                { IsLockedOut: true } => TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.TooManyAttempts, "Too many failed attempts. Please try again later."),
-                { IsNotAllowed: true } => TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotConfirmed, "User account is not confirmed."),
-                _ => TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.InvalidCredentials, "Invalid email or password.")
-            };
+            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotFound, "User not found.");
         }
 
-        var identityUser = await _context.Users.SingleAsync(u => u.Email == email, cancellationToken);
+        var signInResult = await _userManager.CheckPasswordAsync(identityUser, password);
+        if (!signInResult)
+        {
+            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.InvalidCredentials, "Invalid email or password.");
+        }
+
         var user = await _context.DomainUsers.SingleAsync(u => u.Email == Email.Create(email), cancellationToken);
-        if (user == null)
+        if (identityUser == null)
         {
             return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotFound, "User not found.");
         }

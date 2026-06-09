@@ -3,6 +3,7 @@ using Embe.C2C.Application.Commands.Auth;
 using Embe.C2C.Application.Commands.Auth.Handlers;
 using Embe.C2C.Application.Queries.Auth;
 using Embe.C2C.Application.Queries.Auth.Handlers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Embe.C2C.Api.EndPoints;
@@ -18,8 +19,10 @@ public static class AuthEndPoints
         group.MapPost("/account-exists", AccountExists);
         group.MapPost("/signin", SignIn);
         group.MapPost("/signout", SignOut).RequireAuthorization();
-        group.MapPost("/refresh", Refresh).RequireAuthorization(policy => policy.AddAuthenticationSchemes("Refresh").RequireAuthenticatedUser());
-        group.MapPost("/ping", () => Results.Ok("pong")).RequireAuthorization();
+        group.MapPost("/refresh", Refresh).RequireAuthorization(new AuthorizeAttribute
+        {
+            AuthenticationSchemes = "Refresh"
+        });
     }
 
     private static async Task<IResult> AccountExists([FromBody] AccountExistsQuery query, [FromServices] AccountExistsHandler handler, CancellationToken cancellationToken = default)
