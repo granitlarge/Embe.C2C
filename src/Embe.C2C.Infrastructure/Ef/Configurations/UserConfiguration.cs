@@ -76,10 +76,19 @@ public class UserConfiguration : AggregateConfiguration<User>
             .OnDelete(DeleteBehavior.NoAction);
 
         builder
-            .HasMany<Domain.Entities.File>("_files")
-            .WithOne()
-            .HasForeignKey(f => f.OwnerUserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OwnsMany<Domain.Entities.File>("_files", f =>
+            {
+                f.HasKey(f => f.Id);
+                f.WithOwner().HasForeignKey(f => f.OwnerUserId);
+                f.OwnsOne(f => f.FileDetails, fd =>
+                {
+                    fd.Property(d => d.Url);
+                    fd.Property(d => d.MimeType);
+                    fd.Property(d => d.Order);
+                });
+                f.Property(f => f.RowVersion).IsRowVersion();
+            });
+
         base.Configure(builder);
     }
 }

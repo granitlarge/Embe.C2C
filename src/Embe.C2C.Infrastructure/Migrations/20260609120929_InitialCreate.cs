@@ -215,11 +215,11 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OwnerUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MarkedForDeletionAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    FileDetails_Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FileDetails_MimeType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FileDetails_Order = table.Column<int>(type: "int", nullable: false),
-                    FileDetails_Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MarkedForDeletionAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>

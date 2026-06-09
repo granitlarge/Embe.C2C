@@ -14,7 +14,7 @@ using NetTopologySuite.Geometries;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    [Migration("20260608151718_InitialCreate")]
+    [Migration("20260609120929_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -337,50 +337,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("Conversation");
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Entities.File", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("MarkedForDeletionAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("OwnerUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "FileDetails", "Embe.C2C.Domain.Entities.File.FileDetails#FileDetails", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<string>("MimeType")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("Order")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Url")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-                        });
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OwnerUserId");
-
-                    b.ToTable("File");
-                });
-
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.RefreshTokenEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -681,6 +637,66 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasForeignKey("Embe.C2C.Domain.Aggregates.Users.User", "IdentityUserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.OwnsMany("Embe.C2C.Domain.Entities.File", "_files", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset?>("DeletedAt")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<DateTimeOffset?>("MarkedForDeletionAt")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<Guid>("OwnerUserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<byte[]>("RowVersion")
+                                .IsConcurrencyToken()
+                                .IsRequired()
+                                .ValueGeneratedOnAddOrUpdate()
+                                .HasColumnType("rowversion");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("OwnerUserId");
+
+                            b1.ToTable("File");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OwnerUserId");
+
+                            b1.OwnsOne("Embe.C2C.Domain.ValueObjects.FileDetails", "FileDetails", b2 =>
+                                {
+                                    b2.Property<Guid>("FileId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<string>("MimeType")
+                                        .IsRequired()
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.Property<int>("Order")
+                                        .HasColumnType("int");
+
+                                    b2.Property<string>("Url")
+                                        .IsRequired()
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.HasKey("FileId");
+
+                                    b2.ToTable("File");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("FileId");
+                                });
+
+                            b1.Navigation("FileDetails")
+                                .IsRequired();
+                        });
+
+                    b.Navigation("_files");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Entities.Conversation", b =>
@@ -688,15 +704,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Matchings.Matching", null)
                         .WithOne()
                         .HasForeignKey("Embe.C2C.Domain.Entities.Conversation", "MatchingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Embe.C2C.Domain.Entities.File", b =>
-                {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
-                        .WithMany("_files")
-                        .HasForeignKey("OwnerUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -768,11 +775,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasForeignKey("MatchingId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Users.User", b =>
-                {
-                    b.Navigation("_files");
                 });
 #pragma warning restore 612, 618
         }
