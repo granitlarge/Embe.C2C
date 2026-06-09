@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 
 namespace Embe.C2C.Application.Dtos.Aggregates;
 

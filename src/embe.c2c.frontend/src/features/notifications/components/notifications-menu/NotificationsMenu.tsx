@@ -4,20 +4,26 @@ import { Bell } from "@deemlol/next-icons"
 import { useEffect, useState } from "react";
 import useNotificationStore from "../../stores";
 import NotificationsModal from "../notifications-modal/NotificationsModal";
+import * as api from "../../actions/action";
 
 export type NotificationsMenuProps = {
     className?: string;
-    hasUnread?: boolean;
 };
 
-export default function NotificationsMenu({ className, hasUnread: initialHasUnread }: NotificationsMenuProps) {
+export default function NotificationsMenu({ className }: NotificationsMenuProps) {
 
     const setHasUnread = useNotificationStore((state) => state.setHasUnread);
     const hasUnread = useNotificationStore((state) => state.hasUnread);
 
     useEffect(() => {
-        setHasUnread(initialHasUnread ?? false);
-    }, [initialHasUnread, setHasUnread]);
+        async function fetchHasUnread() {
+            const result = await api.hasUnread()
+            if (result.value) {
+                setHasUnread(result.value);
+            }
+        }
+        fetchHasUnread();
+    }, [setHasUnread]);
 
     const [hidden, setHidden] = useState(true);
 

@@ -365,11 +365,19 @@ namespace Embe.C2C.Infrastructure.Migrations
                     ReadAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     NotificationType = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
                     MatchingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PartnerUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PartnerUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartnerProfileImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_DomainUsers_PartnerUserId",
+                        column: x => x.PartnerUserId,
+                        principalTable: "DomainUsers",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Notifications_DomainUsers_RecipientUserId",
                         column: x => x.RecipientUserId,
@@ -475,6 +483,16 @@ namespace Embe.C2C.Infrastructure.Migrations
                 name: "IX_Notifications_MatchingId",
                 table: "Notifications",
                 column: "MatchingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_PartnerUserId",
+                table: "Notifications",
+                column: "PartnerUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_ReadAt",
+                table: "Notifications",
+                column: "ReadAt");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_RecipientUserId",

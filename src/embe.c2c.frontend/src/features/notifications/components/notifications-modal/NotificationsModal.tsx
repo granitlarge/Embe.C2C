@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import useNotificationStore from "../../stores";
 import Notification from "../notification/Notification";
 import styles from "./NotificationsModal.module.css";
-import { getNotifications } from "../../actions/get/action";
+import * as api from "../../actions/action";
 
 export type NotificationsModalProps = {
     hidden: boolean;
@@ -26,7 +26,7 @@ export default function NotificationsModal({ hidden, closed }: NotificationsModa
     useEffect(() => {
 
         async function fetchNotification() {
-            const response = await getNotifications();
+            const response = await api.getNotifications();
             if (response.success) {
                 setHasFetched(true);
                 setError(null);
@@ -63,6 +63,7 @@ export default function NotificationsModal({ hidden, closed }: NotificationsModa
     }
 
     async function markAsUnread(notificationId: string) {
+        await api.markAsRead(notificationId, false);
         setNotifications(notifications.map((notification) => {
             if (notification.id === notificationId) {
                 return { ...notification, isRead: false };
@@ -72,6 +73,7 @@ export default function NotificationsModal({ hidden, closed }: NotificationsModa
     }
 
     async function markAsRead(notificationId: string) {
+        await api.markAsRead(notificationId, true);
         setNotifications(notifications.map((notification) => {
             if (notification.id === notificationId) {
                 return { ...notification, isRead: true, };

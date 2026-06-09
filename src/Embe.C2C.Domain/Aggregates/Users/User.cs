@@ -70,6 +70,8 @@ public class User : Aggregate
     private readonly List<Entities.File> _files;
     [NotMapped]
     public IReadOnlyCollection<Entities.File> Files => _files.AsReadOnly();
+    [NotMapped]
+    public Entities.File ProfilePicture => _files.OrderBy(f => f.FileDetails.Order).First();
 
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset UpdatedAt { get; private set; }

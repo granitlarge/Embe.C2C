@@ -8,19 +8,24 @@ import { clearTokens, getAccessToken, getRefreshToken, saveToken, Token } from "
 type RefreshAccessTokenResponse = ApiResponse<{ accessToken: Token }, FailureReason>;
 
 async function parseResponse<T>(response: Response): Promise<T | undefined> {
+
     try {
+
         const contentType = response.headers.get("Content-Type");
         if (contentType && contentType.includes("application/json")) {
             const responseBody = await response.json();
             return responseBody as T;
         }
+
     } catch (error) {
 
     }
+
     return undefined;
 }
 
 async function refreshAccessToken(): Promise<Token | undefined> {
+
     const refreshToken = await getRefreshToken();
     if (!refreshToken) {
         return undefined;
@@ -42,6 +47,7 @@ async function refreshAccessToken(): Promise<Token | undefined> {
     const responseBody = await response.json();
     const refreshAccessTokenResponse = responseBody as RefreshAccessTokenResponse;
     return refreshAccessTokenResponse.value?.accessToken;
+
 }
 
 async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
@@ -68,7 +74,6 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
     if (response.status === 401) {
         const newAccessToken = await refreshAccessToken();
         if (!newAccessToken) {
-            console.log("Failed to refresh access token after 401, redirecting to login...");
             await clearTokens();
             return redirect("/login", "push");
         }

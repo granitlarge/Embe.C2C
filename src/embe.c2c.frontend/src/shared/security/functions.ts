@@ -1,3 +1,5 @@
+"use server";
+
 import { cookies } from "next/headers";
 import { AccessTokenName, RefreshTokenName, TokenCookieOptions } from "./constants";
 

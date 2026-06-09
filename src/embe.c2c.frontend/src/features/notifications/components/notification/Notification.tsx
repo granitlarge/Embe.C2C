@@ -1,7 +1,6 @@
 import { getMatchingUrl } from "@/src/shared/route";
 import { formatTimeAgo } from "@/src/shared/time";
-import { NotificationType, Notification as NotificationTypeDef } from "@/src/shared/types/domain/aggregates";
-import { MatchingCreatedNotificationIntegrationEntity } from "@/src/shared/types/integration/notifications";
+import { MatchingCreatedNotification, MatchingRemovedNotification, NotificationType, Notification as NotificationTypeDef } from "@/src/shared/types/domain/aggregates";
 import { MailOpen, Mail } from "lucide-react";
 import { Trash2 } from "@deemlol/next-icons";
 import Image from "next/image";
@@ -22,7 +21,7 @@ function getNotificationContent(notification: NotificationTypeDef): Notification
 
     switch (notification.type) {
         case NotificationType.MatchingCreated: {
-            const matchingCreatedNotification = notification as MatchingCreatedNotificationIntegrationEntity;
+            const matchingCreatedNotification = notification as MatchingCreatedNotification;
             title = "new match!";
             content = `you matched with ${matchingCreatedNotification.partnerUserName}`;
             imageUrl = matchingCreatedNotification.partnerProfileImageUrl;
@@ -30,7 +29,7 @@ function getNotificationContent(notification: NotificationTypeDef): Notification
             break;
         }
         case NotificationType.MatchingRemoved: {
-            const matchingRemovedNotification = notification as MatchingCreatedNotificationIntegrationEntity;
+            const matchingRemovedNotification = notification as MatchingRemovedNotification;
             title = "match removed";
             content = `your match with ${matchingRemovedNotification.partnerUserName} has been removed`;
             break;

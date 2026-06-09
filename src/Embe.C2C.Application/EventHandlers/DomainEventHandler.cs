@@ -2,11 +2,11 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Dtos.Aggregates;
 using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Notifications;
-using Embe.C2C.Application.IntegrationEntities.Notifications;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.Notifications.Events;
+using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 using Microsoft.EntityFrameworkCore;
 using NotificationUpdatedEvent = Embe.C2C.Domain.Aggregates.Notifications.Events.NotificationUpdatedEvent;
@@ -62,46 +62,46 @@ public class DomainEventHandler : IntegrationEventCollector
     )
     {
         var matching = matchingCreatedEvent.Matching;
-        var userIdToNotify = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
-        var userIdThatCausedEvent = matchingCreatedEvent.LastJudgeUserId;
+        var matcheeUserId = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
+        var matcherUserId = matchingCreatedEvent.LastJudgeUserId;
+        var matcheeUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == matcheeUserId, cancellationToken);
 
-        var notification = new MatchingCreated(userIdToNotify, matching.Id, matchingCreatedEvent.LastJudgeUserId);
+        var notification = new MatchingCreated
+        (
+            matcheeUserId,
+            matching.Id,
+            matcherUserId,
+            matcheeUser.UserName.Value,
+            matcheeUser.ProfilePicture.FileDetails.Url
+        );
         _context.Notifications.Add(notification);
 
-        var partnerUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == userIdThatCausedEvent, cancellationToken);
-        var partnerUserName = partnerUser.UserName.Value;
-        var partnerProfileImageUrl = partnerUser.Files.OrderBy(f => f.FileDetails.Order).First().FileDetails.Url;
         var notificationDto = notification.ToDto();
-        var integrationEntity = new MatchingCreatedNotificationIntegrationEntity
-        (
-            notificationDto.Id,
-            notificationDto.RecipientUserId,
-            notificationDto.IsRead,
-            notificationDto.ReadAt,
-            notificationDto.CreatedAt,
-            notificationDto.UpdatedAt,
-            matching.Id,
-            partnerUserName,
-            partnerProfileImageUrl
-        );
-
         var integrationEvent = new NotificationCreatedEvent(notificationDto);
         AddIntegrationEvent(integrationEvent);
     }
 
-    private Task HandleMatchingRemovedEventAsync
+    private async Task HandleMatchingRemovedEventAsync
     (
         MatchingRemovedEvent matchingRemovedEvent,
         CancellationToken cancellationToken
     )
     {
         var matching = matchingRemovedEvent.Matching;
-        var userIdToNotify = matchingRemovedEvent.RemoverUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
+        var matchRemoveeUserId = matchingRemovedEvent.RemoverUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
+        var matchRemoverUserId = matchingRemovedEvent.RemoverUserId;
+        var matcheeUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == matchRemoveeUserId, cancellationToken);
 
-        var notification = new MatchingRemoved(userIdToNotify, matching.Id, matchingRemovedEvent.RemoverUserId);
+        var notification = new MatchingCreated
+        (
+            matchRemoveeUserId,
+            matching.Id,
+            matchRemoverUserId,
+            matcheeUser.UserName.Value,
+            matcheeUser.ProfilePicture.FileDetails.Url
+        );
         _context.Notifications.Add(notification);
         AddIntegrationEvent(new NotificationCreatedEvent(notification.ToDto()));
-        return Task.CompletedTask;
     }
 
     private Task HandleNotificationUpdatedEventAsync

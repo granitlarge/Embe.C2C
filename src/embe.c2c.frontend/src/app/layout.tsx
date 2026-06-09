@@ -14,7 +14,7 @@ export type RootLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: RootLayoutProps) {
 

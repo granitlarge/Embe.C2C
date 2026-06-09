@@ -88,10 +88,16 @@ export type Notification = {
 
 export type MatchingCreatedNotification = Notification & {
     matchingId: string;
+    partnerUserId: string;
+    partnerUserName: string;
+    partnerProfileImageUrl: string;
 }
 
 export type MatchingRemovedNotification = Notification & {
     matchingId: string;
+    partnerUserId: string;
+    partnerUserName: string;
+    partnerProfileImageUrl: string;
 }
 
 export type Transaction = {

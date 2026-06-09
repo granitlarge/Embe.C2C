@@ -18,6 +18,9 @@ public static class NotificationEndPoints
 
         group.MapPost("/mark-as-read", MarkAsRead)
             .WithName("MarkNotificationAsRead");
+
+        group.MapGet("/has-unread", HasUnread)
+            .WithName("HasUnreadNotifications");
     }
 
     private static async Task<IResult> GetNotifications
@@ -43,6 +46,16 @@ public static class NotificationEndPoints
     )
     {
         var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> HasUnread
+    (
+        [FromServices] HasUnreadHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await handler.HandleAsync(cancellationToken);
         return result.ToResult();
     }
 }

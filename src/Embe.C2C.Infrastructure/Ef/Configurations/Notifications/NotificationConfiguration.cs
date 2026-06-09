@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,9 @@ public class NotificationConfiguration : AggregateConfiguration<Notification>
              .WithMany()
              .HasForeignKey(n => n.RecipientUserId)
              .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(n => n.ReadAt);
+
         base.Configure(builder);
     }
 }

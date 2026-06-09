@@ -14,7 +14,7 @@ using NetTopologySuite.Geometries;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    [Migration("20260609120929_InitialCreate")]
+    [Migration("20260609222237_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -162,6 +162,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasColumnType("rowversion");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReadAt");
 
                     b.HasIndex("RecipientUserId");
 
@@ -554,21 +556,41 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.MatchingCreated", b =>
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification", b =>
                 {
                     b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Notification");
 
                     b.Property<Guid>("MatchingId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("PartnerProfileImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PartnerUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PartnerUserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasIndex("MatchingId");
+
+                    b.HasIndex("PartnerUserId");
+
+                    b.HasDiscriminator().HasValue("MatchingNotification");
+                });
+
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingCreated", b =>
+                {
+                    b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification");
 
                     b.HasDiscriminator().HasValue("MatchingCreated");
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.MatchingRemoved", b =>
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingRemoved", b =>
                 {
-                    b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Notification");
+                    b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification");
 
                     b.HasDiscriminator().HasValue("MatchingRemoved");
                 });
@@ -768,11 +790,17 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.MatchingCreated", b =>
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification", b =>
                 {
                     b.HasOne("Embe.C2C.Domain.Aggregates.Matchings.Matching", null)
                         .WithMany()
                         .HasForeignKey("MatchingId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("PartnerUserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
                 });

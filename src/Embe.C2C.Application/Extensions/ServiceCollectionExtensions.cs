@@ -23,7 +23,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
 
         services.AddScoped<Queries.Auth.Handlers.AccountExistsHandler>();
+
         services.AddScoped<Queries.Notifications.Handlers.GetNotificationsHandler>();
+        services.AddScoped<Queries.Notifications.Handlers.HasUnreadHandler>();
 
         services.AddScoped<JudgementAuthorizationPolicy>();
         services.AddScoped<MatchingAuthorizationPolicy>();
