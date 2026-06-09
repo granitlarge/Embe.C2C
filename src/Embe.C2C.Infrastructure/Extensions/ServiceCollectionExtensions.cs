@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
         }).AddEntityFrameworkStores<C2CContext>()
         .AddDefaultTokenProviders();
 
-        services.AddDbContext<IC2CContext, C2CContext>
+        services.AddDbContext<IRepository, C2CContext>
         (
             options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), x => x.UseNetTopologySuite())
         );

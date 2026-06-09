@@ -15,9 +15,9 @@ namespace Embe.C2C.Application.EventHandlers;
 
 public class DomainEventHandler : IntegrationEventCollector
 {
-    private readonly IC2CContext _context;
+    private readonly IRepository _context;
 
-    public DomainEventHandler(IC2CContext context)
+    public DomainEventHandler(IRepository context)
     {
         _context = context;
     }
@@ -68,7 +68,7 @@ public class DomainEventHandler : IntegrationEventCollector
         var notification = new MatchingCreated(userIdToNotify, matching.Id, matchingCreatedEvent.LastJudgeUserId);
         _context.Notifications.Add(notification);
 
-        var partnerUser = await _context.DomainUsers.SingleAsync(u => u.Id == userIdThatCausedEvent, cancellationToken);
+        var partnerUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == userIdThatCausedEvent, cancellationToken);
         var partnerUserName = partnerUser.UserName.Value;
         var partnerProfileImageUrl = partnerUser.Files.OrderBy(f => f.FileDetails.Order).First().FileDetails.Url;
         var notificationDto = notification.ToDto();

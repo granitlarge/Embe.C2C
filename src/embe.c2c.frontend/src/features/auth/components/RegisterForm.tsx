@@ -347,7 +347,6 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         }
     }
 
-    console.log("rendering register form, step:", step);
     return (
         <div className={`form flex flex-col gap-5 p-8 ${classNames} w-600px max-w-full`}>
             {step !== "account exists" && <ProgressBar steps={steps.length} progress={steps.indexOf(step) + 1} />}

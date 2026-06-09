@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Users.Handlers;
 
-public class GetUserByIdHandler(IC2CContext context)
+public class GetUserByIdHandler(IRepository context)
 {
-    private readonly IC2CContext _context = context;
+    private readonly IRepository _context = context;
 
     public async Task<Result<User>> HandleAsync(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
-        var user = await _context.DomainUsers.AsNoTracking().SingleOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
+        var user = await _context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
         if (user is null)
             return Result<User>.Failure(FailureReason.NotFound, "User not found.");
         return Result<User>.Success(user);

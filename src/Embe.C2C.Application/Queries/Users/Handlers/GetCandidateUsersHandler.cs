@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Users.Handlers
 {
-    public class GetCandidateUsersHandler(IC2CContext context, IAuthenticatedUserService userService)
+    public class GetCandidateUsersHandler(IRepository context, IAuthenticatedUserService userService)
     {
-        private readonly IC2CContext _context = context;
+        private readonly IRepository _context = context;
         private readonly IAuthenticatedUserService _userService = userService;
 
         public async Task<Result<List<User>>> HandleAsync(GetCandidateUsersQuery request, CancellationToken cancellationToken)
@@ -16,7 +16,7 @@ namespace Embe.C2C.Application.Queries.Users.Handlers
             var userId = _userService.UserId ?? throw new InvalidOperationException("User ID is not available.");
 
             using var transaction = await _context.BeginTransactionAsync();
-            var user = await _context.DomainUsers.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            var user = await _context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
             if (user is null)
                 return Result<List<User>>.Failure(FailureReason.NotFound, "User not found.");
             throw new NotImplementedException();

@@ -9,8 +9,9 @@ import { MatchingCreatedNotificationIntegrationEntity } from "@/src/shared/types
 import { formatTimeAgo } from "@/src/shared/time";
 import Link from "next/link";
 import Image from "next/image";
-import Mail from "@/src/shared/components/icons/Mail";
 import Trash from "@/src/shared/components/icons/Trash";
+import { MailOpen, Mail } from "lucide-react";
+import { getMatchingUrl } from "@/src/shared/route";
 
 type NotificationContent = {
     title: string;
@@ -31,6 +32,7 @@ function getNotificationContent(notification: NotificationTypeDef): Notification
             title = "new match!";
             content = `you matched with ${matchingCreatedNotification.partnerUserName}`;
             imageUrl = matchingCreatedNotification.partnerProfileImageUrl;
+            linkUrl = getMatchingUrl(matchingCreatedNotification.matchingId);
             break;
         }
         case NotificationType.MatchingRemoved: {
@@ -58,41 +60,38 @@ function Notification({ markAsRead, remove, markAsUnread, notification }: Notifi
     const { title, content, imageUrl, linkUrl } = getNotificationContent(notification);
 
     const classNames = [
-        "flex flex-row gap-0 p-3 w-full border border-(--color-tertiary) rounded-lg",
-        notification.isRead ? "bg-(--color-quaternary)" : "bg-(--color-quaternary-light)",
-        linkUrl ? "cursor-pointer" : "",
+        "flex flex-row gap-0 p-3 w-full border border-(--surface-border-color) rounded-lg bg-(--surface)",
+        notification.isRead ? "bg-(--surface)" : "bg-(--surface-light)",
     ].filter(Boolean).join(" ");
 
-    function getTsx(children: React.ReactNode) {
-
-        if (linkUrl) {
-            return <Link className={classNames} href={linkUrl}>{children}</Link>;
-        } else {
-            return <div className={classNames}>{children}</div>;
-        }
-
-    }
-
-    return getTsx
-    (
-        <>
-            <div className="flex flex-row gap-5 items-center">
-                {imageUrl && <Image src={imageUrl} alt="notification image" width={0} height={0} className="w-20 h-20 rounded-full" />}
-                <div className="flex flex-col gap-0">
-                    <span className="text-(--color-secondary) text-(length:--fs-6)">{title}</span>
-                    <span className="text-(length:--fs-lg) text-(--color-tertiary)">{content}</span>
+    return (
+            <div className={classNames}>
+                <div className="flex flex-row gap-5 items-center">
+                    {imageUrl && <Image src={imageUrl} alt="notification image" width={0} height={0} className="w-12 h-12 rounded-full" />}
+                    <div className="flex flex-col gap-0">
+                        {
+                            linkUrl ? <Link className="text-(length:--fs-7)" href={linkUrl}>{title}</Link> :
+                                <span className="text-(--surface-font-color) text-(length:--fs-7)">{title}</span>
+                        }
+                        <span className="text-(length:--fs-md) text-(--surface-font-color-muted)">{content}</span>
+                    </div>
+                </div>
+                <div className="ml-auto flex flex-col gap-2 mt-auto mb-auto items-center">
+                    <div className="flex flex-row gap-2">
+                        {notification.isRead &&
+                            <button title="mark as unread" className="cursor-pointer text-(--surface-font-color)" onClick={markAsUnread}>
+                                <MailOpen className="w-5 h-5" />
+                            </button>}
+                        {!notification.isRead &&
+                            <button title="mark as read" className="cursor-pointer text-(--surface-font-color)" onClick={markAsRead}>
+                                <Mail className="w-5 h-5" />
+                            </button>}
+                        <Trash title="remove" className="w-5 h-5 text-(--destructive) cursor-pointer" onClick={remove} />
+                    </div>
+                    <div className="ml-auto text-(--surface-font-color-muted) text-(length:--fs-sm)">{timeAgo}</div>
                 </div>
             </div>
-            <div className="ml-auto flex flex-col gap-2 mt-auto mb-auto items-center">
-                <div className="flex flex-row gap-2">
-                    {!notification.isRead && <Mail title="mark as read" color="white" unread={false} className="cursor-pointer" onClick={markAsRead} />}
-                    {notification.isRead && <Mail title="mark as unread" color="white" unread={true} className="cursor-pointer" onClick={markAsUnread} />}
-                    <Trash title="remove" className="text-(--color-secondary) cursor-pointer" onClick={remove} />
-                </div>
-                <div className="ml-auto text-(--color-tertiary) text-(length:--fs-md)">{timeAgo}</div>
-            </div>
-        </>
-    )
+        )
 
 }
 
@@ -140,7 +139,7 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
     async function markAsRead(notificationId: string) {
         setNotifications(notifications.map((notification) => {
             if (notification.id === notificationId) {
-                return { ...notification, isRead: true,};
+                return { ...notification, isRead: true, };
             }
             return notification;
         }));
@@ -162,9 +161,9 @@ function NotificationsModal({ hidden, closed }: NotificationsModalProps) {
                 w-[70%] h-[70%] 
                 m-auto 
                 rounded-lg 
-                bg-(--color-quaternary)
+                bg-(--surface)
                 `} closedby="any">
-                <h2 className="mr-auto ml-auto text-(--color-tertiary)">notifications</h2>
+                <h2 className="mr-auto ml-auto text-(--surface-font-color)">notifications</h2>
                 {
                     notifications.length === 0 ? <span className="text-(length:--fs-6)">no notifications</span> :
                         notifications.map((notification) => (
@@ -210,7 +209,7 @@ export default function NotificationsMenu({ className, notifications: initialNot
             >
                 <div className="relative">
                     <Bell size={36} className="relative" />
-                    {hasUnread() && <span className="absolute top-0 -right-1 block h-2 w-2 rounded-full bg-(--color-secondary)"></span>}
+                    {hasUnread() && <span className="absolute top-0 -right-1 block h-2 w-2 rounded-full bg-(--primary)"></span>}
                 </div>
             </button>
             <NotificationsModal hidden={hidden} closed={() => setHidden(true)} />

@@ -22,7 +22,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
 
     public UpdateHandler
     (
-        IC2CContext context,
+        IRepository context,
         UserAuthorizationPolicy authorizationPolicy,
         IFileService fileService,
         DomainEventHandler domainEventHandler,
@@ -35,7 +35,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
         _workItemService = workItemService;
     }
 
-    protected override async Task<TransactionalCommandResult<Result<HandlerReturnType>>> HandleAsync(ISparseC2CContext context, UpdateCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<Result<HandlerReturnType>>> HandleAsync(ISparseRepository context, UpdateCommand command, CancellationToken cancellationToken = default)
     {
         var permissions = await _authorizationPolicy.GetPermissionsAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Update))
@@ -61,7 +61,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
             );
             var location = command.Location;
 
-            var user = await context.DomainUsers.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+            var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
             if (user == null)
             {
                 return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.NotFound, "User not found."));

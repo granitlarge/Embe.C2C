@@ -12,8 +12,8 @@ export default function ProgressBar({ className, steps, progress }: ProgressBarP
 
     return (
         <div className={`w-full ${classNames}`}>
-            <div className="w-full h-[1px] bg-(--color-tertiary) relative">
-                <div className="absolute h-full bg-(--color-primary) transition-all duration-300" style={{ width: `${(progress - 1) / (steps - 1) * 100}%` }}>
+            <div className="w-full h-[1px] bg-(--surface-font-color) relative">
+                <div className="absolute h-full bg-(--primary) transition-all duration-300" style={{ width: `${(progress - 1) / (steps - 1) * 100}%` }}>
                 </div>
                 {
                     [...Array(steps)].map((_, index) => (
@@ -29,7 +29,7 @@ export default function ProgressBar({ className, steps, progress }: ProgressBarP
                             }
                             style={{
                                 left: `${(index) / (steps - 1) * 100}%`,
-                                backgroundColor: progress >= index + 1 ? "var(--color-primary)" : "var(--color-tertiary)"
+                                backgroundColor: progress >= index + 1 ? "var(--primary)" : "var(--surface-font-color)"
                             }}
                         />
                     ))

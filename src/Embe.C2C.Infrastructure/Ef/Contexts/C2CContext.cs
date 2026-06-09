@@ -15,10 +15,30 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Embe.C2C.Infrastructure.Ef.Contexts;
 
+public class MyDbSet<T>(DbSet<T> dbSet) : IDbSet<T> where T : class
+{
+    private readonly DbSet<T> _dbSet = dbSet;
+
+    public void Add(T entity)
+    {
+        _dbSet.Add(entity);
+    }
+
+    public void Remove(T entity)
+    {
+        _dbSet.Remove(entity);
+    }
+
+    public ValueTask<T?> FindAsync(object?[]? keyValues, CancellationToken cancellationToken = default)
+    {
+        return _dbSet.FindAsync(keyValues, cancellationToken);
+    }
+}
+
 public class C2CContext
 (
     DbContextOptions<C2CContext> options
-) : IdentityDbContext<MyIdentityUser>(options), IC2CContext
+) : IdentityDbContext<MyIdentityUser>(options), IRepository
 {
     public DbSet<User> DomainUsers { get; set; }
     public DbSet<Account> Accounts { get; set; }
@@ -36,6 +56,86 @@ public class C2CContext
                 .OfType<DomainEventCollector>()
                 .SelectMany(c => c.DomainEvents)
                 .ToImmutableList();
+        }
+    }
+
+    public IQueryable<User> DomainUsersQuery
+    {
+        get
+        {
+            return DomainUsers;
+        }
+    }
+
+    public IQueryable<Account> AccountsQuery
+    {
+        get
+        {
+            return Accounts;
+        }
+    }
+
+    public IQueryable<Judgement> JudgementsQuery
+    {
+        get
+        {
+            return Judgements;
+        }
+    }
+
+    public IQueryable<Matching> MatchingsQuery
+    {
+        get
+        {
+            return Matchings.Include(m => m.Conversation);
+        }
+    }
+
+    public IQueryable<Notification> NotificationsQuery
+    {
+        get
+        {
+            return Notifications;
+        }
+    }
+
+    IDbSet<User> ISparseRepository.DomainUsers
+    {
+        get
+        {
+            return new MyDbSet<User>(DomainUsers);
+        }
+    }
+
+    IDbSet<Account> ISparseRepository.Accounts
+    {
+        get
+        {
+            return new MyDbSet<Account>(Accounts);
+        }
+    }
+
+    IDbSet<Judgement> ISparseRepository.Judgements
+    {
+        get
+        {
+            return new MyDbSet<Judgement>(Judgements);
+        }
+    }
+
+    IDbSet<Matching> ISparseRepository.Matchings
+    {
+        get
+        {
+            return new MyDbSet<Matching>(Matchings);
+        }
+    }
+
+    IDbSet<Notification> ISparseRepository.Notifications
+    {
+        get
+        {
+            return new MyDbSet<Notification>(Notifications);
         }
     }
 

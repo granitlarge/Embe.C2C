@@ -12,7 +12,7 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
 
     public UnmatchHandler
     (
-        IC2CContext context,
+        IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         MatchingAuthorizationPolicy authorizationPolicy,
@@ -25,7 +25,7 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
 
     protected override async Task<TransactionalCommandResult<Result>> HandleAsync
     (
-        ISparseC2CContext context,
+        ISparseRepository context,
         UnmatchCommand command,
         CancellationToken cancellationToken = default
     )

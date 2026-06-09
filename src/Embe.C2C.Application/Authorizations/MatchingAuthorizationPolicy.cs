@@ -4,10 +4,10 @@ using Embe.C2C.Application.Abstractions.Services;
 
 public class MatchingAuthorizationPolicy
 {
-    private readonly IC2CContext _context;
+    private readonly IRepository _context;
     private readonly IAuthenticatedUserService _userService;
 
-    public MatchingAuthorizationPolicy(IC2CContext context, IAuthenticatedUserService userService)
+    public MatchingAuthorizationPolicy(IRepository context, IAuthenticatedUserService userService)
     {
         _context = context;
         _userService = userService;

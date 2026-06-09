@@ -3,12 +3,21 @@
 @layer base {
   :root {
 
-    --color-primary: #120b10;
-    --color-secondary: #f83529;
-    --color-tertiary: #f8f8f8;
-    --color-quaternary: #452b2b;
-    --color-quaternary-light: #453636;
-    --color-quinternary: #f8f8f8;
+    --primary: #f83529;
+    --secondary: grey;
+    --destructive: #f83529;
+
+    --background: #120b10;
+    --background-font-color: #f8f8f8;
+    ;
+
+    --surface: #f8f8f8;
+    --surface-light: lightgrey;
+    --surface-font-color: #120b10;
+    --surface-border-color: #120b10;
+    --surface-font-color-muted: #424242;
+
+    --link-color: var(--primary);
 
     --fs-1: 4rem;
     --fs-2: calc(var(--fs-1) * .8);
@@ -35,7 +44,8 @@
   }
 
   body {
-    color: var(--color-tertiary);
+    background-color: var(--background);
+    color: var(--background-font-color);
     font-family: var(--font-cal-sans);
     font-size: var(--fs-md);
   }
@@ -67,7 +77,9 @@
   /* Forms BEGIN*/
 
   .form {
-    background-color: var(--color-quaternary);
+    background-color: var(--surface);
+    color: var(--surface-font-color);
+    border-color: var(--surface-border-color);
     border-radius: 0.5rem;
     display: flex;
     flex-direction: column;
@@ -76,7 +88,9 @@
   }
 
   .input {
-    border: solid 3px white;
+    background-color: var(--surface);
+    color: var(--surface-font-color);
+    border: solid 3px var(--surface-border-color);
     padding-inline: 20px;
     padding-block: 5px;
     border-radius: 15px;
@@ -89,7 +103,7 @@
   }
 
   .input-checked {
-    box-shadow: 0px 0px 4px 4px var(--color-secondary);
+    box-shadow: 0px 0px 4px 4px var(--secondary);
   }
 
   .label {
@@ -110,14 +124,14 @@
     font-size: var(--fs-4);
   }
 
-    .form-title {
-      font-size: var(--fs-3);
-    }
+  .form-title {
+    font-size: var(--fs-3);
+  }
 
   .separator {
     width: 100%;
     height: 1px;
-    background-color: var(--color-tertiary);
+    background-color: var(--surface-border-color);
     margin: 10px 0;
   }
 
@@ -134,8 +148,8 @@
   /* Forms END*/
 
   .button {
-    background-color: var(--color-secondary);
-    color: white;
+    background-color: var(--primary);
+    color: var(--surface-font-color);
     border: none;
     padding: 10px 20px;
     border-radius: 0.5rem;
@@ -144,12 +158,19 @@
   }
 
   select option {
-    background-color: var(--color-quaternary);
+    background-color: var(--background);
   }
 
-  a,
-  Link {
-    color: var(--color-secondary);
+    a,
+    Link {
+    color: var(--link-color);
     text-decoration: underline;
   }
+
+  @media(min-width: 450px) {
+    :root {
+      --fs-1: 5rem;
+    }
+
+  } 
 }

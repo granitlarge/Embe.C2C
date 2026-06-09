@@ -18,7 +18,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Res
 
     public JudgeHandler
     (
-        IC2CContext context,
+        IRepository context,
         JudgementAuthorizationPolicy authorizationPolicy,
         JudgementService judgementService,
         DomainEventHandler domainEventHandler,
@@ -35,7 +35,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Res
 
     protected override async Task<TransactionalCommandResult<Result<ResultType>>> HandleAsync
     (
-        ISparseC2CContext context,
+        ISparseRepository context,
         JudgeCommand command,
         CancellationToken cancellationToken = default
     )

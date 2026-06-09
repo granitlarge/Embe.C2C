@@ -16,7 +16,7 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
 
     public DeleteHandler
     (
-        IC2CContext context,
+        IRepository context,
         UserAuthorizationPolicy authorizationPolicy,
         UserService userService,
         DomainEventHandler domainEventHandler,
@@ -29,7 +29,7 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
         _authService = authService;
     }
 
-    protected override async Task<TransactionalCommandResult<Result>> HandleAsync(ISparseC2CContext context, DeleteCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<Result>> HandleAsync(ISparseRepository context, DeleteCommand command, CancellationToken cancellationToken = default)
     {
         var permissions = await _authorizationPolicy.GetPermissionsAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Delete))
@@ -49,7 +49,7 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
             return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!));
         }
 
-        var accounts = await context.Accounts.Where(a => a.UserId == command.UserId).ToListAsync(cancellationToken);
+        var accounts = await context.AccountsQuery.Where(a => a.UserId == command.UserId).ToListAsync(cancellationToken);
 
         _userService.Delete(user, [.. accounts]);
 

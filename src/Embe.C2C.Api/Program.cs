@@ -49,5 +49,6 @@ app.MapAuthEndPoints();
 app.MapUserEndPoints();
 app.MapMatchingEndPoints();
 app.MapJudgementEndPoints();
+app.MapNotificationEndPoints();
 
 app.Run();

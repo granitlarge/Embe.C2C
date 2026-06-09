@@ -31,14 +31,14 @@ export default function DualRangeInput({ label, className, min, max, step, value
                 }}
                 className={`relative flex w-full touch-none select-none items-center ${classNames}`}
             >
-                <Slider.Track className="relative h-2 w-full grow rounded-full bg-(--color-primary)">
-                    <Slider.Range className="absolute h-full rounded-full bg-(--color-secondary)" />
+                <Slider.Track className="relative h-2 w-full grow rounded-full bg-(--background)">
+                    <Slider.Range className="absolute h-full rounded-full bg-(--primary)" />
                 </Slider.Track>
-                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--color-primary) bg-white focus:outline-none" >
-                    <span className="absolute -bottom-8 text-md">{value ? value[0] : min}</span>
+                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--primary) bg-white focus:outline-none" >
+                    <span className="absolute -bottom-8 text-(length:--fs-7)">{value ? value[0] : min}</span>
                 </Slider.Thumb>
-                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--color-primary) bg-white focus:outline-none" >
-                    <span className="absolute -bottom-8 text-md">{value ? value[1] : max}</span>
+                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--primary) bg-white focus:outline-none" >
+                    <span className="absolute -bottom-8 text-(length:--fs-7)">{value ? value[1] : max}</span>
                 </Slider.Thumb>
             </Slider.Root>
         </label>

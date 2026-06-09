@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
-public class GetMatchingsHandler(IC2CContext context, IAuthenticatedUserService userService)
+public class GetMatchingsHandler(IRepository context, IAuthenticatedUserService userService)
 {
-    private readonly IC2CContext _context = context;
+    private readonly IRepository _context = context;
     private readonly IAuthenticatedUserService _userService = userService;
 
     public async Task<Result<List<Matching>>> HandleAsync
@@ -18,7 +18,7 @@ public class GetMatchingsHandler(IC2CContext context, IAuthenticatedUserService 
     )
     {
         var userId = _userService.UserId ?? throw new InvalidOperationException();
-        var matchings = await _context.Matchings
+        var matchings = await _context.MatchingsQuery.AsNoTracking()
             .Where(m => m.UserId1 == userId || m.UserId2 == userId)
             .ToListAsync(cancellationToken);
 

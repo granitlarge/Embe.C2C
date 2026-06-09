@@ -7,13 +7,13 @@ public record TransactionalCommandResult<T>(bool CommitChanges, T Value);
 
 public abstract class TransactionalCommandHandler<T_Command, T_Result>
 {
-    private readonly IC2CContext _context;
+    private readonly IRepository _context;
     private readonly DomainEventHandler _domainEventHandler;
     private readonly IntegrationEventHandler _integrationEventHandler;
 
     public TransactionalCommandHandler
     (
-        IC2CContext context,
+        IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler
     )
@@ -26,7 +26,7 @@ public abstract class TransactionalCommandHandler<T_Command, T_Result>
     public async Task<T_Result> HandleAsync(T_Command command, CancellationToken cancellationToken = default)
     {
         using var transaction = await _context.BeginTransactionAsync(cancellationToken);
-        var result = await HandleAsync(new SparseC2CContext(_context), command, cancellationToken);
+        var result = await HandleAsync(new SparseRepository(_context), command, cancellationToken);
 
         foreach (var domainEvent in _context.DomainEvents)
         {
@@ -48,5 +48,5 @@ public abstract class TransactionalCommandHandler<T_Command, T_Result>
         return result.Value;
     }
 
-    protected abstract Task<TransactionalCommandResult<T_Result>> HandleAsync(ISparseC2CContext context, T_Command command, CancellationToken cancellationToken = default);
+    protected abstract Task<TransactionalCommandResult<T_Result>> HandleAsync(ISparseRepository context, T_Command command, CancellationToken cancellationToken = default);
 }

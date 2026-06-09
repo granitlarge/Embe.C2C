@@ -24,7 +24,7 @@ export default function RootLayout({
       lang="en"
     >
 
-      <body className={`flex flex-col bg-(--color-primary) justify-between h-dvh w-dvw p-3 ${calSans.variable}`}>
+      <body className={`flex flex-col justify-between h-dvh w-dvw p-3 ${calSans.variable}`}>
 
         <Header />
         <main className="grow w-full h-full">{children}</main>

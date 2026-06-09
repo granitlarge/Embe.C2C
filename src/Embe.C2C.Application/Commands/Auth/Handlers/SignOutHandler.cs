@@ -11,7 +11,7 @@ public class SignOutHandler : TransactionalCommandHandler<SignOutCommand, TypedR
 
     public SignOutHandler
     (
-        IC2CContext context,
+        IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IAuthService authService
@@ -22,7 +22,7 @@ public class SignOutHandler : TransactionalCommandHandler<SignOutCommand, TypedR
 
     protected override async Task<TransactionalCommandResult<TypedResult<SignOutFailureReason, bool>>> HandleAsync
     (
-        ISparseC2CContext context,
+        ISparseRepository context,
         SignOutCommand command,
         CancellationToken cancellationToken = default
     )

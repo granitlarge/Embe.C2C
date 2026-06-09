@@ -12,7 +12,7 @@ public class RefreshHandler : TransactionalCommandHandler<RefreshCommand, TypedR
     public RefreshHandler
     (
         IAuthService authService,
-        IC2CContext context,
+        IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler
     ) : base(context, domainEventHandler, integrationEventHandler)
@@ -22,7 +22,7 @@ public class RefreshHandler : TransactionalCommandHandler<RefreshCommand, TypedR
 
     protected override async Task<TransactionalCommandResult<TypedResult<RefreshFailureReason, Credentials>>> HandleAsync
     (
-        ISparseC2CContext context,
+        ISparseRepository context,
         RefreshCommand command,
         CancellationToken cancellationToken = default
     )

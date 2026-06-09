@@ -9,7 +9,7 @@ public class MarkAsReadHandler : TransactionalCommandHandler<MarkAsReadCommand, 
 {
     public MarkAsReadHandler
     (
-        IC2CContext context,
+        IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler
     )
@@ -18,9 +18,9 @@ public class MarkAsReadHandler : TransactionalCommandHandler<MarkAsReadCommand, 
 
     }
 
-    protected async override Task<TransactionalCommandResult<Result>> HandleAsync(ISparseC2CContext context, MarkAsReadCommand command, CancellationToken cancellationToken = default)
+    protected async override Task<TransactionalCommandResult<Result>> HandleAsync(ISparseRepository context, MarkAsReadCommand command, CancellationToken cancellationToken = default)
     {
-        var notification = await context.Notifications.FirstOrDefaultAsync(n => n.Id == command.NotificationId, cancellationToken);
+        var notification = await context.NotificationsQuery.FirstOrDefaultAsync(n => n.Id == command.NotificationId, cancellationToken);
         if (notification is null)
         {
             return new TransactionalCommandResult<Result>(CommitChanges: false, Result.Failure(FailureReason.NotFound, "Notification not found."));

@@ -20,7 +20,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
 
     public RegisterHandler
     (
-        IC2CContext context,
+        IRepository context,
         IFileService fileService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
@@ -33,7 +33,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
         _authService = authService;
     }
 
-    protected override async Task<TransactionalCommandResult<TypedResult<RegisterUserFailureReason, User>>> HandleAsync(ISparseC2CContext context, RegisterCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<TypedResult<RegisterUserFailureReason, User>>> HandleAsync(ISparseRepository context, RegisterCommand command, CancellationToken cancellationToken = default)
     {
         var success = false;
         var uploadedFileUrls = new List<string>();
