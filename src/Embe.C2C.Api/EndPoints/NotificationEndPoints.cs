@@ -11,22 +11,26 @@ public static class NotificationEndPoints
 {
     public static void MapNotificationEndPoints(this WebApplication app)
     {
-        var group = app.MapGroup("/notifications").RequireAuthorization();
+        var group = app.MapGroup("/api/notification").RequireAuthorization();
+
+        group.MapGet("", GetNotifications)
+            .WithName("GetNotifications");
 
         group.MapPost("/mark-as-read", MarkAsRead)
             .WithName("MarkNotificationAsRead");
-
-        group.MapPost("/get", GetNotifications)
-            .WithName("GetNotifications");
     }
 
     private static async Task<IResult> GetNotifications
     (
-        [FromBody] PagedQuery query,
+        [FromQuery] int? pageNumber,
+        [FromQuery] int? pageSize,
         [FromServices] GetNotificationsHandler handler,
         CancellationToken cancellationToken
     )
     {
+        var query = pageNumber.HasValue && pageSize.HasValue
+            ? new PagedQuery(pageNumber.Value, pageSize.Value)
+            : new PagedQuery(1, 10);
         var result = await handler.HandleAsync(query, cancellationToken);
         return result.ToResult();
     }

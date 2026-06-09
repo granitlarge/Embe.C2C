@@ -1,4 +1,4 @@
-import NotificationsMenu from "@/src/features/notifications/components/NotificationsMenu";
+import NotificationsMenu from "@/src/features/notifications/components/notifications-menu/NotificationsMenu";
 import { getAuthenticatedUser } from "../user";
 
 export default async function Header() {

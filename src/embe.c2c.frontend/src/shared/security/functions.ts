@@ -32,3 +32,7 @@ export async function getAccessToken() {
     return accessToken;
 }
 
+export async function clearTokens() {
+    await deleteToken(AccessTokenName);
+    await deleteToken(RefreshTokenName);
+}

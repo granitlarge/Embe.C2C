@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         IHostEnvironment environment
     )
     {
+        services.AddScoped<Settings>();
         services.AddIdentity<MyIdentityUser, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;

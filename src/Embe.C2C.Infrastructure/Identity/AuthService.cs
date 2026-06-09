@@ -8,14 +8,13 @@ using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Embe.C2C.Infrastructure.Identity;
 
 public class AuthService
 (
-    IConfiguration configuration,
+    Settings settings,
     Ef.Contexts.C2CContext context,
     IAuthenticatedUserService userService,
     SignInManager<MyIdentityUser> signInManager,
@@ -26,27 +25,23 @@ public class AuthService
     private readonly SignInManager<MyIdentityUser> _signInManager = signInManager;
     private readonly UserManager<MyIdentityUser> _userManager = userManager;
     private readonly IAuthenticatedUserService _userService = userService;
-    private readonly string _jwtAudience = configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT audience is not configured.");
-    private readonly string _jwtIssuer = configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT issuer is not configured.");
-    private readonly string _jwtSecretAccessToken = configuration["Jwt:Secrets:AccessToken"] ?? throw new InvalidOperationException("JWT secret is not configured.");
-    private readonly string _jwtSecretRefreshToken = configuration["Jwt:Secrets:RefreshToken"] ?? throw new InvalidOperationException("JWT secret is not configured.");
-
-    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(5);
+    private readonly Settings _settings = settings;
+    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan _refreshTokenLifetime = TimeSpan.FromDays(7);
 
     public async Task<TypedResult<RefreshFailureReason, Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
     {
         var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecretAccessToken));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtSettings.RefreshTokenSecret));
         try
         {
 
             var principal = tokenHandler.ValidateToken(refreshTokenValue, new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = _jwtIssuer,
+                ValidIssuer = _settings.JwtSettings.Issuer,
                 ValidateAudience = true,
-                ValidAudience = _jwtAudience,
+                ValidAudience = _settings.JwtSettings.Audience,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = symmetricKey,
                 ValidateLifetime = true,
@@ -178,7 +173,7 @@ public class AuthService
 
     private AccessToken GenerateAccessToken(RefreshToken refreshToken, IdentityUser identityUser, User user)
     {
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecretAccessToken));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtSettings.AccessTokenSecret));
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
@@ -189,8 +184,8 @@ public class AuthService
 
         var jwtSecurityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken
         (
-            issuer: _jwtIssuer,
-            audience: _jwtAudience,
+            issuer: _settings.JwtSettings.Issuer,
+            audience: _settings.JwtSettings.Audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(_accessTokenLifetime),
             signingCredentials: credentials
@@ -203,7 +198,7 @@ public class AuthService
     private RefreshToken GenerateRefreshToken(IdentityUser identityUser, User user)
     {
         var tokenId = Guid.CreateVersion7();
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecretRefreshToken));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtSettings.RefreshTokenSecret));
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
@@ -214,8 +209,8 @@ public class AuthService
 
         var jwtSecurityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken
         (
-            issuer: _jwtIssuer,
-            audience: _jwtAudience,
+            issuer: _settings.JwtSettings.Issuer,
+            audience: _settings.JwtSettings.Audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(_refreshTokenLifetime),
             signingCredentials: credentials

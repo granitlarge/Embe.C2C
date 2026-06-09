@@ -1,8 +1,10 @@
 using Embe.C2C.Api.EndPoints;
 using Embe.C2C.Application.Extensions;
+using Embe.C2C.Infrastructure;
 using Embe.C2C.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+var settings = new Settings(builder.Configuration);
 
 builder.Host.UseDefaultServiceProvider(options =>
 {
@@ -11,23 +13,6 @@ builder.Host.UseDefaultServiceProvider(options =>
 });
 
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey
-            (
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)
-            ),
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -36,7 +21,49 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddApplication();
-builder.Services.AddOpenApi();
+
+// AddIdentity (called inside AddInfrastructure) overrides the default auth/challenge scheme to
+// its cookie scheme ("Identity.Application"). We re-configure here, after AddInfrastructure, to
+// ensure JWT Bearer is the default scheme used by RequireAuthorization().
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "Bearer";
+    options.DefaultChallengeScheme = "Bearer";
+})
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidAudience = settings.JwtSettings.Audience,
+            ValidateIssuer = true,
+            ValidIssuer = settings.JwtSettings.Issuer,
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey
+            (
+                System.Text.Encoding.UTF8.GetBytes(settings.JwtSettings.AccessTokenSecret)
+            ),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidateIssuerSigningKey = true
+        };
+    })
+    .AddJwtBearer("Refresh", options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidAudience = settings.JwtSettings.Audience,
+            ValidateIssuer = true,
+            ValidIssuer = settings.JwtSettings.Issuer,
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey
+            (
+                System.Text.Encoding.UTF8.GetBytes(settings.JwtSettings.RefreshTokenSecret)
+            ),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidateIssuerSigningKey = true
+        };
+    });
 
 var app = builder.Build();
 

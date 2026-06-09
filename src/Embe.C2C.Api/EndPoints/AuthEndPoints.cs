@@ -18,7 +18,8 @@ public static class AuthEndPoints
         group.MapPost("/account-exists", AccountExists);
         group.MapPost("/signin", SignIn);
         group.MapPost("/signout", SignOut).RequireAuthorization();
-        group.MapPost("/refresh", Refresh).RequireAuthorization();
+        group.MapPost("/refresh", Refresh).RequireAuthorization(policy => policy.AddAuthenticationSchemes("Refresh").RequireAuthenticatedUser());
+        group.MapPost("/ping", () => Results.Ok("pong")).RequireAuthorization();
     }
 
     private static async Task<IResult> AccountExists([FromBody] AccountExistsQuery query, [FromServices] AccountExistsHandler handler, CancellationToken cancellationToken = default)
