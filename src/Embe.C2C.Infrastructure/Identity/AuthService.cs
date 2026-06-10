@@ -24,7 +24,7 @@ public class AuthService
     private readonly UserManager<MyIdentityUser> _userManager = userManager;
     private readonly IAuthenticatedUserService _userService = userService;
     private readonly Settings _settings = settings;
-    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan _refreshTokenLifetime = TimeSpan.FromDays(7);
 
     public async Task<TypedResult<RefreshFailureReason, Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)

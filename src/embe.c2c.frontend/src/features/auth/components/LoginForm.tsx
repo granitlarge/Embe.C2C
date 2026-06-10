@@ -44,7 +44,7 @@ export default function LoginForm() {
                         setError("an unknown error occurred");
                 }
             } else {
-                router.replace("/home");
+                router.replace("/protected/dating");
             }
 
         }
@@ -57,7 +57,7 @@ export default function LoginForm() {
         setError(undefined);
     }
 
-    const passwordLabel = <span>password<Link href="/forgot-password" title="Forgot Password?">?</Link></span>;
+    const passwordLabel = <span>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></span>;
     return (
         <div className="form flex flex-col gap-4 p-8 w-[600px] max-w-full">
             <TextInput label="email" type="email" placeholder="name@example.com" value={userName} valid={usernameError === undefined} errorMessage={usernameError} onChange={(un: string) => {

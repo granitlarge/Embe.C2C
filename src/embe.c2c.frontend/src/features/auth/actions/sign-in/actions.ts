@@ -2,9 +2,8 @@
 
 import { Mutate } from "@/src/shared/api";
 import { Credentials } from "@/src/shared/types/application/types";
-import { AccessTokenName, RefreshTokenName } from "@/src/shared/security/constants";
-import { saveToken } from "@/src/shared/security/functions";
 import { SignInError } from "./types";
+import { saveAccessToken, saveRefreshToken } from "@/src/shared/security/functions";
 
 export async function SignIn(email: string, password: string): Promise<SignInError | undefined> {
 
@@ -20,8 +19,8 @@ export async function SignIn(email: string, password: string): Promise<SignInErr
 
     if (response.success) {
         await Promise.all([
-            saveToken(AccessTokenName, response.value!.accessToken),
-            saveToken(RefreshTokenName, response.value!.refreshToken)
+            saveAccessToken(response.value!.accessToken),
+            saveRefreshToken(response.value!.refreshToken)
         ]);
     }
 

@@ -34,25 +34,25 @@ export default function Footer({ className }: FooterProps) {
         <Surface as="footer" padding="sm" className={className}>
             {user &&
                 <nav className="flex items-center justify-center gap-12">
-                    <Link href="/dating" className={linkClassNames}>
+                    <Link href="/protected/dating" className={linkClassNames}>
                         <Users size={iconSize} className="inline" />
                         <span className={linkTextClassNames}>dating</span>
                     </Link>
-                    <Link href="/likes" className={linkClassNames}>
+                    <Link href="/protected/likes" className={linkClassNames}>
                         <div className="relative">
                             <Heart size={iconSize} className={iconClassNames} />
                             {unseenLikes && <span className="absolute top-[1px] -right-[2px] block h-2 w-2 rounded-full bg-(--primary)"></span>}
                         </div>
                         <span className={linkTextClassNames}>likes</span>
                     </Link>
-                    <Link href="/matches" className={linkClassNames}>
+                    <Link href="/protected/matches" className={linkClassNames}>
                         <div className="relative">
                             <MessageCircle size={iconSize} className={iconClassNames} />
                             {unseenMatches && <span className="absolute top-[2px] -right-[0px] block h-2 w-2 rounded-full bg-(--primary)"></span>}
                         </div>
                         <span className={linkTextClassNames}>matches</span>
                     </Link>
-                    <Link href="/profile" className={linkClassNames}>
+                    <Link href="/protected/profile" className={linkClassNames}>
                         <User size={iconSize} className={iconClassNames} />
                         <span className={linkTextClassNames}>profile</span>
                     </Link>

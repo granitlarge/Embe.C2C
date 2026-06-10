@@ -2,11 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { ApiError } from "./api-errors";
-import { AccessTokenName } from "./security/constants";
-import { clearTokens, getAccessToken, getRefreshToken, saveToken, Token } from "./security/functions";
+import { getAccessToken } from "./security/functions";
 import { Tag } from "./cache";
 
-type RefreshAccessTokenResponse = ApiResponse<{ accessToken: Token }, FailureReason>;
 
 async function parseResponse<T>(response: Response): Promise<T | undefined> {
 
@@ -25,43 +23,11 @@ async function parseResponse<T>(response: Response): Promise<T | undefined> {
     return undefined;
 }
 
-async function refreshAccessToken(): Promise<Token | undefined> {
-
-    const refreshToken = await getRefreshToken();
-    if (!refreshToken) {
-        return undefined;
-    }
-
-    const response = await fetch(`${process.env.API_URL}/api/auth/refresh`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${refreshToken}`
-        },
-        body: JSON.stringify({ refreshToken })
-    });
-
-    if (!response.ok) {
-        return undefined;
-    }
-
-    const responseBody = await response.json();
-    const refreshAccessTokenResponse = responseBody as RefreshAccessTokenResponse;
-    return refreshAccessTokenResponse.value?.accessToken;
-
-}
-
 async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
 
     let accessToken = await getAccessToken();
     if (!accessToken) {
-        const newAccessToken = await refreshAccessToken();
-        if (!newAccessToken) {
-            await clearTokens();
-            return redirect("/login", "push");
-        }
-        await saveToken(AccessTokenName, newAccessToken);
-        accessToken = newAccessToken.token;
+        return redirect("/public/login", "push");
     }
 
     request.headers.set("Authorization", `Bearer ${accessToken}`);
@@ -73,24 +39,7 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
     }
 
     if (response.status === 401) {
-        const newAccessToken = await refreshAccessToken();
-        if (!newAccessToken) {
-            await clearTokens();
-            return redirect("/login", "push");
-        }
-
-        await saveToken(AccessTokenName, newAccessToken);
-        request.headers.set("Authorization", `Bearer ${newAccessToken.token}`);
-        const retryResponse = await fetch(request);
-        if (retryResponse.ok) {
-            const parsedRetryResponse = await parseResponse<T>(retryResponse);
-            return parsedRetryResponse!;
-        }
-
-        if (retryResponse.status === 401) {
-            await clearTokens();
-            return redirect("/login", "push");
-        }
+        return redirect("/public/login", "push");
     }
 
     const parsedErrorResponse = await parseResponse<T>(response);
@@ -100,6 +49,7 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
 
     const error = await ApiError.fromResponse(response);
     throw error;
+
 }
 
 async function SendUnauthenticatedRequest<T>(request: Request): Promise<T> {

@@ -7,7 +7,7 @@ export default async function AuthLayout({
 
     const user = await getAuthenticatedUser()
     if (user) {
-        redirect("/");
+        redirect("/protected/dating");
     }
 
     return (
@@ -15,4 +15,5 @@ export default async function AuthLayout({
             {children}
         </>
     )
+
 }
