@@ -6,13 +6,12 @@ export async function accountExists(email: string): Promise<ApiResponse<boolean,
 
     const result = await Read<boolean>
     (
-        `${process.env.API_URL}/api/auth/account-exists`,
+        `${process.env.API_URL}/api/auth/account-exists?email=${encodeURIComponent(email)}`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email }),
         },
         false
     );

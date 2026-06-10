@@ -16,7 +16,7 @@ public static class AuthEndPoints
             .MapGroup("/api/auth")
             .WithTags("Authentication");
 
-        group.MapPost("/account-exists", AccountExists);
+        group.MapGet("/account-exists", AccountExists);
         group.MapPost("/signin", SignIn);
         group.MapPost("/signout", SignOut).RequireAuthorization();
         group.MapPost("/refresh", Refresh).RequireAuthorization(new AuthorizeAttribute
@@ -25,8 +25,9 @@ public static class AuthEndPoints
         });
     }
 
-    private static async Task<IResult> AccountExists([FromBody] AccountExistsQuery query, [FromServices] AccountExistsHandler handler, CancellationToken cancellationToken = default)
+    private static async Task<IResult> AccountExists([FromQuery] string email, [FromServices] AccountExistsHandler handler, CancellationToken cancellationToken = default)
     {
+        var query = new AccountExistsQuery(email);
         var result = await handler.HandleAsync(query, cancellationToken);
         return result.ToResult();
     }
