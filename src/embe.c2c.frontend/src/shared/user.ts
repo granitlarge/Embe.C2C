@@ -2,7 +2,7 @@ import { getRefreshToken } from "./security/functions";
 import { jwtDecode } from "jwt-decode";
 
 export type AuthenticatedUser = {
-    id: string;
+    identityUserId: string;
     userId: string;
 };
 
@@ -13,7 +13,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | undefi
     }
     const decoded = jwtDecode(refreshToken) as { sub: string; userId: string; };
     return {
-        id: decoded.sub,
+        identityUserId: decoded.sub,
         userId: decoded.userId,
     };
 }
