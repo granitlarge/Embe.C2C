@@ -1,9 +1,9 @@
 "use server";
 
-import { SendRequest } from "@/src/shared/api";
+import { Mutate } from "@/src/shared/api";
 
 export async function Logout(): Promise<void> {
-    await SendRequest(new Request(`${process.env.API_URL}/api/auth/logout`, {
+    await Mutate(`${process.env.API_URL}/api/auth/logout`, {
         method: "POST"
-    }));
+    });
 }

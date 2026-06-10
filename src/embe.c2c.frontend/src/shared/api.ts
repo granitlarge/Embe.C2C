@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ApiError } from "./api-errors";
 import { AccessTokenName } from "./security/constants";
 import { clearTokens, getAccessToken, getRefreshToken, saveToken, Token } from "./security/functions";
+import { Tag } from "./cache";
 
 type RefreshAccessTokenResponse = ApiResponse<{ accessToken: Token }, FailureReason>;
 
@@ -125,20 +126,46 @@ export enum FailureReason {
     Unknown = 3
 }
 
-export async function SendRequest<T_Value>(
-    request: Request,
+export type ReadRequest = Omit<RequestInit, "method" | "next"> & {
+    method: "GET" | "HEAD";
+    next?: Omit<RequestInit["next"], "tags"> & {
+        tags?: [...Tag[]]
+    }
+}
+
+export type MutationRequest = Omit<RequestInit, "method"> & {
+    method: "POST" | "PUT" | "PATCH" | "DELETE";
+}
+
+export async function Read<T>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T, FailureReason>>;
+export async function Read<T_Value, T_Error>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T_Value, T_Error>>;
+export async function Read<T_Value, T_Error = FailureReason>(input: URL | RequestInfo, init: ReadRequest, authenticate = true): Promise<ApiResponse<T_Value, T_Error>> {
+    const request = new Request(input, init);
+    if (authenticate) {
+        return await SendAuthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
+    }
+    return await SendUnauthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
+}
+
+export async function Mutate<T_Value>(
+    input: URL | RequestInfo,
+    init?: MutationRequest,
     authenticate?: boolean
 ): Promise<ApiResponse<T_Value, FailureReason>>;
 
-export async function SendRequest<T_Value, T_Error>(
-    request: Request,
+export async function Mutate<T_Value, T_Error>(
+    input: URL | RequestInfo,
+    init?: MutationRequest,
     authenticate?: boolean
+
 ): Promise<ApiResponse<T_Value, T_Error>>;
 
-export async function SendRequest<T_Value, T_Error = FailureReason>(
-    request: Request,
+export async function Mutate<T_Value, T_Error = FailureReason>(
+    input: URL | RequestInfo,
+    init?: MutationRequest,
     authenticate = true
 ): Promise<ApiResponse<T_Value, T_Error>> {
+    const request = new Request(input, init);
     if (authenticate) {
         return await SendAuthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
     }
