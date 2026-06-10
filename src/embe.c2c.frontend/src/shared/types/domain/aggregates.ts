@@ -75,6 +75,7 @@ export type Message = {
 export enum NotificationType {
     MatchingCreated = 0,
     MatchingRemoved = 1,
+    PositiveJudgementReceived = 2,
 }
 
 export type Notification = {

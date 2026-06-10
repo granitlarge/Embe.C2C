@@ -30,7 +30,7 @@ public class Judgement : Aggregate
     public Guid JudgeUserId { get; }
     public Guid JudgeeUserId { get; }
     public bool IsPositive { get; private set; }
-    public DateTimeOffset EditedAt { get; private set;}
+    public DateTimeOffset EditedAt { get; private set; }
     public DateTimeOffset CreatedAt { get; }
 
     public void Edit(bool isPositive)

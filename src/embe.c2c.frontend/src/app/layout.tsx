@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Header from "../shared/components/Header";
-import Footer from "../shared/components/Footer";
+import Header from "../shared/components/header/Header";
+import Footer from "../shared/components/footer/Footer";
 import { calSans } from "@/fonts";
 
 import "./globals.css";
@@ -26,7 +26,6 @@ export default async function RootLayout({
 
       <body className={`flex flex-col justify-between h-dvh w-dvw p-3 ${calSans.variable}`}>
 
-        <Header />
         <main className="grow w-full h-full">{children}</main>
         <Footer />
 

@@ -37,8 +37,9 @@ export default function NotificationsMenu({ className }: NotificationsMenuProps)
                 className={`${classNames} cursor-pointer`}
                 onClick={() => { setHidden(prev => !prev) }}
             >
-                <div className="relative">
+                <div className="relative flex flex-col items-center justify-center">
                     <Bell size={36} className="relative" />
+                    <span className="text-(length:--fs-lg)">notifications</span>
                     {hasUnread && <span className="absolute top-0 -right-1 block h-2 w-2 rounded-full bg-(--primary)"></span>}
                 </div>
             </button>

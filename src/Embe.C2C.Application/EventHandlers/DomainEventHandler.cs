@@ -5,7 +5,6 @@ using Embe.C2C.Application.Events.Notifications;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
-using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Users.Events;

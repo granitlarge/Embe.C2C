@@ -1,0 +1,16 @@
+.modal {
+    min-width: 768px;
+    position: relative;
+}
+
+.modal::backdrop {
+    backdrop-filter: blur(4px);
+}
+
+@media (max-width: 832px) {
+    .modal {
+        min-width: 0px;
+        height: 80%;
+        width: 100%;
+    }
+}

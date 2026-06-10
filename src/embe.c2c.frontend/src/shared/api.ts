@@ -147,18 +147,20 @@ export async function Read<T_Value, T_Error = FailureReason>(input: URL | Reques
     return await SendUnauthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
 }
 
-export async function Mutate<T_Value>(
-    input: URL | RequestInfo,
-    init?: MutationRequest,
-    authenticate?: boolean
-): Promise<ApiResponse<T_Value, FailureReason>>;
+export async function Mutate<T_Value>
+    (
+        input: URL | RequestInfo,
+        init?: MutationRequest,
+        authenticate?: boolean
+    ): Promise<ApiResponse<T_Value, FailureReason>>;
 
-export async function Mutate<T_Value, T_Error>(
-    input: URL | RequestInfo,
-    init?: MutationRequest,
-    authenticate?: boolean
+export async function Mutate<T_Value, T_Error>
+    (
+        input: URL | RequestInfo,
+        init?: MutationRequest,
+        authenticate?: boolean
 
-): Promise<ApiResponse<T_Value, T_Error>>;
+    ): Promise<ApiResponse<T_Value, T_Error>>;
 
 export async function Mutate<T_Value, T_Error = FailureReason>(
     input: URL | RequestInfo,
