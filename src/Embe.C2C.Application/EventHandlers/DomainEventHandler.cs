@@ -2,6 +2,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Dtos.Aggregates;
 using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Notifications;
+using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Notifications;
