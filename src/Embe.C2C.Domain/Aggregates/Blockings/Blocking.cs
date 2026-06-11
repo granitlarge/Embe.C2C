@@ -13,7 +13,7 @@ public class Blocking : Aggregate
     {
         if (blockerUserId == blockedUserId)
         {
-            throw new DomainException("A user cannot block themselves.");
+            throw new DomainException(new DomainError<BlockingError>(BlockingError.SelfBlock));
         }
 
         Id = Guid.CreateVersion7();
@@ -39,4 +39,9 @@ public class Blocking : Aggregate
     {
         return new Blocking(blockerUserId, blockedUserId);
     }
+}
+
+public enum BlockingError
+{
+    SelfBlock
 }

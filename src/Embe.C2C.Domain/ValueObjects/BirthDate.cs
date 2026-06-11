@@ -8,10 +8,15 @@ public record BirthDate
     {
         if (value < DateOnly.FromDateTime(new DateTime(1900, 1, 1)) || value > DateOnly.FromDateTime(DateTime.UtcNow))
         {
-            throw new DomainException("Birth date must be between January 1, 1900 and today.");
+            throw new DomainException(new DomainError<BirthDateError>(BirthDateError.InvalidBirthDate));
         }
         Value = value;
     }
 
     public DateOnly Value { get; }
+}
+
+public enum BirthDateError
+{
+    InvalidBirthDate
 }

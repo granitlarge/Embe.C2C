@@ -8,7 +8,7 @@ public record UserName
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new DomainException("User name cannot be null or whitespace.");
+            throw new DomainException(new DomainError<UserNameError>(UserNameError.EmptyOrWhitespace));
         }
         Value = value;
     }
@@ -19,4 +19,9 @@ public record UserName
     {
         return new UserName(value);
     }
+}
+
+public enum UserNameError
+{
+    EmptyOrWhitespace
 }

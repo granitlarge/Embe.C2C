@@ -22,12 +22,12 @@ public class User : Aggregate
     {
         if (files.Count < 2 || files.Count > 10)
         {
-            throw new DomainException("A user must have at least 2 files and no more than 10 files.");
+            throw new DomainException(new DomainError<UserError>(UserError.InvalidFileCount));
         }
 
         if (new Age(birthDate) < new Age(18))
         {
-            throw new DomainException("User must be at least 18 years old.");
+            throw new DomainException(new DomainError<UserError>(UserError.Underage));
         }
 
         Id = Guid.CreateVersion7();
@@ -95,7 +95,7 @@ public class User : Aggregate
         EnsureActorIsOwner(actorId);
         if (new Age(newBirthDate) < new Age(18))
         {
-            throw new DomainException("User must be at least 18 years old.");
+            throw new DomainException(new DomainError<UserError>(UserError.Underage));
         }
 
         BirthDate = newBirthDate;
@@ -128,7 +128,7 @@ public class User : Aggregate
         EnsureActorIsOwner(actorId);
         if (_files.Count >= 10)
         {
-            throw new DomainException("A user cannot have more than 10 files.");
+            throw new DomainException(new DomainError<UserError>(UserError.InvalidFileCount));
         }
 
         var file = Entities.File.Create(Id, fileDetails);
@@ -139,7 +139,7 @@ public class User : Aggregate
     public void ChangeFileOrder(Guid actorId, Guid fileId, int newOrder)
     {
         EnsureActorIsOwner(actorId);
-        var file = _files.FirstOrDefault(f => f.Id == fileId) ?? throw new DomainException("File not found.");
+        var file = _files.First(f => f.Id == fileId);
         file.ChangeOrder(newOrder);
         UpdatedAt = DateTimeOffset.UtcNow;
     }
@@ -147,10 +147,10 @@ public class User : Aggregate
     public void RemoveFile(Guid actorId, Guid fileId)
     {
         EnsureActorIsOwner(actorId);
-        var file = _files.FirstOrDefault(f => f.Id == fileId) ?? throw new DomainException("File not found.");
+        var file = _files.First(f => f.Id == fileId);
         if (_files.Count <= 2)
         {
-            throw new DomainException("A user must have at least 2 files.");
+            throw new DomainException(new DomainError<UserError>(UserError.InvalidFileCount));
         }
 
         file.MarkForDeletion();
@@ -172,7 +172,7 @@ public class User : Aggregate
     {
         if (actorId != Id)
         {
-            throw new DomainException("Only the user can perform this action.");
+            throw new DomainException(new DomainError<UserError>(UserError.Unauthorized));
         }
     }
 
@@ -201,4 +201,11 @@ public class User : Aggregate
         );
     }
 
+}
+
+public enum UserError
+{
+    InvalidFileCount,
+    Underage,
+    Unauthorized
 }

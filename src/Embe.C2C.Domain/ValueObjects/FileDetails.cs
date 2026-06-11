@@ -8,17 +8,17 @@ public record FileDetails
     {
         if (order < 0)
         {
-            throw new DomainException("Order must be a non-negative integer.");
+            throw new DomainException(new DomainError<FileDetailsError>(FileDetailsError.InvalidOrder));
         }
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new DomainException("Name cannot be null or whitespace.");
+            throw new DomainException(new DomainError<FileDetailsError>(FileDetailsError.InvalidName));
         }
 
         if (string.IsNullOrWhiteSpace(mimeType))
         {
-            throw new DomainException("MIME type cannot be null or whitespace.");
+            throw new DomainException(new DomainError<FileDetailsError>(FileDetailsError.InvalidMimeType));
         }
 
         Name = name;
@@ -29,4 +29,11 @@ public record FileDetails
     public string Name { get; }
     public string MimeType { get; }
     public int Order { get; init; }
+}
+
+public enum FileDetailsError
+{
+    InvalidOrder,
+    InvalidName,
+    InvalidMimeType
 }

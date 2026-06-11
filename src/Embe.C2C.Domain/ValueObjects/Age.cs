@@ -12,7 +12,7 @@ public record Age : IComparable<Age>
         var age = difference.TotalDays / 365.25;
         if (age < 0)
         {
-            throw new DomainException("Birth date cannot be in the future.");
+            throw new DomainException(new DomainError<AgeError>(AgeError.FutureBirthDate));
         }
         Value = (int)age;
     }
@@ -21,7 +21,7 @@ public record Age : IComparable<Age>
     {
         if (age < 0)
         {
-            throw new DomainException("Age cannot be negative.");
+            throw new DomainException(new DomainError<AgeError>(AgeError.NegativeAge));
         }
 
         Value = age;
@@ -38,4 +38,10 @@ public record Age : IComparable<Age>
     public static bool operator >(Age left, Age right) => left.CompareTo(right) > 0;
     public static bool operator <=(Age left, Age right) => left.CompareTo(right) <= 0;
     public static bool operator >=(Age left, Age right) => left.CompareTo(right) >= 0;
+}
+
+public enum AgeError
+{
+    NegativeAge,
+    FutureBirthDate
 }

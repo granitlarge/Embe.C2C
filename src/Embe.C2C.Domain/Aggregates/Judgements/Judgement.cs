@@ -14,7 +14,7 @@ public class Judgement : Aggregate
     {
         if (judgeUserId == judgeeUserId)
         {
-            throw new DomainException("A user cannot judge themselves.");
+            throw new DomainException(new DomainError<JudgementError>(JudgementError.SelfJudgement));
         }
 
         Id = Guid.CreateVersion7();
@@ -56,4 +56,9 @@ public class Judgement : Aggregate
     {
         return new Judgement(judgeUserId, judgeeUserId, isPositive);
     }
+}
+
+public enum JudgementError
+{
+    SelfJudgement
 }

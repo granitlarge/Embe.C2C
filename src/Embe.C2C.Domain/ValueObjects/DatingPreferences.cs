@@ -15,17 +15,17 @@ public record DatingPreferences
     {
         if (interestedInGenders.Count == 0)
         {
-            throw new DomainException("At least one interested in gender must be specified.");
+            throw new DomainException(new DomainError<DatingPreferencesError>(DatingPreferencesError.InvalidInterestedInGenders));
         }
 
         if (ageRangeMin > ageRangeMax)
         {
-            throw new DomainException("Minimum age cannot be greater than maximum age.");
+            throw new DomainException(new DomainError<DatingPreferencesError>(DatingPreferencesError.InvalidAgeRange));
         }
 
         if (ageRangeMin < new Age(18))
         {
-            throw new DomainException("Minimum age must be at least 18.");
+            throw new DomainException(new DomainError<DatingPreferencesError>(DatingPreferencesError.InvalidAgeRange));
         }
 
         InterestedInGenders = [.. interestedInGenders];
@@ -38,4 +38,10 @@ public record DatingPreferences
     public Age AgeRangeMin { get; }
     public Age AgeRangeMax { get; }
     public Distance MaximumDistance { get; }
+}
+
+public enum DatingPreferencesError
+{
+    InvalidInterestedInGenders,
+    InvalidAgeRange
 }

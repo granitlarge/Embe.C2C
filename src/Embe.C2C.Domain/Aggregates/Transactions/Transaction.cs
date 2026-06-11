@@ -18,12 +18,12 @@ public class Transaction : Aggregate
 
         if (amount.Amount <= 0)
         {
-            throw new DomainException($"Transaction amount must be greater than zero. Provided amount: {amount}");
+            throw new DomainException(new DomainError<TransactionError>(TransactionError.ZeroOrNegativeAmount));
         }
 
         if (transactionDate > DateTimeOffset.UtcNow)
         {
-            throw new DomainException($"Transaction date cannot be in the future. Provided date: {transactionDate}");
+            throw new DomainException(new DomainError<TransactionError>(TransactionError.FutureTransactionDate));
         }
 
         Id = Guid.CreateVersion7();
@@ -65,4 +65,10 @@ public class Transaction : Aggregate
     {
         return new Transaction(AccountId, amount, type, reason, transactionDate, note);
     }
+}
+
+public enum TransactionError
+{
+    ZeroOrNegativeAmount,
+    FutureTransactionDate
 }

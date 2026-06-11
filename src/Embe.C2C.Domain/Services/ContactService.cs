@@ -19,22 +19,22 @@ public class ContactService : DomainService
     {
         if (existingContactRequest != null)
         {
-            throw new DomainException("A contact request already exists between the requester and recipient.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.AlreadyExists));
         }
 
         if (existingContact != null)
         {
-            throw new DomainException("A contact already exists between the requester and recipient.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.AlreadyExists));
         }
 
         if (blocking != null)
         {
-            throw new DomainException("A blocking exists between the requester and recipient, so a contact request cannot be sent.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.BlockingExists));
         }
 
         if (requester.Id == recipient.Id)
         {
-            throw new DomainException("A user cannot send a contact request to themselves.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.SelfRequest));
         }
 
         var contactRequest = ContactRequest.Create(requester.Id, recipient.Id);
@@ -49,7 +49,7 @@ public class ContactService : DomainService
     {
         if (blocking != null)
         {
-            throw new DomainException("A blocking exists between the requester and recipient, so the contact request cannot be accepted.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.BlockingExists));
         }
 
         var contact = contactRequest.Accept();

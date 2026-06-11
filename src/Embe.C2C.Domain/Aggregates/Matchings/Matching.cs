@@ -15,7 +15,7 @@ public class Matching : Aggregate
     {
         if (userId1 == userId2)
         {
-            throw new DomainException("A user cannot be matched with themselves.");
+            throw new DomainException(new DomainError<MatchingError>(MatchingError.SelfMatching));
         }
 
         Id = Guid.CreateVersion7();
@@ -33,13 +33,13 @@ public class Matching : Aggregate
     public Guid UserId1 { get; }
     public Guid UserId2 { get; }
     public Conversation Conversation { get; }
-    public DateTimeOffset CreatedAt { get; private set;}
+    public DateTimeOffset CreatedAt { get; private set; }
 
     public void Remove(Guid actorUserId)
     {
         if (actorUserId != UserId1 && actorUserId != UserId2)
         {
-            throw new DomainException("Only users involved in the matching can remove it.");
+            throw new DomainException(new DomainError<MatchingError>(MatchingError.Unauthorized));
         }
         AddDomainEvent(new MatchingRemovedEvent(actorUserId, this));
     }
@@ -53,4 +53,10 @@ public class Matching : Aggregate
     public User? User1 { get; private set; }
     public User? User2 { get; private set; }
     #endregion
+}
+
+public enum MatchingError
+{
+    SelfMatching,
+    Unauthorized
 }

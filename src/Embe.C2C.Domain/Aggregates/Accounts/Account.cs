@@ -41,22 +41,22 @@ public class Account : Aggregate
     {
         if (!IsOpen)
         {
-            throw new DomainException("Account is closed.");
+            throw new DomainException(new DomainError<AccountError>(AccountError.Closed));
         }
 
         if (amount.Currency != Currency)
         {
-            throw new DomainException($"Currency mismatch. Account currency: {Currency}, Request currency: {amount.Currency}");
+            throw new DomainException(new DomainError<AccountError>(AccountError.CurrencyMismatch));
         }
 
         if (amount.Amount > Balance.Amount)
         {
-            throw new DomainException($"Insufficient funds. Account balance: {Balance}, Requested amount: {amount}");
+            throw new DomainException(new DomainError<AccountError>(AccountError.InsufficientFunds));
         }
 
         if (amount.Amount <= 0)
         {
-            throw new DomainException($"Withdrawal amount must be greater than zero. Requested amount: {amount}");
+            throw new DomainException(new DomainError<AccountError>(AccountError.ZeroOrNegativeAmount));
         }
 
         Balance = Money.Create(Balance.Amount - amount.Amount, Balance.Currency);
@@ -77,17 +77,17 @@ public class Account : Aggregate
     {
         if (!IsOpen)
         {
-            throw new DomainException("Account is closed.");
+            throw new DomainException(new DomainError<AccountError>(AccountError.Closed));
         }
 
         if (amount.Currency != Currency)
         {
-            throw new DomainException($"Currency mismatch. Account currency: {Currency}, Request currency: {amount.Currency}");
+            throw new DomainException(new DomainError<AccountError>(AccountError.CurrencyMismatch));
         }
 
         if (amount.Amount <= 0)
         {
-            throw new DomainException($"Deposit amount must be greater than zero. Requested amount: {amount}");
+            throw new DomainException(new DomainError<AccountError>(AccountError.ZeroOrNegativeAmount));
         }
 
         Balance = Money.Create(Balance.Amount + amount.Amount, Balance.Currency);
@@ -108,12 +108,12 @@ public class Account : Aggregate
     {
         if (!IsOpen)
         {
-            throw new DomainException("Account is already closed.");
+            throw new DomainException(new DomainError<AccountError>(AccountError.AlreadyClosed));
         }
 
         if (Balance.Amount != 0)
         {
-            throw new DomainException("Account balance must be zero to close the account.");
+            throw new DomainException(new DomainError<AccountError>(AccountError.BalanceNotZero));
         }
 
         IsOpen = false;
@@ -124,7 +124,7 @@ public class Account : Aggregate
     {
         if (IsOpen)
         {
-            throw new DomainException("Account is already open.");
+            throw new DomainException(new DomainError<AccountError>(AccountError.AlreadyOpened));
         }
 
         IsOpen = true;
@@ -135,8 +135,20 @@ public class Account : Aggregate
     {
         if (IsOpen)
         {
-            throw new DomainException("Account must be closed before it can be removed.");
+            throw new DomainException(new DomainError<AccountError>(AccountError.AccountMustBeClosed));
         }
         AddDomainEvent(new AccountRemovedEvent(this));
     }
+}
+
+public enum AccountError
+{
+    Closed,
+    CurrencyMismatch,
+    InsufficientFunds,
+    ZeroOrNegativeAmount,
+    AlreadyClosed,
+    BalanceNotZero,
+    AlreadyOpened,
+    AccountMustBeClosed
 }

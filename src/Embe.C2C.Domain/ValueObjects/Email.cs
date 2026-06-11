@@ -18,7 +18,7 @@ public record Email
         }
         catch (Exception)
         {
-            throw new DomainException("Invalid email format.");
+            throw new DomainException(new DomainError<EmailError>(EmailError.InvalidFormat));
         }
     }
 
@@ -28,4 +28,9 @@ public record Email
     {
         return new Email(value);
     }
+}
+
+public enum EmailError
+{
+    InvalidFormat
 }

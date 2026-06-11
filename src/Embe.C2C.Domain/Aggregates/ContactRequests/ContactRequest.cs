@@ -14,7 +14,7 @@ public class ContactRequest : Aggregate
     {
         if (requestorUserId == recipientUserId)
         {
-            throw new DomainException("A user cannot send a contact request to themselves.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.SelfRequest));
         }
 
         Id = Guid.CreateVersion7();
@@ -38,7 +38,7 @@ public class ContactRequest : Aggregate
     {
         if (IsAccepted.HasValue)
         {
-            throw new DomainException("Contact request has already been responded to.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.AlreadyResponded));
         }
 
         IsAccepted = true;
@@ -51,7 +51,7 @@ public class ContactRequest : Aggregate
     {
         if (IsAccepted.HasValue)
         {
-            throw new DomainException("Contact request has already been responded to.");
+            throw new DomainException(new DomainError<ContactRequestError>(ContactRequestError.AlreadyResponded));
         }
 
         IsAccepted = false;
@@ -68,4 +68,12 @@ public class ContactRequest : Aggregate
     {
         return new ContactRequest(requestorUserId, recipientUserId);
     }
+}
+
+public enum ContactRequestError
+{
+    SelfRequest,
+    AlreadyResponded,
+    AlreadyExists,
+    BlockingExists
 }

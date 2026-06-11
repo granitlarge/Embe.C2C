@@ -8,7 +8,7 @@ public record Distance
     {
         if (value < 0)
         {
-            throw new DomainException("Distance cannot be negative.");
+            throw new DomainException(new DomainError<DistanceError>(DistanceError.NegativeDistance));
         }
 
         Value = value;
@@ -37,6 +37,11 @@ public record Distance
             _ => throw new InvalidOperationException("Unknown length unit.")
         };
     }
+}
+
+public enum DistanceError
+{
+    NegativeDistance
 }
 
 public enum LengthUnit

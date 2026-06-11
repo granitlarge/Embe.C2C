@@ -8,7 +8,7 @@ public record Money : IComparable<Money>
     {
         if (amount < 0)
         {
-            throw new DomainException("Amount cannot be negative.");
+            throw new DomainException(new DomainError<MoneyError>(MoneyError.NegativeAmount));
         }
 
         Amount = amount;
@@ -34,9 +34,15 @@ public record Money : IComparable<Money>
     {
         if (other != null && Currency != other.Currency)
         {
-            throw new DomainException("Cannot compare money with different currencies.");
+            throw new InvalidOperationException("Cannot compare Money values with different currencies.");
         }
 
         return Amount.CompareTo(other?.Amount);
     }
+}
+
+public enum MoneyError
+{
+    NegativeAmount,
+    CurrencyMismatch
 }

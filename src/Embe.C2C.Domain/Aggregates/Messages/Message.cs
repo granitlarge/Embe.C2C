@@ -62,3 +62,9 @@ public class Message : Aggregate
         return new Message(conversationId, replyToMessageId, authorUserId, content);
     }
 }
+
+public enum MessageError
+{
+    CannotCommunicate,
+    Unauthorized
+}

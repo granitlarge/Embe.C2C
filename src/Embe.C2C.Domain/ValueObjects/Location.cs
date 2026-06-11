@@ -12,12 +12,12 @@ public record Location
     {
         if (latitude < -90 || latitude > 90)
         {
-            throw new DomainException("Latitude must be between -90 and 90.");
+            throw new DomainException(new DomainError<LocationError>(LocationError.InvalidLatitude));
         }
 
         if (longitude < -180 || longitude > 180)
         {
-            throw new DomainException("Longitude must be between -180 and 180.");
+            throw new DomainException(new DomainError<LocationError>(LocationError.InvalidLongitude));
         }
 
         Latitude = latitude;
@@ -26,4 +26,10 @@ public record Location
 
     public double Latitude { get; }
     public double Longitude { get; }
+}
+
+public enum LocationError
+{
+    InvalidLatitude,
+    InvalidLongitude
 }

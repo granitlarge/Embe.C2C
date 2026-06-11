@@ -21,7 +21,7 @@ public class MatchingService : DomainService
     {
         if (!communicationPolicy.CanCommunicate())
         {
-            throw new DomainException("You cannot send a message to this user.");
+            throw new DomainException(new DomainError<MessageError>(MessageError.CannotCommunicate));
         }
 
         var conversation = matching.Conversation;
@@ -37,7 +37,7 @@ public class MatchingService : DomainService
     {
         if (message.AuthorUserId != editor.Id)
         {
-            throw new DomainException("Users can only edit their own messages.");
+            throw new DomainException(new DomainError<MessageError>(MessageError.Unauthorized));
         }
 
         message.Edit(newContent);
@@ -47,7 +47,7 @@ public class MatchingService : DomainService
     {
         if (message.AuthorUserId != deleter.Id)
         {
-            throw new DomainException("Users can only delete their own messages.");
+            throw new DomainException(new DomainError<MessageError>(MessageError.Unauthorized));
         }
 
         var conversation = matching.Conversation;

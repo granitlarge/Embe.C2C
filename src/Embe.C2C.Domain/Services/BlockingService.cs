@@ -15,10 +15,15 @@ public class BlockingService : DomainService
     {
         if (existingBlocking != null)
         {
-            throw new DomainException("A blocking already exists between the blocker and blocked users.");
+            throw new DomainException(new DomainError<BlockingServiceError>(BlockingServiceError.AlreadyExists));
         }
 
         var blocking = Blocking.Create(blockingUser.Id, blockedUser.Id);
         return blocking;
     }
+}
+
+public enum BlockingServiceError
+{
+    AlreadyExists
 }

@@ -8,7 +8,7 @@ public record MessageContent
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new DomainException("Message content cannot be null or whitespace.");
+            throw new DomainException(new DomainError<MessageContentError>(MessageContentError.InvalidMessageContent));
         }
         Value = value;
     }
@@ -18,4 +18,9 @@ public record MessageContent
     {
         return new MessageContent(value);
     }
+}
+
+public enum MessageContentError
+{
+    InvalidMessageContent
 }

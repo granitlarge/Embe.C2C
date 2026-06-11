@@ -29,7 +29,7 @@ public class Contact : Aggregate
     {
         if (removerId != UserId1 && removerId != UserId2)
         {
-            throw new DomainException("Only a participant can remove the contact.");
+            throw new DomainException(new DomainError<ContactError>(ContactError.Unauthorized));
         }
 
         AddDomainEvent(new ContactRemovedEvent(removerId, this));
@@ -39,4 +39,11 @@ public class Contact : Aggregate
     {
         return new Contact(userId1, userId2);
     }
+}
+
+public enum ContactError
+{
+    SelfContact,
+    Unauthorized,
+    AlreadyExists
 }

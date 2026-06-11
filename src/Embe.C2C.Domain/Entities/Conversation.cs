@@ -14,7 +14,7 @@ public class Conversation : Entity
     {
         if (userId1 == userId2)
         {
-            throw new DomainException("A conversation cannot be created between the same user.");
+            throw new DomainException(new DomainError<ConversationError>(ConversationError.SelfConversation));
         }
 
         Id = Guid.CreateVersion7();
@@ -47,7 +47,7 @@ public class Conversation : Entity
     {
         if (MessageCount == 0)
         {
-            throw new DomainException("Message count cannot be negative.");
+            throw new DomainException(new DomainError<ConversationError>(ConversationError.NegativeMessageCount));
         }
 
         MessageCount--;
@@ -75,4 +75,10 @@ public class Conversation : Entity
     public Message? LastMessage { get; private set; }
 
     #endregion
+}
+
+public enum ConversationError
+{
+    SelfConversation,
+    NegativeMessageCount
 }
