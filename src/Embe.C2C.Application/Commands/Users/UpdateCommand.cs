@@ -8,6 +8,7 @@ public record UpdateCommand
 (
     Guid UserId,
     string Email,
+    string UserName,
     DateOnly BirthDate,
     Gender Gender,
     DatingPreferencesDto DatingPreferences,

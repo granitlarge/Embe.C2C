@@ -14,6 +14,7 @@ public record CreateFileDto
 public sealed record RegisterCommand
 (
     string Email,
+    string UserName,
     string Password,
     DateOnly BirthDate,
     Gender Gender,

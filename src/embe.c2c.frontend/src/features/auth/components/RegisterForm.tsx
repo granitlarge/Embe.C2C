@@ -10,11 +10,12 @@ import { accountExists as accountExists } from "../actions/account-exists/action
 import { useRouter } from "next/navigation";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { register } from "@/src/features/auth/actions/register/actions";
-import { FileDetails, Gender, LengthUnit } from "@/src/shared/types/domain/value-objects";
-import ProfileForm, { ProfileFormData } from "./ProfileForm";
-import DatingPreferencesForm, { DatingPreferencesFormData } from "./DatingPreferencesForm";
-import { ImagesFormData } from "./ImagesForm";
-import { RegisterUserFailureReason } from "../actions/register/types";
+import { Gender, LengthUnit } from "@/src/shared/types/domain/value-objects";
+import ProfileForm, { ProfileFormData, ProfileFormError } from "./ProfileForm";
+import DatingPreferencesForm, { DatingPreferencesFormData, DatingPreferencesFormError } from "./DatingPreferencesForm";
+import { ImagesFormData, ImagesFormError } from "./ImagesForm";
+import { Range } from "@/src/shared/types/range";
+import { CreateFile } from "@/src/shared/types/dtos/types";
 
 export type RegisterFormProps = {
     className?: string;
@@ -66,7 +67,7 @@ function EmailStep({ finish, setEmail, value, errorMessage }: EmailStepProps) {
         <div className="flex flex-col gap-3 items-center justify-center">
             <EmailInput value={email} onChange={setEmailState} valid={emailError === undefined} errorMessage={emailError} />
             {error && <span className="error-message">{error}</span>}
-            <Button className="max-w-xs" onClick={onNavigate}>next</Button>
+            <Button className="w-full" onClick={onNavigate}>next</Button>
         </div>
     )
 
@@ -78,7 +79,7 @@ function AccountExistsStep() {
         router.push("/public/login");
     }
     return (
-        <Button onClick={onClick}>login</Button>
+        <Button className="w-full" onClick={onClick}>login</Button>
     )
 }
 
@@ -124,8 +125,8 @@ function PasswordStep({ finish, setPassword, value: initialPassword, errorMessag
 
     return (
         <div className="flex flex-col gap-3 items-center w-full">
-            <TextInput label="password" type="password" value={password} onChange={(pw) => { setPasswordState(pw); clearErrors(); }} valid={true} errorMessage={undefined} />
-            <TextInput label="confirm password" type="password" value={confirmPassword} onChange={(pw) => { setConfirmPasswordState(pw); clearErrors(); }} valid={error === undefined} errorMessage={error} />
+            <TextInput label="password" type="password" value={password} onChange={(pw) => { setPasswordState(pw); clearErrors(); }} errorMessage={undefined} />
+            <TextInput label="confirm password" type="password" value={confirmPassword} onChange={(pw) => { setConfirmPasswordState(pw); clearErrors(); }} errorMessage={error} />
             <Button className="max-w-xs" onClick={next}>next</Button>
         </div>
     )
@@ -133,14 +134,16 @@ function PasswordStep({ finish, setPassword, value: initialPassword, errorMessag
 }
 
 type ProfileStepProps = {
-    errorMessage?: string;
     finish: () => void;
     setGender: (gender: Gender) => void;
     setBirthDate: (birthDate: string) => void;
-    gender?: Gender;
-    birthDate?: string;
+    setUserName: (userName: string) => void;
 }
-function ProfileStep({ finish, setGender, setBirthDate, errorMessage, gender: initialGender, birthDate: initialBirthDate }: ProfileStepProps) {
+function ProfileStep({ finish, setGender, setBirthDate, setUserName }: ProfileStepProps) {
+
+    const validationSchema = z.object({
+        userName: z.string({ message: "username is required" }).min(1, { message: "username is required" })
+    });
 
     const year = new Date().getFullYear();
     const month = new Date().getMonth() + 1;
@@ -148,21 +151,32 @@ function ProfileStep({ finish, setGender, setBirthDate, errorMessage, gender: in
 
     const minDate = `${year - 120}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
     const maxDate = `${year - 18}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+
     const [profileData, setProfileData] = useState<ProfileFormData>({
-        birthDateRange: { lower: minDate, higher: maxDate },
-        birthDate: initialBirthDate || maxDate,
-        gender: initialGender || Gender.Male
+        birthDateRange: { lower: minDate, upper: maxDate },
+        birthDate: maxDate,
+        gender: Gender.Male
     });
 
+    const [profileError, setProfileError] = useState<ProfileFormError | undefined>(undefined);
+
     function onNext() {
-        setGender(profileData.gender);
-        setBirthDate(profileData.birthDate);
+        const result = validationSchema.safeParse(profileData);
+        if (!result.success) {
+            const properties = z.treeifyError(result.error).properties;
+            setProfileError({ userName: properties?.userName?.errors?.[0] });
+            return;
+        }
+        setProfileError(undefined);
+        setGender(profileData.gender!);
+        setBirthDate(profileData.birthDate!);
+        setUserName(profileData.userName!);
         finish();
     }
 
     return (
         <div className="flex flex-col gap-3 items-center w-full">
-            <ProfileForm data={profileData} onChange={setProfileData} errorMessage={errorMessage} />
+            <ProfileForm data={profileData} onChange={setProfileData} error={profileError} />
             <Button className="max-w-xs" onClick={onNext}>next</Button>
         </div>
     )
@@ -170,19 +184,11 @@ function ProfileStep({ finish, setGender, setBirthDate, errorMessage, gender: in
 
 type PreferencesStepProps = {
     onGendersChange?: (genders: Gender[]) => void;
-    onAgeRangeChange?: (ageRange: { lower: number, higher: number }) => void;
-    onDistanceRangeChange?: (distanceRange: { lower: number, higher: number }) => void;
+    onAgeRangeChange?: (ageRange: Range<number>) => void;
+    onDistanceChange?: (distance: number) => void;
     finish: () => void;
-    errorMessage?: string;
-    genders?: Gender[],
-    ageRange?: { lower: number, higher: number },
-    distanceRange?: { lower: number, higher: number }
 }
-function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceRangeChange, finish, errorMessage,
-    genders: initialGenders,
-    ageRange: initialAgeRange,
-    distanceRange: initialDistanceRange
-}: PreferencesStepProps) {
+function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceChange, finish }: PreferencesStepProps) {
 
     const validationSchema = z.object({
         genders: z.array(z.enum(Gender)).min(1, { message: "please select at least one gender" }),
@@ -190,15 +196,17 @@ function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceRangeCha
 
     const minAgeRange = 18;
     const maxAgeRange = 100;
-    const minDistanceRange = 0;
+    const minDistanceRange = 1;
     const maxDistanceRange = 160;
 
     const [datingPreferencesData, setDatingPreferencesData] = useState<DatingPreferencesFormData>({
-        genders: initialGenders || [],
-        ageRange: initialAgeRange || { lower: minAgeRange, higher: maxAgeRange },
-        distanceRange: initialDistanceRange || { lower: minDistanceRange, higher: maxDistanceRange },
-        gendersError: undefined
+        possibleAgeRange: { lower: minAgeRange, upper: maxAgeRange },
+        possibleDistanceRange: { lower: minDistanceRange, upper: maxDistanceRange },
+        genders: [],
+        ageRange: { lower: minAgeRange, upper: maxAgeRange },
+        distance: maxDistanceRange
     });
+    const [datingPreferencesError, setDatingPreferencesError] = useState<DatingPreferencesFormError | undefined>(undefined);
 
     function next() {
 
@@ -206,31 +214,30 @@ function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceRangeCha
 
         if (!result.success) {
             const properties = z.treeifyError(result.error).properties;
-            setDatingPreferencesData(prev => ({ ...prev, gendersError: properties?.genders?.errors?.[0] }));
+            setDatingPreferencesError({ genders: properties?.genders?.errors?.[0] });
             return;
         }
 
-        onGendersChange?.(datingPreferencesData.genders);
-        onAgeRangeChange?.(datingPreferencesData.ageRange);
-        onDistanceRangeChange?.(datingPreferencesData.distanceRange);
+        onGendersChange?.(datingPreferencesData.genders!);
+        onAgeRangeChange?.(datingPreferencesData.ageRange!);
+        onDistanceChange?.(datingPreferencesData.distance!);
         finish();
 
     }
 
     return (
         <div className="flex flex-col gap-10 w-full items-center">
-            <DatingPreferencesForm data={datingPreferencesData} onChange={setDatingPreferencesData} />
+            <DatingPreferencesForm data={datingPreferencesData} onChange={setDatingPreferencesData} error={datingPreferencesError} />
             <Button className="max-w-xs" onClick={next}>next</Button>
         </div>
     )
 }
 
 type ImagesStepProps = {
-    finish?: (images: FileDetails[]) => void;
-    errorMessage?: string;
-    images?: FileDetails[]
+    finish?: (images: CreateFile[]) => void;
+    images?: CreateFile[]
 }
-function ImagesStep({ finish: finish, errorMessage: initialErrorMessage, images: initialImages }: ImagesStepProps) {
+function ImagesStep({ finish: finish }: ImagesStepProps) {
 
     const validationSchema = z.array(z.object({
         url: z.url(),
@@ -238,26 +245,26 @@ function ImagesStep({ finish: finish, errorMessage: initialErrorMessage, images:
     })).min(2, { message: "please add at least two images" })
         .max(10, { message: "you can add up to 10 images" });
 
-    const [imagesData, setImagesData] = useState<ImagesFormData>({
-        images: initialImages || [],
-        imagesError: initialErrorMessage
-    });
+    const [imagesData, setImagesData] = useState<ImagesFormData | undefined>(undefined);
+    const [imagesError, setImagesError] = useState<ImagesFormError | undefined>(undefined);
 
     function onNext() {
-        const result = validationSchema.safeParse(imagesData.images);
+        const result = validationSchema.safeParse(imagesData?.images);
         if (!result.success) {
-            setImagesData(prev => ({ ...prev, imagesError: result.error.issues[0].message }));
+            setImagesError({ images: result.error.issues[0].message });
             return;
         } else {
-            finish?.(imagesData.images);
+            finish?.(imagesData!.images);
         }
     }
 
-    const isValid = imagesData.imagesError === undefined && initialErrorMessage === undefined;
-    const errorMessage = imagesData.imagesError || initialErrorMessage;
     return (
         <div className="flex flex-col gap-3 w-full items-center">
-            <ImageGallery value={imagesData.images} onChange={(newImages) => setImagesData(prev => ({ ...prev, images: newImages }))} valid={isValid} errorMessage={errorMessage} />
+            <ImageGallery
+                data={imagesData}
+                error={imagesError}
+                onChange={(newImages) => setImagesData(prev => ({ ...prev, images: newImages.map((image, index) => ({ ...image, order: index })) }))}
+            />
             <Button className="max-w-xs" onClick={onNext}>finish</Button>
         </div>
     )
@@ -272,17 +279,20 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     ].filter(Boolean).join(" ");
 
     const [step, setStep] = useState<Step>("email");
-    const [email, setEmail] = useState<string | undefined>(undefined);
-    const [password, setPassword] = useState<string | undefined>(undefined);
-    const [gender, setGender] = useState<Gender>(Gender.Male);
-    const [birthDate, setBirthDate] = useState<string | undefined>(undefined);
+    const [data, setData] = useState<{
+        email?: string;
+        userName?: string;
+        password?: string;
+        gender?: Gender;
+        birthDate?: string;
+        datingPreferences?: {
+            interestedInGenders?: Gender[];
+            ageRange?: Range<number>;
+            maxDistance?: number;
+        },
+        images?: CreateFile[];
+    }>({});
 
-    const [preferredGenders, setPreferredGenders] = useState<Gender[]>([]);
-    const [preferredAgeRange, setPreferredAgeRange] = useState<{ lower: number, higher: number }>({ lower: 18, higher: 100 });
-    const [preferredDistanceRange, setPreferredDistanceRange] = useState<{ lower: number, higher: number }>({ lower: 0, higher: 160 });
-    const [images, setImages] = useState<FileDetails[]>([]);
-
-    const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
     const steps = [
         "email",
@@ -295,27 +305,24 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     async function navigate(step: Step) {
 
         setStep(step);
-        setErrorMessage(undefined);
 
     }
 
-    async function finish(images: FileDetails[]) {
+    async function finish(images: CreateFile[]) {
 
-        setImages(images);
+        setData(prev => ({ ...prev, images }));
 
         const response = await register({
-            email: email!,
-            password: password!,
-            birthDate: birthDate!,
-            gender,
+            email: data.email!,
+            userName: data.userName!,
+            password: data.password!,
+            gender: data.gender!,
+            birthDate: data.birthDate!,
             datingPreferences: {
-                interestedInGenders: preferredGenders,
-                ageRangeMin: preferredAgeRange.lower,
-                ageRangeMax: preferredAgeRange.higher,
-                maximumDistance: {
-                    value: preferredDistanceRange.higher,
-                    unit: LengthUnit.Kilometers
-                }
+                interestedInGenders: data.datingPreferences?.interestedInGenders!,
+                ageRangeMax: data.datingPreferences?.ageRange?.upper!,
+                ageRangeMin: data.datingPreferences?.ageRange!?.lower,
+                maximumDistance: { value: data.datingPreferences?.maxDistance!, unit: LengthUnit.Kilometers },
             },
             files: images
         });
@@ -325,32 +332,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         if (response.success) {
             router.push("/public/login");
         } else {
-            switch (response.reason) {
-                case RegisterUserFailureReason.EmailAlreadyExists:
-                    setErrorMessage(response.message?.toLowerCase() || "email already exists");
-                    setStep("account exists");
-                    break;
-                case RegisterUserFailureReason.DomainError:
-                    setErrorMessage(response.message?.toLowerCase() || "a domain error occurred");
-                    setStep("images");
-                    break;
-                case RegisterUserFailureReason.WeakPassword:
-                    setErrorMessage(response.message?.toLowerCase() || "the password is too weak");
-                    setStep("password");
-                    break;
-                case RegisterUserFailureReason.Unknown:
-                    setErrorMessage(response.message?.toLowerCase() || "an unknown error occurred");
-                    setStep("images");
-                    break;
-                case RegisterUserFailureReason.UnknownError:
-                    setErrorMessage(response.message?.toLowerCase() || "an unknown error occurred");
-                    setStep("images");
-                    break;
-                default:
-                    setErrorMessage("an unknown error occurred");
-                    setStep("images");
-                    break;
-            }
+            console.log("register error reason", response.reason);
         }
     }
 
@@ -362,14 +344,23 @@ export default function RegisterForm({ className }: RegisterFormProps) {
                 step === "email" &&
                 <EmailStep
                     finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}
-                    setEmail={setEmail}
-                    errorMessage={errorMessage}
-                    value={email}
+                    setEmail={(email) => setData(prev => ({ ...prev, email }))}
+                    value={data.email}
                 /> ||
-                step === "password" && <PasswordStep finish={() => navigate("profile")} setPassword={setPassword} errorMessage={errorMessage} value={password} /> ||
-                step === "profile" && <ProfileStep finish={() => navigate("dating preferences")} setGender={setGender} setBirthDate={setBirthDate} errorMessage={errorMessage} gender={gender} birthDate={birthDate} /> ||
-                step === "dating preferences" && <PreferencesStep finish={() => navigate("images")} onGendersChange={setPreferredGenders} onAgeRangeChange={setPreferredAgeRange} onDistanceRangeChange={setPreferredDistanceRange} errorMessage={errorMessage} genders={preferredGenders} ageRange={preferredAgeRange} distanceRange={preferredDistanceRange} /> ||
-                step === "images" && <ImagesStep finish={finish} errorMessage={errorMessage} images={images} /> ||
+                step === "password" && <PasswordStep finish={() => navigate("profile")} setPassword={(password) => setData(prev => ({ ...prev, password }))} value={data.password} /> ||
+                step === "profile" && <ProfileStep
+                    finish={() => navigate("dating preferences")}
+                    setUserName={(userName) => setData(prev => ({ ...prev, userName }))}
+                    setGender={(gender) => setData(prev => ({ ...prev, gender }))}
+                    setBirthDate={(birthDate) => setData(prev => ({ ...prev, birthDate }))}
+                /> ||
+                step === "dating preferences" && <PreferencesStep
+                    finish={() => navigate("images")}
+                    onGendersChange={(interestedInGenders) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, interestedInGenders } }))}
+                    onAgeRangeChange={(ageRange) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, ageRange } }))}
+                    onDistanceChange={(maxDistance) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, maxDistance } }))}
+                /> ||
+                step === "images" && <ImagesStep finish={finish} images={data.images} /> ||
                 step === "account exists" && <AccountExistsStep />
             }
         </div>

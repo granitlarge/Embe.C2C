@@ -3,3 +3,9 @@ export type UserBrief = {
     email: string;
     profilePictureUrl: string;
 }
+
+export type CreateFile = {
+    url: string;
+    mimeType: string;
+    order: number;
+}

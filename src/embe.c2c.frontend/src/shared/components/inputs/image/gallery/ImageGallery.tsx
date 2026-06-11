@@ -28,6 +28,7 @@ function MyImage({ id, src, onRemove }: ImageProps) {
 type ImageSelectorProps = {
     onImageSelected?: (image: { url: string, mimeType: string }) => void;
 }
+
 function ImageSelector({ onImageSelected }: ImageSelectorProps) {
 
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -65,21 +66,25 @@ export type Image = {
     mimeType: string;
 }
 
+export type ImageGalleryData = {
+    images: Image[];
+}
+export type ImageGalleryError = { [P in keyof ImageGalleryData]?: string };
+
 export type ImageGalleryProps = {
-    value: Image[];
+    data?: ImageGalleryData;
+    error?: ImageGalleryError;
     className?: string;
     onChange?: (images: Image[]) => void;
-    valid?: boolean;
-    errorMessage?: string;
 }
 
-export default function ImageGallery({ value, className, onChange, valid, errorMessage }: ImageGalleryProps) {
+export default function ImageGallery({ data, error, className, onChange }: ImageGalleryProps) {
 
     const classNames = [
         className
     ].filter(Boolean).join(" ");
 
-    const imagesWithIds = value.map(image => ({ ...image, __id: crypto.randomUUID() }));
+    const imagesWithIds = data?.images.map(image => ({ ...image, __id: crypto.randomUUID() })) ?? [];
     return (
         <DragDropProvider
             onDragEnd={(event) => {
@@ -90,7 +95,7 @@ export default function ImageGallery({ value, className, onChange, valid, errorM
                 const sourceIndex = imagesWithIds.findIndex(image => image.__id === sourceId);
                 const targetIndex = imagesWithIds.findIndex(image => image.__id === targetId);
                 if (sourceIndex === -1 || targetIndex === -1) return;
-                const newValue = [...value];
+                const newValue = [...imagesWithIds.map(image => ({ url: image.url, mimeType: image.mimeType }))];
                 const [movedImage] = newValue.splice(sourceIndex, 1);
                 newValue.splice(targetIndex, 0, movedImage);
                 onChange?.(newValue);
@@ -99,12 +104,12 @@ export default function ImageGallery({ value, className, onChange, valid, errorM
             <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center`}>
                 {
                     imagesWithIds.map((image, index) => (
-                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(value.filter((_, i) => i !== index))} />
+                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(imagesWithIds.filter((_, i) => i !== index).map(image => ({ url: image.url, mimeType: image.mimeType })))} />
                     ))
                 }
-                <ImageSelector onImageSelected={(image) => onChange?.([...value, image])} />
+                <ImageSelector onImageSelected={(image) => onChange?.([...imagesWithIds.map(image => ({ url: image.url, mimeType: image.mimeType })), image])} />
             </div>
-            {!valid && errorMessage && <span className="error-message">{errorMessage}</span>}
+            {error?.images && <span className="error-message">{error.images}</span>}
         </DragDropProvider>
     )
 }

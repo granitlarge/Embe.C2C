@@ -1,7 +1,9 @@
 using Embe.C2C.Api.EndPoints;
+using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Infrastructure;
 using Embe.C2C.Infrastructure.Extensions;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = new Settings(builder.Configuration);
@@ -24,9 +26,6 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddApplication();
 
-// AddIdentity (called inside AddInfrastructure) overrides the default auth/challenge scheme to
-// its cookie scheme ("Identity.Application"). We re-configure here, after AddInfrastructure, to
-// ensure JWT Bearer is the default scheme used by RequireAuthorization().
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "Bearer";

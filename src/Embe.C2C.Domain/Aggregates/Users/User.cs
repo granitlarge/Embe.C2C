@@ -73,13 +73,20 @@ public class User : Aggregate
     [NotMapped]
     public Entities.File ProfilePicture => _files.OrderBy(f => f.FileDetails.Order).First();
 
-    public DateTimeOffset CreatedAt { get; private set;}
+    public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
 
     public void UpdateEmail(Guid actorId, Email newEmail)
     {
         EnsureActorIsOwner(actorId);
         Email = newEmail;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void UpdateUserName(Guid actorId, UserName userName)
+    {
+        EnsureActorIsOwner(actorId);
+        UserName = userName;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
@@ -172,6 +179,7 @@ public class User : Aggregate
     public static User Register
     (
         Email email,
+        UserName userName,
         BirthDate birthDate,
         Gender gender,
         DatingPreferences datingPreferences,
@@ -183,7 +191,7 @@ public class User : Aggregate
         return new User
         (
             email,
-            UserName.Create(email.Value),
+            userName,
             birthDate,
             gender,
             datingPreferences,
@@ -192,4 +200,5 @@ public class User : Aggregate
             identityUserId
         );
     }
+
 }

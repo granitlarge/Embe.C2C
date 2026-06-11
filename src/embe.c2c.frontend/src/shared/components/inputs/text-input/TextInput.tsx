@@ -1,20 +1,22 @@
-export type TextInputProps = {
+export type InputProps = {
+    errorMessage?: string;
+}
+
+export type TextInputProps = InputProps & {
     className?: string;
     onChange?: (value: string) => void;
     value?: string;
-    valid?: boolean;
-    errorMessage?: string;
     label: React.ReactNode;
     type?: string;
     placeholder?: string;
 }
+
 export default function TextInput({
     label,
     className,
     onChange,
     type = "text",
     value,
-    valid,
     errorMessage,
     placeholder
 }: TextInputProps) {
@@ -23,7 +25,7 @@ export default function TextInput({
     ].filter(Boolean).join(" ");
     const inputClassNames = [
         "input",
-        !valid && "input-invalid"
+        errorMessage && "input-invalid"
     ].filter(Boolean).join(" ");
     return (
         <label className={`label flex flex-col items-center ${shellClassNames} w-full`}>
@@ -35,7 +37,7 @@ export default function TextInput({
                 value={value ?? ""}
                 onChange={(e) => onChange?.(e.target.value)}
             />
-            {!valid && errorMessage && <span className="error-message">{errorMessage}</span>}
+            {errorMessage && <span className="error-message">{errorMessage}</span>}
         </label>
     )
 }

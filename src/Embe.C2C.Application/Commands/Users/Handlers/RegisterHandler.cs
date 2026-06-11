@@ -47,6 +47,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
             }
 
             var email = Email.Create(command.Email);
+            var userName = UserName.Create(command.UserName);
             var birthDate = new BirthDate(command.BirthDate);
             var gender = command.Gender;
             var datingPreferences = new DatingPreferences
@@ -69,7 +70,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
 
             success = true;
 
-            var user = User.Register(email, birthDate, gender, datingPreferences, location: null, [.. files], identityUserId);
+            var user = User.Register(email, userName, birthDate, gender, datingPreferences, location: null, [.. files], identityUserId);
             context.DomainUsers.Add(user);
 
             return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, User>>(true, TypedResult<RegisterUserFailureReason, User>.Success(user));

@@ -1,22 +1,21 @@
 import CheckboxInput from "../checkbox-input/CheckBoxInput";
+import { InputProps } from "../text-input/TextInput";
 
 export type Option = {
     value: string;
     label: string;
 }
 
-export type SelectInputProps = {
+export type SelectInputProps = InputProps & {
     options: Option[];
     value?: string[];
     onChange?: (value: string[]) => void;
     label: string;
     className?: string;
     multiple?: boolean;
-    valid?: boolean;
-    errorMessage?: string;
 }
 
-export default function SelectInput({ options, value, onChange, label, className, multiple = false, valid, errorMessage }: SelectInputProps) {
+export default function SelectInput({ options, value, onChange, label, className, multiple = false, errorMessage }: SelectInputProps) {
 
     const classNames = [
         className
@@ -48,7 +47,7 @@ export default function SelectInput({ options, value, onChange, label, className
                             />)
                     }
                 </div>
-                {!valid && errorMessage && <span className="error-message">{errorMessage}</span>}
+                {errorMessage && <span className="error-message">{errorMessage}</span>}
             </label>
         </div>
     )

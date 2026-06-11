@@ -46,6 +46,11 @@ public class AuthService
                 ClockSkew = TimeSpan.Zero
             }, out var validatedToken);
 
+            if (validatedToken is null)
+            {
+                return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
+            }
+
             var refreshTokenIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "tokenId");
             if (refreshTokenIdClaim == null || !Guid.TryParse(refreshTokenIdClaim.Value, out var refreshTokenId))
             {

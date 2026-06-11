@@ -21,6 +21,7 @@ export type FileDetails = {
     mimeType: string;
 }
 
+
 export type Currency = {
     code: string;
     name: string;

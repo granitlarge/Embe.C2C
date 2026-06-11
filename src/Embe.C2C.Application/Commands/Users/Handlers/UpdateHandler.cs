@@ -51,6 +51,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
         try
         {
             var email = Email.Create(command.Email);
+            var userName = UserName.Create(command.UserName);
             var birthDate = new BirthDate(command.BirthDate);
             var gender = command.Gender;
             var datingPreferences = new DatingPreferences
@@ -68,7 +69,9 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
                 return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.NotFound, "User not found."));
             }
 
+
             user.UpdateEmail(actorId, email);
+            user.UpdateUserName(actorId, userName);
             user.UpdateBirthDate(actorId, birthDate);
             user.UpdateGender(actorId, gender);
             user.UpdatePreferences(actorId, datingPreferences);
