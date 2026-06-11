@@ -23,7 +23,7 @@ public record UserDto
 public record UserBriefDto
 (
     Guid Id,
-    string Email,
+    string UserName,
     string ProfilePictureUrl
 );
 
@@ -54,7 +54,7 @@ public static class UserDtoExtensions
         return new UserBriefDto
         (
             user.Id,
-            user.Email.Value,
+            user.UserName.Value,
             profilePictureUrl
         );
     }
