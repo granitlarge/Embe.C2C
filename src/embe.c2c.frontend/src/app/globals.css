@@ -18,7 +18,7 @@
 
     --link-color: var(--primary);
 
-    --fs-1: 4rem;
+    --fs-1: 3rem;
     --fs-2: calc(var(--fs-1) * .8);
     --fs-3: calc(var(--fs-2) * .8);
     --fs-4: calc(var(--fs-3) * .8);
@@ -95,6 +95,7 @@
     border-radius: 15px;
     font-size: var(--fs-6);
     text-align: center;
+    width:100%;
   }
 
   .input-invalid {

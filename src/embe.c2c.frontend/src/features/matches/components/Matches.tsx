@@ -4,17 +4,19 @@ import { MatchCompact } from "./MatchCompact";
 
 export type MatchesProps = {
     user: AuthenticatedUser
+    className?: string;
 };
 
-export async function Matches({ user }: MatchesProps) {
+export async function Matches({ className, user }: MatchesProps) {
     const result = await getMatches();
-    const matches = result.value ?? [];
+    const matches = result.value || [];
+    const classNames = [className].filter(Boolean).join(" ");
     return (
-        <div className="flex flex-col gap-3 w-full h-full">
+        <div className={`flex flex-col gap-3 ${classNames}`}>
             {
                 matches.length > 0 ? matches.map(match => (
                     <MatchCompact key={match.id} match={match} user={user} />
-                )) : <span className="text-(length:--fs-5) mt-auto mb-auto ml-auto mr-auto">no matches yet</span>
+                )) : <span className="text-(length:--fs-5) mx-auto my-auto">no matches yet</span>
             }
         </div>
     );

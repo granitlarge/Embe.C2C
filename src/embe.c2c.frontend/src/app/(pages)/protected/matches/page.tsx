@@ -8,6 +8,9 @@ export default async function MatchesPage() {
     redirect("/public/login");
   }
   return (
-    <Matches user={user} />
+    <div className="flex flex-col h-full">
+      <h1>matches</h1>
+      <Matches className="grow-1" user={user} />
+    </div>
   );
 }

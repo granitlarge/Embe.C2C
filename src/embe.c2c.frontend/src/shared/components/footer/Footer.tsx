@@ -15,7 +15,14 @@ export async function Footer({ className, user }: FooterProps) {
 
     return (
         <Surface as="footer" padding="none" className={className}>
-            <MainNav user={user} hasUnseenLikes={hasUnseenLikes} hasUnseenMatches={hasUnseenMatches} hasUnseenMessages={hasUnseenMessages} />
+            {
+                user && <MainNav
+                    user={user}
+                    hasUnseenLikes={hasUnseenLikes}
+                    hasUnseenMatches={hasUnseenMatches}
+                    hasUnseenMessages={hasUnseenMessages}
+                /> 
+            }
         </Surface>
     )
 

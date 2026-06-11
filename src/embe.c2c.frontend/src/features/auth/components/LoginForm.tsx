@@ -8,6 +8,7 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { SignIn } from "../actions/sign-in/actions";
 import { SignInError } from "../actions/sign-in/types";
+import Surface from "@/src/shared/components/surfaces/Surface";
 
 export default function LoginForm() {
 
@@ -44,7 +45,7 @@ export default function LoginForm() {
                         setError("an unknown error occurred");
                 }
             } else {
-                router.replace("/protected/dating");
+                router.replace("/protected/swipe");
             }
 
         }
@@ -59,7 +60,7 @@ export default function LoginForm() {
 
     const passwordLabel = <span>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></span>;
     return (
-        <div className="form flex flex-col gap-4 p-8 w-[600px] max-w-full">
+        <Surface className="form flex flex-col gap-4 p-1 w-[600px] max-w-full">
             <TextInput label="email" type="email" placeholder="name@example.com" value={userName} valid={usernameError === undefined} errorMessage={usernameError} onChange={(un: string) => {
                 setUsername(un);
                 clearErrors();
@@ -69,8 +70,8 @@ export default function LoginForm() {
                 clearErrors();
             }} />
             {error && <span className="error-message">{error}</span>}
-            <Button className="max-w-xs" onClick={login}>login</Button>
-        </div>
+            <Button className="w-full" onClick={login}>login</Button>
+        </Surface>
     )
 
 }

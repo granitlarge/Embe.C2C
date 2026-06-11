@@ -26,10 +26,12 @@ export default async function RootLayout({
       lang="en"
     >
 
-      <body className={`flex flex-col justify-between h-dvh w-dvw p-3 ${calSans.variable} gap-2`}>
+      <body className={`flex flex-col justify-between h-dvh w-dvw px-3 pb-4 ${calSans.variable} gap-5`}>
 
-        <main className="grow w-full h-full overflow-y-scroll scrollbar-none">{children}</main>
-        <Footer user={user} />
+        <main className="grow-1 overflow-y-scroll scrollbar-none">
+          {children}
+        </main>
+        <Footer className="grow-0" user={user} />
 
       </body>
 
