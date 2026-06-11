@@ -26,7 +26,7 @@ type Step =
     "account exists" |
     "password" |
     "profile" |
-    "dating preferences" |
+    "preferences" |
     "images";
 
 type EmailStepProps = {
@@ -34,9 +34,10 @@ type EmailStepProps = {
     finish: (accountExists: boolean) => void;
     setEmail: (email: string) => void;
     value?: string
+    hidden?: boolean;
 }
 
-function EmailStep({ finish, setEmail, value, errorMessage }: EmailStepProps) {
+function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepProps) {
 
     const emailSchema = z.email({ message: "please enter a valid email" });
     const [email, setEmailState] = useState<string | undefined>(value);
@@ -64,7 +65,7 @@ function EmailStep({ finish, setEmail, value, errorMessage }: EmailStepProps) {
     }
 
     return (
-        <div className="flex flex-col gap-3 items-center justify-center">
+        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 items-center justify-center` }>
             <EmailInput value={email} onChange={setEmailState} valid={emailError === undefined} errorMessage={emailError} />
             {error && <span className="error-message">{error}</span>}
             <Button className="w-full" onClick={onNavigate}>next</Button>
@@ -73,13 +74,13 @@ function EmailStep({ finish, setEmail, value, errorMessage }: EmailStepProps) {
 
 }
 
-function AccountExistsStep() {
+function AccountExistsStep({ hidden }: { hidden: boolean }) {
     const router = useRouter();
     function onClick() {
         router.push("/public/login");
     }
     return (
-        <Button className="w-full" onClick={onClick}>login</Button>
+        <Button className={`${hidden ? "hidden" : ""} w-full`} onClick={onClick}>login</Button>
     )
 }
 
@@ -88,8 +89,10 @@ type PasswordStepProps = {
     finish: () => void;
     setPassword: (password: string) => void;
     value?: string
+    hidden?: boolean;
 }
-function PasswordStep({ finish, setPassword, value: initialPassword, errorMessage }: PasswordStepProps) {
+function PasswordStep({ finish, setPassword, value: initialPassword, errorMessage, hidden }: PasswordStepProps) {
+
 
     const validationSchema = z.object({
         password: z.string(),
@@ -124,7 +127,7 @@ function PasswordStep({ finish, setPassword, value: initialPassword, errorMessag
     }
 
     return (
-        <div className="flex flex-col gap-3 items-center w-full">
+        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 items-center w-full`}>
             <TextInput label="password" type="password" value={password} onChange={(pw) => { setPasswordState(pw); clearErrors(); }} errorMessage={undefined} />
             <TextInput label="confirm password" type="password" value={confirmPassword} onChange={(pw) => { setConfirmPasswordState(pw); clearErrors(); }} errorMessage={error} />
             <Button className="max-w-xs" onClick={next}>next</Button>
@@ -138,9 +141,12 @@ type ProfileStepProps = {
     setGender: (gender: Gender) => void;
     setBirthDate: (birthDate: string) => void;
     setUserName: (userName: string) => void;
+    hidden?: boolean;
 }
-function ProfileStep({ finish, setGender, setBirthDate, setUserName }: ProfileStepProps) {
+function ProfileStep({ finish, setGender, setBirthDate, setUserName, hidden }: ProfileStepProps) {
 
+
+    console.log("rendering profile step");
     const validationSchema = z.object({
         userName: z.string({ message: "username is required" }).min(1, { message: "username is required" })
     });
@@ -175,7 +181,7 @@ function ProfileStep({ finish, setGender, setBirthDate, setUserName }: ProfileSt
     }
 
     return (
-        <div className="flex flex-col gap-3 items-center w-full">
+        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 items-center w-full`}>
             <ProfileForm data={profileData} onChange={setProfileData} error={profileError} />
             <Button className="max-w-xs" onClick={onNext}>next</Button>
         </div>
@@ -187,8 +193,10 @@ type PreferencesStepProps = {
     onAgeRangeChange?: (ageRange: Range<number>) => void;
     onDistanceChange?: (distance: number) => void;
     finish: () => void;
+    hidden?: boolean;
 }
-function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceChange, finish }: PreferencesStepProps) {
+function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceChange, finish, hidden }: PreferencesStepProps) {
+
 
     const validationSchema = z.object({
         genders: z.array(z.enum(Gender)).min(1, { message: "please select at least one gender" }),
@@ -226,7 +234,7 @@ function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceChange, 
     }
 
     return (
-        <div className="flex flex-col gap-10 w-full items-center">
+        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-10 w-full items-center`}>
             <DatingPreferencesForm data={datingPreferencesData} onChange={setDatingPreferencesData} error={datingPreferencesError} />
             <Button className="max-w-xs" onClick={next}>next</Button>
         </div>
@@ -236,8 +244,9 @@ function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceChange, 
 type ImagesStepProps = {
     finish?: (images: CreateFile[]) => void;
     images?: CreateFile[]
+    hidden?: boolean;
 }
-function ImagesStep({ finish: finish }: ImagesStepProps) {
+function ImagesStep({ finish: finish, hidden }: ImagesStepProps) {
 
     const validationSchema = z.array(z.object({
         url: z.url(),
@@ -259,7 +268,7 @@ function ImagesStep({ finish: finish }: ImagesStepProps) {
     }
 
     return (
-        <div className="flex flex-col gap-3 w-full items-center">
+        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 w-full items-center`}>
             <ImageGallery
                 data={imagesData}
                 error={imagesError}
@@ -294,11 +303,11 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     }>({});
 
 
-    const steps = [
+    const steps: Step[] = [
         "email",
         "password",
         "profile",
-        "dating preferences",
+        "preferences",
         "images"
     ]
 
@@ -337,32 +346,43 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     }
 
     return (
-        <div className={`form flex flex-col gap-5 p-8 ${classNames} w-600px max-w-full`}>
-            {step !== "account exists" && <ProgressBar steps={steps.length} progress={steps.indexOf(step) + 1} />}
+        <div className={`form flex flex-col gap-10 p-8 ${classNames} w-600px max-w-full`}>
+            {step !== "account exists" && <ProgressBar steps={steps} progress={steps.indexOf(step) + 1} onClick={(index) => { navigate(steps[index]) }} />}
             {step !== "email" && <span className="form-title">{step}</span>}
-            {
-                step === "email" &&
-                <EmailStep
-                    finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}
-                    setEmail={(email) => setData(prev => ({ ...prev, email }))}
-                    value={data.email}
-                /> ||
-                step === "password" && <PasswordStep finish={() => navigate("profile")} setPassword={(password) => setData(prev => ({ ...prev, password }))} value={data.password} /> ||
-                step === "profile" && <ProfileStep
-                    finish={() => navigate("dating preferences")}
-                    setUserName={(userName) => setData(prev => ({ ...prev, userName }))}
-                    setGender={(gender) => setData(prev => ({ ...prev, gender }))}
-                    setBirthDate={(birthDate) => setData(prev => ({ ...prev, birthDate }))}
-                /> ||
-                step === "dating preferences" && <PreferencesStep
-                    finish={() => navigate("images")}
-                    onGendersChange={(interestedInGenders) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, interestedInGenders } }))}
-                    onAgeRangeChange={(ageRange) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, ageRange } }))}
-                    onDistanceChange={(maxDistance) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, maxDistance } }))}
-                /> ||
-                step === "images" && <ImagesStep finish={finish} images={data.images} /> ||
-                step === "account exists" && <AccountExistsStep />
-            }
+            <EmailStep
+                hidden={step !== "email"}
+                finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}
+                setEmail={(email) => setData(prev => ({ ...prev, email }))}
+                value={data.email}
+            />
+            <PasswordStep
+                hidden={step !== "password"}
+                finish={() => navigate("profile")}
+                setPassword={(password) => setData(prev => ({ ...prev, password }))}
+                value={data.password}
+            />
+            <ProfileStep
+                hidden={step !== "profile"}
+                finish={() => navigate("preferences")}
+                setUserName={(userName) => setData(prev => ({ ...prev, userName }))}
+                setGender={(gender) => setData(prev => ({ ...prev, gender }))}
+                setBirthDate={(birthDate) => setData(prev => ({ ...prev, birthDate }))}
+            />
+            <PreferencesStep
+                hidden={step !== "preferences"}
+                finish={() => navigate("images")}
+                onGendersChange={(interestedInGenders) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, interestedInGenders } }))}
+                onAgeRangeChange={(ageRange) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, ageRange } }))}
+                onDistanceChange={(maxDistance) => setData(prev => ({ ...prev, datingPreferences: { ...prev.datingPreferences, maxDistance } }))}
+            />
+            <ImagesStep
+                hidden={step !== "images"}
+                finish={finish}
+                images={data.images}
+            />
+            <AccountExistsStep
+                hidden={step !== "account exists"}
+            />
         </div>
     )
 

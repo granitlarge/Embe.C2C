@@ -1,11 +1,11 @@
 export type ProgressBarProps = {
     className?: string;
-    steps: number;
+    steps: string[];
     progress: number;
+    onClick?: (stepIndex: number) => void;
 }
 
-export default function ProgressBar({ className, steps, progress }: ProgressBarProps)
-{
+export default function ProgressBar({ className, steps, progress, onClick }: ProgressBarProps) {
     const classNames = [
         className
     ].filter(Boolean).join(" ");
@@ -13,25 +13,34 @@ export default function ProgressBar({ className, steps, progress }: ProgressBarP
     return (
         <div className={`w-full ${classNames}`}>
             <div className="w-full h-[1px] bg-(--surface-font-color) relative">
-                <div className="absolute h-full bg-(--primary) transition-all duration-300" style={{ width: `${(progress - 1) / (steps - 1) * 100}%` }}>
+                <div className="absolute h-full bg-(--primary) transition-all duration-300" style={{ width: `${(progress - 1) / (steps.length - 1) * 100}%` }}>
                 </div>
                 {
-                    [...Array(steps)].map((_, index) => (
-                        <div
-                            key={index}
+                    steps.map((step, index) => (
+                        <button
+                            key={step}
                             className=
                             {
-                                `w-[5px] 
-                                h-[5px] 
+                                `
+                                ${progress > index ? "cursor-pointer" : ""}
+                                w-[10px] 
+                                h-[10px] 
                                 rounded-full
                                 absolute top-1/2 
                                 -translate-y-1/2`
                             }
                             style={{
-                                left: `${(index) / (steps - 1) * 100}%`,
+                                left: `${(index) / (steps.length - 1) * 100}%`,
                                 backgroundColor: progress >= index + 1 ? "var(--primary)" : "var(--surface-font-color)"
                             }}
-                        />
+                            onClick={() => {
+                                if (index + 1 < progress) {
+                                    onClick?.(index);
+                                }
+                            }}
+                        >
+                            <span className="text-(length:--fs-sm) absolute left-1/2 -translate-x-1/2 top-full">{step}</span>
+                        </button>
                     ))
                 }
             </div>
