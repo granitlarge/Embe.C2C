@@ -150,5 +150,6 @@ public enum AccountError
     AlreadyClosed,
     BalanceNotZero,
     AlreadyOpened,
-    AccountMustBeClosed
+    AccountMustBeClosed,
+    Unauthorized
 }
