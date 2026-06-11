@@ -4,16 +4,16 @@ namespace Embe.C2C.Domain.ValueObjects;
 
 public record FileDetails
 {
-    public FileDetails(string url, string mimeType, int order)
+    public FileDetails(string name, string mimeType, int order)
     {
         if (order < 0)
         {
             throw new DomainException("Order must be a non-negative integer.");
         }
 
-        if (string.IsNullOrWhiteSpace(url))
+        if (string.IsNullOrWhiteSpace(name))
         {
-            throw new DomainException("URL cannot be null or whitespace.");
+            throw new DomainException("Name cannot be null or whitespace.");
         }
 
         if (string.IsNullOrWhiteSpace(mimeType))
@@ -21,12 +21,12 @@ public record FileDetails
             throw new DomainException("MIME type cannot be null or whitespace.");
         }
 
-        Url = url;
+        Name = name;
         MimeType = mimeType;
         Order = order;
     }
 
-    public string Url { get; }
+    public string Name { get; }
     public string MimeType { get; }
-    public int Order { get; init;}
+    public int Order { get; init; }
 }

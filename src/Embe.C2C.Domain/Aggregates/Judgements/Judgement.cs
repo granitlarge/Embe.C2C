@@ -26,12 +26,14 @@ public class Judgement : Aggregate
         AddDomainEvent(new JudgementCreatedEvent(this));
     }
 
+    private Judgement() { }
+
     public Guid Id { get; }
     public Guid JudgeUserId { get; }
     public Guid JudgeeUserId { get; }
     public bool IsPositive { get; private set; }
     public DateTimeOffset EditedAt { get; private set; }
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; private set;}
 
     public void Edit(bool isPositive)
     {

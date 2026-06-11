@@ -1,3 +1,4 @@
+import { Message } from "./aggregates";
 import { FileDetails } from "./value-objects";
 
 export type File = {
@@ -18,4 +19,5 @@ export type Conversation = {
     messageCount: number;
     updatedAt: string;
     createdAt: string;
+    lastMessage?: Message;
 }

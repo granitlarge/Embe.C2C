@@ -73,7 +73,7 @@ public class User : Aggregate
     [NotMapped]
     public Entities.File ProfilePicture => _files.OrderBy(f => f.FileDetails.Order).First();
 
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; private set;}
     public DateTimeOffset UpdatedAt { get; private set; }
 
     public void UpdateEmail(Guid actorId, Email newEmail)
@@ -109,7 +109,7 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void UpdateLocation(Guid actorId, Location newLocation)
+    public void UpdateLocation(Guid actorId, Location? newLocation)
     {
         EnsureActorIsOwner(actorId);
         Location = newLocation;

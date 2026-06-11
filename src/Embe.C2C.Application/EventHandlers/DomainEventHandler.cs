@@ -72,7 +72,7 @@ public class DomainEventHandler : IntegrationEventCollector
             matching.Id,
             matcherUserId,
             matcheeUser.UserName.Value,
-            matcheeUser.ProfilePicture.FileDetails.Url
+            matcheeUser.ProfilePicture.FileDetails.Name
         );
         _context.Notifications.Add(notification);
 
@@ -98,7 +98,7 @@ public class DomainEventHandler : IntegrationEventCollector
             matching.Id,
             matchRemoverUserId,
             matcheeUser.UserName.Value,
-            matcheeUser.ProfilePicture.FileDetails.Url
+            matcheeUser.ProfilePicture.FileDetails.Name
         );
         _context.Notifications.Add(notification);
         AddIntegrationEvent(new NotificationCreatedEvent(notification.ToDto()));

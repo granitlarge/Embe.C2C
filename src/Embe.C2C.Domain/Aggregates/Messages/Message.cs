@@ -16,20 +16,29 @@ public class Message : Aggregate
         Id = Guid.CreateVersion7();
         ConversationId = conversationId;
         ReplyToMessageId = replyToMessageId;
+        IsReply = replyToMessageId.HasValue;
         AuthorUserId = authorUserId;
         Content = content;
         CreatedAt = DateTimeOffset.UtcNow;
         EditedAt = CreatedAt;
     }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private Message()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+
+    }
+
     public Guid Id { get; }
     public Guid ConversationId { get; }
     public Guid? ReplyToMessageId { get; }
+    public bool IsReply { get; private set; }
     public Guid AuthorUserId { get; }
     public MessageContent Content { get; private set; }
     public DateTimeOffset? SeenAt { get; private set; }
 
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; private set;}
     public DateTimeOffset EditedAt { get; private set; }
 
     internal void Edit(MessageContent newContent)

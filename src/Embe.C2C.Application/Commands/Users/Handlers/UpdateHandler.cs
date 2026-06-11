@@ -47,6 +47,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
 
         var success = false;
         HashSet<string> uploadedFileUrls = [];
+
         try
         {
             var email = Email.Create(command.Email);
@@ -59,7 +60,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
                 new Age(command.DatingPreferences.AgeRangeMax),
                 new Distance(command.DatingPreferences.MaximumDistance.Value, command.DatingPreferences.MaximumDistance.Unit)
             );
-            var location = command.Location;
+            var location = command.Location != null ? new Location(command.Location.Latitude, command.Location.Longitude) : null;
 
             var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
             if (user == null)
@@ -77,14 +78,14 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
             foreach (var file in filesToRemove)
             {
                 user.RemoveFile(actorId, file.Id);
-                await _fileService.DeleteFileAsync(file.FileDetails.Url, cancellationToken);
+                await _fileService.DeleteFileByUrlAsync(file.FileDetails.Name, cancellationToken);
             }
 
             foreach (var file in command.FilesToAdd)
             {
-                var url = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
-                user.AddFile(actorId, new FileDetails(file.MimeType, url, file.Order));
-                uploadedFileUrls.Add(url);
+                var uploadFileResult = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
+                user.AddFile(actorId, new FileDetails(uploadFileResult.Name, file.MimeType, file.Order));
+                uploadedFileUrls.Add(uploadFileResult.Url);
             }
 
             success = true;
@@ -100,7 +101,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
             {
                 try
                 {
-                    await Task.WhenAll(uploadedFileUrls.Select(url => _fileService.DeleteFileAsync(url, cancellationToken)));
+                    await Task.WhenAll(uploadedFileUrls.Select(url => _fileService.DeleteFileByUrlAsync(url, cancellationToken)));
                 }
                 catch (Exception)
                 {
@@ -108,5 +109,6 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
                 }
             }
         }
+
     }
 }

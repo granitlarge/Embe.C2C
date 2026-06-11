@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Header from "../shared/components/header/Header";
-import Footer from "../shared/components/footer/Footer";
 import { calSans } from "@/fonts";
 
 import "./globals.css";
+import { Footer } from "../shared/components/footer/Footer";
+import { getAuthenticatedUser } from "../shared/user";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,16 +18,18 @@ export default async function RootLayout({
   children,
 }: RootLayoutProps) {
 
+  const user = await getAuthenticatedUser();
+
   return (
 
     <html
       lang="en"
     >
 
-      <body className={`flex flex-col justify-between h-dvh w-dvw p-3 ${calSans.variable}`}>
+      <body className={`flex flex-col justify-between h-dvh w-dvw p-3 ${calSans.variable} gap-2`}>
 
-        <main className="grow w-full h-full">{children}</main>
-        <Footer />
+        <main className="grow w-full h-full overflow-y-scroll scrollbar-none">{children}</main>
+        <Footer user={user} />
 
       </body>
 

@@ -1,7 +1,9 @@
 // A set is a collection of entities: <Set>
 // Each entity has a unique ID within its set : <Set>:<ID>
 // An entity may own collections of other entities. <Set>:<ID>:<Set>
-export type Id = string;
+export type Guid = string & { readonly __brand: unique symbol };
+export const NullGuid: Guid = "00000000-0000-0000-0000-000000000000" as Guid;
+
 export type Set =
     "user" |
     "account" |
@@ -14,10 +16,8 @@ export type Set =
     "transaction" |
     "notification";
 
-export type Entity = `${Set}:${Id}`;
-export type Collection = `${Set}:${Id}:${Set}`;
+export type Entity = `${Set}:${Guid}`;
+export type Collection = `${Set}:${Guid}:${Set}`;
 export type Tag =
     Entity |
-    Collection |
-    `${Set}:${Id}:${Set}:${Id}:${Set}` |
-    `${Set}:${Id}:${Set}:${Id}:${Set}:${Id}:${Set}`;
+    Collection;

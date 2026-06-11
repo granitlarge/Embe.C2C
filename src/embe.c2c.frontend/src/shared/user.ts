@@ -1,9 +1,10 @@
+import { Guid } from "./cache";
 import { getRefreshToken } from "./security/functions";
 import { jwtDecode } from "jwt-decode";
 
 export type AuthenticatedUser = {
-    identityUserId: string;
-    userId: string;
+    identityUserId: Guid;
+    userId: Guid;
 };
 
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | undefined> {
@@ -13,7 +14,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | undefi
     }
     const decoded = jwtDecode(refreshToken) as { sub: string; userId: string; };
     return {
-        identityUserId: decoded.sub,
-        userId: decoded.userId,
+        identityUserId: decoded.sub as Guid,
+        userId: decoded.userId as Guid,
     };
 }

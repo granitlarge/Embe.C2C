@@ -9,12 +9,13 @@ public record MatchingDto
     Guid UserId1,
     Guid UserId2,
     ConversationDto Conversation,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    UserBriefDto? User
 );
 
 public static class MatchingDtoExtensions
 {
-    public static MatchingDto ToDto(this Matching matching)
+    public static async Task<MatchingDto> ToDto(this Matching matching, IFileUrlGenerator fileUrlGenerator)
     {
         return new MatchingDto
         (
@@ -22,7 +23,11 @@ public static class MatchingDtoExtensions
             matching.UserId1,
             matching.UserId2,
             matching.Conversation.ToDto(),
-            matching.CreatedAt
+            matching.CreatedAt,
+
+            matching.User1 != null ? await matching.User1.ToBriefDto(fileUrlGenerator) :
+            matching.User2 != null ? await matching.User2.ToBriefDto(fileUrlGenerator) :
+            null
         );
     }
 }

@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Exceptions;
 
 namespace Embe.C2C.Domain.Entities;
@@ -23,6 +24,8 @@ public class Conversation : Entity
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
     }
+
+    private Conversation() { }
 
     public Guid Id { get; }
     public Guid MatchingId { get; }
@@ -66,4 +69,10 @@ public class Conversation : Entity
     {
         return new Conversation(matchingId, userId1, userId2);
     }
+
+    #region Read Only Navigation Properties
+
+    public Message? LastMessage { get; private set; }
+
+    #endregion
 }

@@ -14,13 +14,13 @@ public record FileDto
 
 public static class FileDtoExtensions
 {
-    public static FileDto ToDto(this Domain.Entities.File file)
+    public static async Task<FileDto> ToDto(this Domain.Entities.File file, IFileUrlGenerator fileUrlGenerator)
     {
         return new FileDto
         (
             file.Id,
             file.OwnerUserId,
-            file.FileDetails.ToDto(),
+            await file.FileDetails.ToDto(fileUrlGenerator),
             file.MarkedForDeletionAt,
             file.DeletedAt,
             file.CreatedAt

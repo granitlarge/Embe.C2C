@@ -24,13 +24,15 @@ public class ContactRequest : Aggregate
         AddDomainEvent(new ContactRequestCreatedEvent(this));
     }
 
+    private ContactRequest() { }
+
     public Guid Id { get; }
     public Guid RequestorUserId { get; }
     public Guid RecipientUserId { get; }
     public bool? IsAccepted { get; private set; }
 
     public DateTimeOffset? RespondedAt { get; private set; }
-    public DateTimeOffset RequestedAt { get; }
+    public DateTimeOffset RequestedAt { get; private set;}
 
     internal Contact Accept()
     {

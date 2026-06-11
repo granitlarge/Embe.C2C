@@ -29,6 +29,8 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Judgement> JudgementsQuery { get; }
         public IQueryable<Matching> MatchingsQuery { get; }
         public IQueryable<Notification> NotificationsQuery { get; }
+
+        public Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId);
     }
 
     public interface IRepository : ISparseRepository
@@ -58,5 +60,10 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Judgement> JudgementsQuery => _context.JudgementsQuery;
         public IQueryable<Matching> MatchingsQuery => _context.MatchingsQuery;
         public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
+
+        public async Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId)
+        {
+            return await _context.GetCandidatesForUserIdAsync(userId);
+        }
     }
 }

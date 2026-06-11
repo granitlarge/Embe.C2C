@@ -56,14 +56,15 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
                 new Age(command.DatingPreferences.AgeRangeMax),
                 new Distance(command.DatingPreferences.MaximumDistance.Value, command.DatingPreferences.MaximumDistance.Unit)
             );
+
             var files = new HashSet<FileDetails>();
             var identityUserId = registerUserResult.Value!.Id;
 
             foreach (var file in command.Files)
             {
-                var url = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
-                uploadedFileUrls.Add(url);
-                files.Add(new FileDetails(file.MimeType, url, file.Order));
+                var uploadFileResult = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
+                uploadedFileUrls.Add(uploadFileResult.Url);
+                files.Add(new FileDetails(uploadFileResult.Name, file.MimeType, file.Order));
             }
 
             success = true;
@@ -89,7 +90,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
         {
             try
             {
-                await Task.WhenAll(uploadedFileUrls.Select(url => _fileService.DeleteFileAsync(url)));
+                await Task.WhenAll(uploadedFileUrls.Select(url => _fileService.DeleteFileByUrlAsync(url)));
             }
             catch (Exception)
             {

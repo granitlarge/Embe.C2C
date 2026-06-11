@@ -23,7 +23,7 @@ public abstract class Notification : Aggregate
     public bool IsRead => ReadAt.HasValue;
 
     public DateTimeOffset? ReadAt { get; private set; }
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt => ReadAt ?? CreatedAt;
 
     public void MarkAsRead(bool isRead)

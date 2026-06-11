@@ -1,3 +1,5 @@
+using Embe.C2C.Application.Dtos.Aggregates;
+
 namespace Embe.C2C.Application.Dtos.Entities;
 
 public record ConversationDto
@@ -9,7 +11,8 @@ public record ConversationDto
     Guid? LastMessageId,
     uint MessageCount,
     DateTimeOffset UpdatedAt,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    MessageDto? LastMessage
 );
 
 public static class ConversationDtoExtensions
@@ -25,7 +28,8 @@ public static class ConversationDtoExtensions
             conversation.LastMessageId,
             conversation.MessageCount,
             conversation.UpdatedAt,
-            conversation.CreatedAt
+            conversation.CreatedAt,
+            conversation.LastMessage?.ToDto()
         );
     }
 }

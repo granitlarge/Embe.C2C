@@ -14,12 +14,8 @@ namespace Embe.C2C.Application.Queries.Users.Handlers
         public async Task<Result<List<User>>> HandleAsync(GetCandidateUsersQuery request, CancellationToken cancellationToken)
         {
             var userId = _userService.UserId ?? throw new InvalidOperationException("User ID is not available.");
-
-            using var transaction = await _context.BeginTransactionAsync();
-            var user = await _context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
-            if (user is null)
-                return Result<List<User>>.Failure(FailureReason.NotFound, "User not found.");
-            throw new NotImplementedException();
+            var candidates = await (await _context.GetCandidatesForUserIdAsync(userId)).ToListAsync(cancellationToken);
+            return Result<List<User>>.Success([.. candidates]);
         }
     }
 }

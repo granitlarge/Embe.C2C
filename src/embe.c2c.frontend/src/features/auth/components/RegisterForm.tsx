@@ -75,7 +75,7 @@ function EmailStep({ finish, setEmail, value, errorMessage }: EmailStepProps) {
 function AccountExistsStep() {
     const router = useRouter();
     function onClick() {
-        router.push("/login");
+        router.push("/public/login");
     }
     return (
         <Button onClick={onClick}>login</Button>
@@ -323,7 +323,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         console.log("register response", response);
 
         if (response.success) {
-            router.push("/login");
+            router.push("/public/login");
         } else {
             switch (response.reason) {
                 case RegisterUserFailureReason.EmailAlreadyExists:

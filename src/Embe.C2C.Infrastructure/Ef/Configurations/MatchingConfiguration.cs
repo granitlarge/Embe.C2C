@@ -12,17 +12,17 @@ public class MatchingConfiguration : AggregateConfiguration<Domain.Aggregates.Ma
 
         builder.HasKey(m => m.Id);
 
-        builder.HasOne<Domain.Aggregates.Users.User>()
+        builder.HasOne(m => m.User1)
             .WithMany()
             .HasForeignKey(m => m.UserId1)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Domain.Aggregates.Users.User>()
+        builder.HasOne(m => m.User2)
             .WithMany()
             .HasForeignKey(m => m.UserId2)
             .OnDelete(DeleteBehavior.ClientCascade);
 
-        builder.HasOne<Conversation>()
+        builder.HasOne(m => m.Conversation)
             .WithOne()
             .HasForeignKey<Conversation>(c => c.MatchingId)
             .OnDelete(DeleteBehavior.Cascade);

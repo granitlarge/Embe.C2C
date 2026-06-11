@@ -11,7 +11,7 @@ public record UpdateCommand
     DateOnly BirthDate,
     Gender Gender,
     DatingPreferencesDto DatingPreferences,
-    Location Location,
+    LocationDto? Location,
     ImmutableHashSet<Guid> FilesToKeep,
-    ImmutableHashSet<FileDetailsDto> FilesToAdd
+    ImmutableHashSet<CreateFileDto> FilesToAdd
 );

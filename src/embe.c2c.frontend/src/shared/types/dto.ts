@@ -1,1 +1,0 @@
-export type CreateDto<T> = Omit<T, "id">; 

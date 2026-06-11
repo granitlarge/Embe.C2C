@@ -1,3 +1,4 @@
+import { UserBrief } from "../dtos/types";
 import { Conversation, File } from "./entities";
 import { DatingPreferences, Gender, Location, Money, TransactionReason, TransactionType } from "./value-objects";
 
@@ -59,6 +60,7 @@ export type Matching = {
     userId2: string;
     conversation: Conversation;
     createdAt: string;
+    user?: UserBrief;
 }
 
 export type Message = {

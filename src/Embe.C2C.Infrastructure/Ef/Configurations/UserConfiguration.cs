@@ -15,6 +15,12 @@ public class UserConfiguration : AggregateConfiguration<User>
     {
         builder.HasKey(u => u.Id);
 
+        builder.Property(u => u.Gender).HasConversion
+        (
+            gender => Enum.GetName(gender)!,
+            value => Enum.Parse<Gender>(value)
+        );
+
         builder.Property(u => u.Email)
             .HasConversion(
                 email => email.Value,
@@ -82,7 +88,7 @@ public class UserConfiguration : AggregateConfiguration<User>
                 f.WithOwner().HasForeignKey(f => f.OwnerUserId);
                 f.OwnsOne(f => f.FileDetails, fd =>
                 {
-                    fd.Property(d => d.Url);
+                    fd.Property(d => d.Name);
                     fd.Property(d => d.MimeType);
                     fd.Property(d => d.Order);
                 });

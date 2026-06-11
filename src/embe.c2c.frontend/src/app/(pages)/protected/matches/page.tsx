@@ -1,8 +1,13 @@
+import { Matches } from "@/src/features/matches/components/Matches";
+import { getAuthenticatedUser } from "@/src/shared/user";
+import { redirect } from "next/navigation";
+
 export default async function MatchesPage() {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    redirect("/public/login");
+  }
   return (
-    <div>
-      <h1>Matches</h1>
-      <p>This is the matches page.</p>
-    </div>
+    <Matches user={user} />
   );
 }

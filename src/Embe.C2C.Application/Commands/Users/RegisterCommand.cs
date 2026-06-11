@@ -4,6 +4,13 @@ using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Commands.Users;
 
+public record CreateFileDto
+(
+    string Url,
+    string MimeType,
+    int Order
+);
+
 public sealed record RegisterCommand
 (
     string Email,
@@ -11,5 +18,5 @@ public sealed record RegisterCommand
     DateOnly BirthDate,
     Gender Gender,
     DatingPreferencesDto DatingPreferences,
-    ImmutableHashSet<FileDetailsDto> Files
+    ImmutableHashSet<CreateFileDto> Files
 );

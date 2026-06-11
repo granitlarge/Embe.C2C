@@ -23,10 +23,12 @@ public class Blocking : Aggregate
         AddDomainEvent(new BlockingCreatedEvent(this));
     }
 
+    private Blocking() { }
+
     public Guid Id { get; }
     public Guid BlockerUserId { get; }
     public Guid BlockedUserId { get; }
-    public DateTimeOffset BlockedAt { get; }
+    public DateTimeOffset BlockedAt { get; private set; }
 
     public void Remove()
     {

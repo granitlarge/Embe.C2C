@@ -17,11 +17,13 @@ public class Contact : Aggregate
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
+    private Contact() { }
+
     public Guid Id { get; }
     public Guid UserId1 { get; }
     public Guid UserId2 { get; }
 
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; private set;}
 
     public void Remove(Guid removerId)
     {

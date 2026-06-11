@@ -20,9 +20,16 @@ public record UserDto
     DateTimeOffset UpdatedAt
 );
 
+public record UserBriefDto
+(
+    Guid Id,
+    string Email,
+    string ProfilePictureUrl
+);
+
 public static class UserDtoExtensions
 {
-    public static UserDto ToDto(this User user)
+    public static async Task<UserDto> ToDto(this User user, IFileUrlGenerator fileUrlGenerator)
     {
         return new UserDto
         (
@@ -33,9 +40,22 @@ public static class UserDtoExtensions
             user.Gender,
             user.DatingPreferences.ToDto(),
             user.Location?.ToDto(),
-            [.. user.Files.Select(f => f.ToDto())],
+            [.. await Task.WhenAll(user.Files.Select(f => f.ToDto(fileUrlGenerator)))],
             user.CreatedAt,
             user.UpdatedAt
+        );
+    }
+
+    public static async Task<UserBriefDto> ToBriefDto(this User user, IFileUrlGenerator fileUrlGenerator)
+    {
+        var profilePictureFileName = user.ProfilePicture.FileDetails.Name;
+        var profilePictureUrl = await fileUrlGenerator.GenerateUrlAsync(profilePictureFileName);
+
+        return new UserBriefDto
+        (
+            user.Id,
+            user.Email.Value,
+            profilePictureUrl
         );
     }
 }

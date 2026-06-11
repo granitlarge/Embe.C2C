@@ -149,4 +149,9 @@ public class C2CContext
     {
         return Database.BeginTransactionAsync(System.Data.IsolationLevel.Snapshot, cancellationToken);
     }
+
+    public async Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
 }
