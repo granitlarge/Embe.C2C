@@ -10,9 +10,9 @@ public record FileDetailsDto
 
 public static class FileDetailsDtoExtensions
 {
-    public static async Task<FileDetailsDto> ToDto(this Domain.ValueObjects.FileDetails fileDetails, IFileUrlGenerator fileUrlGenerator)
+    public static async Task<FileDetailsDto> ToDtoAsync(this Domain.ValueObjects.FileDetails fileDetails, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken = default)
     {
-        var url = await fileUrlGenerator.GenerateUrlAsync(fileDetails.Name);
+        var url = await fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, cancellationToken);
         return new FileDetailsDto(url, fileDetails.Name, fileDetails.MimeType, fileDetails.Order);
     }
 }

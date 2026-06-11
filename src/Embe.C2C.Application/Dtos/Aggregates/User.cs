@@ -29,7 +29,7 @@ public record UserBriefDto
 
 public static class UserDtoExtensions
 {
-    public static async Task<UserDto> ToDto(this User user, IFileUrlGenerator fileUrlGenerator)
+    public static async Task<UserDto> ToDtoAsync(this User user, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken = default)
     {
         return new UserDto
         (
@@ -40,16 +40,16 @@ public static class UserDtoExtensions
             user.Gender,
             user.DatingPreferences.ToDto(),
             user.Location?.ToDto(),
-            [.. await Task.WhenAll(user.Files.Select(f => f.ToDto(fileUrlGenerator)))],
+            [.. await Task.WhenAll(user.Files.Select(f => f.ToDtoAsync(fileUrlGenerator, cancellationToken)))],
             user.CreatedAt,
             user.UpdatedAt
         );
     }
 
-    public static async Task<UserBriefDto> ToBriefDto(this User user, IFileUrlGenerator fileUrlGenerator)
+    public static async Task<UserBriefDto> ToBriefDtoAsync(this User user, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken)
     {
         var profilePictureFileName = user.ProfilePicture.FileDetails.Name;
-        var profilePictureUrl = await fileUrlGenerator.GenerateUrlAsync(profilePictureFileName);
+        var profilePictureUrl = await fileUrlGenerator.GenerateUrlAsync(profilePictureFileName, cancellationToken);
 
         return new UserBriefDto
         (

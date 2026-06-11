@@ -24,8 +24,8 @@ public class GetNotificationsHandler
         var notifications = await _context.NotificationsQuery
             .AsNoTracking()
             .Where(n => n.RecipientUserId == userId)
-            .Skip((query.PageNumber - 1) * query.PageSize)
-            .Take(query.PageSize)
+            .Skip((query.Page - 1) * query.Size)
+            .Take(query.Size)
             .ToListAsync(cancellationToken);
         var dtos = notifications.Select(n => n.ToDto()).ToList();
         return Result<List<NotificationDto>>.Success(dtos);

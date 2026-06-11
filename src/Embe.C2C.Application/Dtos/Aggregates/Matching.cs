@@ -15,7 +15,7 @@ public record MatchingDto
 
 public static class MatchingDtoExtensions
 {
-    public static async Task<MatchingDto> ToDto(this Matching matching, IFileUrlGenerator fileUrlGenerator)
+    public static async Task<MatchingDto> ToDtoAsync(this Matching matching, Guid userId, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken = default)
     {
         return new MatchingDto
         (
@@ -25,8 +25,8 @@ public static class MatchingDtoExtensions
             matching.Conversation.ToDto(),
             matching.CreatedAt,
 
-            matching.User1 != null ? await matching.User1.ToBriefDto(fileUrlGenerator) :
-            matching.User2 != null ? await matching.User2.ToBriefDto(fileUrlGenerator) :
+            matching.User1 != null && matching.User1.Id == userId ? await matching.User1.ToBriefDtoAsync(fileUrlGenerator, cancellationToken) :
+            matching.User2 != null && matching.User2.Id == userId ? await matching.User2.ToBriefDtoAsync(fileUrlGenerator, cancellationToken) :
             null
         );
     }

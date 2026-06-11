@@ -20,26 +20,19 @@ public class GetMatchingsHandler(IRepository context, IAuthenticatedUserService 
     )
     {
         var userId = _userService.UserId ?? throw new InvalidOperationException();
-        var matchings1 = await _context.MatchingsQuery
+        var matchings = await _context.MatchingsQuery
             .AsNoTracking()
             .Include(m => m.User2)
-            .Include(m => m.Conversation)
-                .ThenInclude(c => c.LastMessage)
-            .Where(m => m.UserId1 == userId)
-            .ToListAsync(cancellationToken);
-
-        var matchings2 = await _context.MatchingsQuery
-            .AsNoTracking()
             .Include(m => m.User1)
             .Include(m => m.Conversation)
                 .ThenInclude(c => c.LastMessage)
-            .Where(m => m.UserId2 == userId)
+            .Where(m => m.UserId1 == userId || m.UserId2 == userId)
+            .Skip((query.Page - 1) * query.Size)
+            .Take(query.Size)
             .ToListAsync(cancellationToken);
 
-        var matchings = matchings1.Concat(matchings2).ToList();
-
         var urlGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromSeconds(15));
-        var dtos = await Task.WhenAll(matchings.Select(matching => matching.ToDto(urlGenerator)));
+        var dtos = await Task.WhenAll(matchings.Select(matching => matching.ToDtoAsync(matching.UserId1 == userId ? matching.UserId2 : matching.UserId1, urlGenerator, cancellationToken)));
 
         return Result<MatchingDto[]>.Success(dtos);
     }

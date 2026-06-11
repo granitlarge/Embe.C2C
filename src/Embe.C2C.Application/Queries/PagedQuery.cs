@@ -2,22 +2,22 @@ namespace Embe.C2C.Application.Queries;
 
 public record PagedQuery
 {
-    public PagedQuery(int pageNumber, int pageSize)
+    public PagedQuery(int page, int size)
     {
-        if (pageNumber < 1)
-            throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than 0.");
-        if (pageSize < 1)
-            throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than 0.");
+        if (page < 1)
+            throw new ArgumentOutOfRangeException(nameof(page), "Page number must be greater than 0.");
+        if (size < 1)
+            throw new ArgumentOutOfRangeException(nameof(size), "Page size must be greater than 0.");
 
-        PageNumber = pageNumber;
-        PageSize = pageSize;
+        Page = page;
+        Size = size;
     }
 
-    public int PageNumber { get; init; }
-    public int PageSize { get; init; }
+    public int Page { get; init; }
+    public int Size { get; init; }
 }
 
-public record PagedQuery<T>(int PageNumber, int PageSize) : PagedQuery(PageNumber, PageSize)
+public record PagedQuery<T>(int Page, int Size) : PagedQuery(Page, Size)
 {
     public T? Filter { get; init; }
 }

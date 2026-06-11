@@ -12,7 +12,7 @@ export type MatchCompactProps = {
     user: AuthenticatedUser;
 };
 
-export async function MatchCompact({ match, className, user }: MatchCompactProps) {
+export function MatchCompact({ match, className, user }: MatchCompactProps) {
 
     const otherUser = match.user;
     const classNames = [className].filter(Boolean).join(" ");

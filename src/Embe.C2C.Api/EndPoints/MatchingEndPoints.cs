@@ -20,9 +20,9 @@ public static class MatchingEndPoints
         group.MapPost("/unmatch", Unmatch);
     }
 
-    private static async Task<IResult> Get([FromServices] GetMatchingsHandler handler, CancellationToken cancellationToken = default)
+    private static async Task<IResult> Get([FromQuery] int page, [FromQuery] int size, [FromServices] GetMatchingsHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(GetMatchingsQuery.Instance, cancellationToken);
+        var result = await handler.HandleAsync(new GetMatchingsQuery(page, size), cancellationToken);
         return result.ToResult();
     }
 
