@@ -11,7 +11,7 @@ export default function ProgressBar({ className, steps, progress, onClick }: Pro
     ].filter(Boolean).join(" ");
 
     return (
-        <div className={`w-full ${classNames}`}>
+        <div className={`w-full ${classNames} pb-4`}>
             <div className="w-full h-[1px] bg-(--surface-font-color) relative">
                 <div className="absolute h-full bg-(--primary) transition-all duration-300" style={{ width: `${(progress - 1) / (steps.length - 1) * 100}%` }}>
                 </div>
@@ -39,7 +39,7 @@ export default function ProgressBar({ className, steps, progress, onClick }: Pro
                                 }
                             }}
                         >
-                            <span className="text-(length:--fs-sm) absolute left-1/2 -translate-x-1/2 top-full">{step}</span>
+                            <span className="text-(length:--fs-secondary) absolute left-1/2 -translate-x-1/2 top-full">{step}</span>
                         </button>
                     ))
                 }

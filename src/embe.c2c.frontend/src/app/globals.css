@@ -18,7 +18,7 @@
 
     --link-color: var(--primary);
 
-    --fs-1: 3rem;
+    --fs-1: 2rem;
     --fs-2: calc(var(--fs-1) * .8);
     --fs-3: calc(var(--fs-2) * .8);
     --fs-4: calc(var(--fs-3) * .8);
@@ -31,6 +31,18 @@
     --fs-sm: calc(var(--fs-md) * 0.8);
     --fs-xs: calc(var(--fs-sm) * 0.8);
 
+    /*
+      Semantic font sizes. 
+      These are the ones that should be used in the app, as they are tied to the design system and can be easily changed without affecting the overall hierarchy of the typography.
+    */
+    --fs-header-1: var(--fs-1);
+    --fs-header-2: var(--fs-2);
+    --fs-header-3: var(--fs-3);
+
+    --fs-primary: var(--fs-4);
+    --fs-secondary: var(--fs-5);
+    --fs-tertiary: var(--fs-6);
+    --fs-quaternary: var(--fs-7);
   }
 
   * {
@@ -46,31 +58,31 @@
     background-color: var(--background);
     color: var(--background-font-color);
     font-family: var(--font-cal-sans);
-    font-size: var(--fs-md);
+    font-size: var(--fs-primary);
   }
 
   h1 {
-    font-size: var(--fs-1);
+    font-size: var(--fs-header-1);
   }
 
   h2 {
-    font-size: var(--fs-2);
+    font-size: var(--fs-header-2);
   }
 
   h3 {
-    font-size: var(--fs-3);
+    font-size: var(--fs-header-3);
   }
 
   h4 {
-    font-size: var(--fs-4);
+    font-size: var(--fs-header-4);
   }
 
   h5 {
-    font-size: var(--fs-5);
+    font-size: var(--fs-header-5);
   }
 
   h6 {
-    font-size: var(--fs-6);
+    font-size: var(--fs-header-6);
   }
 
   /* Forms BEGIN*/
@@ -93,9 +105,9 @@
     padding-inline: 20px;
     padding-block: 5px;
     border-radius: 15px;
-    font-size: var(--fs-6);
+    font-size: var(--fs-primary);
     text-align: center;
-    width:100%;
+    width: 100%;
   }
 
   .input-invalid {
@@ -116,16 +128,16 @@
 
   .error-message {
     color: red;
-    font-size: var(--fs-6);
+    font-size: var(--fs-secondary);
 
   }
 
   .label-text {
-    font-size: var(--fs-4);
+    font-size: var(--fs-header-3);
   }
 
   .form-title {
-    font-size: var(--fs-3);
+    font-size: var(--fs-header-2);
   }
 
   .separator {
@@ -141,7 +153,7 @@
   }
 
   .input::placeholder {
-    font-size: var(--fs-6);
+    font-size: var(--fs-primary);
     text-align: center;
   }
 
@@ -154,23 +166,22 @@
     padding: 10px 20px;
     border-radius: 0.5rem;
     cursor: pointer;
-    font-size: var(--fs-6);
+    font-size: var(--fs-primary);
   }
 
   select option {
     background-color: var(--background);
   }
 
-    a,
-    Link {
+  a,
+  Link {
     color: var(--link-color);
     text-decoration: underline;
   }
 
   @media(min-width: 450px) {
     :root {
-      --fs-1: 5rem;
+      --fs-1: 3rem;
     }
-
-  } 
+  }
 }

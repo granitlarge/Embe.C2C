@@ -93,7 +93,6 @@ type PasswordStepProps = {
 }
 function PasswordStep({ finish, setPassword, value: initialPassword, errorMessage, hidden }: PasswordStepProps) {
 
-
     const validationSchema = z.object({
         password: z.string(),
         confirmPassword: z
@@ -268,7 +267,7 @@ function ImagesStep({ finish: finish, hidden }: ImagesStepProps) {
     }
 
     return (
-        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 w-full items-center`}>
+        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 w-full items-center pt-3`}>
             <ImageGallery
                 data={imagesData}
                 error={imagesError}
@@ -346,9 +345,9 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     }
 
     return (
-        <div className={`form flex flex-col gap-10 p-8 ${classNames} w-600px max-w-full`}>
+        <div className={`form flex flex-col gap-3 p-8 ${classNames} w-600px max-w-full`}>
             {step !== "account exists" && <ProgressBar steps={steps} progress={steps.indexOf(step) + 1} onClick={(index) => { navigate(steps[index]) }} />}
-            {step !== "email" && <span className="form-title">{step}</span>}
+            {step === "account exists" && <span className="form-title">{step}</span>}
             <EmailStep
                 hidden={step !== "email"}
                 finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}

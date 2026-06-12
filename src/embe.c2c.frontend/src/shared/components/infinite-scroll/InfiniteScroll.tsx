@@ -47,7 +47,7 @@ export function InfiniteScroll({ className, children, callback }: InfiniteScroll
             {children}
             {hasMore && (
                 <li ref={sentinel} key={children.length} className="flex justify-center">
-                    <span className="text-(length:--fs-5) mx-auto">loading...</span>
+                    <span className="text-(length:--fs-primary) mx-auto">loading...</span>
                 </li>
             )}
         </ul>

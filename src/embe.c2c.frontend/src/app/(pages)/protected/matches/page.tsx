@@ -17,7 +17,7 @@ export default async function MatchesPage() {
   return (
     <div className="flex flex-col h-full">
       <h1>matches</h1>
-      <Matches className="grow-1" user={user} initialMatches={matches} />
+      <Matches user={user} initialMatches={matches} />
     </div>
   );
 }

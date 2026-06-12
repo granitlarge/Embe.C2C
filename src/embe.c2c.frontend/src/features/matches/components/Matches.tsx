@@ -9,14 +9,12 @@ import { getMatches } from "../actions/action";
 
 export type MatchesProps = {
     user: AuthenticatedUser
-    className?: string;
     initialMatches: Matching[];
 };
 
-export function Matches({ className, user, initialMatches }: MatchesProps) {
+export function Matches({ user, initialMatches }: MatchesProps) {
 
     const [matches, setMatches] = useState<Matching[]>(initialMatches);
-    const classNames = [className].filter(Boolean).join(" ");
 
     const page = matches.length > 0 ? 2 : 1;
     const pageSize = matches.length > 0 ? matches.length : 50;
@@ -35,17 +33,17 @@ export function Matches({ className, user, initialMatches }: MatchesProps) {
     }
 
     return (
-        <div>
+        <>
             {
                 items.length > 0 ?
                     <InfiniteScroll className="flex flex-col gap-3" callback={loadMore}>
                         {items}
                     </InfiniteScroll> :
-                    <span className="text-(length:--fs-5) mx-auto my-auto">
+                    <span className="text-(length:--fs-header-2) mx-auto my-auto">
                         no matches yet
                     </span>
             }
-        </div>
+        </>
     );
 
 }

@@ -61,11 +61,11 @@ export default function LoginForm() {
     const passwordLabel = <span>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></span>;
     return (
         <Surface className="form flex flex-col gap-4 p-1 w-[600px] max-w-full">
-            <TextInput label="email" type="email" placeholder="name@example.com" value={userName} valid={usernameError === undefined} errorMessage={usernameError} onChange={(un: string) => {
+            <TextInput label="email" type="email" placeholder="name@example.com" value={userName} errorMessage={usernameError} onChange={(un: string) => {
                 setUsername(un);
                 clearErrors();
             }} />
-            <TextInput label={passwordLabel} type="password" placeholder="***********" value={password} valid={passwordError === undefined} errorMessage={passwordError} onChange={(pw: string) => {
+            <TextInput label={passwordLabel} type="password" placeholder="***********" value={password} errorMessage={passwordError} onChange={(pw: string) => {
                 setPassword(pw);
                 clearErrors();
             }} />

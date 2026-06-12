@@ -25,7 +25,7 @@ export default function MainNav({
     const iconSize = 24;
     const linkClassNames = `flex flex-col items-center justify-center ${styles.link}`;
     const iconClassNames = `relative`;
-    const linkTextClassNames = `text-(length:--fs-lg)`;
+    const linkTextClassNames = ``;
 
     const classNames = [className].filter(Boolean).join(" ");
 
