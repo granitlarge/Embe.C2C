@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Embe.C2C.Application.Dtos.ValueObjects;
+using Embe.C2C.Application.Dtos.Write.ValueObjects;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Commands.Users;
@@ -11,8 +11,8 @@ public record UpdateCommand
     string UserName,
     DateOnly BirthDate,
     Gender Gender,
-    DatingPreferencesDto DatingPreferences,
-    LocationDto? Location,
+    DatingPreferencesWriteDto DatingPreferences,
+    LocationWriteDto? Location,
     ImmutableHashSet<Guid> FilesToKeep,
     ImmutableHashSet<CreateFileDto> FilesToAdd
 );

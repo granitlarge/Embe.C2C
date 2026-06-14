@@ -1,4 +1,4 @@
-using Embe.C2C.Application.Dtos.Aggregates;
+using Embe.C2C.Application.Dtos.Read.Aggregates;
 
 namespace Embe.C2C.Application.Abstractions.Services;
 

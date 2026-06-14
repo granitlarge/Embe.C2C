@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
+using Embe.C2C.Domain.Aggregates.Blockings;
+using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
@@ -75,6 +77,13 @@ public class User : Aggregate
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
+
+    #region read only navigation properties
+    public ICollection<Blocking>? Blocked { get; private set; }
+    public ICollection<Blocking>? BlockedBy { get; private set; }
+    public ICollection<Matching>? Matchings1 { get; private set; }
+    public ICollection<Matching>? Matchings2 { get; private set; }
+    #endregion
 
     public void UpdateEmail(Guid actorId, Email newEmail)
     {

@@ -17,7 +17,4 @@ public record PagedQuery
     public int Size { get; init; }
 }
 
-public record PagedQuery<T>(int Page, int Size) : PagedQuery(Page, Size)
-{
-    public T? Filter { get; init; }
-}
+public record PagedQuery<T>(T Filter, int Page, int Size) : PagedQuery(Page, Size);

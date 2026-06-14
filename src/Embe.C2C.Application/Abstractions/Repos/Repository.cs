@@ -3,6 +3,7 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
+using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.Users;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -29,6 +30,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Judgement> JudgementsQuery { get; }
         public IQueryable<Matching> MatchingsQuery { get; }
         public IQueryable<Notification> NotificationsQuery { get; }
+        public IQueryable<Message> MessagesQuery { get; }
 
         public Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId);
     }
@@ -60,6 +62,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Judgement> JudgementsQuery => _context.JudgementsQuery;
         public IQueryable<Matching> MatchingsQuery => _context.MatchingsQuery;
         public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
+        public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
 
         public async Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId)
         {

@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Embe.C2C.Application.Dtos.ValueObjects;
+using Embe.C2C.Application.Dtos.Write.ValueObjects;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Commands.Users;
@@ -18,6 +18,6 @@ public sealed record RegisterCommand
     string Password,
     DateOnly BirthDate,
     Gender Gender,
-    DatingPreferencesDto DatingPreferences,
+    DatingPreferencesWriteDto DatingPreferences,
     ImmutableHashSet<CreateFileDto> Files
 );

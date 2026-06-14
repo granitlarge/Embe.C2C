@@ -1,5 +1,4 @@
 using Embe.C2C.Application.Abstractions.Repos;
-using Embe.C2C.Application.Dtos.Aggregates;
 using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Notifications;
 using Embe.C2C.Application.Extensions;

@@ -1,6 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Entities;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +12,7 @@ public class MessageConfiguration : AggregateConfiguration<Message>
     public override void Configure(EntityTypeBuilder<Message> builder)
     {
         builder.HasKey(m => m.Id);
-        builder.HasOne<Conversation>()
+        builder.HasOne(m => m.Conversation)
             .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ConversationId)
             .OnDelete(DeleteBehavior.Cascade);

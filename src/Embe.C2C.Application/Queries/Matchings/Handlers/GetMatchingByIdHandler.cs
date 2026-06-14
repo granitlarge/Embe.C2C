@@ -1,26 +1,39 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos;
-using Embe.C2C.Application.Dtos.Aggregates;
+using Embe.C2C.Application.Dtos.Read;
+using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
-public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQuery, Result<MatchingDto>>
+public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQuery, Result<ReadDto<MatchingDto, MatchingPermission>>>
 {
-    private readonly IAuthenticatedUserService _user;
     private readonly IFileService _fileService;
+    private readonly MatchingAuthorizationPolicy _authorizationPolicy;
 
-    public GetMatchingByIdHandler(IAuthenticatedUserService userService, IRepository repository, IFileService fileService) : base(repository)
+    public GetMatchingByIdHandler
+    (
+        IRepository repository,
+        IFileService fileService,
+        MatchingAuthorizationPolicy authorizationPolicy
+    ) : base(repository)
     {
-        _user = userService;
         _fileService = fileService;
+        _authorizationPolicy = authorizationPolicy;
     }
 
-    protected override async Task<Result<MatchingDto>> ExecuteAsync(GetMatchingByIdQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
+    protected override async Task<Result<ReadDto<MatchingDto, MatchingPermission>>> ExecuteAsync(GetMatchingByIdQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
     {
-        var userId = _user.UserId ?? throw new UnauthorizedAccessException("User must be authenticated to get a matching.");
+        var fileGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromMinutes(15));
+        var permissions = await _authorizationPolicy.GetPermissionsAsync(query.MatchingId, cancellationToken);
+        if (!permissions.Contains(MatchingPermission.View))
+        {
+            return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.Forbidden, "You do not have permission to view this matching.");
+        }
+
         var matching = await repository
             .MatchingsQuery
             .AsNoTracking()
@@ -29,14 +42,19 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             .Include(m => m.User2)
             .Include(m => m.Conversation)
                 .ThenInclude(c => c.Messages!.OrderByDescending(m => m.CreatedAt).Take(50))
-            .SingleOrDefaultAsync(m => m.Id == query.MatchingId && (m.UserId1 == userId || m.UserId2 == userId), cancellationToken);
+            .SingleOrDefaultAsync(m => m.Id == query.MatchingId, cancellationToken);
 
         if (matching == null)
         {
-            return Result<MatchingDto>.Failure(FailureReason.NotFound, "Matching not found.");
+            return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.NotFound, "Matching not found.");
         }
 
-        var fileGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromMinutes(15));
-        return Result<MatchingDto>.Success(await matching.ToDtoAsync(userId, fileGenerator, cancellationToken));
+        var dto = await _authorizationPolicy.ToDtoAsync(matching, cancellationToken);
+        if (dto == null)
+        {
+            return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.Forbidden, "You do not have permission to view this matching.");
+        }
+
+        return Result<ReadDto<MatchingDto, MatchingPermission>>.Success(dto);
     }
 }

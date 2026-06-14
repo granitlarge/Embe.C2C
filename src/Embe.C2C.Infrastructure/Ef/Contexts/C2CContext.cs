@@ -4,6 +4,7 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
+using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Infrastructure.Ef.Entities;
@@ -46,6 +47,8 @@ public class C2CContext
     public DbSet<Matching> Matchings { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+    public DbSet<Message> Messages { get; set; }
+
 
     public IImmutableList<DomainEvent> DomainEvents
     {
@@ -138,6 +141,8 @@ public class C2CContext
             return new MyDbSet<Notification>(Notifications);
         }
     }
+
+    public IQueryable<Message> MessagesQuery => Messages;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

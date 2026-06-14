@@ -8,12 +8,6 @@ using Microsoft.AspNetCore.Authentication;
 var builder = WebApplication.CreateBuilder(args);
 var settings = new Settings(builder.Configuration);
 
-builder.Host.UseDefaultServiceProvider(options =>
-{
-    options.ValidateScopes = true;
-    options.ValidateOnBuild = true;
-});
-
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthorization();

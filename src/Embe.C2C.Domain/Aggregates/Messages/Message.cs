@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Messages.Events;
+using Embe.C2C.Domain.Entities;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Domain.Aggregates.Messages;
@@ -61,6 +62,10 @@ public class Message : Aggregate
     {
         return new Message(conversationId, replyToMessageId, authorUserId, content);
     }
+
+    #region Read Only Navigation Properties
+    public Conversation? Conversation { get; private set; }
+    #endregion
 }
 
 public enum MessageError

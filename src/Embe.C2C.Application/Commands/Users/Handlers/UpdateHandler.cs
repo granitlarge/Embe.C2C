@@ -4,24 +4,27 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Authorizations;
+using Embe.C2C.Application.Dtos;
+using Embe.C2C.Application.Dtos.Read;
+using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
-using HandlerReturnType = Embe.C2C.Application.Abstractions.EntityWithPermissions<Embe.C2C.Domain.Aggregates.Users.User, System.Collections.Immutable.ImmutableHashSet<Embe.C2C.Application.Authorizations.UserPermission>>;
-
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<HandlerReturnType>>
+public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<ReadDto<UserDto, UserPermission>?>>
 {
+    private readonly IAuthenticatedUserService _user;
     private readonly UserAuthorizationPolicy _authorizationPolicy;
     private readonly IFileService _fileService;
     private readonly IWorkItemService _workItemService;
 
     public UpdateHandler
     (
+        IAuthenticatedUserService user,
         IRepository context,
         UserAuthorizationPolicy authorizationPolicy,
         IFileService fileService,
@@ -30,20 +33,21 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
         IWorkItemService workItemService
     ) : base(context, domainEventHandler, integrationEventHandler)
     {
+        _user = user;
         _authorizationPolicy = authorizationPolicy;
         _fileService = fileService;
         _workItemService = workItemService;
     }
 
-    protected override async Task<TransactionalCommandResult<Result<HandlerReturnType>>> HandleAsync(ISparseRepository context, UpdateCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync(ISparseRepository context, UpdateCommand command, CancellationToken cancellationToken = default)
     {
-        var permissions = await _authorizationPolicy.GetPermissionsAsync(command.UserId, cancellationToken);
+        var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Update))
         {
-            return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.Forbidden, "User is not authorized to update this profile."));
+            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to update this profile."));
         }
 
-        var actorId = _authorizationPolicy.GetActorId();
+        var actorId = _user.UserId ?? throw new InvalidOperationException("User is not authenticated.");
 
         var success = false;
         HashSet<string> uploadedFileUrls = [];
@@ -66,9 +70,8 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
             var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
             if (user == null)
             {
-                return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.NotFound, "User not found."));
+                return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found."));
             }
-
 
             user.UpdateEmail(actorId, email);
             user.UpdateUserName(actorId, userName);
@@ -92,11 +95,13 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<H
             }
 
             success = true;
-            return new TransactionalCommandResult<Result<HandlerReturnType>>(true, Result<HandlerReturnType>.Success(new HandlerReturnType(user, permissions)));
+
+            var fileGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromMinutes(15));
+            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(true, Result<ReadDto<UserDto, UserPermission>?>.Success(await _authorizationPolicy.ToDtoAsync(user, cancellationToken)));
         }
         catch (DomainException)
         {
-            return new TransactionalCommandResult<Result<HandlerReturnType>>(false, Result<HandlerReturnType>.Failure(FailureReason.DomainError, "Invalid input data."));
+            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.DomainError, "Invalid input data."));
         }
         finally
         {

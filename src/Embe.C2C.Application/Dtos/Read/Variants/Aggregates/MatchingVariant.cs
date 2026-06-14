@@ -1,0 +1,95 @@
+namespace Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
+
+public record MatchingVariant
+{
+    public static readonly MatchingVariant Empty = new
+    (
+        includeCreatedAt: false
+    );
+
+    public static readonly MatchingVariant Full = new
+    (
+        includeCreatedAt: true
+    );
+
+    public MatchingVariant
+    (
+        bool includeCreatedAt
+    )
+    {
+        IncludeCreatedAt = includeCreatedAt;
+    }
+
+    public bool IncludeCreatedAt { get; }
+}
+
+public record ConversationVariant
+{
+    public static readonly ConversationVariant Empty = new
+    (
+        includeMessageCount: false,
+        includeUpdatedAt: false,
+        includeCreatedAt: false
+    );
+
+    public static readonly ConversationVariant Full = new
+    (
+        includeMessageCount: true,
+        includeUpdatedAt: true,
+        includeCreatedAt: true
+    );
+
+    public ConversationVariant
+    (
+        bool includeMessageCount,
+        bool includeUpdatedAt,
+        bool includeCreatedAt
+    )
+    {
+        IncludeMessageCount = includeMessageCount;
+        IncludeUpdatedAt = includeUpdatedAt;
+        IncludeCreatedAt = includeCreatedAt;
+    }
+
+    public bool IncludeMessageCount { get; init; }
+    public bool IncludeUpdatedAt { get; init; }
+    public bool IncludeCreatedAt { get; init; }
+}
+
+public record MessageVariant
+{
+    public static readonly MessageVariant Empty = new
+    (
+        includeContent: false,
+        includeSeenAt: false,
+        includeCreatedAt: false,
+        includeEditedAt: false
+    );
+
+    public static readonly MessageVariant Full = new
+    (
+        includeContent: true,
+        includeSeenAt: true,
+        includeCreatedAt: true,
+        includeEditedAt: true
+    );
+
+    public MessageVariant
+    (
+        bool includeContent,
+        bool includeSeenAt,
+        bool includeCreatedAt,
+        bool includeEditedAt
+    )
+    {
+        IncludeContent = includeContent;
+        IncludeSeenAt = includeSeenAt;
+        IncludeCreatedAt = includeCreatedAt;
+        IncludeEditedAt = includeEditedAt;
+    }
+
+    public bool IncludeContent { get; }
+    public bool IncludeSeenAt { get; }
+    public bool IncludeCreatedAt { get; }
+    public bool IncludeEditedAt { get; }
+}

@@ -15,6 +15,11 @@ public class ConversationConfiguration : EntityConfiguration<Conversation>
             .HasForeignKey<Conversation>(c => c.LastMessageId)
             .OnDelete(DeleteBehavior.ClientSetNull);
 
+        builder.HasOne(c => c.Matching)
+            .WithOne()
+            .HasForeignKey<Conversation>(c => c.MatchingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         base.Configure(builder);
     }
 }

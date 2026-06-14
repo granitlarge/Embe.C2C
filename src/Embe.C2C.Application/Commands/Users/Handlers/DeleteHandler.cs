@@ -31,7 +31,7 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
 
     protected override async Task<TransactionalCommandResult<Result>> HandleAsync(ISparseRepository context, DeleteCommand command, CancellationToken cancellationToken = default)
     {
-        var permissions = await _authorizationPolicy.GetPermissionsAsync(command.UserId, cancellationToken);
+        var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Delete))
         {
             return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You are not authorized to delete this user."));

@@ -9,16 +9,15 @@ public class MatchingConfiguration : AggregateConfiguration<Domain.Aggregates.Ma
 {
     public override void Configure(EntityTypeBuilder<Domain.Aggregates.Matchings.Matching> builder)
     {
-
         builder.HasKey(m => m.Id);
 
         builder.HasOne(m => m.User1)
-            .WithMany()
+            .WithMany(u => u.Matchings1)
             .HasForeignKey(m => m.UserId1)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(m => m.User2)
-            .WithMany()
+            .WithMany(u => u.Matchings2)
             .HasForeignKey(m => m.UserId2)
             .OnDelete(DeleteBehavior.ClientCascade);
 
@@ -28,6 +27,5 @@ public class MatchingConfiguration : AggregateConfiguration<Domain.Aggregates.Ma
             .OnDelete(DeleteBehavior.Cascade);
 
         base.Configure(builder);
-
     }
 }

@@ -1,7 +1,7 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
-using Embe.C2C.Application.Dtos.Aggregates;
+using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions;
 using Microsoft.EntityFrameworkCore;
 

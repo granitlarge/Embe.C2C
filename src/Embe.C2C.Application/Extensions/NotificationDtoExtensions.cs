@@ -1,4 +1,4 @@
-using Embe.C2C.Application.Dtos.Aggregates;
+using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 

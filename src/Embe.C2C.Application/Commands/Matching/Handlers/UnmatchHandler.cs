@@ -1,6 +1,7 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
 
 namespace Embe.C2C.Application.Commands.Matching.Handlers;

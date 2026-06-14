@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Exceptions;
 
@@ -72,6 +73,7 @@ public class Conversation : Entity
 
     #region Read Only Navigation Properties
 
+    public Matching? Matching { get; private set; }
     public Message? LastMessage { get; private set; }
     public ICollection<Message>? Messages { get; private set; }
 
