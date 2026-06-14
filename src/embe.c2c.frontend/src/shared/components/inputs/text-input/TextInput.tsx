@@ -1,3 +1,5 @@
+import Surface from "../../surfaces/Surface";
+
 export type InputProps = {
     errorMessage?: string;
 }
@@ -23,21 +25,17 @@ export default function TextInput({
     const shellClassNames = [
         className
     ].filter(Boolean).join(" ");
-    const inputClassNames = [
-        "input",
-        errorMessage && "input-invalid"
-    ].filter(Boolean).join(" ");
     return (
-        <label className={`label flex flex-col items-center ${shellClassNames} w-full`}>
-            <span className="label-text">{label}</span>
+        <Surface className={`input-wrapper ${shellClassNames}`} padding="none" variant="inherit">
+            <span className="label">{label}</span>
             <input
-                className={inputClassNames}
+                className="input"
                 placeholder={placeholder ?? ""}
                 type={type}
                 value={value ?? ""}
                 onChange={(e) => onChange?.(e.target.value)}
             />
-            {errorMessage && <span className="error-message">{errorMessage}</span>}
-        </label>
+            {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
+        </Surface>
     )
 }

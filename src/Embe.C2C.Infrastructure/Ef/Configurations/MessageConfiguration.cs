@@ -14,7 +14,7 @@ public class MessageConfiguration : AggregateConfiguration<Message>
     {
         builder.HasKey(m => m.Id);
         builder.HasOne<Conversation>()
-            .WithMany()
+            .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ConversationId)
             .OnDelete(DeleteBehavior.Cascade);
 

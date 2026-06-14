@@ -11,3 +11,15 @@ export const calSans = localFont({
     variable: '--font-cal-sans',
     display: 'swap',
 });
+
+export const latoRegular = localFont({
+    src: [
+        {
+            path: './Lato-Regular.ttf',
+            weight: '400',
+            style: 'normal',
+        }
+    ],
+    variable: '--font-lato-regular',
+    display: 'swap',
+});

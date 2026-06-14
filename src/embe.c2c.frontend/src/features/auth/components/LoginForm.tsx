@@ -6,11 +6,17 @@ import Link from "next/link";
 import { useState } from "react";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { SignIn } from "../actions/sign-in/actions";
+import { signIn } from "../actions/sign-in/actions";
 import { SignInError } from "../actions/sign-in/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
 
-export default function LoginForm() {
+export type LoginFormProps = {
+    className?: string;
+}
+
+export default function LoginForm({ className }: LoginFormProps) {
+
+    const classNames = [className].filter(Boolean).join(" ");
 
     const router = useRouter();
     const validationScheme = z.object({
@@ -35,7 +41,7 @@ export default function LoginForm() {
             return;
         } else {
 
-            const error = await SignIn(userName!, password!);
+            const error = await signIn(userName!, password!);
             if (error !== undefined) {
                 switch (error) {
                     case SignInError.InvalidCredentials:
@@ -58,19 +64,26 @@ export default function LoginForm() {
         setError(undefined);
     }
 
-    const passwordLabel = <span>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></span>;
+    const passwordLabel = <>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></>;
     return (
-        <Surface className="form flex flex-col gap-4 p-1 w-[600px] max-w-full">
-            <TextInput label="email" type="email" placeholder="name@example.com" value={userName} errorMessage={usernameError} onChange={(un: string) => {
-                setUsername(un);
-                clearErrors();
-            }} />
-            <TextInput label={passwordLabel} type="password" placeholder="***********" value={password} errorMessage={passwordError} onChange={(pw: string) => {
-                setPassword(pw);
-                clearErrors();
-            }} />
+        <Surface className={`form w-[600px] max-w-full ${classNames}`} variant="secondary">
+            <TextInput
+                label="email"
+                type="email"
+                placeholder="name@example.com"
+                value={userName}
+                errorMessage={usernameError}
+                onChange={(un: string) => {
+                    setUsername(un);
+                    clearErrors();
+                }} />
+            <TextInput
+                label={passwordLabel} type="password" placeholder="***********" value={password} errorMessage={passwordError} onChange={(pw: string) => {
+                    setPassword(pw);
+                    clearErrors();
+                }} />
             {error && <span className="error-message">{error}</span>}
-            <Button className="w-full" onClick={login}>login</Button>
+            <Button onClick={login}>login</Button>
         </Surface>
     )
 

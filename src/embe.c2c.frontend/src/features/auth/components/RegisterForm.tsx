@@ -11,15 +11,12 @@ import { useRouter } from "next/navigation";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { register } from "@/src/features/auth/actions/register/actions";
 import { Gender, LengthUnit } from "@/src/shared/types/domain/value-objects";
-import ProfileForm, { ProfileFormData, ProfileFormError } from "./ProfileForm";
 import DatingPreferencesForm, { DatingPreferencesFormData, DatingPreferencesFormError } from "./DatingPreferencesForm";
 import { ImagesFormData, ImagesFormError } from "./ImagesForm";
 import { Range } from "@/src/shared/types/range";
 import { CreateFile } from "@/src/shared/types/dtos/types";
-
-export type RegisterFormProps = {
-    className?: string;
-}
+import Surface from "@/src/shared/components/surfaces/Surface";
+import ProfileForm, { ProfileFormData, ProfileFormError } from "./ProfileForm";
 
 type Step =
     "email" |
@@ -65,11 +62,15 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
     }
 
     return (
-        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 items-center justify-center` }>
-            <EmailInput value={email} onChange={setEmailState} valid={emailError === undefined} errorMessage={emailError} />
-            {error && <span className="error-message">{error}</span>}
-            <Button className="w-full" onClick={onNavigate}>next</Button>
-        </div>
+        <Surface className={`form ${hidden ? "hidden" : ""}`} padding="none">
+            <EmailInput
+                value={email}
+                onChange={setEmailState}
+                errorMessage={emailError}
+            />
+            {error && <span className="text-(--error-fc)">{error}</span>}
+            <Button onClick={onNavigate}>next</Button>
+        </Surface>
     )
 
 }
@@ -80,7 +81,7 @@ function AccountExistsStep({ hidden }: { hidden: boolean }) {
         router.push("/public/login");
     }
     return (
-        <Button className={`${hidden ? "hidden" : ""} w-full`} onClick={onClick}>login</Button>
+        <Button className={`${hidden ? "hidden" : ""}`} onClick={onClick}>login</Button>
     )
 }
 
@@ -91,7 +92,13 @@ type PasswordStepProps = {
     value?: string
     hidden?: boolean;
 }
-function PasswordStep({ finish, setPassword, value: initialPassword, errorMessage, hidden }: PasswordStepProps) {
+function PasswordStep({
+    finish,
+    setPassword,
+    value: initialPassword,
+    errorMessage,
+    hidden,
+}: PasswordStepProps) {
 
     const validationSchema = z.object({
         password: z.string(),
@@ -126,13 +133,24 @@ function PasswordStep({ finish, setPassword, value: initialPassword, errorMessag
     }
 
     return (
-        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 items-center w-full`}>
-            <TextInput label="password" type="password" value={password} onChange={(pw) => { setPasswordState(pw); clearErrors(); }} errorMessage={undefined} />
-            <TextInput label="confirm password" type="password" value={confirmPassword} onChange={(pw) => { setConfirmPasswordState(pw); clearErrors(); }} errorMessage={error} />
-            <Button className="max-w-xs" onClick={next}>next</Button>
-        </div>
+        <Surface className={`${hidden ? "hidden" : ""} form`} padding="none">
+            <TextInput
+                label="password"
+                type="password"
+                value={password}
+                onChange={(pw) => { setPasswordState(pw); clearErrors(); }}
+                errorMessage={undefined}
+            />
+            <TextInput
+                label="confirm password"
+                type="password"
+                value={confirmPassword}
+                onChange={(pw) => { setConfirmPasswordState(pw); clearErrors(); }}
+                errorMessage={error}
+            />
+            <Button onClick={next}>next</Button>
+        </Surface>
     )
-
 }
 
 type ProfileStepProps = {
@@ -144,8 +162,6 @@ type ProfileStepProps = {
 }
 function ProfileStep({ finish, setGender, setBirthDate, setUserName, hidden }: ProfileStepProps) {
 
-
-    console.log("rendering profile step");
     const validationSchema = z.object({
         userName: z.string({ message: "username is required" }).min(1, { message: "username is required" })
     });
@@ -180,10 +196,9 @@ function ProfileStep({ finish, setGender, setBirthDate, setUserName, hidden }: P
     }
 
     return (
-        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 items-center w-full`}>
-            <ProfileForm data={profileData} onChange={setProfileData} error={profileError} />
-            <Button className="max-w-xs" onClick={onNext}>next</Button>
-        </div>
+        <ProfileForm className={`${hidden ? "hidden" : ""} form`} data={profileData} onChange={setProfileData} error={profileError}>
+            <Button onClick={onNext}>next</Button>
+        </ProfileForm>
     )
 }
 
@@ -195,6 +210,7 @@ type PreferencesStepProps = {
     hidden?: boolean;
 }
 function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceChange, finish, hidden }: PreferencesStepProps) {
+
 
 
     const validationSchema = z.object({
@@ -233,10 +249,9 @@ function PreferencesStep({ onGendersChange, onAgeRangeChange, onDistanceChange, 
     }
 
     return (
-        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-10 w-full items-center`}>
-            <DatingPreferencesForm data={datingPreferencesData} onChange={setDatingPreferencesData} error={datingPreferencesError} />
+        <DatingPreferencesForm className={`${hidden ? "hidden" : ""}`} data={datingPreferencesData} onChange={setDatingPreferencesData} error={datingPreferencesError} >
             <Button className="max-w-xs" onClick={next}>next</Button>
-        </div>
+        </DatingPreferencesForm>
     )
 }
 
@@ -245,7 +260,7 @@ type ImagesStepProps = {
     images?: CreateFile[]
     hidden?: boolean;
 }
-function ImagesStep({ finish: finish, hidden }: ImagesStepProps) {
+function ImagesStep({ finish: finish, hidden, }: ImagesStepProps) {
 
     const validationSchema = z.array(z.object({
         url: z.url(),
@@ -279,6 +294,9 @@ function ImagesStep({ finish: finish, hidden }: ImagesStepProps) {
 
 }
 
+export type RegisterFormProps = {
+    className?: string;
+}
 export default function RegisterForm({ className }: RegisterFormProps) {
 
     const router = useRouter();
@@ -300,7 +318,6 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         },
         images?: CreateFile[];
     }>({});
-
 
     const steps: Step[] = [
         "email",
@@ -335,8 +352,6 @@ export default function RegisterForm({ className }: RegisterFormProps) {
             files: images
         });
 
-        console.log("register response", response);
-
         if (response.success) {
             router.push("/public/login");
         } else {
@@ -345,9 +360,9 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     }
 
     return (
-        <div className={`form flex flex-col gap-3 p-8 ${classNames} w-600px max-w-full`}>
+        <Surface className={`form flex flex-col gap-5 p-0 ${classNames} w-600px max-w-full`} variant="secondary">
             {step !== "account exists" && <ProgressBar steps={steps} progress={steps.indexOf(step) + 1} onClick={(index) => { navigate(steps[index]) }} />}
-            {step === "account exists" && <span className="form-title">{step}</span>}
+            {step === "account exists" && <span className="mx-auto">{step}</span>}
             <EmailStep
                 hidden={step !== "email"}
                 finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}
@@ -382,7 +397,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
             <AccountExistsStep
                 hidden={step !== "account exists"}
             />
-        </div>
+        </Surface>
     )
 
 }

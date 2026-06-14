@@ -5,7 +5,7 @@ import { Credentials } from "@/src/shared/types/application/types";
 import { SignInError } from "./types";
 import { saveAccessToken, saveRefreshToken } from "@/src/shared/security/functions";
 
-export async function SignIn(email: string, password: string): Promise<SignInError | undefined> {
+export async function signIn(email: string, password: string): Promise<SignInError | undefined> {
 
     const response = await Mutate<Credentials, SignInError>
         (

@@ -1,6 +1,8 @@
+import Button from "@/src/shared/components/buttons/Button";
 import DateInput from "@/src/shared/components/inputs/date-input/DateInput";
 import SelectInput from "@/src/shared/components/inputs/select-input/SelectInput";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
+import Surface from "@/src/shared/components/surfaces/Surface";
 import { enumerate, parse } from "@/src/shared/enums";
 import { Gender } from "@/src/shared/types/domain/value-objects";
 import { Range } from "@/src/shared/types/range";
@@ -18,15 +20,21 @@ export type ProfileFormProps = {
     error?: ProfileFormError;
     data: ProfileFormData;
     onChange: (data: ProfileFormData) => void;
+    children: React.ReactNode;
+    className?: string;
 }
 
-export default function ProfileForm({ data, error, onChange }: ProfileFormProps) {
+export default function ProfileForm({ className, data, error, onChange, children}: ProfileFormProps & { className?: string }) {
 
+    const classNames = [
+        "form",
+        className
+    ].filter(Boolean).join(" ");
     const genders = enumerate(Gender).map(value => { return { value: value.key, label: value.key } });
     const gender = enumerate(Gender).find(value => value.value === data?.gender)?.key || undefined;
 
     return (
-        <div className="flex flex-col gap-3 items-center w-full">
+        <Surface className={classNames} variant="inherit" padding="none">
             <TextInput
                 label={"username"}
                 value={data?.userName}
@@ -46,6 +54,9 @@ export default function ProfileForm({ data, error, onChange }: ProfileFormProps)
                 value={gender ? [gender] : undefined}
                 onChange={(genders) => onChange({ ...data, gender: parse(Gender, genders[0])! })}
             />
-        </div>
+            {
+                children
+            }
+        </Surface>
     )
 }

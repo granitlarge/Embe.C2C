@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
+import Surface from "../../../surfaces/Surface";
 
 type ImageProps = {
     id: string;
@@ -19,7 +20,7 @@ function MyImage({ id, src, onRemove }: ImageProps) {
         <div ref={droppableRef}>
             <div ref={draggableRef} className="relative">
                 <Image src={src} alt={"An Image"} className="w-40 h-50 object-cover rounded-lg" width={0} height={0} />
-                <button onClick={onRemove} className="absolute top-0 right-0 -m-3 bg-gray-300 text-gray-600 rounded-full w-6 h-6 p-4 flex items-center justify-center">X</button>
+                <button onClick={onRemove} className="absolute top-0 right-0 -m-3 rounded-full w-6 h-6 p-4 flex items-center justify-center">X</button>
             </div>
         </div>
     )
@@ -53,10 +54,12 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
     }
 
     return (
-        <div className="relative w-40 h-50 bg-gray-300 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}>
+        <Surface
+            className="relative w-40 h-50 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}
+                variant="tertiary">
             <input ref={inputRef} type="file" className="hidden" accept="image/*" onChange={onChange} />
-            <span className="text-3xl text-gray-600">+</span>
-        </div>
+            <span className="text-3xl text-(--secondary-fc)">+</span>
+        </Surface>
 
     )
 }
@@ -109,7 +112,7 @@ export default function ImageGallery({ data, error, className, onChange }: Image
                 }
                 <ImageSelector onImageSelected={(image) => onChange?.([...imagesWithIds.map(image => ({ url: image.url, mimeType: image.mimeType })), image])} />
             </div>
-            {error?.images && <span className="error-message">{error.images}</span>}
+            {error?.images && <span className="text-(--error-fc)">{error.images}</span>}
         </DragDropProvider>
     )
 }

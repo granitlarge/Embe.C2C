@@ -1,4 +1,4 @@
-import { getMatches } from "@/src/features/matches/actions/action";
+import { getMatchings } from "@/src/features/matches/actions/action";
 import { Matches } from "@/src/features/matches/components/Matches";
 import { getAuthenticatedUser } from "@/src/shared/user";
 import { redirect } from "next/navigation";
@@ -11,7 +11,7 @@ export default async function MatchesPage() {
     redirect("/public/login");
   }
 
-  const response = await getMatches(1, 50);
+  const response = await getMatchings(1, 50);
   const matches = response.value || [];
 
   return (

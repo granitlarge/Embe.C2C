@@ -12,7 +12,8 @@ public record ConversationDto
     uint MessageCount,
     DateTimeOffset UpdatedAt,
     DateTimeOffset CreatedAt,
-    MessageDto? LastMessage
+    MessageDto? LastMessage,
+    MessageDto[]? Messages
 );
 
 public static class ConversationDtoExtensions
@@ -29,7 +30,8 @@ public static class ConversationDtoExtensions
             conversation.MessageCount,
             conversation.UpdatedAt,
             conversation.CreatedAt,
-            conversation.LastMessage?.ToDto()
+            conversation.LastMessage?.ToDto(),
+            conversation.Messages?.Select(m => m.ToDto()).ToArray()
         );
     }
 }

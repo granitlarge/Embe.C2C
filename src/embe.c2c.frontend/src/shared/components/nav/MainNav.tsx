@@ -1,14 +1,11 @@
 "use client";
 
-import { Users, Heart, MessageCircle, User } from "lucide-react";
-import { AuthenticatedUser } from "../../user";
-import styles from "./MainNav.module.css";
+import { Users, Heart, MessageCircle, User, Settings } from "lucide-react";
 import Link from "next/link";
 import Surface from "../surfaces/Surface";
 
 export type MainNavProps = {
     className?: string;
-    user: AuthenticatedUser;
     hasUnseenLikes?: boolean;
     hasUnseenMatches?: boolean;
     hasUnseenMessages?: boolean;
@@ -16,22 +13,21 @@ export type MainNavProps = {
 
 export default function MainNav({
     className,
-    user,
     hasUnseenLikes,
     hasUnseenMatches,
     hasUnseenMessages
 }: MainNavProps) {
 
     const iconSize = 24;
-    const linkClassNames = `flex flex-col items-center justify-center ${styles.link}`;
+    const linkClassNames = `flex flex-col items-center justify-center text-(--primary-fc) text-(length:--primary-fs) no-underline`;
     const iconClassNames = `relative`;
     const linkTextClassNames = ``;
 
     const classNames = [className].filter(Boolean).join(" ");
 
     return (
-        <Surface as="nav" className={`${classNames} w-full flex items-center justify-center`} padding="sm">
-            <ul className="flex items-center justify-center gap-12">
+        <Surface as="nav" className={`${classNames}`} padding="sm" variant="secondary">
+            <ul className="flex items-center justify-center gap-5">
                 <li>
                     <Link href="/protected/swipe" className={linkClassNames}>
                         <Users size={iconSize} className="inline" />

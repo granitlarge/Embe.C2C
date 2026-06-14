@@ -14,11 +14,11 @@ export type UserCompactProps = Omit<SurfaceProps<typeof Link>, "as" | "href" | "
     className?: string;
     userBrief?: UserBriefTypeDef;
 }
-export function UserCompact({ className, userBrief, ...props }: UserCompactProps) {
+export function UserCompact({ className, userBrief, style, ...props }: UserCompactProps) {
     const classNames = [className].filter(Boolean).join(" ");
     return (
-        <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={`/protected/users/${userBrief?.id}`} {...props}>
-            <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis">{userBrief?.userName}</span>
+        <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={`/protected/users/${userBrief?.id}`} style={style} {...props} variant="inherit">
+            <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(length:--primary-fs)">{userBrief?.userName}</span>
             {
                 userBrief?.profilePictureUrl &&
                 <Image src={userBrief?.profilePictureUrl} alt="Profile picture" width={0} height={0} className="w-20 h-20 rounded-full object-cover" unoptimized={process.env.NODE_ENV === "development"} />

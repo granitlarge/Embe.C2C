@@ -20,4 +20,5 @@ export type Conversation = {
     updatedAt: string;
     createdAt: string;
     lastMessage?: Message;
+    messages?: Message[];
 }

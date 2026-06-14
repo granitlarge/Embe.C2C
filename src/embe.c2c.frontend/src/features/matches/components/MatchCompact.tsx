@@ -18,15 +18,14 @@ export function MatchCompact({ match, className, user }: MatchCompactProps) {
     const classNames = [className].filter(Boolean).join(" ");
 
     return (
-        <Surface padding="sm" className={`${classNames} flex flex-row justify-between gap-5`}>
-            <UserCompact className="" userBrief={otherUser} />
+        <Surface padding="sm" className={`${classNames} flex flex-row justify-between gap-0`} variant="secondary">
+            <UserCompact userBrief={otherUser} />
             <div className="flex flex-col items-end gap-2 w-full">
-                <span className="text-(length:--fs-secondary) text-(--surface-font-color-muted)">{formatTimeAgo(match.createdAt)}</span>
-                <Surface as={Link} className="w-full no-underline" href={`/protected/matches/${match.id}`} padding="none">
-                    <ConversationCompact className="bg-(--surface-light)" conversation={match.conversation} user={user} />
+                <span className="text-(--secondary-fc) text-(length:--secondary-fs) mb-auto">{formatTimeAgo(match.createdAt)}</span>
+                <Surface as={Link} className="flex flex-col w-full grow-1 no-underline mb-auto" href={`/protected/matches/${match.id}`} padding="none" variant="inherit">
+                    <ConversationCompact className="grow-1 fs-group-secondary" conversation={match.conversation} user={user} />
                 </Surface>
             </div>
-
         </Surface>
     )
 

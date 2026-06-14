@@ -73,6 +73,7 @@ public class Conversation : Entity
     #region Read Only Navigation Properties
 
     public Message? LastMessage { get; private set; }
+    public ICollection<Message>? Messages { get; private set; }
 
     #endregion
 }

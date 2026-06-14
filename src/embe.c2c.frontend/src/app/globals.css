@@ -3,46 +3,90 @@
 @layer base {
   :root {
 
-    --primary: #f83529;
-    --secondary: grey;
-    --destructive: #f83529;
+    --fs-ratio: .80;
+    --fs-1: 3rem;
+    --fs-2: calc(var(--fs-1) * var(--fs-ratio));
+    --fs-3: calc(var(--fs-2) * var(--fs-ratio));
+    --fs-4: calc(var(--fs-3) * var(--fs-ratio));
+    --fs-5: calc(var(--fs-4) * var(--fs-ratio));
+    --fs-6: calc(var(--fs-5) * var(--fs-ratio));
+    --fs-7: calc(var(--fs-6) * var(--fs-ratio));
+    --fs-8: calc(var(--fs-7) * var(--fs-ratio));
+    --fs-9: calc(var(--fs-8) * var(--fs-ratio));
+    --fs-10: calc(var(--fs-9) * var(--fs-ratio));
+    --fs-11: calc(var(--fs-10) * var(--fs-ratio));
+    --fs-12: calc(var(--fs-11) * var(--fs-ratio));
 
-    --background: #120b10;
-    --background-font-color: #f8f8f8;
+    /* surfaces */
+    --primary-bg: rgb(0, 0, 0);
+    --primary-fc-primary: white;
+    --primary-fc-secondary: rgb(187, 187, 187);
+    --primary-fc-tertiary: rgb(136, 136, 136);
+    --primary-border-color: var(--primary-fc-primary);
+    --primary-error-fc: rgb(255, 0, 0);
+    --primary-message-own-bg: rgb(255, 0, 0);
 
-    --surface: #f8f8f8;
-    --surface-light: lightgrey;
-    --surface-font-color: #120b10;
-    --surface-border-color: #120b10;
-    --surface-font-color-muted: #424242;
+    --secondary-bg: white;
+    --secondary-fc-primary: black;
+    --secondary-fc-secondary: rgb(44, 44, 44);
+    --secondary-fc-tertiary: rgb(78, 78, 78);
+    --secondary-border-color: var(--secondary-fc-primary);
+    --secondary-error-fc: rgb(255, 0, 0);
+    --secondary-message-own-bg: rgb(255, 69, 69);
 
-    --link-color: var(--primary);
+    --tertiary-bg: rgb(226, 226, 226);
+    --tertiary-fc-primary: black;
+    --tertiary-fc-secondary: rgb(70, 70, 70);
+    --tertiary-fc-tertiary: rgb(92, 92, 92);
+    --tertiary-border-color: var(--tertiary-fc-primary);
+    --tertiary-error-fc: rgb(255, 0, 0);
+    --tertiary-message-own-bg: red;
 
-    --fs-1: 2rem;
-    --fs-2: calc(var(--fs-1) * .8);
-    --fs-3: calc(var(--fs-2) * .8);
-    --fs-4: calc(var(--fs-3) * .8);
-    --fs-5: calc(var(--fs-4) * .8);
-    --fs-6: calc(var(--fs-5) * .8);
-    --fs-7: calc(var(--fs-6) * .8);
+    /* font size groups*/
+    --primary-label-fs: var(--fs-4);
+    --primary-fs-primary: var(--fs-5);
+    --primary-fs-secondary: var(--fs-6);
+    --primary-fs-tertiary: var(--fs-7);
 
-    --fs-lg: calc(var(--fs-7) * .8);
-    --fs-md: calc(var(--fs-lg) * 0.8);
-    --fs-sm: calc(var(--fs-md) * 0.8);
-    --fs-xs: calc(var(--fs-sm) * 0.8);
+    --secondary-label-fs: var(--fs-5);
+    --secondary-fs-primary: var(--fs-6);
+    --secondary-fs-secondary: var(--fs-7);
+    --secondary-fs-tertiary: var(--fs-8);
+
+    --tertiary-label-fs: var(--fs-6);
+    --tertiary-fs-primary: var(--fs-7);
+    --tertiary-fs-secondary: var(--fs-8);
+    --tertiary-fs-tertiary: var(--fs-9);
+    /*
+      SEMANTIC ELEMENTS BEGIN
+    */
+
+    /*universal colors work on all surface*/
+    --universal-primary-bg: red;
+    --universal-primary-fc: white;
+
+    --primary-fc: none;
+      --secondary-fc: none;
+      --tertiary-fc: none;
+      --error-fc: none;
+      --border-color: none;
+      --link-fc: var(--universal-primary-bg);
+      --button-primary-bg: var(--universal-primary-bg);
+      --button-primary-fc: var(--universal-primary-fc);
+      --message-own-bg: none;
+
+    --label-fs: inherit;
+    --primary-fs: inherit;
+    --secondary-fs: inherit;
+    --tertiary-fs: inherit;
+    --quaternary-fs: inherit;
+    --quinternary-fs: inherit;
+
+    /*These are properties that work on any of the surfaces defined above.*/
 
     /*
-      Semantic font sizes. 
-      These are the ones that should be used in the app, as they are tied to the design system and can be easily changed without affecting the overall hierarchy of the typography.
+      SEMANTIC ELEMENTS END
     */
-    --fs-header-1: var(--fs-1);
-    --fs-header-2: var(--fs-2);
-    --fs-header-3: var(--fs-3);
-
-    --fs-primary: var(--fs-4);
-    --fs-secondary: var(--fs-5);
-    --fs-tertiary: var(--fs-6);
-    --fs-quaternary: var(--fs-7);
   }
 
   * {
@@ -55,133 +99,161 @@
   }
 
   body {
-    background-color: var(--background);
-    color: var(--background-font-color);
     font-family: var(--font-cal-sans);
-    font-size: var(--fs-primary);
   }
 
   h1 {
-    font-size: var(--fs-header-1);
+    font-size: var(--fs-1);
   }
 
   h2 {
-    font-size: var(--fs-header-2);
+    font-size: var(--fs-2);
   }
 
   h3 {
-    font-size: var(--fs-header-3);
+    font-size: var(--fs-3);
   }
 
   h4 {
-    font-size: var(--fs-header-4);
+    font-size: var(--fs-4);
   }
 
   h5 {
-    font-size: var(--fs-header-5);
+    font-size: var(--fs-5);
   }
 
   h6 {
-    font-size: var(--fs-header-6);
+    font-size: var(--fs-6);
   }
 
-  /* Forms BEGIN*/
-
-  .form {
-    background-color: var(--surface);
-    color: var(--surface-font-color);
-    border-color: var(--surface-border-color);
-    border-radius: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  .surface-primary {
+    background-color: var(--primary-bg);
+    color: var(--primary-fc-primary);
+    --primary-fc: var(--primary-fc-primary);
+    --secondary-fc: var(--primary-fc-secondary);
+    --tertiary-fc: var(--primary-fc-tertiary);
+    --error-fc: var(--primary-error-fc);
+    --border-color: var(--primary-border-color);
+    --message-own-bg: var(--primary-message-own-bg);
   }
 
-  .input {
-    background-color: var(--surface);
-    color: var(--surface-font-color);
-    border: solid 3px var(--surface-border-color);
-    padding-inline: 20px;
-    padding-block: 5px;
-    border-radius: 15px;
-    font-size: var(--fs-primary);
-    text-align: center;
-    width: 100%;
+  .surface-secondary {
+    background-color: var(--secondary-bg);
+    color: var(--secondary-fc-primary);
+    --primary-fc: var(--secondary-fc-primary);
+    --secondary-fc: var(--secondary-fc-secondary);
+    --tertiary-fc: var(--secondary-fc-tertiary);
+    --error-fc: var(--secondary-error-fc);
+    --border-color: var(--secondary-border-color);
+    --message-own-bg: var(--secondary-message-own-bg);
   }
 
-  .input-invalid {
-    box-shadow: 0px 0px 2px 2px red;
+  .surface-tertiary {
+    background-color: var(--tertiary-bg);
+    color: var(--tertiary-fc-primary);
+    --primary-fc: var(--tertiary-fc-primary);
+    --secondary-fc: var(--tertiary-fc-secondary);
+    --tertiary-fc: var(--tertiary-fc-tertiary);
+    --error-fc: var(--tertiary-error-fc);
+    --border-color: var(--tertiary-border-color);
+    --message-own-bg: var(--tertiary-message-own-bg);
   }
 
-  .input-checked {
-    box-shadow: 0px 0px 4px 4px var(--secondary);
+  .surface-inherit {
+    background-color: inherit;
+    color: inherit;
+    font-size: inherit;
   }
 
-  .label {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
+  .fs-group-primary {
+    --label-fs: var(--primary-label-fs);
+    --primary-fs: var(--primary-fs-primary);
+    --secondary-fs: var(--primary-fs-secondary);
+    --tertiary-fs: var(--primary-fs-tertiary);
   }
 
-  .error-message {
-    color: red;
-    font-size: var(--fs-secondary);
-
+  .fs-group-secondary {
+    --label-fs: var(--secondary-label-fs);
+    --primary-fs: var(--secondary-fs-primary);
+    --secondary-fs: var(--secondary-fs-secondary);
+    --tertiary-fs: var(--secondary-fs-tertiary);
   }
 
-  .label-text {
-    font-size: var(--fs-header-3);
-  }
-
-  .form-title {
-    font-size: var(--fs-header-2);
-  }
-
-  .separator {
-    width: 100%;
-    height: 1px;
-    background-color: var(--surface-border-color);
-    margin: 10px 0;
-  }
-
-  .input:focus {
-    outline: none;
-    box-shadow: 0px 0px 2px 2px white;
-  }
-
-  .input::placeholder {
-    font-size: var(--fs-primary);
-    text-align: center;
-  }
-
-  /* Forms END*/
-
-  .button {
-    background-color: var(--primary);
-    color: var(--surface-font-color);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: var(--fs-primary);
-  }
-
-  select option {
-    background-color: var(--background);
+  .fs-group-tertiary {
+    --label-fs: var(--tertiary-label-fs);
+    --primary-fs: var(--tertiary-fs-primary);
+    --secondary-fs: var(--tertiary-fs-secondary);
+    --tertiary-fs: var(--tertiary-fs-tertiary);
   }
 
   a,
   Link {
-    color: var(--link-color);
+    color: var(--link-fc);
     text-decoration: underline;
   }
 
-  @media(min-width: 450px) {
-    :root {
-      --fs-1: 3rem;
-    }
+  /*forms*/
+  form,
+  .form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--primary-fs);
   }
+
+  .input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+  }
+
+  label,
+  .label {
+    color: var(--primary-fc);
+    font-size: var(--label-fs);
+    margin-inline: auto;
+  }
+
+  input,
+  .input {
+    width: 100%;
+    border: solid 1px var(--border-color);
+    color: var(--primary-fc);
+    text-align: center;
+    border-radius: 20px;
+    padding: .5rem;
+  }
+
+  input::placeholder,
+  .input::placeholder {
+    color: var(--secondary-fc);
+  }
+
+  .input-checked {
+    box-shadow: inset 0 0 0 2px var(--border-color);
+  }
+
+  .input-invalid {
+    box-shadow: inset 0 0 0 2px var(--error-fc);
+  }
+
+  /*forms*/
+
+  /*buttons*/
+  button,
+  .button {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-fc);
+    border-radius: 20px;
+    padding: 0.5rem;
+  }
+
+  button:hover,
+  .button:hover {
+    cursor: pointer;
+  }
+
 }

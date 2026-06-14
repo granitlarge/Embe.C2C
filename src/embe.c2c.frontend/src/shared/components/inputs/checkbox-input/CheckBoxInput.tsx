@@ -7,13 +7,13 @@ export type CheckboxInputProps = {
 export default function CheckboxInput({ value = false, label, onChange }: CheckboxInputProps) {
 
     const classNames = [
-        value ? "input-checked" : "",
+        value ? "input-checked" : ""
     ].filter(Boolean).join(" ");
     return (
-        <div className={`flex gap-2 input w-full ${classNames}`} onClick={() => {
+        <div className={`input flex gap-2 w-full ${classNames}`} onClick={() => {
             onChange?.(!value);
         }}>
-            <span>{label}</span>
+            <span className="mx-auto">{label}</span>
         </div>
     )
 }

@@ -1,23 +1,37 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Surface from "../surfaces/Surface";
 
+export type InfiniteScrollDirection = "up/left" | "down/right";
 export type InfiniteScrollProps = {
     className?: string;
     children: React.ReactElement<React.LiHTMLAttributes<HTMLLIElement>>[];
     callback: () => Promise<boolean>;
+    direction?: InfiniteScrollDirection;
 };
-export function InfiniteScroll({ className, children, callback }: InfiniteScrollProps) {
+export function InfiniteScroll({ className, children, callback, direction = "down/right" }: InfiniteScrollProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
 
     const [hasMore, setHasMore] = useState(true);
     const sentinel = useRef<HTMLLIElement>(null);
+    const surface = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+
+        if (!surface.current)
+            return;
+        surface.current.scrollTo({
+            top: direction === "up/left" ? surface.current.scrollHeight: 0
+        })
+
+    }, [children.length, direction]);
 
     useEffect(() => {
 
         const options = {
-            root: null,
+            root: surface.current,
             rootMargin: "100px",
             scrollMargin: "0px",
             threshold: 0
@@ -40,17 +54,24 @@ export function InfiniteScroll({ className, children, callback }: InfiniteScroll
             observer.disconnect();
         };
 
-    }, [callback, sentinel]);
+    }, [callback]);
 
     return (
-        <ul className={`${classNames}`}>
-            {children}
-            {hasMore && (
-                <li ref={sentinel} key={children.length} className="flex justify-center">
-                    <span className="text-(length:--fs-primary) mx-auto">loading...</span>
-                </li>
-            )}
-        </ul>
+        <div ref={surface} className="overflow-scroll scrollbar-none">
+            <Surface as="ul" className={`${classNames}`} padding="none" variant="inherit">
+                {hasMore && direction === "up/left" && (
+                    <li ref={sentinel} className="flex justify-center">
+                        <span className="text-(length:--fs-primary) mx-auto">loading...</span>
+                    </li>
+                )}
+                {children}
+                {hasMore && direction === "down/right" && (
+                    <li ref={sentinel} className="flex justify-center">
+                        <span className="text-(length:--fs-primary) mx-auto">loading...</span>
+                    </li>
+                )}
+            </Surface>
+        </div>
     )
 
 }

@@ -4,6 +4,7 @@ export default async function SwipePage() {
     const result = await hasUnread();
     return (
         <>
+            <h1>swipe</h1>
         </>
     )
 }

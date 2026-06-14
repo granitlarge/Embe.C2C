@@ -1,4 +1,5 @@
 import Button from "../../buttons/Button";
+import Surface from "../../surfaces/Surface";
 
 export type DateInputProps = {
     minDate: string;
@@ -22,19 +23,17 @@ export default function DateInput({ label, value, onChange, minDate, maxDate, cl
     ].filter(Boolean).join(" ");
 
     return (
-        <div className={`flex flex-col gap-3 w-full ${shellClassNames}`}>
-            <label className="label flex flex-col items-center w-full">
-                <span className="label-text">{label}</span>
-                <input
-                    className={inputClassNames}
-                    type="date"
-                    value={value}
-                    onChange={(e) => onChange?.(e.target.value)}
-                    min={minDate}
-                    max={maxDate}
-                    required={required} />
-            </label>
-        </div>
+        <Surface className={`input-wrapper ${shellClassNames}`} variant="inherit" padding="none">
+            <span className="label">{label}</span>
+            <input
+                className={inputClassNames}
+                type="date"
+                value={value}
+                onChange={(e) => onChange?.(e.target.value)}
+                min={minDate}
+                max={maxDate}
+                required={required} />
+        </Surface>
     )
 
 }

@@ -1,50 +1,41 @@
 import React from "react";
 
 export type Padding = "none" | "sm" | "md" | "lg";
-export type Color = "default" | "primary";
+export type Variant = "primary" | "secondary" | "tertiary" | "inherit";
 
 export type SurfaceProps<T extends React.ElementType = "div"> = {
     className?: string;
     children: React.ReactNode;
     padding?: Padding;
+    variant?: Variant;
     as?: T;
-    transparent?: boolean;
-    backgroundColor?: Color;
-    color?: Color;
 } & React.ComponentPropsWithoutRef<T>;
 
 export default function Surface<T extends React.ElementType = "div">({
     className,
     children,
     padding = "md",
+    variant = "inherit",
     as,
-    transparent,
-    backgroundColor = "default",
-    color = "default",
+    style,
     ...props
 }: SurfaceProps<T>) {
-    const Component = as || "div";
 
+    const Component = as || "div";
     const classNames = [
         className,
-
-        padding === "none" ? "p-0" :
-        padding === "sm" ? "p-2" :
-        padding === "md" ? "p-4" :
-        "p-6",
-
-        transparent ? "bg-transparent" : 
-        backgroundColor === "default" ? "bg-(--surface)" :
-        backgroundColor === "primary" ? "bg-(--primary)" :
-        "bg-(--surface)",
+        `surface-${variant}`,
+        padding === "none" ? "" :
+            padding === "sm" ? "p-2" :
+                padding === "md" ? "p-4" :
+                    "p-6"
     ]
         .filter(Boolean)
         .join(" ");
-
     return (
         <Component
             {...props}
-            className={`${classNames} text-(--surface-font-color) rounded-md surface`}
+            className={`${classNames} rounded-md border-(--border-color)`}
         >
             {children}
         </Component>

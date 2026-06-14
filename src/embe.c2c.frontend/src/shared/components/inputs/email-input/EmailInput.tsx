@@ -1,3 +1,5 @@
+import Surface from "../../surfaces/Surface";
+
 export type EmailInputProps = {
     className?: string;
     onChange?: (value: string) => void;
@@ -11,30 +13,24 @@ export function EmailInput({
     onChange, 
     value, 
     valid = true,
-    errorMessage
+    errorMessage,
 }: EmailInputProps) {
 
     const shellClassNames = [
         className
     ].filter(Boolean).join(" ");
-    const inputClassNames = [
-        "input",
-        !valid && "input-invalid"
-    ].filter(Boolean).join(" ");
 
     return (
-        <div className={`form flex flex-col gap-3 ${shellClassNames} w-full`}>
-            <label className="label flex flex-col items-center">
-                <span className="label-text">email</span>
-                <input
-                    className={inputClassNames}
-                    type="email"
-                    placeholder="name@example.com"
-                    value={value ?? ""}
-                    onChange={(e) => onChange?.(e.target.value)}
-                    />
-                {errorMessage && <span className="error-message">{errorMessage}</span>}
-            </label>
-        </div>
+        <Surface className={`input-wrapper ${shellClassNames}`} variant="inherit" padding="none">
+            <span className="label">email</span>
+            <input
+                className="input"
+                type="email"
+                placeholder="name@example.com"
+                value={value ?? ""}
+                onChange={(e) => onChange?.(e.target.value)}
+            />
+            {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
+        </Surface>
     )
 }

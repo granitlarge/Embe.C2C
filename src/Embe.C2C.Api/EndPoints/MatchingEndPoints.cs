@@ -17,7 +17,14 @@ public static class MatchingEndPoints
             .RequireAuthorization();
 
         group.MapGet("/", Get);
+        group.MapGet("/{matchingId:guid}", GetById);
         group.MapPost("/unmatch", Unmatch);
+    }
+
+    private static async Task<IResult> GetById([FromRoute] Guid matchingId, [FromServices] GetMatchingByIdHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(new GetMatchingByIdQuery(matchingId), cancellationToken);
+        return result.ToResult();
     }
 
     private static async Task<IResult> Get([FromQuery] int page, [FromQuery] int size, [FromServices] GetMatchingsHandler handler, CancellationToken cancellationToken = default)

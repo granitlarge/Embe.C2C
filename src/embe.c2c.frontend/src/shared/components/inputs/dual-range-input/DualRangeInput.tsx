@@ -1,4 +1,5 @@
 import * as Slider from '@radix-ui/react-slider';
+import Surface from '../../surfaces/Surface';
 
 export type DualRangeInputProps = {
     label: string;
@@ -18,8 +19,8 @@ export default function DualRangeInput({ label, className, min, max, step, value
     ].filter(Boolean).join(" ");
 
     return (
-        <label className="label w-full">
-            <span className="label-text">{label}</span>
+        <Surface className={`input-wrapper ${classNames} pb-9`} variant="inherit" padding="none">
+            <span className="label">{label}</span>
             <Slider.Root
                 value={value ?? [min, max]}
                 min={min}
@@ -31,17 +32,17 @@ export default function DualRangeInput({ label, className, min, max, step, value
                 }}
                 className={`relative flex w-full touch-none select-none items-center ${classNames}`}
             >
-                <Slider.Track className="relative h-2 w-full grow rounded-full bg-(--background)">
-                    <Slider.Range className="absolute h-full rounded-full bg-(--primary)" />
+                <Slider.Track className="relative h-2 w-full grow rounded-full bg-(--secondary-fc)">
+                    <Slider.Range className="absolute h-full rounded-full bg-(--universal-primary-bg)" />
                 </Slider.Track>
-                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--primary) bg-white focus:outline-none" >
-                    <span className="absolute -bottom-8 text-(length:--fs-secondary)">{value ? value[0] : min}</span>
+                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--border-color) bg-(--primary-fc) focus:outline-none" >
+                    <span className="absolute -bottom-8 text-(--primary-fc)">{value ? value[0] : min}</span>
                 </Slider.Thumb>
-                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--primary) bg-white focus:outline-none" >
-                    <span className="absolute -bottom-8 text-(length:--fs-secondary)">{value ? value[1] : max}</span>
+                <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--border-color) bg-(--primary-fc) focus:outline-none" >
+                    <span className="absolute -bottom-8 text-(--primary-fc)">{value ? value[1] : max}</span>
                 </Slider.Thumb>
             </Slider.Root>
-        </label>
+        </Surface>
     )
 
 }

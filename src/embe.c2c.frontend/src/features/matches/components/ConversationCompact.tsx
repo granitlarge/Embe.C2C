@@ -12,8 +12,8 @@ export type ConversationCompactProps = {
 export default function ConversationCompact({ className, conversation, user }: ConversationCompactProps) {
     const classNames = [className].filter(Boolean).join(" ");
     return (
-        <Surface className={`${classNames} w-full flex flex-col justify-center`} padding="sm">
-            <MessageCompact transparent={true} message={conversation.lastMessage} user={user} />
+        <Surface className={`${classNames} w-full flex flex-col justify-center`} padding="none" variant="inherit">
+            <MessageCompact className="grow-1" message={conversation.lastMessage} user={user} />
         </Surface>
     )
 }

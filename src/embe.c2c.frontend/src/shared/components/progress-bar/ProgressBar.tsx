@@ -1,3 +1,5 @@
+import Surface from "../surfaces/Surface";
+
 export type ProgressBarProps = {
     className?: string;
     steps: string[];
@@ -11,9 +13,9 @@ export default function ProgressBar({ className, steps, progress, onClick }: Pro
     ].filter(Boolean).join(" ");
 
     return (
-        <div className={`w-full ${classNames} pb-4`}>
-            <div className="w-full h-[1px] bg-(--surface-font-color) relative">
-                <div className="absolute h-full bg-(--primary) transition-all duration-300" style={{ width: `${(progress - 1) / (steps.length - 1) * 100}%` }}>
+        <Surface className={`${classNames} w-full pb-6 pr-6`} variant="inherit">
+            <div className="w-full h-[2px] bg-(--primary-fc) relative">
+                <div className="absolute h-full bg-(--universal-primary-bg) transition-all duration-300" style={{ width: `${(progress - 1) / (steps.length - 1) * 100}%` }}>
                 </div>
                 {
                     steps.map((step, index) => (
@@ -31,7 +33,8 @@ export default function ProgressBar({ className, steps, progress, onClick }: Pro
                             }
                             style={{
                                 left: `${(index) / (steps.length - 1) * 100}%`,
-                                backgroundColor: progress >= index + 1 ? "var(--primary)" : "var(--surface-font-color)"
+                                transform: `translate(-50%, 0)`,
+                                backgroundColor: progress >= index + 1 ? "var(--universal-primary-bg)" : "var(--primary-fc)",
                             }}
                             onClick={() => {
                                 if (index + 1 < progress) {
@@ -39,11 +42,11 @@ export default function ProgressBar({ className, steps, progress, onClick }: Pro
                                 }
                             }}
                         >
-                            <span className="text-(length:--fs-secondary) absolute left-1/2 -translate-x-1/2 top-full">{step}</span>
+                            <span className="text-(--primary-fc) text-(length:--secondary-fs) absolute left-1/2 -translate-x-1/2 top-full">{step}</span>
                         </button>
                     ))
                 }
             </div>
-        </div>
+        </Surface>
     )
 }

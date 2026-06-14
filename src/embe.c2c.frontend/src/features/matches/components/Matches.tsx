@@ -5,7 +5,7 @@ import { MatchCompact } from "./MatchCompact";
 import { Matching } from "@/src/shared/types/domain/aggregates";
 import { useState } from "react";
 import { InfiniteScroll } from "@/src/shared/components/infinite-scroll/InfiniteScroll";
-import { getMatches } from "../actions/action";
+import { getMatchings } from "../actions/action";
 
 export type MatchesProps = {
     user: AuthenticatedUser
@@ -21,12 +21,12 @@ export function Matches({ user, initialMatches }: MatchesProps) {
 
     const items = matches.length > 0 ? matches.map(match => (
         <li key={match.id}>
-            <MatchCompact match={match} user={user} />
+            <MatchCompact match={match} user={user}/>
         </li>
     )) : [];
 
     async function loadMore(): Promise<boolean> {
-        const response = await getMatches(page, pageSize);
+        const response = await getMatchings(page, pageSize);
         const newMatches = response.value || [];
         setMatches(prev => [...prev, ...newMatches]);
         return newMatches.length > 0;

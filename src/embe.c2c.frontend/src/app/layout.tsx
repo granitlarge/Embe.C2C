@@ -4,6 +4,7 @@ import { calSans } from "@/fonts";
 import "./globals.css";
 import { Footer } from "../shared/components/footer/Footer";
 import { getAuthenticatedUser } from "../shared/user";
+import Surface from "../shared/components/surfaces/Surface";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,14 +27,14 @@ export default async function RootLayout({
       lang="en"
     >
 
-      <body className={`flex flex-col justify-between h-dvh w-dvw px-3 pb-4 ${calSans.variable} gap-5`}>
+      <Surface as="body" className={`fs-group-primary flex flex-col justify-between h-dvh w-dvw px-3 pb-4 ${calSans.variable} gap-5`} variant="primary" padding="none">
 
         <main className="grow-1 overflow-y-scroll scrollbar-none">
           {children}
         </main>
         <Footer className="grow-0" user={user} />
 
-      </body>
+      </Surface>
 
     </html>
 
