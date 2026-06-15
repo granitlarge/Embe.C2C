@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Messages.Handlers;
 
-public class GetMessagesByConversationIdHandler
+public class GetMessagesByMatchingIdHandler
 {
     private readonly IRepository _repository;
     private readonly MatchingAuthorizationPolicy _matchingAuthorizationPolicy;
     private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy;
 
-    public GetMessagesByConversationIdHandler
+    public GetMessagesByMatchingIdHandler
     (
         IRepository repository,
         MatchingAuthorizationPolicy matchingAuthorizationPolicy,

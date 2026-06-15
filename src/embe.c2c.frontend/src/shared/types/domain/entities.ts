@@ -1,4 +1,5 @@
-import { Message } from "./aggregates";
+import { ReadDto } from "../dtos/types";
+import { Message, MessagePermission } from "./aggregates";
 import { FileDetails } from "./value-objects";
 
 export type File = {
@@ -19,6 +20,6 @@ export type Conversation = {
     messageCount: number;
     updatedAt: string;
     createdAt: string;
-    lastMessage?: Message;
-    messages?: Message[];
+    lastMessage?: ReadDto<Message, MessagePermission>;
+    messages?: ReadDto<Message, MessagePermission>[];
 }

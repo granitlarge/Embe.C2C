@@ -31,7 +31,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingsHandler>();
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingByIdHandler>();
 
-
         services.AddScoped<AuthorizationContext>();
         services.AddScoped<JudgementAuthorizationPolicy>();
         services.AddScoped<MatchingAuthorizationPolicy>();

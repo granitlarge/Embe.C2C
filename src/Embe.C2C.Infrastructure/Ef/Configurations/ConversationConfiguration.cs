@@ -16,7 +16,7 @@ public class ConversationConfiguration : EntityConfiguration<Conversation>
             .OnDelete(DeleteBehavior.ClientSetNull);
 
         builder.HasOne(c => c.Matching)
-            .WithOne()
+            .WithOne(m => m.Conversation)
             .HasForeignKey<Conversation>(c => c.MatchingId)
             .OnDelete(DeleteBehavior.Cascade);
 

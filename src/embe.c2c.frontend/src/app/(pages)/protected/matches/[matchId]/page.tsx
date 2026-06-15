@@ -29,12 +29,18 @@ export default async function MatchPage({ params }: MatchPageProps) {
         }
     }
 
-    const partner = response.value?.user;
+    const matchDto = response.value;
+    const match = matchDto?.data;
+    const partner = match?.userId1 === user?.userId ? matchDto?.data.user2?.data : matchDto?.data.user1?.data;
+
     return (
         <div className="flex flex-col h-full">
-            <Link href={`/users/${partner?.id!}`} className="no-underline text-(--primary-fc)">
-                <h1>{partner?.userName}</h1>
-            </Link>
+            {
+                partner &&
+                <Link href={`/users/${partner.id}`} className="no-underline text-(--primary-fc)">
+                    <h1>{partner?.userName}</h1>
+                </Link>
+            }
             <Match match={response.value!} user={user!} />
         </div>
     )

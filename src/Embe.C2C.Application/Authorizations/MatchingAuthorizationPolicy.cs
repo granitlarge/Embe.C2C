@@ -156,7 +156,9 @@ public class MatchingAuthorizationPolicy
 
         var userId = _authenticatedUser.UserId;
         var fact = new MatchFact(matching.Id, matching.UserId1 == userId || matching.UserId2 == userId);
+        var conversationFact = new ConversationFact(matching.Conversation.Id, fact.IsParticipant);
         _authContext.Store(fact);
+        _authContext.Store(conversationFact);
         return fact;
     }
 

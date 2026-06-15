@@ -1,18 +1,25 @@
-import { UserBrief } from "../dtos/types";
+import { ReadDto } from "../dtos/types";
 import { Conversation, File } from "./entities";
 import { DatingPreferences, Gender, Location, Money, TransactionReason, TransactionType } from "./value-objects";
 
 export type User = {
     id: string;
-    email: string;
-    userName: string;
-    birthDate: string;
-    gender: Gender;
-    datingPreferences: DatingPreferences;
-    location: Location;
-    files: File[];
-    createdAt: string;
-    updatedAt: string;
+    email?: string;
+    userName?: string;
+    birthDate?: string;
+    gender?: Gender;
+    datingPreferences?: DatingPreferences;
+    location?: Location;
+    profilePicture?: File;
+    files?: File[];
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export enum UserPermission {
+    View = 0,
+    Update = 1,
+    Delete = 2
 }
 
 export type Account = {
@@ -54,13 +61,23 @@ export type Judgement = {
     createdAt: string;
 }
 
+export enum JudgementPermission {
+    Judge = 0
+}
+
 export type Matching = {
     id: string;
     userId1: string;
     userId2: string;
-    conversation: Conversation;
-    createdAt: string;
-    user?: UserBrief;
+    conversation?: Conversation;
+    createdAt?: string;
+    user1?: ReadDto<User, UserPermission>;
+    user2?: ReadDto<User, UserPermission>;
+}
+
+export enum MatchingPermission {
+    View = 0,
+    Unmatch = 1
 }
 
 export type Message = {
@@ -68,10 +85,16 @@ export type Message = {
     conversationId: string;
     replyToMessageId: string | null;
     authorUserId: string;
-    content: string;
-    seenAt: string | null;
-    createdAt: string;
-    editedAt: string;
+    content?: string;
+    seenAt?: string;
+    createdAt?: string;
+    editedAt?: string;
+}
+
+export enum MessagePermission {
+    View = 0,
+    Edit = 1,
+    Delete = 2
 }
 
 export enum NotificationType {

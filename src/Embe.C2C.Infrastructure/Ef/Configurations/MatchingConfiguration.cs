@@ -21,11 +21,6 @@ public class MatchingConfiguration : AggregateConfiguration<Domain.Aggregates.Ma
             .HasForeignKey(m => m.UserId2)
             .OnDelete(DeleteBehavior.ClientCascade);
 
-        builder.HasOne(m => m.Conversation)
-            .WithOne()
-            .HasForeignKey<Conversation>(c => c.MatchingId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         base.Configure(builder);
     }
 }

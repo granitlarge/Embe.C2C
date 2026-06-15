@@ -13,7 +13,9 @@ export default function ConversationCompact({ className, conversation, user }: C
     const classNames = [className].filter(Boolean).join(" ");
     return (
         <Surface className={`${classNames} w-full flex flex-col justify-center`} padding="none" variant="inherit">
-            <MessageCompact className="grow-1" message={conversation.lastMessage} user={user} />
+            {
+                <MessageCompact className="grow-1" messageDto={conversation.lastMessage} user={user} />
+            }
         </Surface>
     )
 }

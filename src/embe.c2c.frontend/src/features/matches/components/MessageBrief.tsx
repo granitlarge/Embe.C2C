@@ -1,19 +1,22 @@
 import Surface, { SurfaceProps, Variant } from "@/src/shared/components/surfaces/Surface";
 import { formatTimeAgo } from "@/src/shared/time";
-import { Message } from "@/src/shared/types/domain/aggregates";
+import { Message, MessagePermission } from "@/src/shared/types/domain/aggregates";
+import { ReadDto } from "@/src/shared/types/dtos/types";
 import { AuthenticatedUser } from "@/src/shared/user";
 import { CheckCheck } from "lucide-react";
 
 export type MessageCompactProps = Omit<SurfaceProps<"div">, "as" | "children"> & {
     className?: string;
-    message?: Message;
+    messageDto?: ReadDto<Message, MessagePermission>;
     user: AuthenticatedUser;
 }
-export default function MessageCompact({ className, message, user, ...props }: MessageCompactProps) {
 
+export default function MessageCompact({ className, messageDto, user, ...props }: MessageCompactProps) {
     const classNames = [
         className
     ].filter(Boolean).join(" ");
+
+    const message = messageDto?.data;
 
     return (
         <Surface className={`${classNames} flex flex-col justify-center w-full items-center`} padding="none" {...props} variant="tertiary">
@@ -27,8 +30,8 @@ export default function MessageCompact({ className, message, user, ...props }: M
                 </span>
             </div>
             {
-                message &&
-                <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{formatTimeAgo(message?.createdAt)}</span>
+                message && message.createdAt &&
+                <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{formatTimeAgo(message.createdAt)}</span>
             }
         </Surface>
     )

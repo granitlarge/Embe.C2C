@@ -2,26 +2,27 @@
 
 import { AuthenticatedUser } from "@/src/shared/user";
 import { MatchCompact } from "./MatchCompact";
-import { Matching } from "@/src/shared/types/domain/aggregates";
+import { Matching, MatchingPermission } from "@/src/shared/types/domain/aggregates";
 import { useState } from "react";
 import { InfiniteScroll } from "@/src/shared/components/infinite-scroll/InfiniteScroll";
 import { getMatchings } from "../actions/action";
+import { ReadDto } from "@/src/shared/types/dtos/types";
 
 export type MatchesProps = {
     user: AuthenticatedUser
-    initialMatches: Matching[];
+    initialMatches: ReadDto<Matching, MatchingPermission>[];
 };
 
 export function Matches({ user, initialMatches }: MatchesProps) {
 
-    const [matches, setMatches] = useState<Matching[]>(initialMatches);
+    const [matches, setMatches] = useState<ReadDto<Matching, MatchingPermission>[]>(initialMatches);
 
     const page = matches.length > 0 ? 2 : 1;
     const pageSize = matches.length > 0 ? matches.length : 50;
 
-    const items = matches.length > 0 ? matches.map(match => (
-        <li key={match.id}>
-            <MatchCompact match={match} user={user}/>
+    const items = matches.length > 0 ? matches.filter(match => match.data).map(match => (
+        <li key={match.data.id}>
+            <MatchCompact dto={match} user={user} />
         </li>
     )) : [];
 

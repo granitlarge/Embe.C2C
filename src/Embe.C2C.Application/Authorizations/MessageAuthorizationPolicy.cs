@@ -86,8 +86,8 @@ public class MessageAuthorizationPolicy
             else
             {
                 isRecipient = await _repository
-                .MessagesQuery
-                .AnyAsync(m => m.Id == message.Id && (m.Conversation!.UserId1 == _authenticatedUser.UserId || m.Conversation.UserId2 == _authenticatedUser.UserId), cancellationToken);
+                    .MessagesQuery
+                    .AnyAsync(m => m.Id == message.Id && (m.Conversation!.UserId1 == _authenticatedUser.UserId || m.Conversation.UserId2 == _authenticatedUser.UserId), cancellationToken);
                 _context.Store(new ConversationFact(message.ConversationId, isRecipient));
             }
 

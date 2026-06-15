@@ -21,12 +21,12 @@ public class GetMatchingsHandler
     IRepository repository,
     IFileService fileService,
     MatchingAuthorizationPolicy authorizationPolicy
-) : TransactionalQueryHandler<GetMatchingsQuery, Result<ReadDto<MatchingDto, MatchingPermission>[]>>(repository)
+) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
     private readonly IFileService _fileService = fileService;
     private readonly MatchingAuthorizationPolicy _authorizationPolicy = authorizationPolicy;
 
-    protected override async Task<Result<ReadDto<MatchingDto, MatchingPermission>[]>> ExecuteAsync
+    protected override async Task<Result<List<ReadDto<MatchingDto, MatchingPermission>>>> ExecuteAsync
     (
         GetMatchingsQuery query,
         ISparseRepository _,
@@ -42,13 +42,21 @@ public class GetMatchingsHandler
             .Include(m => m.User2)
             .Include(m => m.Conversation)
                 .ThenInclude(c => c.LastMessage)
+            .OrderByDescending(m => m.CreatedAt)
             .Skip((query.Page - 1) * query.Size)
             .Take(query.Size)
-            .OrderByDescending(m => m.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        var dtos = await Task.WhenAll(matchings.Select(m => _authorizationPolicy.ToDtoAsync(m, cancellationToken)));
-        var notnulls = dtos.Where(dto => dto is not null).Select(dto => dto!).ToArray();
-        return Result<ReadDto<MatchingDto, MatchingPermission>[]>.Success(notnulls);
+        var dtos = new List<ReadDto<MatchingDto, MatchingPermission>>();
+        foreach (var matching in matchings)
+        {
+            var dto = await _authorizationPolicy.ToDtoAsync(matching, cancellationToken);
+            if (dto is not null)
+            {
+                dtos.Add(dto);
+            }
+        }
+
+        return Result<List<ReadDto<MatchingDto, MatchingPermission>>>.Success(dtos);
     }
 }

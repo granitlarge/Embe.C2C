@@ -1,13 +1,13 @@
 "use server";
 
 import { ApiResponse, FailureReason, Mutate, Read } from "@/src/shared/api";
-import { Tag } from "@/src/shared/cache";
+import { NullGuid, Tag } from "@/src/shared/cache";
 import { Notification } from "@/src/shared/types/domain/aggregates";
 import { getAuthenticatedUser } from "@/src/shared/user";
 
 async function getUserNotificationTag(): Promise<Tag> {
     const user = await getAuthenticatedUser();
-    const tag: Tag = `user:${user?.userId || crypto.randomUUID()}:notification`;
+    const tag: Tag = `user:${user?.userId || NullGuid}:notification`;
     return tag;
 }
 
