@@ -1,4 +1,5 @@
 using Embe.C2C.Application.Authorizations;
+using Embe.C2C.Application.Authorizations.Contexts;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,9 +31,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingsHandler>();
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingByIdHandler>();
 
+
+        services.AddScoped<AuthorizationContext>();
         services.AddScoped<JudgementAuthorizationPolicy>();
         services.AddScoped<MatchingAuthorizationPolicy>();
         services.AddScoped<UserAuthorizationPolicy>();
+        services.AddScoped<MessageAuthorizationPolicy>();
 
         services.AddScoped<DomainEventHandler>();
         services.AddScoped<IntegrationEventHandler>();

@@ -1,25 +1,17 @@
 using System.Collections.Immutable;
-using Embe.C2C.Application.Abstractions.Repos;
-using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.Contexts;
 
 namespace Embe.C2C.Application.Authorizations;
 
 public class JudgementAuthorizationPolicy
 {
-    private readonly IAuthenticatedUserService _user;
-    private readonly IRepository _repo;
     private readonly AuthorizationContext _authorizationContext;
 
     public JudgementAuthorizationPolicy
     (
-        IAuthenticatedUserService user,
-        IRepository repo,
         AuthorizationContext authorizationContext
     )
     {
-        _user = user;
-        _repo = repo;
         _authorizationContext = authorizationContext;
     }
 
@@ -37,7 +29,7 @@ public class JudgementAuthorizationPolicy
 
     private async ValueTask<JudgementFact> GetJudgementFactAsync(Guid judgeeUserId, CancellationToken cancellationToken)
     {
-        var fact = _authorizationContext.Get<JudgementFact>().FirstOrDefault(f => f.JudgeeId == judgeeUserId);
+        var fact = _authorizationContext.Get<JudgementFact>(judgeeUserId);
         if (fact != null)
         {
             return fact;
@@ -50,5 +42,5 @@ public class JudgementAuthorizationPolicy
 
 public enum JudgementPermission
 {
-    Judge
+    Judge = 0
 }

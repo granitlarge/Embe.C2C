@@ -104,7 +104,7 @@ public class UserAuthorizationPolicy
     {
         var userId = _authenticatedUserService.UserId;
 
-        if (_context.Get<UserFact>().FirstOrDefault(f => f.UserId == otherUserId) is UserFact cachedFact)
+        if (_context.Get<UserFact>(otherUserId) is UserFact cachedFact)
         {
             return cachedFact;
         }
@@ -128,7 +128,7 @@ public class UserAuthorizationPolicy
             .Where(u => u.Id == otherUserId)
             .Select(u => new UserFact
             (
-                UserId: u.Id,
+                UserId: otherUserId,
                 IsBlockedBy: u.Blocked!.Any(b => b.BlockedUserId == userId),
                 IsBlocking: u.BlockedBy!.Any(b => b.BlockerUserId == userId),
                 IsMatched: u.Matchings1!.Any(m => m.UserId1 == userId || m.UserId2 == userId) || u.Matchings2!.Any(m => m.UserId1 == userId || m.UserId2 == userId),
@@ -151,7 +151,7 @@ public class UserAuthorizationPolicy
 
 public enum UserPermission
 {
-    View,
-    Update,
-    Delete
+    View = 0,
+    Update = 1,
+    Delete = 2
 }

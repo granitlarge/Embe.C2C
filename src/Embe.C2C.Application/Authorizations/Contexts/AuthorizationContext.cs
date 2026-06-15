@@ -2,17 +2,17 @@ namespace Embe.C2C.Application.Authorizations.Contexts;
 
 public class AuthorizationContext
 {
-    private readonly Dictionary<Type, List<object>> _factsCache = [];
+    private readonly Dictionary<Type, Dictionary<Guid, Fact>> _factsCache = [];
 
-    public IReadOnlyList<T> Get<T>()
+    public T? Get<T>(Guid id)
         where T : Fact
     {
         var type = typeof(T);
-        if (_factsCache.TryGetValue(type, out var cachedFacts))
+        if (_factsCache.TryGetValue(type, out var cachedFacts) && cachedFacts.TryGetValue(id, out var fact))
         {
-            return [.. cachedFacts.Cast<T>()];
+            return (T)fact;
         }
-        return [];
+        return null;
     }
 
     public void Store<T>(T fact)
@@ -21,18 +21,18 @@ public class AuthorizationContext
         var type = typeof(T);
         if (_factsCache.TryGetValue(type, out var cachedFacts))
         {
-            cachedFacts.Add(fact);
+            cachedFacts[fact.Id] = fact;
         }
         else
         {
-            _factsCache[type] = [fact];
+            _factsCache[type] = new Dictionary<Guid, Fact> { { fact.Id, fact } };
         }
     }
 }
 
-public abstract record Fact();
-public record UserFact(Guid UserId, bool IsBlockedBy, bool IsBlocking, bool IsMatched, bool IsSame) : Fact();
-public record MatchFact(Guid MatchId, bool IsParticipant) : Fact();
-public record ConversationFact(Guid ConversationId, bool IsParticipant) : Fact();
-public record MessageFact(Guid MessageId, bool IsAuthor, bool IsRecipient) : Fact();
-public record JudgementFact(Guid JudgeeId, bool CanJudge) : Fact();
+public abstract record Fact(Guid Id);
+public record UserFact(Guid UserId, bool IsBlockedBy, bool IsBlocking, bool IsMatched, bool IsSame) : Fact(UserId);
+public record MatchFact(Guid MatchId, bool IsParticipant) : Fact(MatchId);
+public record ConversationFact(Guid ConversationId, bool IsParticipant) : Fact(ConversationId);
+public record MessageFact(Guid MessageId, bool IsAuthor, bool IsRecipient) : Fact(MessageId);
+public record JudgementFact(Guid JudgeeId, bool CanJudge) : Fact(JudgeeId);

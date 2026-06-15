@@ -62,7 +62,7 @@ public class MessageAuthorizationPolicy
         CancellationToken cancellationToken
     )
     {
-        var messageFact = _context.Get<MessageFact>().FirstOrDefault(f => f.MessageId == message.Id);
+        var messageFact = _context.Get<MessageFact>(message.Id);
         if (messageFact != null)
         {
             return messageFact;
@@ -78,7 +78,7 @@ public class MessageAuthorizationPolicy
         else
         {
             bool isRecipient = false;
-            var conversationFact = _context.Get<ConversationFact>().FirstOrDefault(f => f.ConversationId == message.ConversationId);
+            var conversationFact = _context.Get<ConversationFact>(message.ConversationId);
             if (conversationFact != null)
             {
                 isRecipient = conversationFact.IsParticipant;
@@ -118,7 +118,7 @@ public class MessageAuthorizationPolicy
 
 public enum MessagePermission
 {
-    View,
-    Edit,
-    Delete
+    View = 0,
+    Edit = 1,
+    Delete = 2
 }

@@ -127,8 +127,7 @@ public class MatchingAuthorizationPolicy
         Guid matchingId
     )
     {
-        var cachedFacts = _authContext.Get<MatchFact>();
-        var cachedFact = cachedFacts.FirstOrDefault(f => f.MatchId == matchingId);
+        var cachedFact = _authContext.Get<MatchFact>(matchingId);
         if (cachedFact != null)
         {
             return cachedFact;
@@ -149,8 +148,7 @@ public class MatchingAuthorizationPolicy
         Matching matching
     )
     {
-        var cachedFacts = _authContext.Get<MatchFact>();
-        var cachedFact = cachedFacts.FirstOrDefault(f => f.MatchId == matching.Id);
+        var cachedFact = _authContext.Get<MatchFact>(matching.Id);
         if (cachedFact != null)
         {
             return cachedFact;
@@ -166,6 +164,6 @@ public class MatchingAuthorizationPolicy
 
 public enum MatchingPermission
 {
-    View,
-    Unmatch
+    View = 0,
+    Unmatch = 1
 }
