@@ -47,6 +47,7 @@ export default function Match({ match, user, className }: MatchProps) {
         const response = await createMessage(message);
         if (response.success) {
             setMessages(prev => sortMessages([...prev, response.value!]));
+            setNewMessage("");
         } else {
             throw new Error("Not Implemented");
         }
@@ -63,7 +64,7 @@ export default function Match({ match, user, className }: MatchProps) {
 
     return (
         <div className={`flex flex-col justify-between gap-3 ${className}`}>
-            <InfiniteScroll direction="up/left" className="flex flex-col gap-3 fs-group-primary" callback={loadMessages}>
+            <InfiniteScroll direction="up" className="flex flex-col gap-3 fs-group-primary" callback={loadMessages}>
                 {items}
             </InfiniteScroll>
             <div className="relative">
