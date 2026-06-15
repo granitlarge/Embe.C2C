@@ -1,9 +1,9 @@
 "use server";
 
-import { ApiResponse, FailureReason, Read } from "@/src/shared/api";
-import { NullGuid } from "@/src/shared/cache";
+import { ApiResponse, FailureReason, Mutate, Read } from "@/src/shared/api";
+import { Guid, NullGuid } from "@/src/shared/cache";
 import { Matching, MatchingPermission, Message, MessagePermission } from "@/src/shared/types/domain/aggregates";
-import { ReadDto } from "@/src/shared/types/dtos/types";
+import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
 import { getAuthenticatedUser } from "@/src/shared/user";
 
 export async function getMatchings(page: number, size: number): Promise<ApiResponse<ReadDto<Matching, MatchingPermission>[], FailureReason>> {
@@ -36,6 +36,31 @@ export async function getMatching(matchId: string): Promise<ApiResponse<ReadDto<
     return response;
 }
 
-export async function getMessages(conversationId: string, page: number, size: number): Promise<ApiResponse<ReadDto<Message, MessagePermission>[], FailureReason>> {
-    throw new Error("Not implemented");
+export async function getMessages(matchingId: Guid, page: number, size: number): Promise<ApiResponse<ReadDto<Message, MessagePermission>[], FailureReason>> {
+    const response = await Read<ReadDto<Message, MessagePermission>[]>
+        (
+            `${process.env.API_URL}/api/messages?matchingId=${matchingId}&page=${page}&size=${size}`,
+            {
+                method: "GET",
+                next: {
+                    tags: [`matching:${matchingId}:message`]
+                }
+            }
+        );
+    return response;
+}
+
+export async function createMessage(createMessage: CreateMessage): Promise<ApiResponse<ReadDto<Message, MessagePermission>, FailureReason>> {
+    const response = await Mutate<ReadDto<Message, MessagePermission>>
+        (
+            `${process.env.API_URL}/api/messages`,
+            {
+                method: "POST",
+                body: JSON.stringify(createMessage),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            }
+        )
+    return response;
 }

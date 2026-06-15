@@ -6,6 +6,7 @@ using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain.Services;
+using Microsoft.EntityFrameworkCore;
 namespace Embe.C2C.Application.Commands.Judgements.Handlers;
 
 public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
@@ -46,20 +47,20 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         }
 
         var userId = _userService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-        var judge = await context.DomainUsers.FindAsync([userId], cancellationToken);
+        var judge = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         if (judge == null)
         {
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "User not found."));
         }
 
-        var judgee = await context.DomainUsers.FindAsync([command.JudgeeUserId], cancellationToken);
+        var judgee = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == command.JudgeeUserId, cancellationToken);
         if (judgee == null)
         {
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Judgee not found."));
         }
 
-        var existingJudgement = await context.Judgements.FindAsync([userId, command.JudgeeUserId], cancellationToken);
-        var oppositeJudgement = await context.Judgements.FindAsync([command.JudgeeUserId, userId], cancellationToken);
+        var existingJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.JudgeUserId == userId && j.JudgeeUserId == command.JudgeeUserId, cancellationToken);
+        var oppositeJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.JudgeUserId == command.JudgeeUserId && j.JudgeeUserId == userId, cancellationToken);
 
         var match = _judgementService.Judge(judge, judgee, command.IsPositive, existingJudgement, oppositeJudgement);
         if (match != null)

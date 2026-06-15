@@ -41,7 +41,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
                     <h1>{partner?.userName}</h1>
                 </Link>
             }
-            <Match match={response.value!} user={user!} />
+            <Match className="grow-1 overflow-scroll scrollbar-none" match={response.value!} user={user!} />
         </div>
     )
 }

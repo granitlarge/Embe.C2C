@@ -49,6 +49,13 @@ public class Matching : Aggregate
         return new Matching(userId1, userId2);
     }
 
+    public Guid? GetOtherUserId(Guid? userId)
+    {
+        if (userId == UserId1) return UserId2;
+        if (userId == UserId2) return UserId1;
+        return null;
+    }
+
     #region Read Only Navigation Properties
     public User? User1 { get; private set; }
     public User? User2 { get; private set; }

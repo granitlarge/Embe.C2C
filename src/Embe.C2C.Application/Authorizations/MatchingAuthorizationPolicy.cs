@@ -11,13 +11,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Authorizations;
 
-// 1) Only participants in a matching can view it.
-// If a user has read access to a matching, we still must figure out
-// if he has access to the related entities, and which level of access.
-
 public class MatchingAuthorizationPolicy
 {
-
     private readonly AuthorizationContext _authContext;
     private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy;
     private readonly UserAuthorizationPolicy _userAuthorizationPolicy;
@@ -117,6 +112,7 @@ public class MatchingAuthorizationPolicy
         {
             permissions.Add(MatchingPermission.View);
             permissions.Add(MatchingPermission.Unmatch);
+            permissions.Add(MatchingPermission.Chat);
         }
 
         return [.. permissions];
@@ -167,5 +163,6 @@ public class MatchingAuthorizationPolicy
 public enum MatchingPermission
 {
     View = 0,
-    Unmatch = 1
+    Unmatch = 1,
+    Chat = 2
 }

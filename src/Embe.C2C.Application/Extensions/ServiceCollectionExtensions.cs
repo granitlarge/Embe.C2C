@@ -21,6 +21,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Auth.Handlers.SignOutHandler>();
         services.AddScoped<Commands.Auth.Handlers.RefreshHandler>();
 
+        services.AddScoped<Commands.Messages.Handlers.CreateMessageHandler>();
+
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
 
         services.AddScoped<Queries.Auth.Handlers.AccountExistsHandler>();
@@ -30,6 +32,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingsHandler>();
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingByIdHandler>();
+
+        services.AddScoped<Queries.Messages.Handlers.GetMessagesByMatchingIdHandler>();
 
         services.AddScoped<AuthorizationContext>();
         services.AddScoped<JudgementAuthorizationPolicy>();

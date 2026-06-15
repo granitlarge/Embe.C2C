@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Surface from "../surfaces/Surface";
+import { Loader } from "@deemlol/next-icons";
 
 export type InfiniteScrollDirection = "up/left" | "down/right";
 export type InfiniteScrollProps = {
@@ -23,10 +24,10 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
         if (!surface.current)
             return;
         surface.current.scrollTo({
-            top: direction === "up/left" ? surface.current.scrollHeight: 0
+            top: direction === "up/left" ? surface.current.scrollHeight : 0,
         })
 
-    }, [children.length, direction]);
+    }, [direction]);
 
     useEffect(() => {
 
@@ -61,13 +62,13 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
             <Surface as="ul" className={`${classNames}`} padding="none" variant="inherit">
                 {hasMore && direction === "up/left" && (
                     <li ref={sentinel} className="flex justify-center">
-                        <span className="text-(length:--fs-primary) mx-auto">loading...</span>
+                        <Loader className="animate-spin text-(length:--fs-secondary) mx-auto" />
                     </li>
                 )}
                 {children}
                 {hasMore && direction === "down/right" && (
                     <li ref={sentinel} className="flex justify-center">
-                        <span className="text-(length:--fs-primary) mx-auto">loading...</span>
+                        <Loader className="animate-spin text-(length:--fs-secondary) mx-auto" />
                     </li>
                 )}
             </Surface>

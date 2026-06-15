@@ -3,6 +3,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Matching.Handlers;
 
@@ -38,7 +39,7 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
         }
 
         var actorId = _userService.UserId ?? throw new InvalidOperationException("Unauthorized"); ;
-        var matching = await context.Matchings.FindAsync([command.MatchingId], cancellationToken);
+        var matching = await context.MatchingsQuery.SingleOrDefaultAsync(m => m.Id == command.MatchingId, cancellationToken);
         if (matching == null)
         {
             return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found."));

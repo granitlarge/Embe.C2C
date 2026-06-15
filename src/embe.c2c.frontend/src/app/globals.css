@@ -4,7 +4,7 @@
   :root {
 
     --fs-ratio: .80;
-    --fs-1: 3rem;
+    --fs-1: 2.5rem;
     --fs-2: calc(var(--fs-1) * var(--fs-ratio));
     --fs-3: calc(var(--fs-2) * var(--fs-ratio));
     --fs-4: calc(var(--fs-3) * var(--fs-ratio));
@@ -24,7 +24,6 @@
     --primary-fc-tertiary: rgb(136, 136, 136);
     --primary-border-color: var(--primary-fc-primary);
     --primary-error-fc: rgb(255, 0, 0);
-    --primary-message-own-bg: rgb(255, 0, 0);
 
     --secondary-bg: white;
     --secondary-fc-primary: black;
@@ -32,7 +31,6 @@
     --secondary-fc-tertiary: rgb(78, 78, 78);
     --secondary-border-color: var(--secondary-fc-primary);
     --secondary-error-fc: rgb(255, 0, 0);
-    --secondary-message-own-bg: rgb(255, 69, 69);
 
     --tertiary-bg: rgb(226, 226, 226);
     --tertiary-fc-primary: black;
@@ -40,7 +38,13 @@
     --tertiary-fc-tertiary: rgb(92, 92, 92);
     --tertiary-border-color: var(--tertiary-fc-primary);
     --tertiary-error-fc: rgb(255, 0, 0);
-    --tertiary-message-own-bg: red;
+
+    --message-bg: rgb(243, 63, 63);
+    --message-fc-primary: black;
+    --message-fc-secondary: black;
+    --message-fc-tertiary: black;
+    --message-border-color: var(--message-fc-primary);
+    --message-error-fc: orange;
 
     /* font size groups*/
     --primary-label-fs: var(--fs-4);
@@ -79,8 +83,6 @@
     --primary-fs: inherit;
     --secondary-fs: inherit;
     --tertiary-fs: inherit;
-    --quaternary-fs: inherit;
-    --quinternary-fs: inherit;
 
     /*These are properties that work on any of the surfaces defined above.*/
 
@@ -134,7 +136,6 @@
     --tertiary-fc: var(--primary-fc-tertiary);
     --error-fc: var(--primary-error-fc);
     --border-color: var(--primary-border-color);
-    --message-own-bg: var(--primary-message-own-bg);
   }
 
   .surface-secondary {
@@ -145,7 +146,6 @@
     --tertiary-fc: var(--secondary-fc-tertiary);
     --error-fc: var(--secondary-error-fc);
     --border-color: var(--secondary-border-color);
-    --message-own-bg: var(--secondary-message-own-bg);
   }
 
   .surface-tertiary {
@@ -156,7 +156,16 @@
     --tertiary-fc: var(--tertiary-fc-tertiary);
     --error-fc: var(--tertiary-error-fc);
     --border-color: var(--tertiary-border-color);
-    --message-own-bg: var(--tertiary-message-own-bg);
+  }
+
+  .surface-message {
+    background-color: var(--message-bg);
+    color: var(--message-fc-primary);
+    --primary-fc: var(--message-fc-primary);
+    --secondary-fc: var(--message-fc-secondary);
+    --tertiary-fc: var(--message-fc-tertiary);
+    --error-fc: var(--message-error-fc);
+    --border-color: var(--message-border-color);
   }
 
   .surface-inherit {
@@ -217,20 +226,29 @@
     margin-inline: auto;
   }
 
-  input,
-  .input {
-    width: 100%;
-    border: solid 1px var(--border-color);
-    color: var(--primary-fc);
-    text-align: center;
-    border-radius: 20px;
-    padding: .5rem;
-  }
+    input,
+    .input {
+      width: 100%;
+      border: solid 1px var(--border-color);
+      color: var(--primary-fc);
+      font-size: var(--primary-fs);
+      text-align: center;
+      border-radius: 20px;
+      padding: .5rem;
+    }
 
   input::placeholder,
   .input::placeholder {
     color: var(--secondary-fc);
+    font-size: var(--primary-fs);
   }
+
+  input:focus,
+  .input:focus {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--border-color);
+  }
+
 
   .input-checked {
     box-shadow: inset 0 0 0 2px var(--border-color);
@@ -245,8 +263,10 @@
   /*buttons*/
   button,
   .button {
+    width:100%;
     background-color: var(--button-primary-bg);
     color: var(--button-primary-fc);
+    font-size: var(--primary-fs);
     border-radius: 20px;
     padding: 0.5rem;
   }

@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
+using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
@@ -48,6 +49,7 @@ public class C2CContext
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
     public DbSet<Message> Messages { get; set; }
+    public DbSet<Blocking> Blockings { get; set; }
 
 
     public IImmutableList<DomainEvent> DomainEvents
@@ -143,6 +145,12 @@ public class C2CContext
     }
 
     public IQueryable<Message> MessagesQuery => Messages;
+
+    IDbSet<Message> ISparseRepository.Messages => new MyDbSet<Message>(Messages);
+
+    IDbSet<Blocking> ISparseRepository.Blockings => new MyDbSet<Blocking>(Blockings);
+
+    public IQueryable<Blocking> BlockingsQuery => Blockings;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

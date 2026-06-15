@@ -72,5 +72,6 @@ app.MapUserEndPoints();
 app.MapMatchingEndPoints();
 app.MapJudgementEndPoints();
 app.MapNotificationEndPoints();
+app.MapMessageEndPoints();
 
 app.Run();

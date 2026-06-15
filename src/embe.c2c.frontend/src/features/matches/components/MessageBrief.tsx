@@ -17,12 +17,14 @@ export default function MessageCompact({ className, messageDto, user, ...props }
     ].filter(Boolean).join(" ");
 
     const message = messageDto?.data;
+    const isOwn = message?.authorUserId === user.userId;
+    const isSeen = message?.seenAt !== undefined;
 
     return (
         <Surface className={`${classNames} flex flex-col justify-center w-full items-center`} padding="none" {...props} variant="tertiary">
             <div className="flex flex-row gap-[3px] items-center">
-                {message?.authorUserId !== user.userId && message?.seenAt && <CheckCheck className="text-(--universal-primary-bg)" size={12} />}
-                {message?.authorUserId !== user.userId && !message?.seenAt && <span className="text-(--universal-primary-bg)">•</span>}
+                {!isOwn && isSeen && <CheckCheck className="text-(--universal-primary-bg)" size={12} />}
+                {!isOwn && !isSeen && <span className="text-(--universal-primary-bg)">•</span>}
                 <span className="max-w-[170px] text-nowrap text-center overflow-hidden text-ellipsis text-(length:--primary-fs)">
                     {
                         message?.content || "no messages"

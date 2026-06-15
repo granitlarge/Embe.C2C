@@ -52,5 +52,6 @@ public class MatchingService : DomainService
 
         var conversation = matching.Conversation;
         conversation.DecrementMessageCount();
+        message.Remove();
     }
 }

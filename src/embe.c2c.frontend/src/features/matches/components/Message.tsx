@@ -28,7 +28,7 @@ export default function Message({ className, dto, isOwn }: MessageProps) {
 
     const classNames = [
         "max-w-max px-2 py-1",
-        isOwn ? "bg-(--message-own-bg)" : "",
+        isOwn ? "surface-message" : "",
         className
     ]
         .filter(Boolean).join(" ");
@@ -44,10 +44,10 @@ export default function Message({ className, dto, isOwn }: MessageProps) {
                 {message.content && <MessageContent className="text-(--primary-fc) text-(length:--primary-fs)" content={message.content} />}
                 <div className="flex gap-2 items-center ml-auto">
                     {
-                        seen && isOwn && <CheckCheck size={16} className="text-(--primary-fc)" />
+                        seen && isOwn && <CheckCheck className="text-(--tertiary-fc) h-(--primary-fs) w-(--primary-fs)" />
                     }
                     {
-                        edited && <span className="text-(length:--secondary-fs) text-(--secondary-fc)">(edited)</span>
+                        edited && <span className="text-(length:--tertiary-fs) text-(--tertiary-fc)">(edited)</span>
                     }
                     {(message.editedAt || message.createdAt) && <span className="text-(length:--tertiary-fs) text-(--tertiary-fc)">{formatTimeAgo((message.editedAt ?? message.createdAt)!)}</span>}
                 </div>

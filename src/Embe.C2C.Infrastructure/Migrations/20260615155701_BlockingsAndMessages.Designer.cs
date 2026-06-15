@@ -5,6 +5,7 @@ using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -13,9 +14,11 @@ using NetTopologySuite.Geometries;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    partial class C2CContextModelSnapshot : ModelSnapshot
+    [Migration("20260615155701_BlockingsAndMessages")]
+    partial class BlockingsAndMessages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

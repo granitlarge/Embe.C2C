@@ -1,9 +1,10 @@
+import { Guid } from "../../cache";
 import { ReadDto } from "../dtos/types";
 import { Conversation, File } from "./entities";
 import { DatingPreferences, Gender, Location, Money, TransactionReason, TransactionType } from "./value-objects";
 
 export type User = {
-    id: string;
+    id: Guid;
     email?: string;
     userName?: string;
     birthDate?: string;
@@ -23,39 +24,39 @@ export enum UserPermission {
 }
 
 export type Account = {
-    id: string;
-    userId: string;
+    id: Guid;
+    userId: Guid;
     balance: Money;
     isOpen: boolean;
 }
 
 export type Blocking = {
-    id: string;
-    blockerUserId: string;
-    blockedUserId: string;
+    id: Guid;
+    blockerUserId: Guid;
+    blockedUserId: Guid;
     blockedAt: string;
 }
 
 export type Contact = {
-    id: string;
-    userId1: string;
-    userId2: string;
+    id: Guid;
+    userId1: Guid;
+    userId2: Guid;
     createdAt: string;
 }
 
 export type ContactRequest = {
-    id: string;
-    requestorUserId: string;
-    recipientUserId: string;
+    id: Guid;
+    requestorUserId: Guid;
+    recipientUserId: Guid;
     isAccepted: boolean | null;
     respondedAt: string | null;
     requestedAt: string;
 }
 
 export type Judgement = {
-    id: string;
-    judgeUserId: string;
-    judgeeUserId: string;
+    id: Guid;
+    judgeUserId: Guid;
+    judgeeUserId: Guid;
     isPositive: boolean;
     editedAt: string;
     createdAt: string;
@@ -66,9 +67,9 @@ export enum JudgementPermission {
 }
 
 export type Matching = {
-    id: string;
-    userId1: string;
-    userId2: string;
+    id: Guid;
+    userId1: Guid;
+    userId2: Guid;
     conversation?: Conversation;
     createdAt?: string;
     user1?: ReadDto<User, UserPermission>;
@@ -81,10 +82,10 @@ export enum MatchingPermission {
 }
 
 export type Message = {
-    id: string;
-    conversationId: string;
-    replyToMessageId: string | null;
-    authorUserId: string;
+    id: Guid;
+    conversationId: Guid;
+    replyToMessageId?: Guid;
+    authorUserId: Guid;
     content?: string;
     seenAt?: string;
     createdAt?: string;
@@ -105,30 +106,30 @@ export enum NotificationType {
 
 export type Notification = {
     type: NotificationType;
-    id: string;
-    recipientUserId: string;
+    id: Guid;
+    recipientUserId: Guid;
     isRead: boolean;
     readAt: string | null;
     createdAt: string;
 }
 
 export type MatchingCreatedNotification = Notification & {
-    matchingId: string;
-    partnerUserId: string;
+    matchingId: Guid;
+    partnerUserId: Guid;
     partnerUserName: string;
     partnerProfileImageUrl: string;
 }
 
 export type MatchingRemovedNotification = Notification & {
-    matchingId: string;
-    partnerUserId: string;
+    matchingId: Guid;
+    partnerUserId: Guid;
     partnerUserName: string;
     partnerProfileImageUrl: string;
 }
 
 export type Transaction = {
-    id: string;
-    accountId: string;
+    id: Guid;
+    accountId: Guid;
     amount: Money;
     type: TransactionType;
     reason: TransactionReason;

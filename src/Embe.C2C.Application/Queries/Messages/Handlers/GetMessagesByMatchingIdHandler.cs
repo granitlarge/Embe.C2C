@@ -30,7 +30,7 @@ public class GetMessagesByMatchingIdHandler
         var messages = await _repository.MessagesQuery
             .Where(m => m.Conversation!.Matching!.Id == query.Filter)
             .OrderByDescending(m => m.CreatedAt)
-            .Skip(query.Page * query.Size)
+            .Skip((query.Page - 1) * query.Size)
             .Take(query.Size)
             .ToListAsync(cancellationToken);
 

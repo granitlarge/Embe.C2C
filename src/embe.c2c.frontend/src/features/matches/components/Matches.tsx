@@ -20,7 +20,7 @@ export function Matches({ user, initialMatches }: MatchesProps) {
     const page = matches.length > 0 ? 2 : 1;
     const pageSize = matches.length > 0 ? matches.length : 50;
 
-    const items = matches.length > 0 ? matches.filter(match => match.data).map(match => (
+    const items = matches.length > 0 ? matches.map(match => (
         <li key={match.data.id}>
             <MatchCompact dto={match} user={user} />
         </li>

@@ -8,9 +8,10 @@ export type TextInputProps = InputProps & {
     className?: string;
     onChange?: (value: string) => void;
     value?: string;
-    label: React.ReactNode;
+    label?: React.ReactNode;
     type?: string;
     placeholder?: string;
+    children?: React.ReactNode;
 }
 
 export default function TextInput({
@@ -20,14 +21,15 @@ export default function TextInput({
     type = "text",
     value,
     errorMessage,
-    placeholder
+    placeholder,
+    children
 }: TextInputProps) {
     const shellClassNames = [
         className
     ].filter(Boolean).join(" ");
     return (
         <Surface className={`input-wrapper ${shellClassNames}`} padding="none" variant="inherit">
-            <span className="label">{label}</span>
+            {label && <span className="label">{label}</span>}
             <input
                 className="input"
                 placeholder={placeholder ?? ""}
@@ -36,6 +38,7 @@ export default function TextInput({
                 onChange={(e) => onChange?.(e.target.value)}
             />
             {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
+            {children}
         </Surface>
     )
 }

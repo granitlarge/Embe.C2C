@@ -85,6 +85,7 @@ export type ReadRequest = Omit<RequestInit, "method" | "next"> & {
 
 export type MutationRequest = Omit<RequestInit, "method"> & {
     method: "POST" | "PUT" | "PATCH" | "DELETE";
+    next?: Omit<RequestInit["next"], "tags">
 }
 
 export async function Read<T>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T, FailureReason>>;
@@ -117,9 +118,12 @@ export async function Mutate<T_Value, T_Error = FailureReason>(
     init?: MutationRequest,
     authenticate = true
 ): Promise<ApiResponse<T_Value, T_Error>> {
+
     const request = new Request(input, init);
+
     if (authenticate) {
         return await SendAuthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
     }
+
     return await SendUnauthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
 }

@@ -37,7 +37,7 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
             return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You are not authorized to delete this user."));
         }
 
-        var user = await context.DomainUsers.FindAsync([command.UserId], cancellationToken);
+        var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
         if (user is null)
         {
             return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "User not found."));

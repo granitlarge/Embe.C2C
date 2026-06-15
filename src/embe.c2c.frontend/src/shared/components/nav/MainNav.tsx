@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, Heart, MessageCircle, User, Settings } from "lucide-react";
+import { Users, Heart, MessageCircle, User } from "lucide-react";
 import Link from "next/link";
 import Surface from "../surfaces/Surface";
 
@@ -26,7 +26,7 @@ export default function MainNav({
     const classNames = [className].filter(Boolean).join(" ");
 
     return (
-        <Surface as="nav" className={`${classNames}`} padding="sm" variant="secondary">
+        <Surface as="nav" className={`${classNames} fs-group-primary`} padding="sm" variant="secondary">
             <ul className="flex items-center justify-center gap-5">
                 <li>
                     <Link href="/protected/swipe" className={linkClassNames}>

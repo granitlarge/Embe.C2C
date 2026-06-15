@@ -39,7 +39,7 @@ public class Message : Aggregate
     public MessageContent Content { get; private set; }
     public DateTimeOffset? SeenAt { get; private set; }
 
-    public DateTimeOffset CreatedAt { get; private set;}
+    public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset EditedAt { get; private set; }
 
     internal void Edit(MessageContent newContent)
