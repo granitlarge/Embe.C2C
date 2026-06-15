@@ -12,6 +12,7 @@ export type InfiniteScrollProps = {
     callback: () => Promise<boolean>;
     direction?: InfiniteScrollDirection;
 };
+
 export function InfiniteScroll({ className, children, callback, direction = "down" }: InfiniteScrollProps) {
 
     const classNames = [className].filter(Boolean).join(" ");

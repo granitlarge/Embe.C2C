@@ -23,3 +23,15 @@ export const latoRegular = localFont({
     variable: '--font-lato-regular',
     display: 'swap',
 });
+
+export const robotoRegular = localFont({
+    src: [
+        {
+            path: './Roboto-Regular.ttf',
+            weight: '400',
+            style: 'normal',
+        }
+    ],
+    variable: '--font-roboto-regular',
+    display: 'swap',
+});

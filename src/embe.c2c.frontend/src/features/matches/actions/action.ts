@@ -64,3 +64,30 @@ export async function createMessage(createMessage: CreateMessage): Promise<ApiRe
         )
     return response;
 }
+
+export async function deleteMessage(messageId: Guid): Promise<ApiResponse<void, FailureReason>> {
+    const response = await Mutate<void>
+        (
+            `${process.env.API_URL}/api/messages/${messageId}`,
+            {
+                method: "DELETE",
+            }
+        )
+    console.log("Delete Message Response:", response);
+    return response;
+}
+
+export async function updateMessage(messageId: Guid, newContent: string): Promise<ApiResponse<ReadDto<Message, MessagePermission>, FailureReason>> {
+    const response = await Mutate<ReadDto<Message, MessagePermission>>
+        (
+            `${process.env.API_URL}/api/messages`,
+            {
+                method: "PUT",
+                body: JSON.stringify({ messageId, newContent }),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            }
+        )
+    return response;
+}

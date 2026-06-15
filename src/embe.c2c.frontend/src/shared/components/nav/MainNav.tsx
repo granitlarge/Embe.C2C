@@ -26,7 +26,7 @@ export default function MainNav({
     const classNames = [className].filter(Boolean).join(" ");
 
     return (
-        <Surface as="nav" className={`${classNames} fs-group-primary`} padding="sm" variant="secondary">
+        <Surface as="nav" className={`${classNames} fs-group-primary py-1`} padding="none" variant="secondary">
             <ul className="flex items-center justify-center gap-5">
                 <li>
                     <Link href="/protected/swipe" className={linkClassNames}>

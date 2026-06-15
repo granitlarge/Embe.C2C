@@ -22,6 +22,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Auth.Handlers.RefreshHandler>();
 
         services.AddScoped<Commands.Messages.Handlers.CreateMessageHandler>();
+        services.AddScoped<Commands.Messages.Handlers.DeleteMessageHandler>();
+        services.AddScoped<Commands.Messages.Handlers.EditMessageHandler>();
 
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
 

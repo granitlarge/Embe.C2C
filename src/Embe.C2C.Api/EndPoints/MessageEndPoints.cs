@@ -11,10 +11,11 @@ public static class MessageEndPoints
 {
     public static void MapMessageEndPoints(this WebApplication app)
     {
-        app.MapGet("/api/messages", GetMatchingMessages)
-            .RequireAuthorization();
-        app.MapPost("/api/messages", CreateMessage)
-            .RequireAuthorization();
+        var group = app.MapGroup("/api/messages").RequireAuthorization();
+        group.MapGet("/", GetMatchingMessages);
+        group.MapPost("/", CreateMessage);
+        group.MapDelete("/{messageId:guid}", DeleteMessage);
+        group.MapPut("/", EditMessage);
     }
 
     private static async Task<IResult> GetMatchingMessages
@@ -35,6 +36,29 @@ public static class MessageEndPoints
     (
         CreateMessageCommand command,
         [FromServices] CreateMessageHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> DeleteMessage
+    (
+        Guid messageId,
+        [FromServices] DeleteMessageHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var command = new DeleteMessageCommand(messageId);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> EditMessage
+    (
+        [FromBody] EditMessageCommand command,
+        [FromServices] EditMessageHandler handler,
         CancellationToken cancellationToken
     )
     {

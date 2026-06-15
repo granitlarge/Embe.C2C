@@ -11,12 +11,12 @@ public static class ResultExtensions
         var statusCode = failureReason.ToStatusCode();
         return statusCode switch
         {
-            HttpStatusCode.BadRequest => Results.BadRequest(new { success = false, reason = failureReason, message }),
-            HttpStatusCode.NotFound => Results.NotFound(new { success = false, reason = failureReason, message }),
+            HttpStatusCode.BadRequest => Results.BadRequest(new { success = false, reason = failureReason, message, value }),
+            HttpStatusCode.NotFound => Results.NotFound(new { success = false, reason = failureReason, message, value }),
             HttpStatusCode.Forbidden => Results.Forbid(),
             HttpStatusCode.Unauthorized => Results.Unauthorized(),
             HttpStatusCode.TooManyRequests => Results.StatusCode((int)HttpStatusCode.TooManyRequests),
-            HttpStatusCode.InternalServerError => Results.InternalServerError(new { success = false, reason = failureReason, message }),
+            HttpStatusCode.InternalServerError => Results.InternalServerError(new { success = false, reason = failureReason, message, value }),
             _ => Results.StatusCode((int)statusCode)
         };
     }
@@ -26,7 +26,7 @@ public static class ResultExtensions
     {
         if (result.IsSuccess)
         {
-            return Results.NoContent();
+            return Results.Ok(new { success = true });
         }
         else
         {

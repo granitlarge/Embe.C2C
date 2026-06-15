@@ -101,31 +101,37 @@
   }
 
   body {
-    font-family: var(--font-cal-sans);
+    font-family: var(--font-roboto-regular);
   }
 
   h1 {
     font-size: var(--fs-1);
+    font-family: var(--font-cal-sans);
   }
 
   h2 {
     font-size: var(--fs-2);
+    font-family: var(--font-cal-sans);
   }
 
   h3 {
     font-size: var(--fs-3);
+    font-family: var(--font-cal-sans);
   }
 
   h4 {
     font-size: var(--fs-4);
+    font-family: var(--font-cal-sans);
   }
 
   h5 {
     font-size: var(--fs-5);
+    font-family: var(--font-cal-sans);
   }
 
   h6 {
     font-size: var(--fs-6);
+    font-family: var(--font-cal-sans);
   }
 
   .surface-primary {

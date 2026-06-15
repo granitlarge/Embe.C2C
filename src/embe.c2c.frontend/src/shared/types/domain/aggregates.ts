@@ -95,7 +95,8 @@ export type Message = {
 export enum MessagePermission {
     View = 0,
     Edit = 1,
-    Delete = 2
+    Delete = 2,
+    Report = 3
 }
 
 export enum NotificationType {

@@ -43,7 +43,12 @@ public class MatchingService : DomainService
         message.Edit(newContent);
     }
 
-    public void DeleteMessage(User deleter, Message message, Matching matching)
+    public void DeleteMessage
+    (
+        User deleter, 
+        Message message, 
+        Matching matching
+    )
     {
         if (message.AuthorUserId != deleter.Id)
         {
