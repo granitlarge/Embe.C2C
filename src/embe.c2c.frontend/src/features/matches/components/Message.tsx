@@ -1,24 +1,8 @@
-import { Guid } from "@/src/shared/cache";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { formatTimeAgo } from "@/src/shared/time";
 import { MessagePermission, Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { CheckCheck, Edit, Flag, Trash2 } from "lucide-react";
-
-type MessageMenuProps = {
-    onEdit: () => void;
-    onDelete: () => void;
-    className?: string;
-}
-function MessageMenu({ className, onEdit, onDelete }: MessageMenuProps) {
-    const classNames = [className].filter(Boolean).join(" ");
-    return (
-        <Surface className={`${classNames} flex flex-col p-3`} padding="none" variant="secondary">
-            <button onClick={onEdit} className="text-(--secondary-fc) text-(length:--secondary-fs) bg-transparent underline p-0">Edit</button>
-            <button onClick={onDelete} className="text-(--secondary-fc) text-(length:--secondary-fs) bg-transparent underline p-0">Delete</button>
-        </Surface>
-    )
-}
 
 type MessageContentProps = {
     content: string;
@@ -78,7 +62,7 @@ export default function Message({ className, dto, isOwn, onEdit, onDelete, onRep
                     {
                         edited && <span className="text-(length:--tertiary-fs) text-(--tertiary-fc)">(edited)</span>
                     }
-                    {(message.editedAt || message.createdAt) && <span className="text-(length:--tertiary-fs) text-(--tertiary-fc)">{formatTimeAgo((message.editedAt ?? message.createdAt)!)}</span>}
+                    {(message.editedAt || message.createdAt) && <span suppressHydrationWarning className="text-(length:--tertiary-fs) text-(--tertiary-fc)">{formatTimeAgo((message.editedAt ?? message.createdAt)!)}</span>}
                 </div>
             </div>
         </Surface>

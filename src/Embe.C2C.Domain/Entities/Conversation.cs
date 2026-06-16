@@ -55,7 +55,7 @@ public class Conversation : Entity
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    internal void UpdateLastMessageId(Guid messageId)
+    internal void UpdateLastMessageId(Guid? messageId)
     {
         LastMessageId = messageId;
         UpdatedAt = DateTimeOffset.UtcNow;

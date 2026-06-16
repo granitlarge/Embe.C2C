@@ -14,7 +14,10 @@ export default function ConversationCompact({ className, conversation, user }: C
     return (
         <Surface className={`${classNames} w-full flex flex-col justify-center`} padding="none" variant="inherit">
             {
-                <MessageCompact className="grow-1" messageDto={conversation.lastMessage} user={user} />
+                conversation.lastMessage && <MessageCompact className="grow-1" messageDto={conversation.lastMessage} user={user} /> ||
+                <span className="surface-tertiary text-(--primary-fc) text-center text-(length:--primary-fs) w-full grow-1 flex items-center justify-center rounded-md">
+                    no messages yet
+                </span>
             }
         </Surface>
     )

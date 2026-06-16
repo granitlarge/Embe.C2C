@@ -57,7 +57,12 @@ public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCom
             if (matching is null)
                 return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found for the message."));
 
-            _matchingService.DeleteMessage(user, message, matching);
+            var newLastMessage = await context.MessagesQuery
+                .Where(m => m.ConversationId == matching.Conversation.Id && m.Id != message.Id)
+                .OrderByDescending(m => m.CreatedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            _matchingService.DeleteMessage(user, message, newLastMessage, matching);
             context.Messages.Remove(message);
 
             var result = Result.Success();

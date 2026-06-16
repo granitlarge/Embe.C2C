@@ -47,6 +47,7 @@ public class MatchingService : DomainService
     (
         User deleter, 
         Message message, 
+        Message? newLastMessage,
         Matching matching
     )
     {
@@ -57,6 +58,7 @@ public class MatchingService : DomainService
 
         var conversation = matching.Conversation;
         conversation.DecrementMessageCount();
+        conversation.UpdateLastMessageId(newLastMessage?.Id);
         message.Remove();
     }
 }
