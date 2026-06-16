@@ -1,25 +1,19 @@
 using System.Collections.Immutable;
-using Embe.C2C.Application.Abstractions.Repos;
-using Embe.C2C.Application.Abstractions.Services;
-using Embe.C2C.Application.Authorizations.Contexts;
+using Embe.C2C.Application.Authorizations.FactStores.Messages;
+using Embe.C2C.Application.Authorizations.FactStores.Messages.Facts;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Messages;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Authorizations;
 
 public class MessageAuthorizationPolicy
 (
-    AuthorizationContext context,
-    IRepository repository,
-    IAuthenticatedUserService authenticatedUser
+    MessageAuthorizationFactStore facts
 )
 {
-    private readonly AuthorizationContext _context = context;
-    private readonly IRepository _repository = repository;
-    private readonly IAuthenticatedUserService _authenticatedUser = authenticatedUser;
+    private readonly MessageAuthorizationFactStore _facts = facts;
 
     public async Task<ReadDto<MessageDto, MessagePermission>?> ToDtoAsync
     (
@@ -53,9 +47,10 @@ public class MessageAuthorizationPolicy
         CancellationToken cancellationToken
     )
     {
-        var fact = await GetFactAsync(message, cancellationToken);
-        var permissions = GetPermissions(fact);
-        var variant = fact.IsAuthor || fact.IsRecipient ? MessageVariant.Full : MessageVariant.Empty;
+        var authorFact = _facts.GetAuthorFact(message);
+        var recipientFact = await _facts.GetRecipientFactAsync(message, cancellationToken);
+        var permissions = GetPermissions(authorFact, recipientFact);
+        var variant = authorFact.Value == true || recipientFact.Value == true ? MessageVariant.Full : MessageVariant.Empty;
         return (permissions, variant);
     }
 
@@ -65,94 +60,32 @@ public class MessageAuthorizationPolicy
         CancellationToken cancellationToken
     )
     {
-        var fact = await GetFactAsync(messageId, cancellationToken);
-        var permissions = GetPermissions(fact);
-        var variant = fact.IsAuthor || fact.IsRecipient ? MessageVariant.Full : MessageVariant.Empty;
+        var authorFact = await _facts.GetAuthorFactAsync(messageId, cancellationToken);
+        var recipientFact = await _facts.GetRecipientFactAsync(messageId, cancellationToken);
+        var permissions = GetPermissions(authorFact, recipientFact);
+        var variant = authorFact.Value == true || recipientFact.Value == true ? MessageVariant.Full : MessageVariant.Empty;
         return (permissions, variant);
-    }
-
-    private async ValueTask<MessageFact> GetFactAsync
-    (
-        Guid messageId,
-        CancellationToken cancellationToken
-    )
-    {
-        var existingFact = _context.Get<MessageFact>(messageId);
-        if (existingFact != null)
-        {
-            return existingFact;
-        }
-
-        var message = await _repository.MessagesQuery.SingleOrDefaultAsync(m => m.Id == messageId, cancellationToken);
-        if (message is null)
-        {
-            var fact = new MessageFact(messageId, false, false);
-            _context.Store(fact);
-            return fact;
-        }
-
-        return await GetFactAsync(message, cancellationToken);
-    }
-
-    private async ValueTask<MessageFact> GetFactAsync
-    (
-        Message message,
-        CancellationToken cancellationToken
-    )
-    {
-        var messageFact = _context.Get<MessageFact>(message.Id);
-        if (messageFact != null)
-        {
-            return messageFact;
-        }
-
-        bool isAuthor = message.AuthorUserId == _authenticatedUser.UserId;
-        if (isAuthor)
-        {
-            var fact = new MessageFact(message.Id, true, false);
-            _context.Store(fact);
-            return fact;
-        }
-        else
-        {
-            bool isRecipient = false;
-            var conversationFact = _context.Get<ConversationFact>(message.ConversationId);
-            if (conversationFact != null)
-            {
-                isRecipient = conversationFact.IsParticipant;
-            }
-            else
-            {
-                isRecipient = await _repository
-                    .MessagesQuery
-                    .AnyAsync(m => m.Id == message.Id && (m.Conversation!.UserId1 == _authenticatedUser.UserId || m.Conversation.UserId2 == _authenticatedUser.UserId), cancellationToken);
-                _context.Store(new ConversationFact(message.ConversationId, isRecipient));
-            }
-
-            var fact = new MessageFact(message.Id, isAuthor, isRecipient);
-            _context.Store(fact);
-            return fact;
-        }
     }
 
     private static ImmutableHashSet<MessagePermission> GetPermissions
     (
-        MessageFact fact
+        AuthorMessageFact authorFact,
+        RecipientMessageFact recipientFact
     )
     {
         var permissions = new HashSet<MessagePermission>();
-        if (fact.IsAuthor || fact.IsRecipient)
+        if (authorFact.Value == true || recipientFact.Value == true)
         {
             permissions.Add(MessagePermission.View);
         }
 
-        if (fact.IsAuthor)
+        if (authorFact.Value == true)
         {
             permissions.Add(MessagePermission.Edit);
             permissions.Add(MessagePermission.Delete);
         }
 
-        if (fact.IsRecipient)
+        if (recipientFact.Value == true)
         {
             permissions.Add(MessagePermission.Report);
         }

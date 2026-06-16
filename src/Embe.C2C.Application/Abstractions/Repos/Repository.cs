@@ -35,7 +35,10 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Message> MessagesQuery { get; }
         public IQueryable<Blocking> BlockingsQuery { get; }
 
-        public Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId);
+        public Task<List<User>> GetCandidatesForUserIdAsync
+        (
+            Guid userId
+        );
     }
 
     public interface IRepository : ISparseRepository
@@ -70,7 +73,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
         public IQueryable<Blocking> BlockingsQuery => _context.BlockingsQuery;
 
-        public async Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId)
+        public async Task<List<User>> GetCandidatesForUserIdAsync(Guid userId)
         {
             return await _context.GetCandidatesForUserIdAsync(userId);
         }

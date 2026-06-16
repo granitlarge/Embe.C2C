@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using Embe.C2C.Domain.Aggregates.Blockings;
+using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 using Embe.C2C.Domain.Exceptions;
@@ -83,6 +84,8 @@ public class User : Aggregate
     public ICollection<Blocking>? BlockedBy { get; private set; }
     public ICollection<Matching>? Matchings1 { get; private set; }
     public ICollection<Matching>? Matchings2 { get; private set; }
+    public ICollection<Judgement>? JudgementsPassed { get; private set; }
+    public ICollection<Judgement>? JudgementsReceived { get; private set; }
     #endregion
 
     public void UpdateEmail(Guid actorId, Email newEmail)

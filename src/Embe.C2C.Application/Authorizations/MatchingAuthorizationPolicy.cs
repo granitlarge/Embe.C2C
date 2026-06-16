@@ -1,50 +1,46 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Repos;
-using Embe.C2C.Application.Abstractions.Services;
-using Embe.C2C.Application.Authorizations.Contexts;
+using Embe.C2C.Application.Authorizations.FactStores.Matches;
+using Embe.C2C.Application.Authorizations.FactStores.Matches.Facts;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Matchings;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Authorizations;
 
 public class MatchingAuthorizationPolicy
 {
-    private readonly AuthorizationContext _authContext;
+    private readonly IRepository _repo;
+    private readonly MatchingAuthorizationFactStore _facts;
     private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy;
     private readonly UserAuthorizationPolicy _userAuthorizationPolicy;
-    private readonly IRepository _repo;
-    private readonly IAuthenticatedUserService _authenticatedUser;
 
     public MatchingAuthorizationPolicy
     (
-        AuthorizationContext authorizationContext,
-        MessageAuthorizationPolicy messageAuthorizationPolicy,
-        UserAuthorizationPolicy userAuthorizationPolicy,
         IRepository repo,
-        IAuthenticatedUserService user
+        MatchingAuthorizationFactStore facts,
+        MessageAuthorizationPolicy messageAuthorizationPolicy,
+        UserAuthorizationPolicy userAuthorizationPolicy
     )
     {
-        _authContext = authorizationContext;
+        _repo = repo;
+        _facts = facts;
         _messageAuthorizationPolicy = messageAuthorizationPolicy;
         _userAuthorizationPolicy = userAuthorizationPolicy;
-        _repo = repo;
-        _authenticatedUser = user;
     }
 
     public IQueryable<Matching> GetViewable()
     {
-        var userId = _authenticatedUser.UserId;
+        var userId = _facts.CurrentUserId;
 #warning if this changes, we'll have to make the update in two places, maybe we can unify the logic somehow?
         return _repo.MatchingsQuery.Where(m => m.UserId1 == userId || m.UserId2 == userId);
     }
 
     public async Task<ImmutableHashSet<MatchingPermission>> GetPermissionsAsync(Guid matchingId, CancellationToken cancellationToken)
     {
-        return GetPermissions(await GetMatchFactAsync(matchingId));
+        return GetPermissions(await _facts.GetIsParticipantFactAsync(matchingId, cancellationToken));
     }
 
     public async Task<ReadDto<MatchingDto, MatchingPermission>?> ToDtoAsync
@@ -92,23 +88,23 @@ public class MatchingAuthorizationPolicy
         Matching matching
     )
     {
-        var fact = GetMatchFact(matching);
-        var permissions = GetPermissions(fact);
+        var isParticipantFact = _facts.GetIsParticipantFact(matching);
+        var permissions = GetPermissions(isParticipantFact);
         if (!permissions.Contains(MatchingPermission.View))
         {
             return (permissions, MatchingVariant.Empty);
         }
 
-        return (permissions, fact.IsParticipant ? MatchingVariant.Full : MatchingVariant.Empty);
+        return (permissions, isParticipantFact.Value ? MatchingVariant.Full : MatchingVariant.Empty);
     }
 
     private static ImmutableHashSet<MatchingPermission> GetPermissions
     (
-        MatchFact fact
+        IsParticipantMatchFact fact
     )
     {
         var permissions = new HashSet<MatchingPermission>();
-        if (fact.IsParticipant)
+        if (fact.Value)
         {
             permissions.Add(MatchingPermission.View);
             permissions.Add(MatchingPermission.Unmatch);
@@ -116,46 +112,6 @@ public class MatchingAuthorizationPolicy
         }
 
         return [.. permissions];
-    }
-
-    private async ValueTask<MatchFact> GetMatchFactAsync
-    (
-        Guid matchingId
-    )
-    {
-        var cachedFact = _authContext.Get<MatchFact>(matchingId);
-        if (cachedFact != null)
-        {
-            return cachedFact;
-        }
-
-        var matching = await _repo.MatchingsQuery.AsNoTracking().SingleOrDefaultAsync(m => m.Id == matchingId);
-        if (matching == null)
-        {
-            var notFoundFact = new MatchFact(matchingId, false);
-            _authContext.Store(notFoundFact);
-            return notFoundFact;
-        }
-        return GetMatchFact(matching);
-    }
-
-    private MatchFact GetMatchFact
-    (
-        Matching matching
-    )
-    {
-        var cachedFact = _authContext.Get<MatchFact>(matching.Id);
-        if (cachedFact != null)
-        {
-            return cachedFact;
-        }
-
-        var userId = _authenticatedUser.UserId;
-        var fact = new MatchFact(matching.Id, matching.UserId1 == userId || matching.UserId2 == userId);
-        var conversationFact = new ConversationFact(matching.Conversation.Id, fact.IsParticipant);
-        _authContext.Store(fact);
-        _authContext.Store(conversationFact);
-        return fact;
     }
 
 }

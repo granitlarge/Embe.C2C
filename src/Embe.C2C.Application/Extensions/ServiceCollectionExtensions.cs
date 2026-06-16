@@ -1,5 +1,8 @@
 using Embe.C2C.Application.Authorizations;
-using Embe.C2C.Application.Authorizations.Contexts;
+using Embe.C2C.Application.Authorizations.FactStores.Conversations;
+using Embe.C2C.Application.Authorizations.FactStores.Matches;
+using Embe.C2C.Application.Authorizations.FactStores.Messages;
+using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,8 +40,13 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Queries.Messages.Handlers.GetMessagesByMatchingIdHandler>();
 
-        services.AddScoped<AuthorizationContext>();
-        services.AddScoped<JudgementAuthorizationPolicy>();
+        services.AddScoped<Queries.Users.Handlers.GetCandidateUsersHandler>();
+
+        services.AddScoped<ConversationAuthorizationFactStore>();
+        services.AddScoped<UserAuthorizationFactStore>();
+        services.AddScoped<MatchingAuthorizationFactStore>();
+        services.AddScoped<MessageAuthorizationFactStore>();
+
         services.AddScoped<MatchingAuthorizationPolicy>();
         services.AddScoped<UserAuthorizationPolicy>();
         services.AddScoped<MessageAuthorizationPolicy>();

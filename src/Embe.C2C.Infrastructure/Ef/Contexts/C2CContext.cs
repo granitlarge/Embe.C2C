@@ -163,8 +163,37 @@ public class C2CContext
         return Database.BeginTransactionAsync(System.Data.IsolationLevel.Snapshot, cancellationToken);
     }
 
-    public async Task<IQueryable<User>> GetCandidatesForUserIdAsync(Guid userId)
+    public async Task<List<User>> GetCandidatesForUserIdAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        // User has not blocked Candidate
+        // Candidate has not blocked User
+        // User's preferences align with Candidate's information.
+        // Candidate's preferences align with User's information.
+        // User and Candidate are not matched.
+        // User has not already judged Candidate. 2nd chances? Show the same candidate again after a certain period of time? (e.g., 1 month)
+        // Candidate has not already judged User negatively.
+        var query = (
+
+            from user in DomainUsers
+            from candidate in DomainUsers
+
+            where 1 == 1 &&
+            user.Id == userId &&
+            user.Id != candidate.Id &&
+
+            !user.Blocked!.Any(b => b.BlockedUserId == candidate.Id) &&
+            !user.BlockedBy!.Any(b => b.BlockerUserId == candidate.Id) &&
+
+            !user.Matchings1!.Any(m => m.UserId1 == candidate.Id || m.UserId2 == candidate.Id) &&
+            !user.Matchings2!.Any(m => m.UserId1 == candidate.Id || m.UserId2 == candidate.Id) &&
+
+            !user.JudgementsPassed!.Any(j => j.JudgeUserId == user.Id && j.JudgeeUserId == candidate.Id) &&
+            !user.JudgementsReceived!.Any(j => j.JudgeUserId == candidate.Id && j.JudgeeUserId == user.Id)
+
+            select candidate
+
+        );
+
+        return await query.Take(20).ToListAsync();
     }
 }

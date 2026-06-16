@@ -12,14 +12,15 @@ public class JudgementConfiguration : AggregateConfiguration<Judgement>
         builder.HasKey(j => j.Id);
 
         builder.HasOne<Domain.Aggregates.Users.User>()
-            .WithMany()
+            .WithMany(u => u.JudgementsPassed)
             .HasForeignKey(j => j.JudgeUserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Domain.Aggregates.Users.User>()
-            .WithMany()
+            .WithMany(u => u.JudgementsReceived)
             .HasForeignKey(j => j.JudgeeUserId)
             .OnDelete(DeleteBehavior.ClientCascade);
+
         base.Configure(builder);
     }
 }

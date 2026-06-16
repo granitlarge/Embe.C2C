@@ -1,6 +1,8 @@
 using Embe.C2C.Api.Extensions;
 using Embe.C2C.Application.Commands.Users;
 using Embe.C2C.Application.Commands.Users.Handlers;
+using Embe.C2C.Application.Queries.Users;
+using Embe.C2C.Application.Queries.Users.Handlers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Embe.C2C.Api.EndPoints;
@@ -16,23 +18,30 @@ public static class UserEndPoints
         group.MapPost("/register", Register);
         group.MapPut("/update", Update).RequireAuthorization();
         group.MapDelete("/delete", Delete).RequireAuthorization();
+        group.MapGet("/candidates", GetCandidates).RequireAuthorization();
     }
 
-    private static async Task<IResult> Register([FromBody]RegisterCommand command, [FromServices]RegisterHandler handler, CancellationToken cancellationToken = default)
+    private static async Task<IResult> Register([FromBody] RegisterCommand command, [FromServices] RegisterHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 
-    private static async Task<IResult> Update([FromBody]UpdateCommand command, [FromServices]UpdateHandler handler, CancellationToken cancellationToken = default)
+    private static async Task<IResult> Update([FromBody] UpdateCommand command, [FromServices] UpdateHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 
-    private static async Task<IResult> Delete([FromBody]DeleteCommand command, [FromServices]DeleteHandler handler, CancellationToken cancellationToken = default)
+    private static async Task<IResult> Delete([FromBody] DeleteCommand command, [FromServices] DeleteHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> GetCandidates([FromServices] GetCandidateUsersHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(GetCandidateUsersQuery.Instance, cancellationToken);
         return result.ToResult();
     }
 }

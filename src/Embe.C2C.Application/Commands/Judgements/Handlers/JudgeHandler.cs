@@ -11,7 +11,7 @@ namespace Embe.C2C.Application.Commands.Judgements.Handlers;
 
 public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
 {
-    private readonly JudgementAuthorizationPolicy _authorizationPolicy;
+    private readonly UserAuthorizationPolicy _userAuthorizationPolicy;
     private readonly JudgementService _judgementService;
     private readonly IAuthenticatedUserService _userService;
     private readonly MatchingAuthorizationPolicy _matchingAuthorizationPolicy;
@@ -19,7 +19,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
     public JudgeHandler
     (
         IRepository context,
-        JudgementAuthorizationPolicy authorizationPolicy,
+        UserAuthorizationPolicy userAuthorizationPolicy,
         JudgementService judgementService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
@@ -27,7 +27,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         MatchingAuthorizationPolicy matchingAuthorizationPolicy
     ) : base(context, domainEventHandler, integrationEventHandler)
     {
-        _authorizationPolicy = authorizationPolicy;
+        _userAuthorizationPolicy = userAuthorizationPolicy;
         _judgementService = judgementService;
         _userService = userService;
         _matchingAuthorizationPolicy = matchingAuthorizationPolicy;
@@ -40,8 +40,8 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         CancellationToken cancellationToken = default
     )
     {
-        var isAuthorized = (await _authorizationPolicy.GetPermissionsAsync(command.JudgeeUserId, cancellationToken)).Contains(JudgementPermission.Judge);
-        if (!isAuthorized)
+        var (permissions, _) = await _userAuthorizationPolicy.GetAsync(command.JudgeeUserId, cancellationToken);
+        if (!permissions.Contains(UserPermission.Judge))
         {
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to judge."));
         }

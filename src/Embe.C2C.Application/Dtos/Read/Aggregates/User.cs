@@ -38,21 +38,22 @@ public static class UserDtoExtensions
             return null;
         }
 
-        var fileDtos = user.Files != null ? await Task.WhenAll(user.Files.Select(f => f.ToDtoAsync(fileUrlGenerator, cancellationToken))) : null;
-        var profilePicture = fileDtos?.FirstOrDefault(f => f.Id == user.ProfilePicture.Id);
+        var files = user.Files != null && variant.IncludeFiles ? await Task.WhenAll(user.Files.Select(f => f.ToDtoAsync(fileUrlGenerator, cancellationToken))) : null;
+        var profilePicture = user.ProfilePicture != null && variant.IncludeProfilePicture ? await user.ProfilePicture.ToDtoAsync(fileUrlGenerator, cancellationToken) : null;
+
         return new UserDto
         (
             user.Id,
-            user.Email.Value,
-            user.UserName.Value,
-            user.BirthDate.Value,
-            user.Gender,
+            variant.IncludeEmail ? user.Email.Value : null,
+            variant.IncludeUserName ? user.UserName.Value : null,
+            variant.IncludeBirthDate ? user.BirthDate.Value : null,
+            variant.IncludeGender ? user.Gender : null,
             user.DatingPreferences.ToDto(variant.DatingPreferencesVariant),
-            user.Location?.ToDto(),
-            profilePicture,
-            fileDtos?.ToImmutableHashSet(),
-            user.CreatedAt,
-            user.UpdatedAt
+            variant.IncludeLocation ? user.Location?.ToDto() : null,
+            variant.IncludeProfilePicture ? profilePicture : null,
+            variant.IncludeFiles ? files?.ToImmutableHashSet() : null,
+            variant.IncludeCreatedAt ? user.CreatedAt : null,
+            variant.IncludeUpdatedAt ? user.UpdatedAt : null
         );
     }
 }

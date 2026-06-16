@@ -1,35 +1,28 @@
 using System.Collections.Immutable;
-using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
-using Embe.C2C.Application.Authorizations.Contexts;
+using Embe.C2C.Application.Authorizations.FactStores.Users;
+using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Authorizations;
 
 public class UserAuthorizationPolicy
 {
-    private readonly AuthorizationContext _context;
-    private readonly IRepository _repo;
+    private readonly UserAuthorizationFactStore _facts;
     private readonly IFileUrlGenerator _fileUrlGenerator;
-    private readonly IAuthenticatedUserService _authenticatedUserService;
 
     public UserAuthorizationPolicy
     (
-        AuthorizationContext context,
-        IFileService fileService,
-        IRepository repo,
-        IAuthenticatedUserService authenticatedUserService
+        UserAuthorizationFactStore facts,
+        IFileService fileService
     )
     {
-        _context = context;
+        _facts = facts;
         _fileUrlGenerator = new FileUrlGenerator(fileService, TimeSpan.FromSeconds(15));
-        _repo = repo;
-        _authenticatedUserService = authenticatedUserService;
     }
 
     public async Task<ReadDto<UserDto, UserPermission>?> ToDtoAsync
@@ -57,101 +50,89 @@ public class UserAuthorizationPolicy
         CancellationToken cancellationToken = default
     )
     {
-        var fact = await GetUserFactAsync(userId, cancellationToken);
-        var permissions = GetPermissions(fact);
-        var variant = GetVariant(fact);
+        var blockedByUserFact = await _facts.GetBlockedByUserFactAsync(userId, cancellationToken);
+        var blockingUserFact = await _facts.GetBlockingUserFactAsync(userId, cancellationToken);
+        var candidateUserFact = _facts.GetCandidateUserFact(userId);
+        var sameUserFact = await _facts.GetSameUserFactAsync(userId, cancellationToken);
+        var matchedUserFact = await _facts.GetMatchedUserFactAsync(userId, cancellationToken);
+
+        var permissions = GetPermissions(blockedByUserFact, blockingUserFact, candidateUserFact, sameUserFact, matchedUserFact);
+        var variant = GetVariant(blockedByUserFact, blockingUserFact, candidateUserFact, sameUserFact, matchedUserFact);
         return (permissions, variant);
     }
 
-    private static UserVariant GetVariant(UserFact fact)
+    private static UserVariant GetVariant
+    (
+        BlockedByUserFact? isBlockedBy,
+        BlockingUserFact? isBlocking,
+        CandidateUserFact? isCandidate,
+        SameUserFact? isSame,
+        MatchedUserFact? isMatched
+    )
     {
-        if (fact.IsSame)
-            return UserVariant.Full;
+        if (isBlockedBy?.Value == true || isBlocking?.Value == true)
+        {
+            return UserVariant.Blocked;
+        }
 
-        if (fact.IsMatched)
+        if (isSame?.Value == true)
+        {
+            return UserVariant.Full;
+        }
+
+        if (isMatched?.Value == true)
+        {
             return UserVariant.Matched;
+        }
+
+        if (isCandidate?.Value == true)
+        {
+            return UserVariant.Candidate;
+        }
 
         return UserVariant.Empty;
     }
 
     private static ImmutableHashSet<UserPermission> GetPermissions
     (
-        UserFact fact
+        BlockedByUserFact? isBlockedBy,
+        BlockingUserFact? isBlocking,
+        CandidateUserFact? isCandidate,
+        SameUserFact? isSame,
+        MatchedUserFact? isMatched
     )
     {
-        if (fact.IsBlockedBy || fact.IsBlocking)
+        if (isBlockedBy?.Value == true || isBlocking?.Value == true)
         {
             return [];
         }
 
         var permissions = new HashSet<UserPermission>();
-        if (fact.IsSame)
+        if (isSame?.Value == true)
         {
             permissions.Add(UserPermission.View);
             permissions.Add(UserPermission.Update);
             permissions.Add(UserPermission.Delete);
         }
 
-        if (fact.IsMatched)
+        if (isMatched?.Value == true)
+        {
+            permissions.Add(UserPermission.View);
+        }
+
+        if (isCandidate?.Value == true)
         {
             permissions.Add(UserPermission.View);
         }
 
         return [.. permissions];
     }
-
-    private async ValueTask<UserFact> GetUserFactAsync(Guid otherUserId, CancellationToken cancellationToken = default)
-    {
-        var userId = _authenticatedUserService.UserId;
-
-        if (_context.Get<UserFact>(otherUserId) is UserFact cachedFact)
-        {
-            return cachedFact;
-        }
-
-        if (userId == otherUserId)
-        {
-            var sameFact = new UserFact
-            (
-                UserId: userId.Value,
-                IsBlockedBy: false,
-                IsBlocking: false,
-                IsMatched: false,
-                IsSame: true
-            );
-
-            _context.Store(sameFact);
-            return sameFact;
-        }
-
-        var fact = await _repo.DomainUsersQuery
-            .Where(u => u.Id == otherUserId)
-            .Select(u => new UserFact
-            (
-                UserId: otherUserId,
-                IsBlockedBy: u.Blocked!.Any(b => b.BlockedUserId == userId),
-                IsBlocking: u.BlockedBy!.Any(b => b.BlockerUserId == userId),
-                IsMatched: u.Matchings1!.Any(m => m.UserId1 == userId || m.UserId2 == userId) || u.Matchings2!.Any(m => m.UserId1 == userId || m.UserId2 == userId),
-                IsSame: u.Id == userId
-            ))
-            .FirstOrDefaultAsync(cancellationToken) ?? new UserFact
-            (
-                UserId: otherUserId,
-                IsBlockedBy: false,
-                IsBlocking: false,
-                IsMatched: false,
-                IsSame: false
-            );
-
-        _context.Store(fact);
-        return fact;
-    }
-
 }
 
 public enum UserPermission
 {
     View = 0,
     Update = 1,
-    Delete = 2
+    Delete = 2,
+    Judge = 3
 }
