@@ -5,6 +5,7 @@ using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -13,9 +14,11 @@ using NetTopologySuite.Geometries;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    partial class C2CContextModelSnapshot : ModelSnapshot
+    [Migration("20260618131631_Candidates")]
+    partial class Candidates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -888,7 +891,7 @@ namespace Embe.C2C.Infrastructure.Migrations
 
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.CandidateEntity", b =>
                 {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "Candidate")
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
                         .WithMany()
                         .HasForeignKey("CandidateUserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -899,8 +902,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Candidate");
                 });
 
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.RefreshTokenEntity", b =>

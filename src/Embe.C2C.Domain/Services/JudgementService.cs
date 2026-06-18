@@ -7,7 +7,7 @@ namespace Embe.C2C.Domain.Services;
 
 public class JudgementService : DomainService
 {
-    public Matching? Judge
+    public (Matching? Matching, Judgement Judgement) Judge
     (
         User judge,
         User judgee,
@@ -33,6 +33,7 @@ public class JudgementService : DomainService
         {
             AddDomainEvent(new MatchingCreatedEvent(judge.Id, match));
         }
-        return match;
+
+        return (match, judgement);
     }
 }

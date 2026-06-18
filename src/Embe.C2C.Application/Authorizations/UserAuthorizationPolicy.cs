@@ -53,7 +53,7 @@ public class UserAuthorizationPolicy
         var blockedByUserFact = await _facts.GetBlockedByUserFactAsync(userId, cancellationToken);
         var blockingUserFact = await _facts.GetBlockingUserFactAsync(userId, cancellationToken);
         var candidateUserFact = _facts.GetCandidateUserFact(userId);
-        var sameUserFact = await _facts.GetSameUserFactAsync(userId, cancellationToken);
+        var sameUserFact = _facts.GetSameUserFact(userId);
         var matchedUserFact = await _facts.GetMatchedUserFactAsync(userId, cancellationToken);
 
         var permissions = GetPermissions(blockedByUserFact, blockingUserFact, candidateUserFact, sameUserFact, matchedUserFact);
@@ -123,6 +123,7 @@ public class UserAuthorizationPolicy
         if (isCandidate?.Value == true)
         {
             permissions.Add(UserPermission.View);
+            permissions.Add(UserPermission.Judge);
         }
 
         return [.. permissions];

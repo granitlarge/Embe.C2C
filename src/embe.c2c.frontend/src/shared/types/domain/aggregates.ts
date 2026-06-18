@@ -8,6 +8,7 @@ export type User = {
     email?: string;
     userName?: string;
     birthDate?: string;
+    age?: number;
     gender?: Gender;
     datingPreferences?: DatingPreferences;
     location?: Location;

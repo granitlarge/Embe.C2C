@@ -2,6 +2,7 @@ using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
+using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
@@ -15,6 +16,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
     private readonly JudgementService _judgementService;
     private readonly IAuthenticatedUserService _userService;
     private readonly MatchingAuthorizationPolicy _matchingAuthorizationPolicy;
+    private readonly UserAuthorizationFactStore _userAuthorizationFactStore;
 
     public JudgeHandler
     (
@@ -24,13 +26,15 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IAuthenticatedUserService userService,
-        MatchingAuthorizationPolicy matchingAuthorizationPolicy
+        MatchingAuthorizationPolicy matchingAuthorizationPolicy,
+        UserAuthorizationFactStore userAuthorizationFactStore
     ) : base(context, domainEventHandler, integrationEventHandler)
     {
         _userAuthorizationPolicy = userAuthorizationPolicy;
         _judgementService = judgementService;
         _userService = userService;
         _matchingAuthorizationPolicy = matchingAuthorizationPolicy;
+        _userAuthorizationFactStore = userAuthorizationFactStore;
     }
 
     protected override async Task<TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
@@ -40,13 +44,21 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         CancellationToken cancellationToken = default
     )
     {
+        var userId = _userService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
+        var isCandidate = await context.IsCandidateForUserIdAsync(userId, command.JudgeeUserId, cancellationToken);
+        if (!isCandidate)
+        {
+            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "Judgee is not a candidate for the judge."));
+        }
+
+        _userAuthorizationFactStore.SetCandidateUserFact(command.JudgeeUserId, isCandidate: true);
+
         var (permissions, _) = await _userAuthorizationPolicy.GetAsync(command.JudgeeUserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Judge))
         {
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to judge."));
         }
 
-        var userId = _userService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
         var judge = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         if (judge == null)
         {
@@ -62,13 +74,23 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         var existingJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.JudgeUserId == userId && j.JudgeeUserId == command.JudgeeUserId, cancellationToken);
         var oppositeJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.JudgeUserId == command.JudgeeUserId && j.JudgeeUserId == userId, cancellationToken);
 
-        var match = _judgementService.Judge(judge, judgee, command.IsPositive, existingJudgement, oppositeJudgement);
-        if (match != null)
+        var (matching, judgement) = _judgementService.Judge(judge, judgee, command.IsPositive, existingJudgement, oppositeJudgement);
+        if (matching != null)
         {
-            context.Matchings.Add(match);
+            context.Matchings.Add(matching);
+            if (oppositeJudgement != null)
+            {
+                context.Judgements.Remove(oppositeJudgement);
+            }
+        }
+        else if (existingJudgement == null)
+        {
+            context.Judgements.Add(judgement);
         }
 
-        var matchingDto = match != null ? await _matchingAuthorizationPolicy.ToDtoAsync(match, cancellationToken) : null;
+        await context.ClearCandidateForUserIdAsync(userId, command.JudgeeUserId, cancellationToken);
+
+        var matchingDto = matching != null ? await _matchingAuthorizationPolicy.ToDtoAsync(matching, cancellationToken) : null;
         var result = Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(matchingDto);
 
         return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, result);

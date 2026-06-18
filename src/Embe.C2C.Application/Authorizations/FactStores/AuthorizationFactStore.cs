@@ -10,7 +10,8 @@ public abstract class AuthorizationFactStore(IAuthenticatedUserService authentic
 
     public T_Fact? GetFact<T_Fact>(Guid factId) where T_Fact : AuthorizationFact
     {
-        if (_facts.TryGetValue(typeof(T_Fact), out var factDictionary) && factDictionary.TryGetValue(factId, out var fact))
+        var factType = typeof(T_Fact);
+        if (_facts.TryGetValue(factType, out var factDictionary) && factDictionary.TryGetValue(factId, out var fact))
         {
             return (T_Fact)fact;
         }
@@ -19,10 +20,11 @@ public abstract class AuthorizationFactStore(IAuthenticatedUserService authentic
 
     public T_Fact SetFact<T_Fact>(T_Fact fact) where T_Fact : AuthorizationFact
     {
-        if (!_facts.TryGetValue(typeof(T_Fact), out var factDictionary))
+        var factType = fact.GetType();
+        if (!_facts.TryGetValue(factType, out var factDictionary))
         {
             factDictionary = [];
-            _facts[typeof(T_Fact)] = factDictionary;
+            _facts[factType] = factDictionary;
         }
         factDictionary[fact.Id] = fact;
         return fact;

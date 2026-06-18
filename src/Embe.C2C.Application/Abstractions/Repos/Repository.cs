@@ -35,9 +35,24 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Message> MessagesQuery { get; }
         public IQueryable<Blocking> BlockingsQuery { get; }
 
-        public Task<List<User>> GetCandidatesForUserIdAsync
+        public Task<List<User>> GenerateCandidatesForUserIdAsync
         (
-            Guid userId
+            Guid userId,
+            CancellationToken cancellationToken = default
+        );
+
+        public Task<bool> IsCandidateForUserIdAsync
+        (
+            Guid userId,
+            Guid candidateUserId,
+            CancellationToken cancellationToken = default
+        );
+
+        public Task ClearCandidateForUserIdAsync
+        (
+            Guid userId,
+            Guid candidateUserId,
+            CancellationToken cancellationToken = default
         );
     }
 
@@ -73,9 +88,19 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
         public IQueryable<Blocking> BlockingsQuery => _context.BlockingsQuery;
 
-        public async Task<List<User>> GetCandidatesForUserIdAsync(Guid userId)
+        public Task ClearCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
         {
-            return await _context.GetCandidatesForUserIdAsync(userId);
+            return _context.ClearCandidateForUserIdAsync(userId, candidateUserId, cancellationToken);
+        }
+
+        public async Task<List<User>> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await _context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
+        }
+
+        public async Task<bool> IsCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
+        {
+            return await _context.IsCandidateForUserIdAsync(userId, candidateUserId, cancellationToken);
         }
     }
 }

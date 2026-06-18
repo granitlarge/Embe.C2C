@@ -50,7 +50,7 @@ public class C2CContext
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Blocking> Blockings { get; set; }
-
+    public DbSet<CandidateEntity> Candidates { get; set; }
 
     public IImmutableList<DomainEvent> DomainEvents
     {
@@ -163,8 +163,17 @@ public class C2CContext
         return Database.BeginTransactionAsync(System.Data.IsolationLevel.Snapshot, cancellationToken);
     }
 
-    public async Task<List<User>> GetCandidatesForUserIdAsync(Guid userId)
+    public async Task<List<User>> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
+        var existingCandidates = await Candidates
+            .Include(c => c.Candidate)
+            .Where(c => c.UserId == userId).ToListAsync(cancellationToken);
+
+        if (existingCandidates.Count != 0)
+        {
+            return [.. existingCandidates.Select(c => c.Candidate!)];
+        }
+
         // User has not blocked Candidate
         // Candidate has not blocked User
         // User's preferences align with Candidate's information.
@@ -172,7 +181,13 @@ public class C2CContext
         // User and Candidate are not matched.
         // User has not already judged Candidate. 2nd chances? Show the same candidate again after a certain period of time? (e.g., 1 month)
         // Candidate has not already judged User negatively.
-        var query = (
+
+        // Then we need to prioritize candidates based on the following criteria:
+        // 1. Candidates who have liked the user
+        // 2. Candidates who have not been judged by the user yet
+
+        var query =
+        (
 
             from user in DomainUsers
             from candidate in DomainUsers
@@ -184,16 +199,33 @@ public class C2CContext
             !user.Blocked!.Any(b => b.BlockedUserId == candidate.Id) &&
             !user.BlockedBy!.Any(b => b.BlockerUserId == candidate.Id) &&
 
-            !user.Matchings1!.Any(m => m.UserId1 == candidate.Id || m.UserId2 == candidate.Id) &&
-            !user.Matchings2!.Any(m => m.UserId1 == candidate.Id || m.UserId2 == candidate.Id) &&
+            !user.Matchings1!.Any(m => m.UserId2 == candidate.Id) &&
+            !user.Matchings2!.Any(m => m.UserId1 == candidate.Id) &&
 
-            !user.JudgementsPassed!.Any(j => j.JudgeUserId == user.Id && j.JudgeeUserId == candidate.Id) &&
-            !user.JudgementsReceived!.Any(j => j.JudgeUserId == candidate.Id && j.JudgeeUserId == user.Id)
+            !user.JudgementsPassed!.Any(j => j.JudgeUserId == user.Id && j.JudgeeUserId == candidate.Id && !j.IsPositive) &&
+            !user.JudgementsReceived!.Any(j => j.JudgeUserId == candidate.Id && j.JudgeeUserId == user.Id && !j.IsPositive)
 
             select candidate
 
         );
 
-        return await query.Take(20).ToListAsync();
+        var users = await query.Take(20).ToListAsync(cancellationToken);
+        var candidates = users.Select(u => new CandidateEntity(userId, u.Id));
+        Candidates.AddRange(candidates);
+        return users;
+    }
+
+    public Task<bool> IsCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
+    {
+        return Candidates.AnyAsync(c => c.UserId == userId && c.CandidateUserId == candidateUserId, cancellationToken);
+    }
+
+    public async Task ClearCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
+    {
+        var candidate = await Candidates.FirstOrDefaultAsync(c => c.UserId == userId && c.CandidateUserId == candidateUserId, cancellationToken);
+        if (candidate is not null)
+        {
+            Candidates.Remove(candidate);
+        }
     }
 }

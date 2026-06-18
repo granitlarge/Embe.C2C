@@ -10,9 +10,9 @@ export default async function SwipePage({ }: SwipePageProps) {
         throw new Error("Not implemented");
     }
     return (
-        <div>
+        <div className="flex flex-col grow-1">
             <h1>swipe</h1>
-            <Swipe candidates={response.value || []} />
+            <Swipe className="grow-1" candidates={response.value || []} />
         </div>
     )
 }

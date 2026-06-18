@@ -38,7 +38,7 @@ public static class MatchingDtoExtensions
             matching.UserId1,
             matching.UserId2,
             conversation,
-            matching.CreatedAt,
+            variant.IncludeCreatedAt ? matching.CreatedAt : null,
             user1,
             user2
         );

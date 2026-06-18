@@ -29,7 +29,7 @@ export default async function RootLayout({
 
       <Surface as="body" className={`fs-group-primary flex flex-col justify-between h-dvh w-dvw px-2 pb-2 ${calSans.variable} gap-2`} variant="primary" padding="none">
 
-        <main className="grow-1 overflow-y-scroll scrollbar-none">
+        <main className="grow-1 overflow-y-scroll scrollbar-none flex flex-col">
           {children}
         </main>
         <Footer className="grow-0" user={user} />

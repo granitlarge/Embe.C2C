@@ -9,6 +9,7 @@ export type Set =
     "account" |
     "blocking" |
     "contact" |
+    "candidate" |
     "contact-request" |
     "judgement" |
     "matching" |

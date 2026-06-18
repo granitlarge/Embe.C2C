@@ -1,4 +1,5 @@
 using Embe.C2C.Application.Authorizations;
+using Embe.C2C.Application.Authorizations.FactGenerators;
 using Embe.C2C.Application.Authorizations.FactStores.Conversations;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Users.Handlers.RegisterHandler>();
         services.AddScoped<Commands.Users.Handlers.DeleteHandler>();
         services.AddScoped<Commands.Users.Handlers.UpdateHandler>();
+        services.AddScoped<Commands.Users.Handlers.GenerateCandidatesHandler>();
 
         services.AddScoped<Commands.Matching.Handlers.UnmatchHandler>();
         services.AddScoped<Commands.Judgements.Handlers.JudgeHandler>();
@@ -40,12 +42,14 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Queries.Messages.Handlers.GetMessagesByMatchingIdHandler>();
 
-        services.AddScoped<Queries.Users.Handlers.GetCandidateUsersHandler>();
-
         services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();
         services.AddScoped<MatchingAuthorizationFactStore>();
         services.AddScoped<MessageAuthorizationFactStore>();
+
+        services.AddScoped<UserFactGenerator>();
+        services.AddScoped<MatchingFactGenerator>();
+        services.AddScoped<MessageFactGenerator>();
 
         services.AddScoped<MatchingAuthorizationPolicy>();
         services.AddScoped<UserAuthorizationPolicy>();

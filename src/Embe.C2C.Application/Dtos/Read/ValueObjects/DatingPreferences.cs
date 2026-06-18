@@ -14,14 +14,19 @@ public record DatingPreferencesDto
 
 public static class DatingPreferencesDtoExtensions
 {
-    public static DatingPreferencesDto ToDto(this DatingPreferences datingPreferences, DatingPreferencesVariant variant)
+    public static DatingPreferencesDto? ToDto(this DatingPreferences datingPreferences, DatingPreferencesVariant variant)
     {
+        if (variant == DatingPreferencesVariant.Empty)
+        {
+            return null;
+        }
+
         return new DatingPreferencesDto
         (
-            datingPreferences.InterestedInGenders,
-            datingPreferences.AgeRangeMin.Value,
-            datingPreferences.AgeRangeMax.Value,
-            datingPreferences.MaximumDistance.ToDto()
+            variant.IncludeInterestedInGenders ? datingPreferences.InterestedInGenders : null,
+            variant.IncludeAgeRange ? datingPreferences.AgeRangeMin.Value : null,
+            variant.IncludeAgeRange ? datingPreferences.AgeRangeMax.Value : null,
+            variant.IncludeMaximumDistance ? datingPreferences.MaximumDistance.ToDto() : null
         );
     }
 }

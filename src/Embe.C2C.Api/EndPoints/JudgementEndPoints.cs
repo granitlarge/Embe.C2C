@@ -11,7 +11,7 @@ public static class JudgementEndPoints
         var group = app
             .MapGroup("/api/judgement")
             .WithTags("Judgement")
-            .RequireAuthorization("JudgementPolicy");
+            .RequireAuthorization();
 
         group.MapPost("/", Judge);
     }
