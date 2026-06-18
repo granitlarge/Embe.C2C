@@ -80,7 +80,6 @@ export type MatchProps = {
 }
 export default function Match({ match, user, className }: MatchProps) {
 
-    console.log(match);
     const [messages, setMessages] = useState(sortMessages(match.data.conversation?.messages || []));
     const page = messages.length > 0 ? 2 : 1;
     const pageSize = messages.length > 0 ? messages.length : 50;
