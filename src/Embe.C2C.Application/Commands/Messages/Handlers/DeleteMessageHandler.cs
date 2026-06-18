@@ -62,7 +62,11 @@ public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCom
                 .OrderByDescending(m => m.CreatedAt)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            _matchingService.DeleteMessage(user, message, newLastMessage, matching);
+            var replies = await context.MessagesQuery
+                .Where(m => m.ReplyToMessageId == message.Id)
+                .ToListAsync(cancellationToken);
+
+            _matchingService.DeleteMessage(user, message, newLastMessage, matching, replies);
             context.Messages.Remove(message);
 
             var result = Result.Success();

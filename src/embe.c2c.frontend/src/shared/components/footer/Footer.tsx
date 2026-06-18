@@ -14,15 +14,8 @@ export async function Footer({ className, user }: FooterProps) {
     const hasUnseenMessages = true;
 
     return (
-        <Surface as="footer" padding="none" className={className} variant="inherit">
-            {
-                user && <MainNav
-                    hasUnseenLikes={hasUnseenLikes}
-                    hasUnseenMatches={hasUnseenMatches}
-                    hasUnseenMessages={hasUnseenMessages}
-                /> 
-            }
-        </Surface>
+        <>
+        </>
     )
 
 }

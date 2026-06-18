@@ -10,7 +10,6 @@ export type MatchPageProps = {
         matchId: string
     }>
 }
-
 export default async function MatchPage({ params }: MatchPageProps) {
     const { matchId } = await params;
 

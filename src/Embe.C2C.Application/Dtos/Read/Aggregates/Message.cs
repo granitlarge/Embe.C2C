@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Messages;
 
@@ -9,15 +10,17 @@ public record MessageDto
     Guid ConversationId,
     Guid? ReplyToMessageId,
     Guid AuthorUserId,
+    bool? IsReply,
     string? Content,
     DateTimeOffset? SeenAt,
     DateTimeOffset? CreatedAt,
-    DateTimeOffset? EditedAt
+    DateTimeOffset? EditedAt,
+    ReadDto<MessageDto, MessagePermission>? ReplyToMessage
 );
 
 public static class MessageDtoExtensions
 {
-    public static MessageDto ToDto(this Message message, MessageVariant variant)
+    public static MessageDto ToDto(this Message message, MessageVariant variant, ReadDto<MessageDto, MessagePermission>? replyToMessageDto = null)
     {
         return new MessageDto
         (
@@ -25,10 +28,12 @@ public static class MessageDtoExtensions
             message.ConversationId,
             message.ReplyToMessageId,
             message.AuthorUserId,
+            variant.IncludeIsReply ? message.IsReply : null,
             variant.IncludeContent ? message.Content?.Value : null,
             variant.IncludeSeenAt ? message.SeenAt : null,
             variant.IncludeCreatedAt ? message.CreatedAt : null,
-            variant.IncludeEditedAt ? message.EditedAt : null
+            variant.IncludeEditedAt ? message.EditedAt : null,
+            variant.IncludeReplyToMessage ? replyToMessageDto : null
         );
     }
 }

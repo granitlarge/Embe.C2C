@@ -15,7 +15,7 @@ export default function Surface<T extends React.ElementType = "div">({
     className,
     children,
     padding = "md",
-    variant = "inherit",
+    variant = "none",
     as,
     style,
     ...props

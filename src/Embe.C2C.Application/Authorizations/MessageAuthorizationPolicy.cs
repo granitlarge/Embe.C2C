@@ -27,7 +27,8 @@ public class MessageAuthorizationPolicy
             return null;
         }
 
-        var messageDto = message.ToDto(variant);
+        var messageReplyToDto = message.ReplyToMessage != null ? await ToDtoAsync(message.ReplyToMessage, cancellationToken) : null;
+        var messageDto = message.ToDto(variant, messageReplyToDto);
         return new ReadDto<MessageDto, MessagePermission>(messageDto, permissions);
     }
 
@@ -88,6 +89,7 @@ public class MessageAuthorizationPolicy
         if (recipientFact.Value == true)
         {
             permissions.Add(MessagePermission.Report);
+            permissions.Add(MessagePermission.Reply);
         }
 
         return [.. permissions];
@@ -99,5 +101,6 @@ public enum MessagePermission
     View = 0,
     Edit = 1,
     Delete = 2,
-    Report = 3
+    Report = 3,
+    Reply = 4
 }

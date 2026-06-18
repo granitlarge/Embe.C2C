@@ -53,21 +53,29 @@ public class CreateMessageHandler : TransactionalCommandHandler<CreateMessageCom
         try
         {
             var messageContent = MessageContent.Create(command.Content);
+            var replyToMessageId = command.ReplyToMessageId;
+
             var user = await context.DomainUsersQuery.SingleAsync(u => u.Id == _authenticatedUser.UserId, cancellationToken);
             if (user is null)
                 return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
+
             var matching = await context.MatchingsQuery.SingleAsync(m => m.Id == command.MatchingId, cancellationToken);
             if (matching is null)
                 return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Matching not found."));
+
             var receiver = await context.DomainUsersQuery.SingleAsync(u => u.Id == matching.GetOtherUserId(_authenticatedUser.UserId), cancellationToken);
             if (receiver is null)
                 return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Receiver user not found."));
+
+            var replyToMessage = replyToMessageId.HasValue ? await context.MessagesQuery.SingleOrDefaultAsync(m => m.Id == replyToMessageId.Value, cancellationToken) : null;
+            if (replyToMessageId.HasValue && replyToMessage is null)
+                return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Reply-to message not found."));
 
             var blocking1 = await context.BlockingsQuery.FirstOrDefaultAsync(b => b.BlockerUserId == user.Id && b.BlockedUserId == receiver.Id, cancellationToken);
             var blocking2 = await context.BlockingsQuery.FirstOrDefaultAsync(b => b.BlockerUserId == receiver.Id && b.BlockedUserId == user.Id, cancellationToken);
 
             var communicationPolicy = new CommunicationPolicy(user, receiver, matching, blocking1, blocking2);
-            var message = _matchingService.SendMessage(user, matching, messageContent, communicationPolicy);
+            var message = _matchingService.SendMessage(user, matching, messageContent, communicationPolicy, replyToMessage);
             context.Messages.Add(message);
             var dto = await _messageAuthorizationPolicy.ToDtoAsync(message, cancellationToken) ??
                 throw new InvalidOperationException("The message should be viewable to the sender right after sending it.");

@@ -63,7 +63,9 @@ public record MessageVariant
         includeContent: false,
         includeSeenAt: false,
         includeCreatedAt: false,
-        includeEditedAt: false
+        includeEditedAt: false,
+        includeIsReply: false,
+        includeReplyToMessage: false
     );
 
     public static readonly MessageVariant Full = new
@@ -71,7 +73,9 @@ public record MessageVariant
         includeContent: true,
         includeSeenAt: true,
         includeCreatedAt: true,
-        includeEditedAt: true
+        includeEditedAt: true,
+        includeIsReply: true,
+        includeReplyToMessage: true
     );
 
     public MessageVariant
@@ -79,17 +83,23 @@ public record MessageVariant
         bool includeContent,
         bool includeSeenAt,
         bool includeCreatedAt,
-        bool includeEditedAt
+        bool includeEditedAt,
+        bool includeIsReply,
+        bool includeReplyToMessage
     )
     {
         IncludeContent = includeContent;
         IncludeSeenAt = includeSeenAt;
         IncludeCreatedAt = includeCreatedAt;
         IncludeEditedAt = includeEditedAt;
+        IncludeIsReply = includeIsReply;
+        IncludeReplyToMessage = includeReplyToMessage;
     }
 
     public bool IncludeContent { get; }
     public bool IncludeSeenAt { get; }
     public bool IncludeCreatedAt { get; }
     public bool IncludeEditedAt { get; }
+    public bool IncludeIsReply { get; }
+    public bool IncludeReplyToMessage { get; }
 }

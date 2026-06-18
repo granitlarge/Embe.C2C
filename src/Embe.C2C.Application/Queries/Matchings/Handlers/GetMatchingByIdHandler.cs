@@ -42,6 +42,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             .Include(m => m.User2)
             .Include(m => m.Conversation)
                 .ThenInclude(c => c.Messages!.OrderByDescending(m => m.CreatedAt).Take(50))
+                    .ThenInclude(m => m.ReplyToMessage)
             .SingleOrDefaultAsync(m => m.Id == query.MatchingId, cancellationToken);
 
         if (matching == null)

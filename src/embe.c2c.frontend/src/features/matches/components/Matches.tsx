@@ -11,9 +11,9 @@ import { ReadDto } from "@/src/shared/types/dtos/types";
 export type MatchesProps = {
     user: AuthenticatedUser
     initialMatches: ReadDto<Matching, MatchingPermission>[];
+    className?: string;
 };
-
-export function Matches({ user, initialMatches }: MatchesProps) {
+export function Matches({ user, initialMatches, className }: MatchesProps) {
 
     const [matches, setMatches] = useState<ReadDto<Matching, MatchingPermission>[]>(initialMatches);
 
@@ -34,17 +34,17 @@ export function Matches({ user, initialMatches }: MatchesProps) {
     }
 
     return (
-        <>
+        <div className={`flex flex-col gap-3 ${className}`}>
             {
                 items.length > 0 ?
-                    <InfiniteScroll className="flex flex-col gap-3" callback={loadMore}>
+                    <InfiniteScroll className={`flex flex-col gap-3`} callback={loadMore}>
                         {items}
                     </InfiniteScroll> :
-                    <span className="text-(length:--fs-header-2) mx-auto my-auto">
+                    <span className={`text-(length:--fs-header-2) mx-auto my-auto`}>
                         no matches yet
                     </span>
             }
-        </>
+        </div>
     );
 
 }

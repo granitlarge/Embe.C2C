@@ -1,3 +1,3 @@
 namespace Embe.C2C.Application.Commands.Messages;
 
-public record CreateMessageCommand(Guid MatchingId, string Content);
+public record CreateMessageCommand(Guid MatchingId, string Content, Guid? ReplyToMessageId = null);

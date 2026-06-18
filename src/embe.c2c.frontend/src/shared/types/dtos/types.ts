@@ -3,7 +3,7 @@ import { Message } from "../domain/aggregates";
 import { Guid } from "../../cache";
 
 export type CreateFile = Pick<File, "fileDetails">;
-export type CreateMessage = Pick<Message, "content"> & {
+export type CreateMessage = Pick<Message, "content" | "replyToMessageId"> & {
     matchingId: Guid;
 };
 

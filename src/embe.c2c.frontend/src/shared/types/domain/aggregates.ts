@@ -91,13 +91,16 @@ export type Message = {
     seenAt?: string;
     createdAt?: string;
     editedAt?: string;
+    isReply?: boolean;
+    replyToMessage?: ReadDto<Message, MessagePermission>;
 }
 
 export enum MessagePermission {
     View = 0,
     Edit = 1,
     Delete = 2,
-    Report = 3
+    Report = 3,
+    Reply = 4,
 }
 
 export enum NotificationType {

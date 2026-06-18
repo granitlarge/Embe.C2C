@@ -12,9 +12,65 @@ import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAr
 import { Guid } from "@/src/shared/cache";
 import { Save, Send } from "@deemlol/next-icons";
 import { Ban } from "lucide-react";
+import Surface from "@/src/shared/components/surfaces/Surface";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
+}
+
+type MessageCrafterProps = {
+
+    saveMessage: () => void;
+    onChange: (value: string) => void;
+    onCancel: () => void;
+    content: string | undefined,
+    editingId: Guid | undefined,
+    replyId: Guid | undefined,
+    replyToMessage: ReadDto<MessageTypeDef, MessagePermission> | undefined,
+    mode: "create" | "edit" | "reply";
+
+}
+
+function MessageCrafter({
+    saveMessage,
+    content = undefined,
+    replyToMessage = undefined,
+    mode = "create",
+    onChange,
+    onCancel,
+}: MessageCrafterProps) {
+
+    return (
+        <div className="relative flex gap-0">
+            {
+                mode === "reply" && <Message className="surface-tertiary absolute bottom-full mb-1" dto={replyToMessage!} isOwn={false} />
+            }
+            <TextAreaInput
+                value={content}
+                onChange={onChange}
+                placeholder="write a message.."
+                className="surface-secondary w-full p-3 rounded-l-lg grow-1"
+            >
+            </TextAreaInput>
+            <div className="surface-secondary rounded-r-lg flex flex-col justify-center p-2">
+                {
+                    mode === "create" &&
+                    <button className="max-w-max max-h-max my-auto" onClick={saveMessage}>
+                        <Send className="text-(--primary-fc) text-(length:--primary-fs)" />
+                    </button>
+                }
+                {
+                    (mode === "edit" || mode === "reply") &&
+                    <div className="flex flex-col gap-2 justify-center">
+                        <button className="text-(--primary-fc) text-(length:--primary-fs)" onClick={saveMessage}>{mode === "edit" ? <Save /> : <Send />}</button>
+                        <button className="text-(--primary-fc) text-(length:--primary-fs)" onClick={onCancel}><Ban /></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+    );
+
 }
 
 export type MatchProps = {
@@ -24,19 +80,24 @@ export type MatchProps = {
 }
 export default function Match({ match, user, className }: MatchProps) {
 
+    console.log(match);
     const [messages, setMessages] = useState(sortMessages(match.data.conversation?.messages || []));
     const page = messages.length > 0 ? 2 : 1;
     const pageSize = messages.length > 0 ? messages.length : 50;
 
-    const [message, setMessage] = useState<{
-        content: string;
-        isEditing: boolean;
-        editingId: Guid | undefined;
-    }>({
+    const defaultMessage = {
         content: "",
-        isEditing: false,
-        editingId: undefined
-    });
+        editingId: undefined,
+        replyId: undefined,
+        mode: "create" as "create" | "edit" | "reply",
+    };
+
+    const [messageCrafterConfig, setMessageCrafterConfig] = useState<{
+        content: string;
+        mode: "create" | "edit" | "reply";
+        replyId: Guid | undefined;
+        editingId: Guid | undefined;
+    }>(defaultMessage);
 
     async function loadMessages(): Promise<boolean> {
         const response = await getMessages(match.data.id, page, pageSize);
@@ -50,14 +111,15 @@ export default function Match({ match, user, className }: MatchProps) {
     }
 
     async function saveMessage() {
-        const content = message.content;
-        const isEditing = message.isEditing;
-        const editingId = message.editingId;
+        const content = messageCrafterConfig.content;
+        const editingId = messageCrafterConfig.editingId;
+        const replyId = messageCrafterConfig.replyId;
+
         if (!content) {
             return;
         }
 
-        if (isEditing) {
+        if (messageCrafterConfig.mode === "edit") {
 
             if (!editingId) {
                 throw new Error("impossible state");
@@ -70,11 +132,7 @@ export default function Match({ match, user, className }: MatchProps) {
                     const otherMessages = prev.filter(message => message.data.id !== editingId);
                     return sortMessages([...otherMessages, response.value!]);
                 });
-                setMessage({
-                    content: "",
-                    isEditing: false,
-                    editingId: undefined
-                });
+                setMessageCrafterConfig(defaultMessage);
 
             } else {
 
@@ -86,18 +144,15 @@ export default function Match({ match, user, className }: MatchProps) {
 
             const message: CreateMessage = {
                 content: content,
-                matchingId: match.data.id
+                matchingId: match.data.id,
+                replyToMessageId: replyId
             }
 
             const response = await createMessage(message);
 
             if (response.success) {
                 setMessages(prev => sortMessages([...prev, response.value!]));
-                setMessage({
-                    content: "",
-                    isEditing: false,
-                    editingId: undefined
-                });
+                setMessageCrafterConfig(defaultMessage);
             } else {
                 throw new Error("Not Implemented");
             }
@@ -110,41 +165,101 @@ export default function Match({ match, user, className }: MatchProps) {
     }
 
     function onEdit(message: MessageTypeDef) {
-        setMessage({
+        setMessageCrafterConfig({
             content: message.content!,
-            isEditing: true,
-            editingId: message.id
+            mode: "edit",
+            editingId: message.id,
+            replyId: undefined
+        });
+    }
+
+    function onReply(message: MessageTypeDef) {
+        setMessageCrafterConfig({
+            content: "",
+            editingId: undefined,
+            replyId: message.id,
+            mode: "reply"
         });
     }
 
     async function onDelete(messageId: Guid) {
         const response = await deleteMessage(messageId);
         if (response.success) {
-            if (message.isEditing && message.editingId === messageId) {
-                setMessage({
-                    content: "",
-                    isEditing: false,
-                    editingId: undefined
-                });
+            if (messageCrafterConfig.mode === "edit" && messageCrafterConfig.editingId === messageId) {
+                setMessageCrafterConfig(defaultMessage);
             }
-            setMessages(prev => prev.filter(message => message.data.id !== messageId));
+            setMessages(prev =>
+                prev
+                    .filter(dto => dto.data.id !== messageId)
+                    .map(dto => {
+                        if (dto.data.replyToMessageId === messageId) {
+                            return {
+                                ...dto,
+                                data: {
+                                    ...dto.data,
+                                    replyToMessageId: undefined,
+                                    replyToMessage: undefined
+                                }
+                            }
+                        } else {
+                            return dto;
+                        }
+                    })
+            );
         } else {
             throw new Error("Not Implemented");
         }
     }
 
     const items = messages.map(message => {
+
+        // This is way too complex. Simplify.
         const isOwn = message.data.authorUserId === user.userId;
+        const isReply = message.data.isReply;
+        const isReplyDeleted = !message.data.replyToMessageId;
+        const indexOfMessage = messages.findIndex(m => m.data.id === message.data.id);
+        const indexOfReply = messages.findIndex(m => m.data.id === message.data.replyToMessageId);
+        const replyImmediatelyFollowsMessage = indexOfReply === indexOfMessage - 1;
+
+        let item = <Message
+            className={`max-w-max ${isOwn ? "ml-auto" : "mr-auto"} ${isOwn ? "surface-message" : "surface-secondary"}`}
+            dto={message}
+            isOwn={isOwn}
+            onReport={() => onReport(message.data.id)}
+            onEdit={() => onEdit(message.data)}
+            onDelete={() => onDelete(message.data.id)}
+            onReply={() => onReply(message.data)}
+        />;
+
+        if (isReply && !replyImmediatelyFollowsMessage) {
+            item = <Surface className={`relative w-full px-2 py-1 flex flex-col gap-2`} padding="none" variant="tertiary">
+                <span className={`text-(length:--secondary-fs) text-(--secondary-fc) absolute ${isOwn ? "right-1" : "left-1"}`}>reply</span>
+                {
+
+                    <>
+                        {
+                            isReplyDeleted ?
+                                <span className="text-(--secondary-fc) text-(length:--secondary-fs) italic mx-auto">replied message was deleted</span>
+                                :
+                                <Message className={`${isOwn ? "surface-secondary mr-auto" : "surface-message ml-auto"} max-w-max`} dto={message.data.replyToMessage!} isOwn={!isOwn} />
+                        }
+                        <Message
+                            className={`${isOwn ? "surface-message ml-auto" : "surface-secondary mr-auto"} max-w-max`}
+                            dto={message}
+                            isOwn={isOwn}
+                            onReport={() =>
+                                onReport(message.data.id)}
+                            onEdit={() => onEdit(message.data)}
+                            onDelete={() => onDelete(message.data.id)}
+                            onReply={() => onReply(message.data)} />
+                    </>
+                }
+            </Surface>
+        }
+
         return (
             <li key={message.data.id}>
-                <Message
-                    className={isOwn ? "ml-auto" : "mr-auto"}
-                    dto={message}
-                    isOwn={isOwn}
-                    onReport={() => onReport(message.data.id)}
-                    onEdit={() => onEdit(message.data)}
-                    onDelete={() => onDelete(message.data.id)}
-                />
+                {item}
             </li>
         )
     }) ?? [];
@@ -154,28 +269,16 @@ export default function Match({ match, user, className }: MatchProps) {
             <InfiniteScroll direction="up" className="flex flex-col gap-3 fs-group-primary" callback={loadMessages}>
                 {items}
             </InfiniteScroll>
-            <div className="relative flex gap-2">
-                <TextAreaInput
-                    value={message.content}
-                    onChange={(value) => setMessage(prev => ({ ...prev, content: value }))}
-                    placeholder="write a message.."
-                    className="surface-secondary w-full p-3 rounded-lg grow-1"
-                >
-                </TextAreaInput>
-                {
-                    !message.isEditing &&
-                    <button className="max-w-max max-h-max my-auto" onClick={saveMessage}>
-                        <Send className="text-(--primary-fc) text-(length:--primary-fs)" />
-                    </button>
-                }
-                {
-                    message.isEditing &&
-                    <div className="flex flex-col gap-2 justify-center">
-                        <button className="" onClick={saveMessage}><Save /></button>
-                        <button className="" onClick={() => setMessage({ content: "", isEditing: false, editingId: undefined })}><Ban /></button>
-                    </div>
-                }
-            </div>
+            <MessageCrafter
+                saveMessage={saveMessage}
+                onCancel={() => setMessageCrafterConfig(defaultMessage)}
+                onChange={(value: string) => setMessageCrafterConfig(prev => ({ ...prev, content: value }))}
+                content={messageCrafterConfig.content}
+                editingId={messageCrafterConfig.editingId}
+                mode={messageCrafterConfig.mode}
+                replyId={messageCrafterConfig.replyId}
+                replyToMessage={messageCrafterConfig.replyId ? messages.find(m => m.data.id === messageCrafterConfig.replyId) : undefined}
+            />
         </div>
     )
 }

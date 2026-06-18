@@ -48,7 +48,8 @@ public class MatchingService : DomainService
         User deleter, 
         Message message, 
         Message? newLastMessage,
-        Matching matching
+        Matching matching,
+        List<Message> replies
     )
     {
         if (message.AuthorUserId != deleter.Id)
@@ -56,9 +57,22 @@ public class MatchingService : DomainService
             throw new DomainException(new DomainError<MessageError>(MessageError.Unauthorized));
         }
 
+        foreach (var reply in replies)
+        {
+            if (reply.ReplyToMessageId != message.Id)
+            {
+                throw new DomainException(new DomainError<MessageError>(MessageError.InvalidReply));
+            }
+        }
+
         var conversation = matching.Conversation;
         conversation.DecrementMessageCount();
         conversation.UpdateLastMessageId(newLastMessage?.Id);
         message.Remove();
+
+        foreach (var reply in replies)
+        {
+            reply.ReplyMessageRemoved();
+        }
     }
 }

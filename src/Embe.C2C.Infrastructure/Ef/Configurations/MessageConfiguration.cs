@@ -17,7 +17,7 @@ public class MessageConfiguration : AggregateConfiguration<Message>
             .HasForeignKey(m => m.ConversationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Message>()
+        builder.HasOne(m => m.ReplyToMessage)
             .WithMany()
             .HasForeignKey(m => m.ReplyToMessageId)
             .OnDelete(DeleteBehavior.ClientCascade);
@@ -27,7 +27,8 @@ public class MessageConfiguration : AggregateConfiguration<Message>
             .HasForeignKey(m => m.AuthorUserId)
             .OnDelete(DeleteBehavior.ClientCascade);
 
-        builder.Property(m => m.Content)
+        builder
+            .Property(m => m.Content)
             .HasConversion
             (
                 m => m.Value,
