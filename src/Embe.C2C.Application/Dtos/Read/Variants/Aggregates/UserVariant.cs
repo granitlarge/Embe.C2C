@@ -64,6 +64,21 @@ public record UserVariant
         includeUpdatedAt: false
     );
 
+    public static readonly UserVariant PositivelyJudged = new
+    (
+        includeEmail: false,
+        includeUserName: true,
+        includeBirthDate: false,
+        includeAge: true,
+        includeGender: true,
+        datingPreferencesVariant: DatingPreferencesVariant.Empty,
+        includeLocation: false,
+        includeProfilePicture: true,
+        includeFiles: true,
+        includeCreatedAt: false,
+        includeUpdatedAt: false
+    );
+
     public static readonly UserVariant Full = new
     (
         includeEmail: true,

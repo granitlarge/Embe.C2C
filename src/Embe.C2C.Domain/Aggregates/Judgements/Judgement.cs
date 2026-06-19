@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Judgements.Events;
+using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Exceptions;
 
 namespace Embe.C2C.Domain.Aggregates.Judgements;
@@ -35,6 +36,10 @@ public class Judgement : Aggregate
     public DateTimeOffset EditedAt { get; private set; }
     public DateTimeOffset CreatedAt { get; private set;}
 
+    #region read-only navigation properties
+    public User? Judge { get; private set; }
+    #endregion
+
     public void Edit(bool isPositive)
     {
         if (IsPositive == isPositive)
@@ -52,7 +57,7 @@ public class Judgement : Aggregate
 
     }
 
-    internal static Judgement Judge(Guid judgeUserId, Guid judgeeUserId, bool isPositive)
+    internal static Judgement Create(Guid judgeUserId, Guid judgeeUserId, bool isPositive)
     {
         return new Judgement(judgeUserId, judgeeUserId, isPositive);
     }

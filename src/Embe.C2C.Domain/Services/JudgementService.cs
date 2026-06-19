@@ -24,7 +24,7 @@ public class JudgementService : DomainService
         }
         else
         {
-            judgement = Judgement.Judge(judge.Id, judgee.Id, isPositive);
+            judgement = Judgement.Create(judge.Id, judgee.Id, isPositive);
         }
 
         var isMatch = judgement.IsPositive && oppositeJudgement?.IsPositive == true;

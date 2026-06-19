@@ -4,8 +4,8 @@ import { InfiniteScroll } from "@/src/shared/components/infinite-scroll/Infinite
 import { Matching, MatchingPermission, MessagePermission } from "@/src/shared/types/domain/aggregates"
 import { AuthenticatedUser } from "@/src/shared/user";
 import Message from "./Message";
-import { useState } from "react";
-import { createMessage, deleteMessage, getMessages, updateMessage } from "../actions/action";
+import { useEffect, useState } from "react";
+import { createMessage, deleteMessage, getMessages, markMessageAsSeen, updateMessage } from "../actions/action";
 import { Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
 import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
 import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAreaInput";
@@ -30,7 +30,6 @@ type MessageCrafterProps = {
     mode: "create" | "edit" | "reply";
 
 }
-
 function MessageCrafter({
     saveMessage,
     content = undefined,
@@ -68,7 +67,6 @@ function MessageCrafter({
                 }
             </div>
         </div>
-
     );
 
 }
@@ -98,6 +96,11 @@ export default function Match({ match, user, className }: MatchProps) {
         editingId: Guid | undefined;
     }>(defaultMessage);
 
+    useEffect(() => {
+        const unseenNewMessages = messages.filter(nm => !nm.data.seenAt && nm.data.authorUserId !== user.userId);
+        markAsSeen(...unseenNewMessages.map(newMessage => newMessage.data.id));
+    }, [messages]);
+
     async function loadMessages(): Promise<boolean> {
         const response = await getMessages(match.data.id, page, pageSize);
         if (response.success) {
@@ -110,6 +113,7 @@ export default function Match({ match, user, className }: MatchProps) {
     }
 
     async function saveMessage() {
+
         const content = messageCrafterConfig.content;
         const editingId = messageCrafterConfig.editingId;
         const replyId = messageCrafterConfig.replyId;
@@ -157,6 +161,31 @@ export default function Match({ match, user, className }: MatchProps) {
             }
 
         }
+
+    }
+
+    async function markAsSeen(...messageIds: Guid[]) {
+        if (messageIds.length === 0) {
+            return;
+        }
+        const response = await markMessageAsSeen(...messageIds);
+        if (response.success) {
+            setMessages(prev => sortMessages(prev.map(message => {
+                if (messageIds.includes(message.data.id)) {
+                    return {
+                        ...message,
+                        data: {
+                            ...message.data,
+                            seenAt: new Date().toISOString()
+                        }
+                    }
+                } else {
+                    return message;
+                }
+            })));
+        } else {
+            throw new Error("Not Implemented");
+        }
     }
 
     function onReport(messageId: Guid) {
@@ -188,23 +217,24 @@ export default function Match({ match, user, className }: MatchProps) {
                 setMessageCrafterConfig(defaultMessage);
             }
             setMessages(prev =>
-                prev
-                    .filter(dto => dto.data.id !== messageId)
-                    .map(dto => {
-                        if (dto.data.replyToMessageId === messageId) {
-                            return {
-                                ...dto,
-                                data: {
-                                    ...dto.data,
-                                    replyToMessageId: undefined,
-                                    replyToMessage: undefined
+                sortMessages(
+                    prev
+                        .filter(dto => dto.data.id !== messageId)
+                        .map(dto => {
+                            if (dto.data.replyToMessageId === messageId) {
+                                return {
+                                    ...dto,
+                                    data: {
+                                        ...dto.data,
+                                        replyToMessageId: undefined,
+                                        replyToMessage: undefined
+                                    }
                                 }
+                            } else {
+                                return dto;
                             }
-                        } else {
-                            return dto;
-                        }
-                    })
-            );
+                        })
+                ));
         } else {
             throw new Error("Not Implemented");
         }
@@ -264,6 +294,7 @@ export default function Match({ match, user, className }: MatchProps) {
     }) ?? [];
 
     return (
+
         <div className={`flex flex-col justify-between gap-3 ${className}`}>
             <InfiniteScroll direction="up" className="flex flex-col gap-3 fs-group-primary" callback={loadMessages}>
                 {items}
@@ -279,5 +310,6 @@ export default function Match({ match, user, className }: MatchProps) {
                 replyToMessage={messageCrafterConfig.replyId ? messages.find(m => m.data.id === messageCrafterConfig.replyId) : undefined}
             />
         </div>
+
     )
 }

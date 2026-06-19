@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         IHostEnvironment environment
     )
     {
+
         services.AddScoped<Settings>();
         services.AddIdentityCore<MyIdentityUser>(options =>
         {
@@ -50,5 +51,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
 
         return services;
+
     }
 }

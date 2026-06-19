@@ -11,7 +11,7 @@ export default async function SwipePage({ }: SwipePageProps) {
         throw new Error("Not implemented");
     }
     return (
-        <div className="flex flex-col grow-1">
+        <div className="flex flex-col grow-1 gap-3">
             <h1>swipe</h1>
             <Swipe className="grow-1" candidates={response.value || []} />
             <MainNav className="grow-0" />

@@ -48,9 +48,13 @@ public class Message : Aggregate
         EditedAt = DateTimeOffset.UtcNow;
     }
 
-    public void MarkAsSeen()
+    public void MarkAsSeen(bool seen)
     {
-        SeenAt = DateTimeOffset.UtcNow;
+        if (seen && SeenAt.HasValue)
+        {
+            return;
+        }
+        SeenAt = seen ? DateTimeOffset.UtcNow : null;
     }
 
     public void Remove()

@@ -16,6 +16,7 @@ public static class MessageEndPoints
         group.MapPost("/", CreateMessage);
         group.MapDelete("/{messageId:guid}", DeleteMessage);
         group.MapPut("/", EditMessage);
+        group.MapPost("/mark-as-seen", MarkMessagesAsSeen);
     }
 
     private static async Task<IResult> GetMatchingMessages
@@ -59,6 +60,17 @@ public static class MessageEndPoints
     (
         [FromBody] EditMessageCommand command,
         [FromServices] EditMessageHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> MarkMessagesAsSeen
+    (
+        [FromBody] MarkMessagesAsSeenCommand command,
+        [FromServices] MarkMessagesAsSeenHandler handler,
         CancellationToken cancellationToken
     )
     {

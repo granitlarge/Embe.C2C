@@ -90,6 +90,7 @@ public class MessageAuthorizationPolicy
         {
             permissions.Add(MessagePermission.Report);
             permissions.Add(MessagePermission.Reply);
+            permissions.Add(MessagePermission.MarkAsSeen);
         }
 
         return [.. permissions];
@@ -102,5 +103,6 @@ public enum MessagePermission
     Edit = 1,
     Delete = 2,
     Report = 3,
-    Reply = 4
+    Reply = 4,
+    MarkAsSeen = 5
 }

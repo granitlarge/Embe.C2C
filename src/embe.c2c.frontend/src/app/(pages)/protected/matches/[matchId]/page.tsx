@@ -11,6 +11,7 @@ export type MatchPageProps = {
     }>
 }
 export default async function MatchPage({ params }: MatchPageProps) {
+
     const { matchId } = await params;
 
     const user = await getAuthenticatedUser();
@@ -43,4 +44,5 @@ export default async function MatchPage({ params }: MatchPageProps) {
             <Match className="grow-1 overflow-scroll scrollbar-none" match={response.value!} user={user!} />
         </div>
     )
+
 }

@@ -1,8 +1,7 @@
-using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactGenerators;
+using Embe.C2C.Application.Authorizations.FactStores.Judgements.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Authorizations.FactStores.Users;
 
@@ -17,6 +16,12 @@ public class UserAuthorizationFactStore
     public void SetCandidateUserFact(Guid userId, bool isCandidate)
     {
         var fact = new CandidateUserFact(userId, isCandidate);
+        SetFact(fact);
+    }
+
+    public void SetIsPositivelyJudgedByUserFact(Guid userId, bool isPositivelyJudgedByUser)
+    {
+        var fact = new IsPositivelyJudgedByUser(userId, isPositivelyJudgedByUser);
         SetFact(fact);
     }
 
@@ -68,6 +73,18 @@ public class UserAuthorizationFactStore
     {
         var fact = GetFact<SameUserFact>(userId) ?? SetFact(new SameUserFact(userId, userId == CurrentUserId));
         return fact;
+    }
+
+    public async ValueTask<IsPositivelyJudged> GetIsPositivelyJudgedByUserFactAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var fact = GetFact<IsPositivelyJudged>(userId);
+        if (fact != null)
+        {
+            return fact;
+        }
+
+        await LoadUserFactsAsync(userId, cancellationToken);
+        return GetFact<IsPositivelyJudged>(userId) ?? throw new InvalidOperationException("IsPositivelyJudgedJudgee fact should have been loaded.");
     }
 
     private async Task LoadUserFactsAsync(Guid userId, CancellationToken cancellationToken = default)

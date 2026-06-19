@@ -21,7 +21,7 @@ export async function getMatchings(page: number, size: number): Promise<ApiRespo
     return response;
 }
 
-export async function getMatching(matchId: string): Promise<ApiResponse<ReadDto<Matching, MatchingPermission>, FailureReason>> {
+export async function getMatching(matchId: Guid): Promise<ApiResponse<ReadDto<Matching, MatchingPermission>, FailureReason>> {
     const user = await getAuthenticatedUser();
     const response = await Read<ReadDto<Matching, MatchingPermission>>
         (
@@ -29,7 +29,7 @@ export async function getMatching(matchId: string): Promise<ApiResponse<ReadDto<
             {
                 method: "GET",
                 next: {
-                    tags: [`user:${user?.userId || NullGuid}:matching`]
+                    tags: [`user:${user?.userId || NullGuid}:matching`, `matching:${matchId}`]
                 }
             }
         );
@@ -84,6 +84,24 @@ export async function updateMessage(messageId: Guid, newContent: string): Promis
             {
                 method: "PUT",
                 body: JSON.stringify({ messageId, newContent }),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            }
+        )
+    return response;
+}
+
+export async function markMessageAsSeen(...messageIds: Guid[]): Promise<ApiResponse<void, FailureReason>> {
+    if (messageIds.length === 0) {
+        return { success: true };
+    }
+    const response = await Mutate<void>
+        (
+            `${process.env.API_URL}/api/messages/mark-as-seen`,
+            {
+                method: "POST",
+                body: JSON.stringify({ messageIds }),
                 headers: {
                     "Content-Type": "application/json"
                 },

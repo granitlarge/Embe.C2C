@@ -1,6 +1,7 @@
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactStores;
+using Embe.C2C.Application.Authorizations.FactStores.Judgements.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Microsoft.EntityFrameworkCore;
 
@@ -58,6 +59,7 @@ public class UserFactGenerator
                 IsBlocking = u.Blocked!.Any(bu => bu.BlockedUserId == userId),
                 IsBlockedBy = u.BlockedBy!.Any(bu => bu.BlockerUserId == userId),
                 IsMatched = u.Matchings1!.Any(m => m.UserId2 == userId) || u.Matchings2!.Any(m => m.UserId1 == userId),
+                IsPositivelyJudged = u.JudgementsReceived!.Any(j => j.JudgeUserId == userId && j.IsPositive)
             })
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -65,13 +67,15 @@ public class UserFactGenerator
         var blockingFact = new BlockingUserFact(userId, facts?.IsBlocking ?? false);
         var matchedFact = new MatchedUserFact(userId, facts?.IsMatched ?? false);
         var sameFact = new SameUserFact(userId, userId == CurrentUserId);
+        var positivelyJudgedFact = new IsPositivelyJudged(userId, facts?.IsPositivelyJudged ?? false);
 
         return
         [
             blockedByFact,
             blockingFact,
             matchedFact,
-            sameFact
+            sameFact,
+            positivelyJudgedFact
         ];
     }
 }

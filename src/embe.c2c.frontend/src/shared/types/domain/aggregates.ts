@@ -58,13 +58,14 @@ export type Judgement = {
     id: Guid;
     judgeUserId: Guid;
     judgeeUserId: Guid;
-    isPositive: boolean;
-    editedAt: string;
-    createdAt: string;
+    isPositive?: boolean;
+    editedAt?: string;
+    createdAt?: string;
+    judge?: ReadDto<User, UserPermission>;
 }
 
 export enum JudgementPermission {
-    Judge = 0
+    View = 0
 }
 
 export type Matching = {
@@ -101,6 +102,7 @@ export enum MessagePermission {
     Delete = 2,
     Report = 3,
     Reply = 4,
+    MarkAsSeen = 5
 }
 
 export enum NotificationType {

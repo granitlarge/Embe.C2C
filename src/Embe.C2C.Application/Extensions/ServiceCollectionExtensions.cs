@@ -1,6 +1,7 @@
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Authorizations.FactGenerators;
 using Embe.C2C.Application.Authorizations.FactStores.Conversations;
+using Embe.C2C.Application.Authorizations.FactStores.Judgements;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
@@ -29,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Messages.Handlers.CreateMessageHandler>();
         services.AddScoped<Commands.Messages.Handlers.DeleteMessageHandler>();
         services.AddScoped<Commands.Messages.Handlers.EditMessageHandler>();
+        services.AddScoped<Commands.Messages.Handlers.MarkMessagesAsSeenHandler>();
 
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
 
@@ -42,10 +44,13 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Queries.Messages.Handlers.GetMessagesByMatchingIdHandler>();
 
+        services.AddScoped<Queries.Judgements.Handlers.GetPositiveJudgementsHandler>();
+
         services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();
         services.AddScoped<MatchingAuthorizationFactStore>();
         services.AddScoped<MessageAuthorizationFactStore>();
+        services.AddScoped<JudgementAuthorizationFactStore>();
 
         services.AddScoped<UserFactGenerator>();
         services.AddScoped<MatchingFactGenerator>();
@@ -54,6 +59,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MatchingAuthorizationPolicy>();
         services.AddScoped<UserAuthorizationPolicy>();
         services.AddScoped<MessageAuthorizationPolicy>();
+        services.AddScoped<JudgementAuthorizationPolicy>();
 
         services.AddScoped<DomainEventHandler>();
         services.AddScoped<IntegrationEventHandler>();
@@ -61,7 +67,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UserService>();
         services.AddScoped<MatchingService>();
         services.AddScoped<JudgementService>();
-
 
         return services;
     }

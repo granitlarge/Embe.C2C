@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Authorizations.FactStores.Judgements.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Embe.C2C.Application.Dtos;
@@ -12,7 +13,9 @@ namespace Embe.C2C.Application.Authorizations;
 
 public class UserAuthorizationPolicy
 {
+
     private readonly UserAuthorizationFactStore _facts;
+
     private readonly IFileUrlGenerator _fileUrlGenerator;
 
     public UserAuthorizationPolicy
@@ -31,6 +34,7 @@ public class UserAuthorizationPolicy
         CancellationToken cancellationToken = default
     )
     {
+
         var (permissions, variant) = await GetAsync(user.Id, cancellationToken);
 
         var dto = await user.ToDtoAsync(variant, _fileUrlGenerator, cancellationToken);
@@ -42,6 +46,7 @@ public class UserAuthorizationPolicy
             dto,
             permissions
         );
+
     }
 
     public async ValueTask<(ImmutableHashSet<UserPermission> Permissions, UserVariant Variant)> GetAsync
@@ -55,9 +60,10 @@ public class UserAuthorizationPolicy
         var candidateUserFact = _facts.GetCandidateUserFact(userId);
         var sameUserFact = _facts.GetSameUserFact(userId);
         var matchedUserFact = await _facts.GetMatchedUserFactAsync(userId, cancellationToken);
+        var isPositivelyJudgedByUserFact = await _facts.GetIsPositivelyJudgedByUserFactAsync(userId, cancellationToken);
 
-        var permissions = GetPermissions(blockedByUserFact, blockingUserFact, candidateUserFact, sameUserFact, matchedUserFact);
-        var variant = GetVariant(blockedByUserFact, blockingUserFact, candidateUserFact, sameUserFact, matchedUserFact);
+        var permissions = GetPermissions(blockedByUserFact, blockingUserFact, candidateUserFact, sameUserFact, matchedUserFact, isPositivelyJudgedByUserFact);
+        var variant = GetVariant(blockedByUserFact, blockingUserFact, candidateUserFact, sameUserFact, matchedUserFact, isPositivelyJudgedByUserFact);
         return (permissions, variant);
     }
 
@@ -67,7 +73,8 @@ public class UserAuthorizationPolicy
         BlockingUserFact? isBlocking,
         CandidateUserFact? isCandidate,
         SameUserFact? isSame,
-        MatchedUserFact? isMatched
+        MatchedUserFact? isMatched,
+        IsPositivelyJudged? isPositivelyJudgedByUserFact = null
     )
     {
         if (isBlockedBy?.Value == true || isBlocking?.Value == true)
@@ -90,6 +97,11 @@ public class UserAuthorizationPolicy
             return UserVariant.Candidate;
         }
 
+        if (isPositivelyJudgedByUserFact?.Value == true)
+        {
+            return UserVariant.PositivelyJudged;
+        }
+
         return UserVariant.Empty;
     }
 
@@ -99,7 +111,8 @@ public class UserAuthorizationPolicy
         BlockingUserFact? isBlocking,
         CandidateUserFact? isCandidate,
         SameUserFact? isSame,
-        MatchedUserFact? isMatched
+        MatchedUserFact? isMatched,
+        IsPositivelyJudged? isPositivelyJudgedByUserFact = null
     )
     {
         if (isBlockedBy?.Value == true || isBlocking?.Value == true)
@@ -126,8 +139,14 @@ public class UserAuthorizationPolicy
             permissions.Add(UserPermission.Judge);
         }
 
+        if (isPositivelyJudgedByUserFact?.Value == true)
+        {
+            permissions.Add(UserPermission.View);
+        }
+
         return [.. permissions];
     }
+
 }
 
 public enum UserPermission

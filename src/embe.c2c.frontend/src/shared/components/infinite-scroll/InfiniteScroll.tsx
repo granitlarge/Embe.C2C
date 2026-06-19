@@ -5,7 +5,7 @@ import Surface from "../surfaces/Surface";
 import { Loader } from "@deemlol/next-icons";
 
 export type Position = "start" | "end" | "center";
-export type InfiniteScrollDirection = "up" | "down" ;
+export type InfiniteScrollDirection = "up" | "down";
 export type InfiniteScrollProps = {
     className?: string;
     children: React.ReactElement<React.LiHTMLAttributes<HTMLLIElement>>[];
@@ -109,7 +109,7 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
                     } else {
                         positionRef.current = "center";
                     }
-                } 
+                }
             };
 
             surface.current.addEventListener("scroll", listener);
@@ -122,20 +122,18 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
     }, [callback]);
 
     return (
-        <div ref={surface} className="overflow-scroll scrollbar-none">
-            <Surface as="ul" className={`${classNames}`} padding="none" variant="inherit">
-                {loadingMore && (direction === "up") && (
-                    <li className="flex justify-center">
-                        <Loader className="animate-spin text-(length:--fs-secondary) mx-auto" />
-                    </li>
-                )}
-                {children}
-                {loadingMore && (direction === "down") && (
-                    <li className="flex justify-center">
-                        <Loader className="animate-spin text-(length:--fs-secondary) mx-auto" />
-                    </li>
-                )}
-            </Surface>
+        <div ref={surface} className={`${classNames} overflow-scroll scrollbar-none surface-inherit`}>
+            {loadingMore && (direction === "up") && (
+                <li className="flex justify-center">
+                    <Loader className="animate-spin text-(length:--fs-secondary) mx-auto" />
+                </li>
+            )}
+            {children}
+            {loadingMore && (direction === "down") && (
+                <li className="flex justify-center">
+                    <Loader className="animate-spin text-(length:--fs-secondary) mx-auto" />
+                </li>
+            )}
         </div>
     )
 
