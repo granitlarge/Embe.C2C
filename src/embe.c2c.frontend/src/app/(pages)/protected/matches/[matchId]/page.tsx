@@ -1,13 +1,14 @@
 import { getMatching } from "@/src/features/matches/actions/action";
 import Match from "@/src/features/matches/components/Match";
 import { FailureReason } from "@/src/shared/api";
+import { Guid } from "@/src/shared/cache";
 import { getAuthenticatedUser } from "@/src/shared/user";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export type MatchPageProps = {
     params: Promise<{
-        matchId: string
+        matchId: Guid
     }>
 }
 export default async function MatchPage({ params }: MatchPageProps) {
