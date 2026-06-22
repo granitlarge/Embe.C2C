@@ -7,6 +7,13 @@ namespace Embe.C2C.Domain.Services;
 
 public class JudgementService : DomainService
 {
+    private readonly DomainEventStore _domainEventStore;
+
+    public JudgementService(DomainEventStore domainEventStore)
+    {
+        _domainEventStore = domainEventStore;
+    }
+
     public (Matching? Matching, Judgement Judgement) Judge
     (
         User judge,
@@ -31,7 +38,7 @@ public class JudgementService : DomainService
         var match = isMatch ? Matching.Create(judge.Id, judgee.Id) : null;
         if (match != null)
         {
-            AddDomainEvent(new MatchingCreatedEvent(judge.Id, match));
+            _domainEventStore.AddDomainEvent(new MatchingCreatedEvent(judge.Id, match));
         }
 
         return (match, judgement);

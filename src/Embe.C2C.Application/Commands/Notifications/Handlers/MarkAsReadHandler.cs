@@ -1,7 +1,9 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Notifications.Handlers;
 
@@ -11,9 +13,10 @@ public class MarkAsReadHandler : TransactionalCommandHandler<MarkAsReadCommand, 
     (
         IRepository context,
         DomainEventHandler domainEventHandler,
-        IntegrationEventHandler integrationEventHandler
+        IntegrationEventHandler integrationEventHandler,
+        DomainEventStore domainEventStore
     )
-        : base(context, domainEventHandler, integrationEventHandler)
+        : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
 
     }

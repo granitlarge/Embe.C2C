@@ -2,6 +2,8 @@ using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 
@@ -11,11 +13,12 @@ public class SignOutHandler : TransactionalCommandHandler<SignOutCommand, TypedR
 
     public SignOutHandler
     (
+        DomainEventStore domainEventStore,
         IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IAuthService authService
-    ) : base(context, domainEventHandler, integrationEventHandler)
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authService = authService;
     }

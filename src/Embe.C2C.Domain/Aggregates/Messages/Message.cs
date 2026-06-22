@@ -54,6 +54,16 @@ public class Message : Aggregate
         {
             return;
         }
+
+        if (seen)
+        {
+            AddDomainEvent(new MessageSeenEvent(this));
+        }
+        else
+        {
+            AddDomainEvent(new MessageUnseenEvent(this));
+        }
+
         SeenAt = seen ? DateTimeOffset.UtcNow : null;
     }
 

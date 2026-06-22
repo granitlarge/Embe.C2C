@@ -12,6 +12,7 @@ public static class MessageEndPoints
     public static void MapMessageEndPoints(this WebApplication app)
     {
         var group = app.MapGroup("/api/messages").RequireAuthorization();
+        group.MapGet("/{messageId:guid}", GetMessageById);
         group.MapGet("/", GetMatchingMessages);
         group.MapPost("/", CreateMessage);
         group.MapDelete("/{messageId:guid}", DeleteMessage);
@@ -75,6 +76,18 @@ public static class MessageEndPoints
     )
     {
         var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> GetMessageById
+    (
+        Guid messageId,
+        [FromServices] GetMessageByIdHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var query = new GetMessageByIdQuery(messageId);
+        var result = await handler.HandleAsync(query, cancellationToken);
         return result.ToResult();
     }
 }

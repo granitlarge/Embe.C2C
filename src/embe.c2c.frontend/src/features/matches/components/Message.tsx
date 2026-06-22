@@ -49,7 +49,7 @@ export default function Message({ className, dto, onEdit, onDelete, onReport, on
         <Surface className={`${classNames} w-full px-2 py-1`} padding="none" variant="none">
             <div className="flex flex-col gap-1">
                 <div className="flex gap-2 justify-between items-center">
-                    <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{isOwn ? "you" : "them"}</span>
+                    <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{isOwn ? "you" : "they"}</span>
                     <div className="flex gap-1 items-center">
                         {!isOwn && canReply && onReply && <button className="p-0 bg-transparent" onClick={onReply}><Reply className={actionIconClassNames} /></button>}
                         {canEdit && onEdit && <button className="p-0 bg-transparent" onClick={onEdit}><Edit className={actionIconClassNames} /></button>}

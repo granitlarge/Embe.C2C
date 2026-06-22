@@ -9,9 +9,11 @@ using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
@@ -30,8 +32,9 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
         IFileService fileService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
-        IWorkItemService workItemService
-    ) : base(context, domainEventHandler, integrationEventHandler)
+        IWorkItemService workItemService,
+        DomainEventStore domainEventStore
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _user = user;
         _authorizationPolicy = authorizationPolicy;

@@ -109,3 +109,17 @@ export async function markMessageAsSeen(...messageIds: Guid[]): Promise<ApiRespo
         )
     return response;
 }
+
+export async function getMessage(messageId: Guid): Promise<ApiResponse<ReadDto<Message, MessagePermission>, FailureReason>> {
+    const response = await Read<ReadDto<Message, MessagePermission>>
+        (
+            `${process.env.API_URL}/api/messages/${messageId}`,
+            {
+                method: "GET",
+                next: {
+                    tags: [`message:${messageId}`]
+                }
+            }
+        );
+    return response;
+}

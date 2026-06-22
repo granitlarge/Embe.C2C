@@ -7,6 +7,13 @@ namespace Embe.C2C.Domain.Services;
 
 public class UserService : DomainService
 {
+    private readonly DomainEventStore _domainEventStore;
+
+    public UserService(DomainEventStore domainEventStore)
+    {
+        _domainEventStore = domainEventStore;
+    }
+
     public void Delete
     (
         User user,
@@ -21,6 +28,6 @@ public class UserService : DomainService
         }
 
         user.Remove();
-        AddDomainEvent(new UserDeletedEvent(user));
+        _domainEventStore.AddDomainEvent(new UserDeletedEvent(user));
     }
 }

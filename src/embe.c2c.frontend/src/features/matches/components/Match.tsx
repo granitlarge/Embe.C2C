@@ -4,71 +4,18 @@ import { InfiniteScroll } from "@/src/shared/components/infinite-scroll/Infinite
 import { Matching, MatchingPermission, MessagePermission } from "@/src/shared/types/domain/aggregates"
 import { AuthenticatedUser } from "@/src/shared/user";
 import Message from "./Message";
-import { useEffect, useState } from "react";
-import { createMessage, deleteMessage, getMessages, markMessageAsSeen, updateMessage } from "../actions/action";
+import { useEffect, useRef, useState } from "react";
+import { createMessage, deleteMessage, getMessage, getMessages, markMessageAsSeen, updateMessage } from "../actions/action";
 import { Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
 import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
-import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAreaInput";
 import { Guid } from "@/src/shared/cache";
-import { Save, Send } from "@deemlol/next-icons";
-import { Ban } from "lucide-react";
 import Surface from "@/src/shared/components/surfaces/Surface";
+import { getOrCreateConnection } from "@/src/shared/signal-r";
+import { HubConnection } from "@microsoft/signalr";
+import { MessageCrafter } from "./MessageCrafter";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
-}
-
-type MessageCrafterProps = {
-
-    saveMessage: () => void;
-    onChange: (value: string) => void;
-    onCancel: () => void;
-    content: string | undefined,
-    editingId: Guid | undefined,
-    replyId: Guid | undefined,
-    replyToMessage: ReadDto<MessageTypeDef, MessagePermission> | undefined,
-    mode: "create" | "edit" | "reply";
-
-}
-function MessageCrafter({
-    saveMessage,
-    content = undefined,
-    replyToMessage = undefined,
-    mode = "create",
-    onChange,
-    onCancel,
-}: MessageCrafterProps) {
-
-    return (
-        <div className="relative flex gap-0">
-            {
-                mode === "reply" && <Message className="surface-tertiary absolute bottom-full mb-1" dto={replyToMessage!} isOwn={false} />
-            }
-            <TextAreaInput
-                value={content}
-                onChange={onChange}
-                placeholder="write a message.."
-                className="surface-secondary w-full p-3 rounded-l-lg grow-1"
-            >
-            </TextAreaInput>
-            <div className="surface-secondary rounded-r-lg flex flex-col justify-center p-2">
-                {
-                    mode === "create" &&
-                    <button className="max-w-max max-h-max my-auto" onClick={saveMessage}>
-                        <Send className="text-(--primary-fc) text-(length:--primary-fs)" />
-                    </button>
-                }
-                {
-                    (mode === "edit" || mode === "reply") &&
-                    <div className="flex flex-col gap-2 justify-center">
-                        <button className="text-(--primary-fc) text-(length:--primary-fs)" onClick={saveMessage}>{mode === "edit" ? <Save /> : <Send />}</button>
-                        <button className="text-(--primary-fc) text-(length:--primary-fs)" onClick={onCancel}><Ban /></button>
-                    </div>
-                }
-            </div>
-        </div>
-    );
-
 }
 
 export type MatchProps = {
@@ -78,11 +25,16 @@ export type MatchProps = {
 }
 export default function Match({ match, user, className }: MatchProps) {
 
+    const matchRef = useRef(match);
+    const partner = match.data.userId1 === user.userId ? match.data.user2 : match.data.user1;
+    const connection = useRef<HubConnection | null>(null);
+
+    const [partnerIsTyping, setPartnerIsTyping] = useState(false);
     const [messages, setMessages] = useState(sortMessages(match.data.conversation?.messages || []));
     const page = messages.length > 0 ? 2 : 1;
     const pageSize = messages.length > 0 ? messages.length : 50;
 
-    const defaultMessage = {
+    const defaultMessageCrafterConfig = {
         content: "",
         editingId: undefined,
         replyId: undefined,
@@ -94,7 +46,198 @@ export default function Match({ match, user, className }: MatchProps) {
         mode: "create" | "edit" | "reply";
         replyId: Guid | undefined;
         editingId: Guid | undefined;
-    }>(defaultMessage);
+    }>(defaultMessageCrafterConfig);
+
+    function onMessageDeleted(messageId: Guid) {
+
+        setMessages(prev =>
+            sortMessages(
+                prev.filter(dto => dto.data.id !== messageId)
+                    .map(dto => {
+                        if (dto.data.replyToMessageId === messageId) {
+                            return {
+                                ...dto,
+                                data: {
+                                    ...dto.data,
+                                    replyToMessageId: undefined,
+                                    replyToMessage: undefined
+                                }
+                            }
+                        } else {
+                            return dto;
+                        }
+                    })
+            ));
+
+        setMessageCrafterConfig(prev => {
+            if (prev.mode === "reply" && prev.replyId === messageId) {
+                return defaultMessageCrafterConfig;
+            }
+            return prev;
+        });
+
+    }
+
+    function onMessagesSeen(...messageIds: Guid[]) {
+        setMessages(prev =>
+            sortMessages(
+                prev.map(dto => {
+                    if (messageIds.includes(dto.data.id)) {
+                        return {
+                            ...dto,
+                            data: {
+                                ...dto.data,
+                                seenAt: new Date().toISOString()
+                            }
+                        }
+                    } else {
+                        return dto;
+                    }
+                })
+            ));
+    }
+
+    function onMessagesUnseen(...messageIds: Guid[]) {
+        setMessages(prev =>
+            sortMessages(
+                prev.map(dto => {
+                    if (messageIds.includes(dto.data.id)) {
+                        return {
+                            ...dto,
+                            data: {
+                                ...dto.data,
+                                seenAt: undefined
+                            }
+                        }
+                    } else {
+                        return dto;
+                    }
+                })
+            ));
+    }
+
+    useEffect(() => {
+        matchRef.current = match;
+    }, [match]);
+
+    useEffect(() => {
+
+        connection.current = getOrCreateConnection();
+
+        const onMessageAddedHandler = async (messageId: Guid, conversationId: Guid) => {
+
+            if (conversationId !== matchRef.current.data.conversation?.id) {
+                return;
+            }
+
+            const getMessageResponse = await getMessage(messageId);
+            if (!getMessageResponse.success) {
+                throw new Error("Not Implemented");
+            }
+
+            const newMessage = getMessageResponse.value!;
+            setMessages(prev => {
+                const otherMessages = prev.filter(m => m.data.id !== newMessage.data.id);
+                return sortMessages([...otherMessages, newMessage]);
+            });
+
+        };
+
+        const onMessageEditedHandler = async (messageId: Guid, conversationId: Guid) => {
+
+            if (conversationId !== matchRef.current.data.conversation?.id) {
+                return;
+            }
+
+            const getMessageResponse = await getMessage(messageId);
+            if (!getMessageResponse.success) {
+                throw new Error("Not Implemented");
+            }
+
+            const editedMessage = getMessageResponse.value!;
+
+            setMessages(prev => {
+                const otherMessages = prev.filter(m => m.data.id !== editedMessage.data.id);
+                return sortMessages([...otherMessages, editedMessage]);
+            });
+
+        };
+
+        const onMessageDeletedHandler = (messageId: Guid, conversationId: Guid) => {
+
+            if (conversationId !== matchRef.current.data.conversation?.id) {
+                return;
+            }
+
+            onMessageDeleted(messageId);
+
+        };
+
+        const onMessagesSeenHandler = (messageIds: Guid[], conversationId: Guid) => {
+
+            if (conversationId !== matchRef.current.data.conversation?.id) {
+                return;
+            }
+
+            onMessagesSeen(...messageIds);
+
+        };
+
+        const onMessagesUnseenHandler = (messageIds: Guid[], conversationId: Guid) => {
+
+            if (conversationId !== matchRef.current.data.conversation?.id) {
+                return;
+            }
+
+            onMessagesUnseen(...messageIds);
+
+        }
+
+        const onStartedTypingHandler = (conversationId: Guid) => {
+
+            if (conversationId !== matchRef.current.data.conversation?.id) {
+                return;
+            }
+
+            setPartnerIsTyping(true);
+
+        }
+
+        const onStoppedTypingHandler = (conversationId: Guid) => {
+
+            if (conversationId !== matchRef.current.data.conversation?.id) {
+                return;
+            }
+
+            setPartnerIsTyping(false);
+
+        }
+
+        connection.current.on("MessageAdded", onMessageAddedHandler);
+        connection.current.on("MessageEdited", onMessageEditedHandler);
+        connection.current.on("MessageDeleted", onMessageDeletedHandler);
+        connection.current.on("MessagesSeen", onMessagesSeenHandler);
+        connection.current.on("MessagesUnseen", onMessagesUnseenHandler);
+        connection.current.on("StartedTyping", onStartedTypingHandler);
+        connection.current.on("StoppedTyping", onStoppedTypingHandler);
+
+        if (connection.current.state === "Disconnected") {
+            connection.current.start().catch(err => {
+                console.error("Failed to start connection:", err);
+            });
+        }
+
+        return () => {
+            connection.current?.off("MessageAdded", onMessageAddedHandler);
+            connection.current?.off("MessageEdited", onMessageEditedHandler);
+            connection.current?.off("MessageDeleted", onMessageDeletedHandler);
+            connection.current?.off("MessagesSeen", onMessagesSeenHandler);
+            connection.current?.off("MessagesUnseen", onMessagesUnseenHandler);
+            connection.current?.off("StartedTyping", onStartedTypingHandler);
+            connection.current?.off("StoppedTyping", onStoppedTypingHandler);
+        }
+
+    }, []);
 
     useEffect(() => {
         const unseenNewMessages = messages.filter(nm => !nm.data.seenAt && nm.data.authorUserId !== user.userId);
@@ -135,7 +278,7 @@ export default function Match({ match, user, className }: MatchProps) {
                     const otherMessages = prev.filter(message => message.data.id !== editingId);
                     return sortMessages([...otherMessages, response.value!]);
                 });
-                setMessageCrafterConfig(defaultMessage);
+                setMessageCrafterConfig(defaultMessageCrafterConfig);
 
             } else {
 
@@ -155,7 +298,7 @@ export default function Match({ match, user, className }: MatchProps) {
 
             if (response.success) {
                 setMessages(prev => sortMessages([...prev, response.value!]));
-                setMessageCrafterConfig(defaultMessage);
+                setMessageCrafterConfig(defaultMessageCrafterConfig);
             } else {
                 throw new Error("Not Implemented");
             }
@@ -170,19 +313,7 @@ export default function Match({ match, user, className }: MatchProps) {
         }
         const response = await markMessageAsSeen(...messageIds);
         if (response.success) {
-            setMessages(prev => sortMessages(prev.map(message => {
-                if (messageIds.includes(message.data.id)) {
-                    return {
-                        ...message,
-                        data: {
-                            ...message.data,
-                            seenAt: new Date().toISOString()
-                        }
-                    }
-                } else {
-                    return message;
-                }
-            })));
+            onMessagesSeen(...messageIds);
         } else {
             throw new Error("Not Implemented");
         }
@@ -193,48 +324,44 @@ export default function Match({ match, user, className }: MatchProps) {
     }
 
     function onEdit(message: MessageTypeDef) {
+
+        if (messageCrafterConfig.mode === "edit") {
+            setMessageCrafterConfig(defaultMessageCrafterConfig);
+            return;
+        }
+
         setMessageCrafterConfig({
             content: message.content!,
             mode: "edit",
             editingId: message.id,
             replyId: undefined
         });
+
     }
 
     function onReply(message: MessageTypeDef) {
+
+        if (messageCrafterConfig.mode === "reply") {
+            setMessageCrafterConfig(defaultMessageCrafterConfig);
+            return;
+        }
+
         setMessageCrafterConfig({
             content: "",
             editingId: undefined,
             replyId: message.id,
             mode: "reply"
         });
+
     }
 
     async function onDelete(messageId: Guid) {
         const response = await deleteMessage(messageId);
         if (response.success) {
             if (messageCrafterConfig.mode === "edit" && messageCrafterConfig.editingId === messageId) {
-                setMessageCrafterConfig(defaultMessage);
+                setMessageCrafterConfig(defaultMessageCrafterConfig);
             }
-            setMessages(prev =>
-                sortMessages(
-                    prev
-                        .filter(dto => dto.data.id !== messageId)
-                        .map(dto => {
-                            if (dto.data.replyToMessageId === messageId) {
-                                return {
-                                    ...dto,
-                                    data: {
-                                        ...dto.data,
-                                        replyToMessageId: undefined,
-                                        replyToMessage: undefined
-                                    }
-                                }
-                            } else {
-                                return dto;
-                            }
-                        })
-                ));
+            onMessageDeleted(messageId);
         } else {
             throw new Error("Not Implemented");
         }
@@ -261,29 +388,30 @@ export default function Match({ match, user, className }: MatchProps) {
         />;
 
         if (isReply && !replyImmediatelyFollowsMessage) {
-            item = <Surface className={`relative w-full px-2 py-1 flex flex-col gap-2`} padding="none" variant="tertiary">
-                <span className={`text-(length:--secondary-fs) text-(--secondary-fc) absolute ${isOwn ? "right-1" : "left-1"}`}>reply</span>
-                {
+            item =
+                <Surface className={`relative w-full px-2 py-1 flex flex-col gap-2`} padding="none" variant="tertiary">
+                    <span className={`text-(length:--secondary-fs) text-(--secondary-fc) absolute ${isOwn ? "right-1" : "left-1"}`}>reply</span>
+                    {
 
-                    <>
-                        {
-                            isReplyDeleted ?
-                                <span className="text-(--secondary-fc) text-(length:--secondary-fs) italic mx-auto">replied message was deleted</span>
-                                :
-                                <Message className={`${isOwn ? "surface-secondary mr-auto" : "surface-message ml-auto"} max-w-max`} dto={message.data.replyToMessage!} isOwn={!isOwn} />
-                        }
-                        <Message
-                            className={`${isOwn ? "surface-message ml-auto" : "surface-secondary mr-auto"} max-w-max`}
-                            dto={message}
-                            isOwn={isOwn}
-                            onReport={() =>
-                                onReport(message.data.id)}
-                            onEdit={() => onEdit(message.data)}
-                            onDelete={() => onDelete(message.data.id)}
-                            onReply={() => onReply(message.data)} />
-                    </>
-                }
-            </Surface>
+                        <>
+                            {
+                                isReplyDeleted ?
+                                    <span className="text-(--secondary-fc) text-(length:--secondary-fs) italic mx-auto">replied message was deleted</span>
+                                    :
+                                    <Message className={`${isOwn ? "surface-secondary mr-auto" : "surface-message ml-auto"} max-w-max`} dto={message.data.replyToMessage!} isOwn={!isOwn} />
+                            }
+                            <Message
+                                className={`${isOwn ? "surface-message ml-auto" : "surface-secondary mr-auto"} max-w-max`}
+                                dto={message}
+                                isOwn={isOwn}
+                                onReport={() =>
+                                    onReport(message.data.id)}
+                                onEdit={() => onEdit(message.data)}
+                                onDelete={() => onDelete(message.data.id)}
+                                onReply={() => onReply(message.data)} />
+                        </>
+                    }
+                </Surface>
         }
 
         return (
@@ -294,22 +422,21 @@ export default function Match({ match, user, className }: MatchProps) {
     }) ?? [];
 
     return (
-
         <div className={`flex flex-col justify-between gap-3 ${className}`}>
-            <InfiniteScroll direction="up" className="flex flex-col gap-3 fs-group-primary" callback={loadMessages}>
+            <InfiniteScroll direction="up" className="flex flex-col gap-3  grow-1" callback={loadMessages}>
                 {items}
             </InfiniteScroll>
+            {
+                partnerIsTyping && <span className="text-(--primary-fc) text-(length:--primary-fs) italic">{partner?.data.userName} is typing...</span>
+            }
             <MessageCrafter
                 saveMessage={saveMessage}
-                onCancel={() => setMessageCrafterConfig(defaultMessage)}
+                onCancel={() => setMessageCrafterConfig(defaultMessageCrafterConfig)}
                 onChange={(value: string) => setMessageCrafterConfig(prev => ({ ...prev, content: value }))}
                 content={messageCrafterConfig.content}
-                editingId={messageCrafterConfig.editingId}
                 mode={messageCrafterConfig.mode}
-                replyId={messageCrafterConfig.replyId}
                 replyToMessage={messageCrafterConfig.replyId ? messages.find(m => m.data.id === messageCrafterConfig.replyId) : undefined}
             />
         </div>
-
     )
 }

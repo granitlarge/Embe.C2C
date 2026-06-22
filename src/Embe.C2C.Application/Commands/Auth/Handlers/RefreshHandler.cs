@@ -2,6 +2,7 @@ using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 
@@ -14,8 +15,9 @@ public class RefreshHandler : TransactionalCommandHandler<RefreshCommand, TypedR
         IAuthService authService,
         IRepository context,
         DomainEventHandler domainEventHandler,
-        IntegrationEventHandler integrationEventHandler
-    ) : base(context, domainEventHandler, integrationEventHandler)
+        IntegrationEventHandler integrationEventHandler,
+        DomainEventStore domainEventStore
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authService = authService;
     }

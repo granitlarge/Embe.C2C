@@ -3,8 +3,10 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
@@ -21,8 +23,9 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
         UserService userService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
-        IAuthService authService
-    ) : base(context, domainEventHandler, integrationEventHandler)
+        IAuthService authService,
+        DomainEventStore domainEventStore
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authorizationPolicy = authorizationPolicy;
         _userService = userService;

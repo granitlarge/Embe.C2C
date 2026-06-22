@@ -3,9 +3,11 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
@@ -22,8 +24,9 @@ public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCom
         MatchingService matchingService,
         IRepository context,
         DomainEventHandler domainEventHandler,
-        IntegrationEventHandler integrationEventHandler
-    ) : base(context, domainEventHandler, integrationEventHandler)
+        IntegrationEventHandler integrationEventHandler,
+        DomainEventStore domainEventStore
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _messageAuthorizationPolicy = messageAuthorizationPolicy;
         _authenticatedUser = authenticatedUser;

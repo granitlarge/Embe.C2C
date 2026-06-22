@@ -4,7 +4,13 @@ public enum IntegrationEventType
 {
     NotificationCreated,
     NotificationUpdated,
-    NotificationDeleted
+    NotificationDeleted,
+
+    MessageCreated,
+    MessageEdited,
+    MessageDeleted,
+    MessageSeen,
+    MessageUnseen
 }
 
 public record IntegrationEvent(IntegrationEventType Type)

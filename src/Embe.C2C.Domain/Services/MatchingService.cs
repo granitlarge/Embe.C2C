@@ -10,6 +10,13 @@ namespace Embe.C2C.Domain.Services;
 
 public class MatchingService : DomainService
 {
+    private readonly DomainEventStore _domainEventStore;
+
+    public MatchingService(DomainEventStore domainEventStore)
+    {
+        _domainEventStore = domainEventStore;
+    }
+
     public Message SendMessage
     (
         User author,
@@ -26,7 +33,7 @@ public class MatchingService : DomainService
 
         var conversation = matching.Conversation;
         var message = Message.Create(conversation.Id, replyToMessage?.Id, author.Id, content);
-        AddDomainEvent(new MessageSentEvent(message));
+        _domainEventStore.AddDomainEvent(new MessageCreatedEvent(message));
         conversation.UpdateLastMessageId(message.Id);
         conversation.IncrementMessageCount();
 
@@ -41,12 +48,13 @@ public class MatchingService : DomainService
         }
 
         message.Edit(newContent);
+        _domainEventStore.AddDomainEvent(new MessageEditedEvent(message));
     }
 
     public void DeleteMessage
     (
-        User deleter, 
-        Message message, 
+        User deleter,
+        Message message,
         Message? newLastMessage,
         Matching matching,
         List<Message> replies
@@ -74,5 +82,7 @@ public class MatchingService : DomainService
         {
             reply.ReplyMessageRemoved();
         }
+
+        _domainEventStore.AddDomainEvent(new MessageRemovedEvent(message));
     }
 }

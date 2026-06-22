@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Services;
@@ -24,7 +25,7 @@ public class AuthService
     private readonly UserManager<MyIdentityUser> _userManager = userManager;
     private readonly IAuthenticatedUserService _userService = userService;
     private readonly Settings _settings = settings;
-    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan _refreshTokenLifetime = TimeSpan.FromDays(7);
 
     public async Task<TypedResult<RefreshFailureReason, Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
@@ -180,9 +181,10 @@ public class AuthService
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
-            new System.Security.Claims.Claim("sub", identityUser.Id),
-            new System.Security.Claims.Claim("userId", user.Id.ToString()),
-            new System.Security.Claims.Claim("refreshTokenId", refreshToken.Id.ToString()),
+            new Claim("sub", user.Id.ToString()),
+            new Claim("userId", user.Id.ToString()),
+            new Claim("identityUserId", identityUser.Id),
+            new Claim("refreshTokenId", refreshToken.Id.ToString()),
         };
 
         var jwtSecurityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken
@@ -205,9 +207,10 @@ public class AuthService
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
-            new System.Security.Claims.Claim("sub", identityUser.Id),
-            new System.Security.Claims.Claim("userId", user.Id.ToString()),
-            new System.Security.Claims.Claim("tokenId", tokenId.ToString()),
+            new Claim("sub", user.Id.ToString()),
+            new Claim("identityUserId", identityUser.Id),
+            new Claim("userId", user.Id.ToString()),
+            new Claim("tokenId", tokenId.ToString()),
         };
 
         var jwtSecurityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken

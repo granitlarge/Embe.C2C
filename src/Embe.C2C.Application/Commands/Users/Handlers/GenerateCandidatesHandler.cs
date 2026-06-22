@@ -6,6 +6,8 @@ using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
@@ -16,9 +18,11 @@ public class GenerateCandidatesHandler
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
-    UserAuthorizationFactStore userAuthorizationFactStore
+    UserAuthorizationFactStore userAuthorizationFactStore,
+    DomainEventStore domainEventStore
 ) : TransactionalCommandHandler<GenerateCandidatesCommand, Result<List<ReadDto<UserDto, UserPermission>>>>
 (
+    domainEventStore,
     context,
     domainEventHandler,
     integrationEventHandler

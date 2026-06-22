@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { AccessTokenName, RefreshTokenName, TokenCookieOptions } from "./constants";
 import { ApiResponse, FailureReason } from "../api";
+import * as jwtdecode from "jwt-decode";
 
 export type Token = {
     token: string;
@@ -34,12 +35,29 @@ async function deleteToken(name: typeof AccessTokenName | typeof RefreshTokenNam
 export async function getRefreshToken(): Promise<string | undefined> {
     const cookie = await cookies();
     const refreshToken = cookie.get(RefreshTokenName)?.value;
+    const decodedToken = refreshToken ? jwtdecode.jwtDecode<{ exp: number }>(refreshToken) : null;
+    if (decodedToken) {
+        const expiresAt = new Date(decodedToken.exp * 1000);
+        if (expiresAt < new Date()) {
+            await deleteToken(AccessTokenName);
+            await deleteToken(RefreshTokenName);
+            return undefined;
+        }
+    }
     return refreshToken;
 }
 
-export async function getAccessToken() {
+export async function getAccessToken(): Promise<string | undefined> {
     const cookie = await cookies();
     const accessToken = cookie.get(AccessTokenName)?.value;
+    const decodedToken = accessToken ? jwtdecode.jwtDecode<{ exp: number }>(accessToken) : null;
+    if (decodedToken) {
+        const expiresAt = new Date(decodedToken.exp * 1000);
+        if (expiresAt < new Date()) {
+            await deleteToken(AccessTokenName);
+            return undefined;
+        }
+    }
     return accessToken;
 }
 

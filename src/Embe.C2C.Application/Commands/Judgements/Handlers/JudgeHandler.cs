@@ -6,8 +6,10 @@ using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 namespace Embe.C2C.Application.Commands.Judgements.Handlers;
 
 public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
@@ -27,8 +29,9 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         IntegrationEventHandler integrationEventHandler,
         IAuthenticatedUserService userService,
         MatchingAuthorizationPolicy matchingAuthorizationPolicy,
-        UserAuthorizationFactStore userAuthorizationFactStore
-    ) : base(context, domainEventHandler, integrationEventHandler)
+        UserAuthorizationFactStore userAuthorizationFactStore,
+        DomainEventStore domainEventStore
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _userAuthorizationPolicy = userAuthorizationPolicy;
         _judgementService = judgementService;

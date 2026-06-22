@@ -1,5 +1,6 @@
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 
 namespace Embe.C2C.Application.Commands;
 
@@ -7,17 +8,20 @@ public record TransactionalCommandResult<T>(bool CommitChanges, T Value);
 
 public abstract class TransactionalCommandHandler<T_Command, T_Result>
 {
+    private readonly DomainEventStore _domainEventStore;
     private readonly IRepository _context;
     private readonly DomainEventHandler _domainEventHandler;
     private readonly IntegrationEventHandler _integrationEventHandler;
 
     public TransactionalCommandHandler
     (
+        DomainEventStore domainEventStore,
         IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler
     )
     {
+        _domainEventStore = domainEventStore;
         _context = context;
         _domainEventHandler = domainEventHandler;
         _integrationEventHandler = integrationEventHandler;
@@ -28,7 +32,7 @@ public abstract class TransactionalCommandHandler<T_Command, T_Result>
         using var transaction = await _context.BeginTransactionAsync(cancellationToken);
         var result = await HandleAsync(new SparseRepository(_context), command, cancellationToken);
 
-        foreach (var domainEvent in _context.DomainEvents)
+        foreach (var domainEvent in _context.DomainEvents.Union(_domainEventStore.DomainEvents))
         {
             await _domainEventHandler.HandleAsync(domainEvent, cancellationToken);
         }

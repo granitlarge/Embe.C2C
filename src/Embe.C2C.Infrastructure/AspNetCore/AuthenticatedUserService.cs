@@ -1,6 +1,5 @@
 using Embe.C2C.Application.Abstractions.Services;
 using Microsoft.AspNetCore.Http;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Embe.C2C.Infrastructure.AspNetCore;
 
@@ -24,20 +23,6 @@ public class AuthenticatedUserService(IHttpContextAccessor httpContextAccessor) 
                 return userId;
             }
             return null;
-        }
-    }
-
-    public string? Subject
-    {
-        get
-        {
-            var user = _httpContextAccessor.HttpContext?.User;
-            if (user == null || user.Identity?.IsAuthenticated != true)
-            {
-                return null;
-            }
-
-            return user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         }
     }
 }

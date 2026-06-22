@@ -5,11 +5,13 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Policies;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
@@ -22,6 +24,7 @@ public class CreateMessageHandler : TransactionalCommandHandler<CreateMessageCom
 
     public CreateMessageHandler
     (
+        DomainEventStore domainEventStore,
         MatchingAuthorizationPolicy matchingAuthorizationPolicy,
         MessageAuthorizationPolicy messageAuthorizationPolicy,
         IAuthenticatedUserService authenticatedUser,
@@ -29,7 +32,7 @@ public class CreateMessageHandler : TransactionalCommandHandler<CreateMessageCom
         IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler
-    ) : base(context, domainEventHandler, integrationEventHandler)
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _matchingAuthorizationPolicy = matchingAuthorizationPolicy;
         _messageAuthorizationPolicy = messageAuthorizationPolicy;

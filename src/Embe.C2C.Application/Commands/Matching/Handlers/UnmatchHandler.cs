@@ -3,7 +3,9 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Matching.Handlers;
 
@@ -18,8 +20,9 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         MatchingAuthorizationPolicy authorizationPolicy,
-        IAuthenticatedUserService userService
-    ) : base(context, domainEventHandler, integrationEventHandler)
+        IAuthenticatedUserService userService,
+        DomainEventStore domainEventStore
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authorizationPolicy = authorizationPolicy;
         _userService = userService;

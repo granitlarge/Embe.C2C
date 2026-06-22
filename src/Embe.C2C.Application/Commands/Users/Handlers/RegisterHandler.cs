@@ -7,9 +7,11 @@ using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
+using Microsoft.Extensions.DependencyInjection;
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, TypedResult<RegisterUserFailureReason, User>>
@@ -25,8 +27,9 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IWorkItemService workItemService,
-        IAuthService authService
-    ) : base(context, domainEventHandler, integrationEventHandler)
+        IAuthService authService,
+        DomainEventStore domainEventStore
+    ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _fileService = fileService;
         _workItemService = workItemService;

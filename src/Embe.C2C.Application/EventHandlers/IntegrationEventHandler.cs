@@ -1,20 +1,16 @@
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Events;
+using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
 
 namespace Embe.C2C.Application.EventHandlers;
 
 public class IntegrationEventHandler
+(
+    INotificationService notificationService
+)
 {
-    private readonly INotificationService _notificationService;
-
-    public IntegrationEventHandler
-    (
-        INotificationService notificationService
-    )
-    {
-        _notificationService = notificationService;
-    }
+    private readonly INotificationService _notificationService = notificationService;
 
     public async Task HandleAsync(IntegrationEventCollector eventCollector, CancellationToken cancellationToken = default)
     {
@@ -24,6 +20,9 @@ public class IntegrationEventHandler
 
     private async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
     {
+        // Notify clients about the event using the notification service
+        await _notificationService.SendNotificationAsync(integrationEvent, cancellationToken);
+
         switch (integrationEvent)
         {
             case NotificationCreatedEvent notificationCreatedEvent:
@@ -40,7 +39,42 @@ public class IntegrationEventHandler
         CancellationToken cancellationToken = default
     )
     {
-        var notification = notificationCreatedEvent.Notification;
-        await _notificationService.SendNotificationAsync(notification, cancellationToken);
+
+    }
+
+    private async Task HandleMessageCreatedEventAsync
+    (
+        MessageCreated messageCreatedEvent,
+        CancellationToken cancellationToken = default
+    )
+    {
+
+    }
+
+    private async Task HandleMessageEditedEventAsync
+    (
+        MessageEdited messageEditedEvent,
+        CancellationToken cancellationToken = default
+    )
+    {
+
+    }
+
+    private async Task HandleMessageDeletedEventAsync
+    (
+        MessageDeleted messageDeletedEvent,
+        CancellationToken cancellationToken = default
+    )
+    {
+
+    }
+
+    private async Task HandleMessageSeenEventAsync
+    (
+        MessageSeen messageSeenEvent,
+        CancellationToken cancellationToken = default
+    )
+    {
+
     }
 }

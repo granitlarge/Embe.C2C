@@ -2,7 +2,9 @@ using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
@@ -11,8 +13,9 @@ public class MarkMessagesAsSeenHandler
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
-    MessageAuthorizationPolicy messageAuthoriztionPolicy
-) : TransactionalCommandHandler<MarkMessagesAsSeenCommand, Result>(context, domainEventHandler, integrationEventHandler)
+    MessageAuthorizationPolicy messageAuthoriztionPolicy,
+    DomainEventStore domainEventStore
+) : TransactionalCommandHandler<MarkMessagesAsSeenCommand, Result>(domainEventStore, context, domainEventHandler, integrationEventHandler)
 {
     private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy = messageAuthoriztionPolicy;
 

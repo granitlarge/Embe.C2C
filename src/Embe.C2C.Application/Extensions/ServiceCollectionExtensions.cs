@@ -6,6 +6,7 @@ using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,6 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingByIdHandler>();
 
         services.AddScoped<Queries.Messages.Handlers.GetMessagesByMatchingIdHandler>();
+        services.AddScoped<Queries.Messages.Handlers.GetMessageByIdHandler>();
 
         services.AddScoped<Queries.Judgements.Handlers.GetPositiveJudgementsHandler>();
 
@@ -64,6 +66,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<DomainEventHandler>();
         services.AddScoped<IntegrationEventHandler>();
 
+        services.AddScoped<DomainEventStore>();
         services.AddScoped<UserService>();
         services.AddScoped<MatchingService>();
         services.AddScoped<JudgementService>();

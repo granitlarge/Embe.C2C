@@ -1,13 +1,24 @@
 using Embe.C2C.Api.EndPoints;
-using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Infrastructure;
 using Embe.C2C.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Authentication;
+using Embe.C2C.Infrastructure.SignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = new Settings(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthorization();
@@ -41,6 +52,21 @@ builder.Services.AddAuthentication(options =>
             ClockSkew = TimeSpan.Zero,
             ValidateIssuerSigningKey = true
         };
+
+        options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     })
     .AddJwtBearer("Refresh", options =>
     {
@@ -63,6 +89,7 @@ builder.Services.AddAuthentication(options =>
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -73,5 +100,10 @@ app.MapMatchingEndPoints();
 app.MapJudgementEndPoints();
 app.MapNotificationEndPoints();
 app.MapMessageEndPoints();
+
+app.MapHub<MainHub>("/hubs/main", options =>
+{
+    options.CloseOnAuthenticationExpiration = true;
+});
 
 app.Run();
