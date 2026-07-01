@@ -12,7 +12,6 @@ public record UserWriteDto
     string? UserName,
     DateOnly? BirthDate,
     Gender? Gender,
-    DatingPreferencesWriteDto? DatingPreferences,
     LocationWriteDto? Location,
     FileWriteDto? ProfilePicture,
     ImmutableHashSet<FileWriteDto>? Files,

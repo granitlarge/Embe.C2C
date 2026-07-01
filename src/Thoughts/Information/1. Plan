@@ -1,0 +1,24 @@
+We're looking to collect information about individuals to be used in matching.
+
+* Which basic/general information should we collect?
+
+* Alias
+* Age
+* Gender
+
+Search Profiles
+
+* Are you looking to meet virtually, IRL or both?
+* How long would you like the relationship to last (relationship boundedness)? one-time, fixed duration (at which point the user specifies a date range), open (ongoing)
+* How often would you like to engage with this person (relationship interaction frequency)? Once, Daily, Weekly, Monthly, Yearly. If the user specified boundedness to be one-time then this question is already answered.
+
+We'll need to store this information in a way that can be queried efficiently. First we must figure out what kind of information we'll store, and how we'll query it.
+
+Matching, fundamentally, is a search process. Individual A is searching for an individual X, as described by their search profile. We'll do hard filtering 
+initially, then we'll calculate compatibility scores and rank the resulting set. 
+
+The compatibility calculation is allowed to be slow, but the hard filtering is not.
+When we do hard filtering, we'll mostly execute the following operations:
+
+* Comparing whether two values are equal
+* Comparing whether ranges overlap or are contained within each other

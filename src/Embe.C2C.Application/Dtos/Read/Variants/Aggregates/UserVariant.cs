@@ -11,7 +11,6 @@ public record UserVariant
         includeBirthDate: false,
         includeAge: false,
         includeGender: false,
-        datingPreferencesVariant: DatingPreferencesVariant.Empty,
         includeLocation: false,
         includeProfilePicture: false,
         includeFiles: false,
@@ -26,7 +25,6 @@ public record UserVariant
         includeBirthDate: false,
         includeAge: false,
         includeGender: false,
-        datingPreferencesVariant: DatingPreferencesVariant.Empty,
         includeLocation: false,
         includeProfilePicture: false,
         includeFiles: false,
@@ -41,7 +39,6 @@ public record UserVariant
         includeBirthDate: false,
         includeAge: true,
         includeGender: true,
-        datingPreferencesVariant: DatingPreferencesVariant.Matched,
         includeLocation: false,
         includeProfilePicture: true,
         includeFiles: true,
@@ -56,7 +53,6 @@ public record UserVariant
         includeBirthDate: false,
         includeAge: true,
         includeGender: true,
-        datingPreferencesVariant: DatingPreferencesVariant.Empty,
         includeLocation: false,
         includeProfilePicture: true,
         includeFiles: true,
@@ -71,7 +67,6 @@ public record UserVariant
         includeBirthDate: false,
         includeAge: true,
         includeGender: true,
-        datingPreferencesVariant: DatingPreferencesVariant.Empty,
         includeLocation: false,
         includeProfilePicture: true,
         includeFiles: true,
@@ -86,7 +81,6 @@ public record UserVariant
         includeBirthDate: true,
         includeAge: true,
         includeGender: true,
-        datingPreferencesVariant: DatingPreferencesVariant.Full,
         includeLocation: true,
         includeProfilePicture: true,
         includeFiles: true,
@@ -101,7 +95,6 @@ public record UserVariant
         bool includeBirthDate,
         bool includeAge,
         bool includeGender,
-        DatingPreferencesVariant datingPreferencesVariant,
         bool includeLocation,
         bool includeProfilePicture,
         bool includeFiles,
@@ -114,7 +107,6 @@ public record UserVariant
         IncludeBirthDate = includeBirthDate;
         IncludeAge = includeAge;
         IncludeGender = includeGender;
-        DatingPreferencesVariant = datingPreferencesVariant;
         IncludeLocation = includeLocation;
         IncludeProfilePicture = includeProfilePicture;
         IncludeFiles = includeFiles;
@@ -127,7 +119,6 @@ public record UserVariant
     public bool IncludeBirthDate { get; }
     public bool IncludeAge { get; }
     public bool IncludeGender { get; }
-    public DatingPreferencesVariant DatingPreferencesVariant { get; }
     public bool IncludeLocation { get; }
     public bool IncludeProfilePicture { get; }
     public bool IncludeFiles { get; }

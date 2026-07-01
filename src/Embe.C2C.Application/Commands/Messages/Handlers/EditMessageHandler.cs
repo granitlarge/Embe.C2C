@@ -56,7 +56,10 @@ public class EditMessageHandler : TransactionalCommandHandler<EditMessageCommand
             if (user is null)
                 return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 
-            var message = await context.MessagesQuery.SingleOrDefaultAsync(m => m.Id == command.MessageId, cancellationToken);
+            var message = await context.MessagesQuery
+                .Include(m => m.ReplyToMessage)
+                .SingleOrDefaultAsync(m => m.Id == command.MessageId, cancellationToken);
+
             if (message is null)
                 return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Message not found."));
 

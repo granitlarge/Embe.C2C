@@ -1,10 +1,8 @@
-import RegisterForm from "@/src/features/auth/components/RegisterForm"
-
+import RegisterForm from "@/src/features/auth/components/register/RegisterForm"
 
 export type RegisterPageProps = {
 
 }
-
 export default async function RegisterPage({ }: RegisterPageProps) {
 
     return (
@@ -13,4 +11,5 @@ export default async function RegisterPage({ }: RegisterPageProps) {
             <RegisterForm className="w-[600px] max-w-[100%]" />
         </div>
     )
+
 }

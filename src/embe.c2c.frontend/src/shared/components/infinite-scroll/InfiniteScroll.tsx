@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import Surface from "../surfaces/Surface";
 import { Loader } from "@deemlol/next-icons";
 
 export type Position = "start" | "end" | "center";
@@ -88,8 +87,9 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
                 const scrollTop = surface.current.scrollTop;
                 const clientHeight = surface.current.clientHeight;
 
-                const isAtTop = Math.abs(scrollTop - 0) < 4;
-                const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < 4;
+                const comparisonPixelThreshold = 4;
+                const isAtTop = Math.abs(scrollTop) < comparisonPixelThreshold;
+                const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < comparisonPixelThreshold;
 
                 if (direction === "down") {
                     if (isAtTop) {

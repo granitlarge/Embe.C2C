@@ -14,10 +14,19 @@ public record CreateFileDto
 public sealed record RegisterCommand
 (
     string Email,
-    string UserName,
+    string Alias,
     string Password,
-    DateOnly BirthDate,
-    Gender Gender,
-    DatingPreferencesWriteDto DatingPreferences,
-    ImmutableHashSet<CreateFileDto> Files
+    DateOnly BirthDate
+);
+
+public sealed record CreateSearchProfileDto
+(
+    string Name,
+    string Description,
+    RelationshipType RelationshipType,
+    EngagementWriteDto Engagement,
+    ImmutableHashSet<Gender> Genders,
+    Age? AgeRangeMin,
+    Age? AgeRangeMax,
+    Distance? MaximumDistance
 );

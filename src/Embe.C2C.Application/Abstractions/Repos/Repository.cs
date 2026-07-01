@@ -6,6 +6,7 @@ using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -26,6 +27,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IDbSet<Notification> Notifications { get; }
         public IDbSet<Message> Messages { get; }
         public IDbSet<Blocking> Blockings { get; }
+        public IDbSet<SearchProfile> SearchProfiles { get; }
 
         public IQueryable<User> DomainUsersQuery { get; }
         public IQueryable<Account> AccountsQuery { get; }
@@ -34,6 +36,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Notification> NotificationsQuery { get; }
         public IQueryable<Message> MessagesQuery { get; }
         public IQueryable<Blocking> BlockingsQuery { get; }
+        public IQueryable<SearchProfile> SearchProfilesQuery { get; }
 
         public Task<List<User>> GenerateCandidatesForUserIdAsync
         (
@@ -79,12 +82,13 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IDbSet<Notification> Notifications => _context.Notifications;
         public IDbSet<Message> Messages => _context.Messages;
         public IDbSet<Blocking> Blockings => _context.Blockings;
-
+        public IDbSet<SearchProfile> SearchProfiles => _context.SearchProfiles;
         public IQueryable<User> DomainUsersQuery => _context.DomainUsersQuery;
         public IQueryable<Account> AccountsQuery => _context.AccountsQuery;
         public IQueryable<Judgement> JudgementsQuery => _context.JudgementsQuery;
         public IQueryable<Matching> MatchingsQuery => _context.MatchingsQuery;
         public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
+        public IQueryable<SearchProfile> SearchProfilesQuery => _context.SearchProfilesQuery;
         public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
         public IQueryable<Blocking> BlockingsQuery => _context.BlockingsQuery;
 

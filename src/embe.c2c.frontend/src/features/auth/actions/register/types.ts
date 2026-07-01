@@ -1,14 +1,10 @@
 import { Gender, DatingPreferences, FileDetails } from "@/src/shared/types/domain/value-objects";
-import { CreateFile } from "@/src/shared/types/dtos/types";
 
 export type RegisterRequest = {
     email: string,
-    userName?: string;
+    alias?: string;
     password: string,
     birthDate: string,
-    gender: Gender,
-    datingPreferences: DatingPreferences,
-    files: CreateFile[]
 }
 
 export enum RegisterUserFailureReason {

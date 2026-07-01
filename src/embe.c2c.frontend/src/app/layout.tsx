@@ -27,7 +27,7 @@ export default async function RootLayout({
       lang="en"
     >
 
-      <Surface as="body" className={`fs-group-primary flex flex-col justify-between h-dvh w-dvw px-2 pb-2 ${calSans.variable} gap-2`} variant="primary" padding="none">
+      <Surface as="body" className={`fs-group-primary flex flex-col justify-between h-dvh w-dvw px-2 pb-2 ${calSans.variable} gap-2 max-w-[1200px] mx-auto`} variant="primary" padding="none">
 
         <main className="grow-1 overflow-y-scroll scrollbar-none flex flex-col overflow-x-hidden">
           {children}

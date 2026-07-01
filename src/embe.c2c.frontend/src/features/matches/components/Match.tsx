@@ -378,7 +378,7 @@ export default function Match({ match, user, className }: MatchProps) {
         const replyImmediatelyFollowsMessage = indexOfReply === indexOfMessage - 1;
 
         let item = <Message
-            className={`max-w-max ${isOwn ? "ml-auto" : "mr-auto"} ${isOwn ? "surface-message" : "surface-secondary"}`}
+            className={`${isOwn ? "ml-auto" : "mr-auto"} ${isOwn ? "surface-message" : "surface-secondary"}`}
             dto={message}
             isOwn={isOwn}
             onReport={() => onReport(message.data.id)}
@@ -398,10 +398,10 @@ export default function Match({ match, user, className }: MatchProps) {
                                 isReplyDeleted ?
                                     <span className="text-(--secondary-fc) text-(length:--secondary-fs) italic mx-auto">replied message was deleted</span>
                                     :
-                                    <Message className={`${isOwn ? "surface-secondary mr-auto" : "surface-message ml-auto"} max-w-max`} dto={message.data.replyToMessage!} isOwn={!isOwn} />
+                                    <Message className={`${isOwn ? "surface-secondary mr-auto" : "surface-message ml-auto"}`} dto={message.data.replyToMessage!} isOwn={!isOwn} />
                             }
                             <Message
-                                className={`${isOwn ? "surface-message ml-auto" : "surface-secondary mr-auto"} max-w-max`}
+                                className={`${isOwn ? "surface-message ml-auto" : "surface-secondary mr-auto"}`}
                                 dto={message}
                                 isOwn={isOwn}
                                 onReport={() =>
@@ -423,7 +423,7 @@ export default function Match({ match, user, className }: MatchProps) {
 
     return (
         <div className={`flex flex-col justify-between gap-3 ${className}`}>
-            <InfiniteScroll direction="up" className="flex flex-col gap-3  grow-1" callback={loadMessages}>
+            <InfiniteScroll direction="up" className="flex flex-col gap-3 grow-1" callback={loadMessages}>
                 {items}
             </InfiniteScroll>
             {

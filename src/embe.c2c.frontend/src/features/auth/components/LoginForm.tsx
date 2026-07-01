@@ -51,7 +51,7 @@ export default function LoginForm({ className }: LoginFormProps) {
                         setError("an unknown error occurred");
                 }
             } else {
-                router.replace("/protected/swipe");
+                router.replace("/protected/find");
             }
 
         }

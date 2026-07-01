@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
@@ -17,8 +16,8 @@ public class UserConfiguration : AggregateConfiguration<User>
 
         builder.Property(u => u.Gender).HasConversion
         (
-            gender => Enum.GetName(gender)!,
-            value => Enum.Parse<Gender>(value)
+            gender => gender != null ? Enum.GetName(gender.Value)! : null,
+            value => value != null ? Enum.Parse<Gender>(value) : null
         );
 
         builder.Property(u => u.Email)
@@ -27,10 +26,10 @@ public class UserConfiguration : AggregateConfiguration<User>
                 value => Email.Create(value))
             .IsRequired();
 
-        builder.Property(u => u.UserName)
+        builder.Property(u => u.Alias)
             .HasConversion(
                 userName => userName.Value,
-                value => UserName.Create(value))
+                value => Alias.Create(value))
             .IsRequired();
 
         builder.Property(u => u.BirthDate)
@@ -38,34 +37,6 @@ public class UserConfiguration : AggregateConfiguration<User>
                 birthDate => birthDate.Value,
                 value => new BirthDate(value))
             .IsRequired();
-
-        builder
-            .ComplexProperty(u => u.DatingPreferences, dp =>
-            {
-                dp.Property(d => d.AgeRangeMin)
-                    .HasConversion(
-                        age => age.Value,
-                        value => new Age(value))
-                    .IsRequired();
-
-                dp.Property(d => d.AgeRangeMax)
-                    .HasConversion(
-                        age => age.Value,
-                        value => new Age(value))
-                    .IsRequired();
-
-                dp.Property(d => d.MaximumDistance)
-                    .HasConversion(
-                        distance => distance.ToKilometers().Value,
-                        value => new Distance(value, LengthUnit.Kilometers))
-                    .IsRequired();
-
-                dp.Property(d => d.InterestedInGenders)
-                    .HasConversion(
-                        genders => string.Join(',', genders.Select(g => Enum.GetName(g))),
-                        value => value.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(e => Enum.Parse<Gender>(e)).ToImmutableHashSet())
-                    .IsRequired();
-            });
 
         builder.Property(u => u.Location)
             .HasConversion(

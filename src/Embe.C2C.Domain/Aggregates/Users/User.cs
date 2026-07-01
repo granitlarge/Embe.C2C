@@ -14,16 +14,15 @@ public class User : Aggregate
     private User
     (
         Email email,
-        UserName userName,
+        Alias alias,
         BirthDate birthDate,
-        Gender gender,
-        DatingPreferences datingPreferences,
+        Gender? gender,
         Location? location,
-        ImmutableHashSet<FileDetails> files,
+        ImmutableHashSet<FileDetails>? files,
         string identityUserId
     )
     {
-        if (files.Count < 2 || files.Count > 10)
+        if (files != null && (files.Count > 10))
         {
             throw new DomainException(new DomainError<UserError>(UserError.InvalidFileCount));
         }
@@ -36,18 +35,20 @@ public class User : Aggregate
         Id = Guid.CreateVersion7();
         IdentityUserId = identityUserId;
         Email = email;
-        UserName = userName;
+        Alias = alias;
         BirthDate = birthDate;
         Gender = gender;
-        DatingPreferences = datingPreferences;
         Location = location;
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
 
         _files = [];
-        foreach (var file in files)
+        if (files != null)
         {
-            AddFile(Id, file);
+            foreach (var file in files)
+            {
+                AddFile(Id, file);
+            }
         }
 
         AddDomainEvent(new UserCreatedEvent(this));
@@ -63,18 +64,17 @@ public class User : Aggregate
     public Guid Id { get; }
     public string IdentityUserId { get; }
     public Email Email { get; private set; }
-    public UserName UserName { get; private set; }
+    public Alias Alias { get; private set; }
     public BirthDate BirthDate { get; private set; }
     public Age Age => new(BirthDate);
-    public Gender Gender { get; private set; }
-    public DatingPreferences DatingPreferences { get; private set; }
+    public Gender? Gender { get; private set; }
     public Location? Location { get; private set; }
 
     private readonly List<Entities.File> _files;
     [NotMapped]
     public IReadOnlyCollection<Entities.File> Files => _files.AsReadOnly();
     [NotMapped]
-    public Entities.File ProfilePicture => _files.OrderBy(f => f.FileDetails.Order).First();
+    public Entities.File? ProfilePicture => _files.OrderBy(f => f.FileDetails.Order).FirstOrDefault();
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -95,10 +95,10 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void UpdateUserName(Guid actorId, UserName userName)
+    public void UpdateAlias(Guid actorId, Alias alias)
     {
         EnsureActorIsOwner(actorId);
-        UserName = userName;
+        Alias = alias;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
@@ -118,13 +118,6 @@ public class User : Aggregate
     {
         EnsureActorIsOwner(actorId);
         Gender = newGender;
-        UpdatedAt = DateTimeOffset.UtcNow;
-    }
-
-    public void UpdatePreferences(Guid actorId, DatingPreferences newPreferences)
-    {
-        EnsureActorIsOwner(actorId);
-        DatingPreferences = newPreferences;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
@@ -151,7 +144,7 @@ public class User : Aggregate
     public void ChangeFileOrder(Guid actorId, Guid fileId, int newOrder)
     {
         EnsureActorIsOwner(actorId);
-        var file = _files.First(f => f.Id == fileId);
+        var file = _files.Single(f => f.Id == fileId);
         file.ChangeOrder(newOrder);
         UpdatedAt = DateTimeOffset.UtcNow;
     }
@@ -159,12 +152,7 @@ public class User : Aggregate
     public void RemoveFile(Guid actorId, Guid fileId)
     {
         EnsureActorIsOwner(actorId);
-        var file = _files.First(f => f.Id == fileId);
-        if (_files.Count <= 2)
-        {
-            throw new DomainException(new DomainError<UserError>(UserError.InvalidFileCount));
-        }
-
+        var file = _files.Single(f => f.Id == fileId);
         file.MarkForDeletion();
         file.MarkAsDeleted();
         UpdatedAt = DateTimeOffset.UtcNow;
@@ -191,28 +179,25 @@ public class User : Aggregate
     public static User Register
     (
         Email email,
-        UserName userName,
+        Alias alias,
         BirthDate birthDate,
-        Gender gender,
-        DatingPreferences datingPreferences,
+        Gender? gender,
         Location? location,
-        ImmutableHashSet<FileDetails> files,
+        ImmutableHashSet<FileDetails>? files,
         string identityUserId
     )
     {
         return new User
         (
             email,
-            userName,
+            alias,
             birthDate,
             gender,
-            datingPreferences,
             location,
             files,
             identityUserId
         );
     }
-
 }
 
 public enum UserError

@@ -1,0 +1,26 @@
+The main challenge of this project is to design the constructs necessary to
+
+1) collect information about individuals
+2) use that information to match individuals in an evidence-based, scientifically backed way
+
+After discussing the idea with ChatGPT, I have arrived at the following conclusions:
+
+1) we shall base our matching algorithm on scientific information
+
+2) we shall do so by investigating the following scientific fields & theories
+    2.1) relationship science
+    2.2) attachment theory
+    2.3) conflict style
+    2.4) big five
+    2.5) core values
+    2.6) relationship goals
+    
+3) in addition to basing our matching algorithm on established science, we shall use a continuously improved 
+   AI to establish relationships between data we collect and relationship outcomes
+
+We shall split these tasks as follows:
+
+1) study relationship science
+2) design questionnaires that reveal relevant information about individuals, in a quantifiable manner
+3) determine how to vectorize the collected information, and how to calculate similarity between individuals (potentially an ML-project)
+4) deploy

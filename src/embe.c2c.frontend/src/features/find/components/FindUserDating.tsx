@@ -4,11 +4,11 @@ import { User as UserTypeDef } from "@/src/shared/types/domain/aggregates";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import ImageGallery from "@/src/shared/components/image-gallery/ImageGallery";
 
-export type SwipeUserDatingProps = {
+export type FindUserDatingProps = {
     dto: ReadDto<UserTypeDef, UserPermission>;
     className?: string;
 }
-export default function SwipeUserDating({ dto, className }: SwipeUserDatingProps) {
+export default function FindUserDating({ dto, className }: FindUserDatingProps) {
 
     const user = dto.data;
     const permissions = dto.permissions;

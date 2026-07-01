@@ -21,7 +21,6 @@ export type FileDetails = {
     mimeType: string;
 }
 
-
 export type Currency = {
     code: string;
     name: string;
@@ -57,4 +56,31 @@ export enum TransactionReason {
     Refund = 3,
     Withdrawal = 4,
     Deposit = 5,
+}
+
+export enum EngagementMedium {
+    Virtual = 0,
+    InPerson = 1,
+    Hybrid = 2,
+}
+
+export enum EngagementBoundedness {
+    OneTime = 0,
+    Ongoing = 1,
+    FixedTerm = 2,
+}
+
+export enum EngagementFrequency {
+    One = 0,
+    Daily = 1,
+    Weekly = 2,
+    Monthly = 3,
+    Quarterly = 4,
+    Yearly = 5,
+}
+
+export enum RelationshipType {
+    Romantic = 0,
+    Platonic = 1,
+    Professional = 2
 }

@@ -29,9 +29,9 @@ export default function MainNav({
         <Surface as="nav" className={`${classNames} fs-group-primary py-1`} padding="none" variant="secondary">
             <ul className="flex items-center justify-center gap-5">
                 <li>
-                    <Link href="/protected/swipe" className={linkClassNames}>
+                    <Link href="/protected/find" className={linkClassNames}>
                         <Users size={iconSize} className="inline" />
-                        <span className={linkTextClassNames}>swipe</span>
+                        <span className={linkTextClassNames}>find</span>
                     </Link>
                 </li>
                 <li>

@@ -258,6 +258,60 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("AgeRangeMax")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AgeRangeMin")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("MaximumDistance")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Engagement", "Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile.Engagement#Engagement", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Boundedness")
+                                .HasColumnType("int");
+
+                            b1.Property<DateOnly?>("EndDate")
+                                .HasColumnType("date");
+
+                            b1.Property<int>("Frequency")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Medium")
+                                .HasColumnType("int");
+
+                            b1.Property<DateOnly?>("StartDate")
+                                .HasColumnType("date");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SearchProfiles");
+                });
+
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Transactions.Transaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -326,6 +380,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
@@ -337,7 +395,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Gender")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IdentityUserId")
@@ -355,28 +412,6 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "DatingPreferences", "Embe.C2C.Domain.Aggregates.Users.User.DatingPreferences#DatingPreferences", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<int>("AgeRangeMax")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("AgeRangeMin")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("InterestedInGenders")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<double>("MaximumDistance")
-                                .HasColumnType("float");
-                        });
 
                     b.HasKey("Id");
 
@@ -728,7 +763,7 @@ namespace Embe.C2C.Infrastructure.Migrations
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Judgements.Judgement", b =>
                 {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "Judge")
                         .WithMany("JudgementsPassed")
                         .HasForeignKey("JudgeUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -739,6 +774,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasForeignKey("JudgeeUserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
+
+                    b.Navigation("Judge");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Matchings.Matching", b =>
@@ -791,6 +828,34 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasForeignKey("RecipientUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
+                {
+                    b.OwnsMany("Embe.C2C.Domain.Entities.SearchProfiles.SearchProfileGender", "_genders", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<byte[]>("RowVersion")
+                                .IsRequired()
+                                .HasColumnType("varbinary(max)");
+
+                            b1.Property<Guid>("SearchProfileId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("SearchProfileId");
+
+                            b1.ToTable("SearchProfileGender");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SearchProfileId");
+                        });
+
+                    b.Navigation("_genders");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Transactions.Transaction", b =>

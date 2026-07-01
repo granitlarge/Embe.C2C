@@ -3,16 +3,16 @@
 import { User as UserTypeDef, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { useCallback, useState } from "react";
-import SwipeUserDating from "./SwipeUserDating";
+import FindUserDating from "./FindUserDating";
 import JudgeOverlay from "./JudgeOverlay";
 import * as api from "../actions/action";
 
-export type SwipeProps = {
+export type FindProps = {
     candidates: ReadDto<UserTypeDef, UserPermission>[];
     className?: string;
 }
 
-export default function Swipe({ candidates: initialCandidates, className }: SwipeProps) {
+export default function Find({ candidates: initialCandidates, className }: FindProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
 
@@ -46,7 +46,7 @@ export default function Swipe({ candidates: initialCandidates, className }: Swip
             {
                 candidates[0] &&
                 <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
-                    <SwipeUserDating className="grow-1" dto={candidates[0]} />
+                    <FindUserDating className="grow-1" dto={candidates[0]} />
                 </JudgeOverlay>
             } {
                 !candidates[0] &&

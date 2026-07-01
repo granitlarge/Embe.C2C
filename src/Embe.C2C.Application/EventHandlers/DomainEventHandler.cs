@@ -88,7 +88,7 @@ public class DomainEventHandler(IRepository context) : IntegrationEventCollector
             matcheeUserId,
             matching.Id,
             matcherUserId,
-            matcheeUser.UserName.Value,
+            matcheeUser.Alias.Value,
             matcheeUser.ProfilePicture.FileDetails.Name
         );
         _context.Notifications.Add(notification);
@@ -114,7 +114,7 @@ public class DomainEventHandler(IRepository context) : IntegrationEventCollector
             matchRemoveeUserId,
             matching.Id,
             matchRemoverUserId,
-            matcheeUser.UserName.Value,
+            matcheeUser.Alias.Value,
             matcheeUser.ProfilePicture.FileDetails.Name
         );
         _context.Notifications.Add(notification);

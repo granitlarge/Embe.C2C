@@ -58,16 +58,9 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
         try
         {
             var email = Email.Create(command.Email);
-            var userName = UserName.Create(command.UserName);
+            var userName = Alias.Create(command.UserName);
             var birthDate = new BirthDate(command.BirthDate);
             var gender = command.Gender;
-            var datingPreferences = new DatingPreferences
-            (
-                [.. command.DatingPreferences.InterestedInGenders],
-                new Age(command.DatingPreferences.AgeRangeMin),
-                new Age(command.DatingPreferences.AgeRangeMax),
-                new Distance(command.DatingPreferences.MaximumDistance.Value, command.DatingPreferences.MaximumDistance.Unit)
-            );
             var location = command.Location != null ? new Location(command.Location.Latitude, command.Location.Longitude) : null;
 
             var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
@@ -77,10 +70,9 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
             }
 
             user.UpdateEmail(actorId, email);
-            user.UpdateUserName(actorId, userName);
+            user.UpdateAlias(actorId, userName);
             user.UpdateBirthDate(actorId, birthDate);
             user.UpdateGender(actorId, gender);
-            user.UpdatePreferences(actorId, datingPreferences);
             user.UpdateLocation(actorId, location);
 
             var filesToRemove = user.Files.Where(f => !command.FilesToKeep.Contains(f.Id)).ToList();

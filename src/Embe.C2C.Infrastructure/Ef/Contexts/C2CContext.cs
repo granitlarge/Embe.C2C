@@ -7,6 +7,7 @@ using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Identity;
@@ -51,6 +52,7 @@ public class C2CContext
     public DbSet<Message> Messages { get; set; }
     public DbSet<Blocking> Blockings { get; set; }
     public DbSet<CandidateEntity> Candidates { get; set; }
+    public DbSet<SearchProfile> SearchProfiles { get; set; }
 
     public IImmutableList<DomainEvent> DomainEvents
     {
@@ -151,6 +153,10 @@ public class C2CContext
     IDbSet<Blocking> ISparseRepository.Blockings => new MyDbSet<Blocking>(Blockings);
 
     public IQueryable<Blocking> BlockingsQuery => Blockings;
+
+    IDbSet<SearchProfile> ISparseRepository.SearchProfiles => new MyDbSet<SearchProfile>(SearchProfiles);
+
+    public IQueryable<SearchProfile> SearchProfilesQuery => SearchProfiles;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

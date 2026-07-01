@@ -13,7 +13,7 @@ function MessageContent({ content, className }: MessageContentProps) {
         className
     ].filter(Boolean).join(" ");
     return (
-        <span className={`${classNames} whitespace-pre-wrap break-word`}>
+        <span className={`${classNames} whitespace-pre-wrap [overflow-wrap:anywhere]`}>
             {content}
         </span>
     )
@@ -46,7 +46,7 @@ export default function Message({ className, dto, onEdit, onDelete, onReport, on
     const actionIconClassNames = "text-(--secondary-fc) h-(--secondary-fs) w-(--secondary-fs)";
 
     return (
-        <Surface className={`${classNames} w-full px-2 py-1`} padding="none" variant="none">
+        <Surface className={`${classNames} w-max max-w-full px-2 py-1`} padding="none" variant="none">
             <div className="flex flex-col gap-1">
                 <div className="flex gap-2 justify-between items-center">
                     <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{isOwn ? "you" : "they"}</span>

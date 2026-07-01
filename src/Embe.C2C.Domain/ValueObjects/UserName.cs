@@ -2,26 +2,26 @@ using Embe.C2C.Domain.Exceptions;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
-public record UserName
+public record Alias
 {
-    private UserName(string value)
+    private Alias(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new DomainException(new DomainError<UserNameError>(UserNameError.EmptyOrWhitespace));
+            throw new DomainException(new DomainError<AliasError>(AliasError.EmptyOrWhitespace));
         }
         Value = value;
     }
 
     public string Value { get; }
 
-    public static UserName Create(string value)
+    public static Alias Create(string value)
     {
-        return new UserName(value);
+        return new Alias(value);
     }
 }
 
-public enum UserNameError
+public enum AliasError
 {
     EmptyOrWhitespace
 }
