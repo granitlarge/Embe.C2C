@@ -4,7 +4,7 @@
   :root {
 
     --fs-ratio: .80;
-    --fs-1: 2.5rem;
+    --fs-1: 2.0rem;
     --fs-2: calc(var(--fs-1) * var(--fs-ratio));
     --fs-3: calc(var(--fs-2) * var(--fs-ratio));
     --fs-4: calc(var(--fs-3) * var(--fs-ratio));
@@ -69,22 +69,28 @@
     --universal-primary-bg: red;
     --universal-primary-fc: white;
 
+    --universal-secondary-bg: lightgray;
+    --universal-secondary-fc: black;
+
     --primary-fc: none;
       --secondary-fc: none;
       --tertiary-fc: none;
       --error-fc: none;
       --border-color: none;
       --link-fc: var(--universal-primary-bg);
+
       --button-primary-bg: var(--universal-primary-bg);
       --button-primary-fc: var(--universal-primary-fc);
+
+      --button-secondary-bg: var(--universal-secondary-bg);
+      --button-secondary-fc: var(--universal-secondary-fc);
+
       --message-own-bg: none;
 
     --label-fs: inherit;
     --primary-fs: inherit;
     --secondary-fs: inherit;
     --tertiary-fs: inherit;
-
-    /*These are properties that work on any of the surfaces defined above.*/
 
     /*
       SEMANTIC ELEMENTS END
@@ -230,6 +236,7 @@
     color: var(--primary-fc);
     font-size: var(--label-fs);
     margin-inline: auto;
+    font-weight: 500;
   }
 
     input,
@@ -275,6 +282,11 @@
     font-size: var(--primary-fs);
     border-radius: 20px;
     padding: 0.5rem;
+  }
+
+  .button-secondary {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-fc);
   }
 
   button:hover,

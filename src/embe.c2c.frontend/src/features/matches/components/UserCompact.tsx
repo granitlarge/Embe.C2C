@@ -23,7 +23,7 @@ export function UserCompact({ className, dto, style, ...props }: UserCompactProp
             {
                 user?.id &&
                 <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={`/protected/users/${user?.id}`} style={style} {...props} variant="inherit">
-                    {user?.userName && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs)">{user?.userName}</span>}
+                    {user?.alias && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs)">{user?.alias}</span>}
                     {
                         user?.profilePicture?.imageDetails?.url &&
                         <Image src={user?.profilePicture?.imageDetails?.url} alt="Profile picture" width={0} height={0} className="w-20 h-20 rounded-full object-cover" unoptimized={process.env.NODE_ENV === "development"} />

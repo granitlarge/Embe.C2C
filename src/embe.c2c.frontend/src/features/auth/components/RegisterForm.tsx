@@ -17,6 +17,7 @@ import { Range } from "@/src/shared/types/range";
 import { CreateFile } from "@/src/shared/types/dtos/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import BasicProfileForm, { BasicProfileFormData, BasicProfileFormError } from "./BasicProfileForm";
+import { getValidBirthdateRange } from "@/src/shared/time";
 
 type Step =
     "email" |
@@ -160,16 +161,11 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
         alias: z.string({ message: "alias is required" }).min(1, { message: "alias is required" })
     });
 
-    const year = new Date().getFullYear();
-    const month = new Date().getMonth() + 1;
-    const day = new Date().getDate();
-
-    const minDate = `${year - 120}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
-    const maxDate = `${year - 18}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+    const { lower, upper } = getValidBirthdateRange(18, 120);
 
     const [profileData, setProfileData] = useState<BasicProfileFormData>({
-        birthDateRange: { lower: minDate, upper: maxDate },
-        birthDate: maxDate,
+        birthDateRange: { lower, upper },
+        birthDate: upper,
         alias: ""
     });
 

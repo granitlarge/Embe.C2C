@@ -14,9 +14,10 @@ export type SelectInputProps = InputProps & {
     label: string;
     className?: string;
     multiple?: boolean;
+    required?: boolean
 }
 
-export default function SelectInput({ options, value, onChange, label, className, multiple = false, errorMessage }: SelectInputProps) {
+export default function SelectInput({ options, value, onChange, label, className, multiple = false, required = false, errorMessage }: SelectInputProps) {
 
     const classNames = [
         className
@@ -41,7 +42,12 @@ export default function SelectInput({ options, value, onChange, label, className
                                         onChange?.(newValues);
                                     }
                                 } else {
-                                    onChange?.([option.value]);
+                                    if (checked) {
+                                        onChange?.([option.value]);
+                                    }
+                                    else {
+                                        onChange?.([]);
+                                    }
                                 }
                             }}
                         />)

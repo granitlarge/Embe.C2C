@@ -40,7 +40,10 @@ public class UserConfiguration : AggregateConfiguration<User>
 
         builder.Property(u => u.Location)
             .HasConversion(
-                location => location == null ? null : new Point(location.Longitude, location.Latitude),
+                location => location == null ? null : new Point(location.Longitude, location.Latitude)
+                {
+                    SRID = 4326
+                },
                 value => value == null ? null : new Domain.ValueObjects.Location(value.Y, value.X)
             );
 

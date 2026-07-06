@@ -4,7 +4,7 @@ using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Commands.Users;
 
-public record CreateFileDto
+public record CreateImageDto
 (
     string Url,
     string MimeType,

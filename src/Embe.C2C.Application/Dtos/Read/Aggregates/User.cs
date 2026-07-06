@@ -12,7 +12,7 @@ public record UserDto
 (
     Guid Id,
     string? Email,
-    string? UserName,
+    string? Alias,
     DateOnly? BirthDate,
     int? Age,
     Gender? Gender,
@@ -45,7 +45,7 @@ public static class UserDtoExtensions
         (
             user.Id,
             variant.IncludeEmail ? user.Email.Value : null,
-            variant.IncludeUserName ? user.Alias.Value : null,
+            variant.IncludeAlias ? user.Alias.Value : null,
             variant.IncludeBirthDate ? user.BirthDate.Value : null,
             variant.IncludeAge ? user.Age.Value : null,
             variant.IncludeGender ? user.Gender : null,

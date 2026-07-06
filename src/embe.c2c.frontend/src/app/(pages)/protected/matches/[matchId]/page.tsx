@@ -39,7 +39,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
             {
                 partner &&
                 <Link href={`/users/${partner.id}`} className="no-underline text-(--primary-fc)">
-                    <h1 className="truncate">{partner?.userName}</h1>
+                    <h1 className="truncate">{partner?.alias}</h1>
                 </Link>
             }
             <Match className="grow-1 overflow-scroll scrollbar-none" match={response.value!} user={user!} />

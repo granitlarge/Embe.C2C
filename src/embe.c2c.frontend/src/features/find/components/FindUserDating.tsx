@@ -20,7 +20,7 @@ export default function FindUserDating({ dto, className }: FindUserDatingProps) 
                 user.images && user.images.length > 0 &&
                 <ImageGallery imageUrls={user.images.map(file => file.imageDetails.url)} />
             }
-            {user.userName && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.userName}</span>}
+            {user.alias && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.alias}</span>}
             {user.age && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.age}</span>}
             {user.gender && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.gender}</span>}
         </Surface>

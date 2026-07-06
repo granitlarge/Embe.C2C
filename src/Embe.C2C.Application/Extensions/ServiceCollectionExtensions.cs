@@ -20,7 +20,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Users.Handlers.DeleteHandler>();
         services.AddScoped<Commands.Users.Handlers.UpdateHandler>();
         services.AddScoped<Commands.Users.Handlers.GenerateCandidatesHandler>();
-        services.AddScoped<Commands.Users.Handlers.UpdateImagesHandler>();
 
         services.AddScoped<Commands.Matching.Handlers.UnmatchHandler>();
         services.AddScoped<Commands.Judgements.Handlers.JudgeHandler>();

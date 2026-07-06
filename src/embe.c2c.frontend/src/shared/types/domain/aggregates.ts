@@ -6,7 +6,7 @@ import { DatingPreferences, Gender, Location, Money, TransactionReason, Transact
 export type User = {
     id: Guid;
     email?: string;
-    userName?: string;
+    alias?: string;
     birthDate?: string;
     age?: number;
     gender?: Gender;

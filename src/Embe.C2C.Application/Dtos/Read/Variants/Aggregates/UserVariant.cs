@@ -103,7 +103,7 @@ public record UserVariant
     )
     {
         IncludeEmail = includeEmail;
-        IncludeUserName = includeUserName;
+        IncludeAlias = includeUserName;
         IncludeBirthDate = includeBirthDate;
         IncludeAge = includeAge;
         IncludeGender = includeGender;
@@ -115,7 +115,7 @@ public record UserVariant
     }
 
     public bool IncludeEmail { get; }
-    public bool IncludeUserName { get; }
+    public bool IncludeAlias { get; }
     public bool IncludeBirthDate { get; }
     public bool IncludeAge { get; }
     public bool IncludeGender { get; }

@@ -7,11 +7,16 @@ namespace Embe.C2C.Application.Commands.Users;
 public record UpdateCommand
 (
     Guid UserId,
-    string Email,
-    string UserName,
+    string Alias,
     DateOnly BirthDate,
-    Gender Gender,
+    Gender? Gender,
     LocationWriteDto? Location,
-    ImmutableHashSet<Guid> FilesToKeep,
-    ImmutableHashSet<CreateFileDto> FilesToAdd
+    ImmutableHashSet<UpdateImageDto>? ImagesToKeep,
+    ImmutableHashSet<CreateImageDto>? ImagesToAdd
+);
+
+public record UpdateImageDto
+(
+    Guid Id,
+    int Order
 );

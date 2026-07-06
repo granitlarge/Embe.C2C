@@ -13,7 +13,6 @@ export type TextInputProps = InputProps & {
     placeholder?: string;
     children?: React.ReactNode;
 }
-
 export default function TextInput({
     label,
     className,

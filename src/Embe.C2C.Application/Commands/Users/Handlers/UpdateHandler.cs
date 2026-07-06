@@ -13,7 +13,6 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
@@ -42,7 +41,12 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
         _workItemService = workItemService;
     }
 
-    protected override async Task<TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync(ISparseRepository context, UpdateCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
+    (
+        ISparseRepository context,
+        UpdateCommand command,
+        CancellationToken cancellationToken = default
+    )
     {
         var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Update))
@@ -57,8 +61,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
 
         try
         {
-            var email = Email.Create(command.Email);
-            var userName = Alias.Create(command.UserName);
+            var alias = Alias.Create(command.Alias);
             var birthDate = new BirthDate(command.BirthDate);
             var gender = command.Gender;
             var location = command.Location != null ? new Location(command.Location.Latitude, command.Location.Longitude) : null;
@@ -69,24 +72,28 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
                 return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found."));
             }
 
-            user.UpdateEmail(actorId, email);
-            user.UpdateAlias(actorId, userName);
+            user.UpdateAlias(actorId, alias);
             user.UpdateBirthDate(actorId, birthDate);
             user.UpdateGender(actorId, gender);
             user.UpdateLocation(actorId, location);
 
-            var filesToRemove = user.Images.Where(f => !command.FilesToKeep.Contains(f.Id)).ToList();
-            foreach (var file in filesToRemove)
+            var imagesToRemove = user.Images.Where(f => !command.ImagesToKeep?.Any(itk => itk.Id == f.Id) ?? true).ToList();
+            foreach (var image in imagesToRemove)
             {
-                user.RemoveImage(actorId, file.Id);
-                await _fileService.DeleteFileByUrlAsync(file.ImageDetails.Name, cancellationToken);
+                user.RemoveImage(actorId, image.Id);
+                await _fileService.DeleteFileByNameAsync(image.ImageDetails.Name, cancellationToken);
             }
 
-            foreach (var file in command.FilesToAdd)
+            foreach (var image in command.ImagesToKeep ?? [])
             {
-                var uploadFileResult = await _fileService.UploadFileAsync(file.Url.DataUrlToBytes(), file.MimeType, cancellationToken);
-                user.AddImage(actorId, new ImageDetails(uploadFileResult.Name, file.MimeType, file.Order));
-                uploadedFileUrls.Add(uploadFileResult.Url);
+                user.ChangeImageOrder(actorId, image.Id, image.Order);
+            }
+
+            foreach (var image in command.ImagesToAdd ?? [])
+            {
+                var uploadImageResult = await _fileService.UploadFileAsync(image.Url.DataUrlToBytes(), image.MimeType, cancellationToken);
+                user.AddImage(actorId, new ImageDetails(uploadImageResult.Name, image.MimeType, image.Order));
+                uploadedFileUrls.Add(uploadImageResult.Url);
             }
 
             success = true;

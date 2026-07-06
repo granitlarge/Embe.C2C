@@ -1,3 +1,5 @@
+import { Range } from "./types/range";
+
 export function formatTimeAgo(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
@@ -14,4 +16,14 @@ export function formatTimeAgo(dateString: string): string {
         const days = Math.floor(diffInSeconds / 86400);
         return `${days} day${days > 1 ? "s" : ""} ago`;
     }
+}
+
+export function getValidBirthdateRange(minimumAge: number, maximumAge: number): Range<string> {
+    const today = new Date();
+    const minDate = new Date(today.getFullYear() - maximumAge, today.getMonth(), today.getDate());
+    const maxDate = new Date(today.getFullYear() - minimumAge, today.getMonth(), today.getDate());
+    return {
+        lower: minDate.toISOString().split('T')[0],
+        upper: maxDate.toISOString().split('T')[0]
+    };
 }

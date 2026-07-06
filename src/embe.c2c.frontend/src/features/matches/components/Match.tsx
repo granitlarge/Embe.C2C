@@ -427,7 +427,7 @@ export default function Match({ match, user, className }: MatchProps) {
                 {items}
             </InfiniteScroll>
             {
-                partnerIsTyping && <span className="text-(--primary-fc) text-(length:--primary-fs) italic">{partner?.data.userName} is typing...</span>
+                partnerIsTyping && <span className="text-(--primary-fc) text-(length:--primary-fs) italic">{partner?.data.alias} is typing...</span>
             }
             <MessageCrafter
                 saveMessage={saveMessage}

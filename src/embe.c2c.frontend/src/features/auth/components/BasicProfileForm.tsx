@@ -1,12 +1,28 @@
+"use client";
+
 import DateInput from "@/src/shared/components/inputs/date-input/DateInput";
+import SelectInput from "@/src/shared/components/inputs/select-input/SelectInput";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import Surface from "@/src/shared/components/surfaces/Surface";
+import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import { Range } from "@/src/shared/types/range";
+import * as enums from "@/src/shared/enums";
+import Button from "@/src/shared/components/buttons/Button";
+import LocationInput from "@/src/shared/components/inputs/location-input/LocationInput";
 
 export type BasicProfileFormData = {
     birthDateRange: Range<string>;
     birthDate?: string;
     alias?: string;
+    gender?: Gender;
+    location?: Location;
+}
+
+export type BasicProfileFormConfig = {
+    birthDate: boolean,
+    alias: boolean,
+    gender: boolean,
+    location: boolean
 }
 
 export type BasicProfileFormError = { [P in keyof BasicProfileFormData]?: string };
@@ -15,35 +31,70 @@ export type BasicProfileFormProps = {
     error?: BasicProfileFormError;
     data: BasicProfileFormData;
     onChange: (data: BasicProfileFormData) => void;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     className?: string;
+    config?: BasicProfileFormConfig;
 }
 
-export default function BasicProfileForm({ className, data, error, onChange, children }: BasicProfileFormProps & { className?: string }) {
+export default function BasicProfileForm({ className, data, error, onChange, children, config }: BasicProfileFormProps & { className?: string }) {
+
+    config = config || {
+        birthDate: true,
+        alias: true,
+        gender: false,
+        location: false
+    }
 
     const classNames = [
         "form",
         className
     ].filter(Boolean).join(" ");
 
+    const genderOptions = enums.enumerate(Gender).map(gender => ({ value: gender.key, label: gender.key }));
+    const genderValue = enums.enumerate(Gender).find(gender => gender.value === data.gender)?.key;
+
     return (
         <Surface className={classNames} variant="inherit" padding="none">
-            <TextInput
-                label={"alias"}
-                value={data?.alias}
-                onChange={(alias) => onChange({ ...data, alias })}
-                errorMessage={error?.alias}
-            />
-            <DateInput
-                label={"date of birth"}
-                minDate={data.birthDateRange.lower}
-                maxDate={data.birthDateRange.upper}
-                value={data?.birthDate}
-                onChange={(birthDate) => onChange({ ...data, birthDate })}
-            />
+            {
+                config.alias &&
+                <TextInput
+                    label={"alias"}
+                    value={data?.alias}
+                    onChange={(alias) => onChange({ ...data, alias })}
+                    errorMessage={error?.alias}
+                />
+            }
+            {
+                config.birthDate &&
+                <DateInput
+                    label={"date of birth"}
+                    minDate={data.birthDateRange.lower}
+                    maxDate={data.birthDateRange.upper}
+                    value={data?.birthDate}
+                    onChange={(birthDate) => onChange({ ...data, birthDate })}
+                />
+            }
+            {
+                config.gender &&
+                <SelectInput
+                    multiple={false}
+                    options={genderOptions}
+                    label={"gender"}
+                    value={genderValue ? [genderValue] : []}
+                    onChange={(gender) => onChange({ ...data, gender: gender.length > 0 ? enums.parse(Gender, gender[0]) : undefined })}
+                />
+            }
+            {
+                config.location && 
+                <LocationInput
+                    value={data.location}
+                    onChange={(location) => {onChange({ ...data, location })}}
+                />
+            }
             {
                 children
             }
         </Surface>
     )
+
 }

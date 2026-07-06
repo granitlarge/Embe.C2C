@@ -9,9 +9,10 @@ export type DateInputProps = {
     onChange?: (value: string) => void;
     className?: string;
     required?: boolean
+    errorMessage?: string;
 }
 
-export default function DateInput({ label, value, onChange, minDate, maxDate, className, required = true }: DateInputProps) {
+export default function DateInput({ label, value, onChange, minDate, maxDate, className, required = true, errorMessage }: DateInputProps) {
 
     const shellClassNames = [
         className
@@ -33,6 +34,7 @@ export default function DateInput({ label, value, onChange, minDate, maxDate, cl
                 min={minDate}
                 max={maxDate}
                 required={required} />
+            {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
         </Surface>
     )
 

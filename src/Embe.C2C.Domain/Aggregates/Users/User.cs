@@ -114,7 +114,7 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void UpdateGender(Guid actorId, Gender newGender)
+    public void UpdateGender(Guid actorId, Gender? newGender)
     {
         EnsureActorIsOwner(actorId);
         Gender = newGender;

@@ -19,7 +19,6 @@ export default function Modal({ children, className, closed, hidden, header, ...
     const dialog = useRef<HTMLDialogElement | null>(null);
 
     function close() {
-        dialog.current?.close();
         closed();
     }
 
