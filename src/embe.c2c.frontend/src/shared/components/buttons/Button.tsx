@@ -14,7 +14,8 @@ export default function Button({ onClick, variant = "primary", ...props }: Butto
     const classNames = [
         props.className,
         variant === "primary" ? "button-primary" :
-            variant === "secondary" ? "button-secondary" : ""
+            variant === "secondary" ? "button-secondary" : 
+            variant === "tertiary" ? "button-tertiary" : ""
     ].filter(Boolean).join(" ");
 
     return (
