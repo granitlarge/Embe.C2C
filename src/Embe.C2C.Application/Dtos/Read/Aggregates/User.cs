@@ -17,8 +17,8 @@ public record UserDto
     int? Age,
     Gender? Gender,
     LocationDto? Location,
-    FileDto? ProfilePicture,
-    ImmutableHashSet<FileDto>? Files,
+    ImageDto? ProfilePicture,
+    ImmutableHashSet<ImageDto>? Images,
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt
 );
@@ -38,7 +38,7 @@ public static class UserDtoExtensions
             return null;
         }
 
-        var files = user.Files != null && variant.IncludeFiles ? await Task.WhenAll(user.Files.Select(f => f.ToDtoAsync(fileUrlGenerator, cancellationToken))) : null;
+        var images = user.Images != null && variant.IncludeImages ? await Task.WhenAll(user.Images.Select(f => f.ToDtoAsync(fileUrlGenerator, cancellationToken))) : null;
         var profilePicture = user.ProfilePicture != null && variant.IncludeProfilePicture ? await user.ProfilePicture.ToDtoAsync(fileUrlGenerator, cancellationToken) : null;
 
         return new UserDto
@@ -51,7 +51,7 @@ public static class UserDtoExtensions
             variant.IncludeGender ? user.Gender : null,
             variant.IncludeLocation ? user.Location?.ToDto() : null,
             variant.IncludeProfilePicture ? profilePicture : null,
-            variant.IncludeFiles ? files?.ToImmutableHashSet() : null,
+            variant.IncludeImages ? images?.ToImmutableHashSet() : null,
             variant.IncludeCreatedAt ? user.CreatedAt : null,
             variant.IncludeUpdatedAt ? user.UpdatedAt : null
         );

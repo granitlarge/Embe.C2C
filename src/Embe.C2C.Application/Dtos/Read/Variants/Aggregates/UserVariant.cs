@@ -109,7 +109,7 @@ public record UserVariant
         IncludeGender = includeGender;
         IncludeLocation = includeLocation;
         IncludeProfilePicture = includeProfilePicture;
-        IncludeFiles = includeFiles;
+        IncludeImages = includeFiles;
         IncludeCreatedAt = includeCreatedAt;
         IncludeUpdatedAt = includeUpdatedAt;
     }
@@ -121,7 +121,7 @@ public record UserVariant
     public bool IncludeGender { get; }
     public bool IncludeLocation { get; }
     public bool IncludeProfilePicture { get; }
-    public bool IncludeFiles { get; }
+    public bool IncludeImages { get; }
     public bool IncludeCreatedAt { get; }
     public bool IncludeUpdatedAt { get; }
 }

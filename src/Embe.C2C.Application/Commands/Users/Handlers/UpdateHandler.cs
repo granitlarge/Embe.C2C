@@ -75,17 +75,17 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
             user.UpdateGender(actorId, gender);
             user.UpdateLocation(actorId, location);
 
-            var filesToRemove = user.Files.Where(f => !command.FilesToKeep.Contains(f.Id)).ToList();
+            var filesToRemove = user.Images.Where(f => !command.FilesToKeep.Contains(f.Id)).ToList();
             foreach (var file in filesToRemove)
             {
-                user.RemoveFile(actorId, file.Id);
-                await _fileService.DeleteFileByUrlAsync(file.FileDetails.Name, cancellationToken);
+                user.RemoveImage(actorId, file.Id);
+                await _fileService.DeleteFileByUrlAsync(file.ImageDetails.Name, cancellationToken);
             }
 
             foreach (var file in command.FilesToAdd)
             {
-                var uploadFileResult = await _fileService.UploadFileAsync(file.Url.FromDataUrl(), file.MimeType, cancellationToken);
-                user.AddFile(actorId, new FileDetails(uploadFileResult.Name, file.MimeType, file.Order));
+                var uploadFileResult = await _fileService.UploadFileAsync(file.Url.DataUrlToBytes(), file.MimeType, cancellationToken);
+                user.AddImage(actorId, new ImageDetails(uploadFileResult.Name, file.MimeType, file.Order));
                 uploadedFileUrls.Add(uploadFileResult.Url);
             }
 

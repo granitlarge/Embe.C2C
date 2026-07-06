@@ -15,10 +15,11 @@ export type DatingPreferences = {
     maximumDistance: Distance;
 }
 
-export type FileDetails = {
+export type ImageDetails = {
     url: string;
     name: string;
     mimeType: string;
+    order: number;
 }
 
 export type Currency = {

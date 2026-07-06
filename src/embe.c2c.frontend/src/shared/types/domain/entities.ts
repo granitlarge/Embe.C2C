@@ -1,11 +1,11 @@
 import { ReadDto } from "../dtos/types";
 import { Message, MessagePermission } from "./aggregates";
-import { FileDetails } from "./value-objects";
+import { ImageDetails as ImageDetails } from "./value-objects";
 
-export type File = {
+export type Image = {
     id: string;
     ownerUserId: string;
-    fileDetails: FileDetails;
+    imageDetails: ImageDetails;
     markedForDeletionAt: string | null;
     deletedAt: string | null;
     createdAt: string;

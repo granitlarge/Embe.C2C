@@ -38,9 +38,9 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
             var alias = Alias.Create(command.Alias);
             var birthDate = new BirthDate(command.BirthDate);
 
-            var files = new HashSet<FileDetails>();
+            var files = new HashSet<ImageDetails>();
             var identityUserId = registerUserResult.Value!.Id;
-            var user = User.Register(email, alias, birthDate, gender: null, location: null, files: null, identityUserId);
+            var user = User.Register(email, alias, birthDate, gender: null, location: null, images: null, identityUserId);
 
             context.DomainUsers.Add(user);
 

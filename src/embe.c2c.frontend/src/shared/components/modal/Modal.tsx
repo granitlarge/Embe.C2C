@@ -46,7 +46,6 @@ export default function Modal({ children, className, closed, hidden, header, ...
                 w-[70%] h-[70%] 
                 m-auto 
                 rounded-lg 
-                bg-(--surface)
                 scrollbar-gutter-stable
                 `} {...props}>
             <h2 className="mr-auto ml-auto text-(--surface-font-color)">{header}</h2>

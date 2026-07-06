@@ -29,6 +29,12 @@ export default function MainNav({
         <Surface as="nav" className={`${classNames} fs-group-primary py-1`} padding="none" variant="secondary">
             <ul className="flex items-center justify-center gap-5">
                 <li>
+                    <Link href="/protected/discover" className={linkClassNames}>
+                        <Users size={iconSize} className="inline" />
+                        <span className={linkTextClassNames}>discover</span>
+                    </Link>
+                </li>
+                <li>
                     <Link href="/protected/find" className={linkClassNames}>
                         <Users size={iconSize} className="inline" />
                         <span className={linkTextClassNames}>find</span>
@@ -53,9 +59,9 @@ export default function MainNav({
                     </Link>
                 </li>
                 <li>
-                    <Link href="/protected/profile" className={linkClassNames}>
+                    <Link href="/protected/me" className={linkClassNames}>
                         <User size={iconSize} className={iconClassNames} />
-                        <span className={linkTextClassNames}>profile</span>
+                        <span className={linkTextClassNames}>me</span>
                     </Link>
                 </li>
             </ul>

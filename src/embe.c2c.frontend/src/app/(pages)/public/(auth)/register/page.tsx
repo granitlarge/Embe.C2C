@@ -1,4 +1,4 @@
-import RegisterForm from "@/src/features/auth/components/register/RegisterForm"
+import RegisterForm from "@/src/features/auth/components/RegisterForm"
 
 export type RegisterPageProps = {
 

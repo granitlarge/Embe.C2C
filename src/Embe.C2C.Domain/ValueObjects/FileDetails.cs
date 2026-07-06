@@ -2,23 +2,23 @@ using Embe.C2C.Domain.Exceptions;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
-public record FileDetails
+public record ImageDetails
 {
-    public FileDetails(string name, string mimeType, int order)
+    public ImageDetails(string name, string mimeType, int order)
     {
         if (order < 0)
         {
-            throw new DomainException(new DomainError<FileDetailsError>(FileDetailsError.InvalidOrder));
+            throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidOrder));
         }
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new DomainException(new DomainError<FileDetailsError>(FileDetailsError.InvalidName));
+            throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidName));
         }
 
         if (string.IsNullOrWhiteSpace(mimeType))
         {
-            throw new DomainException(new DomainError<FileDetailsError>(FileDetailsError.InvalidMimeType));
+            throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidMimeType));
         }
 
         Name = name;
@@ -31,7 +31,7 @@ public record FileDetails
     public int Order { get; init; }
 }
 
-public enum FileDetailsError
+public enum ImageDetailsError
 {
     InvalidOrder,
     InvalidName,

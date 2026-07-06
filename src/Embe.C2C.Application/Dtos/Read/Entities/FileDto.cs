@@ -3,25 +3,25 @@ using Embe.C2C.Application.Dtos.Read.ValueObjects;
 
 namespace Embe.C2C.Application.Dtos.Read.Entities;
 
-public record FileDto
+public record ImageDto
 (
     Guid Id,
     Guid OwnerUserId,
-    FileDetailsDto? FileDetails,
+    ImageDetailsDto? ImageDetails,
     DateTimeOffset? MarkedForDeletionAt,
     DateTimeOffset? DeletedAt,
     DateTimeOffset? CreatedAt
 );
 
-public static class FileDtoExtensions
+public static class ImageDtoExtensions
 {
-    public static async Task<FileDto> ToDtoAsync(this Domain.Entities.File file, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken = default)
+    public static async Task<ImageDto> ToDtoAsync(this Domain.Entities.Image file, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken = default)
     {
-        return new FileDto
+        return new ImageDto
         (
             file.Id,
             file.OwnerUserId,
-            await file.FileDetails.ToDtoAsync(fileUrlGenerator, cancellationToken),
+            await file.ImageDetails.ToDtoAsync(fileUrlGenerator, cancellationToken),
             file.MarkedForDeletionAt,
             file.DeletedAt,
             file.CreatedAt

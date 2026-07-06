@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
 import Surface from "../../../surfaces/Surface";
+import { X } from "@deemlol/next-icons";
 
 type ImageProps = {
     id: string;
@@ -19,8 +20,10 @@ function MyImage({ id, src, onRemove }: ImageProps) {
     return (
         <div ref={droppableRef}>
             <div ref={draggableRef} className="relative">
-                <Image src={src} alt={"An Image"} className="w-40 h-50 object-cover rounded-lg" width={0} height={0} />
-                <button onClick={onRemove} className="absolute top-0 right-0 -m-3 rounded-full w-6 h-6 p-4 flex items-center justify-center">X</button>
+                <Image src={src} alt={"An Image"} className="w-30 h-40 object-cover rounded-lg" width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
+                <button onClick={onRemove} className="bg-gray-300 absolute top-0 right-0 -m-3 rounded-full w-6 h-6 flex items-center justify-center">
+                    <X className="text-black" />
+                </button>
             </div>
         </div>
     )
@@ -55,8 +58,8 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
 
     return (
         <Surface
-            className="relative w-40 h-50 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}
-                variant="tertiary">
+            className="relative w-30 h-40 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}
+            variant="tertiary">
             <input ref={inputRef} type="file" className="hidden" accept="image/*" onChange={onChange} />
             <span className="text-3xl text-(--secondary-fc)">+</span>
         </Surface>
@@ -69,19 +72,19 @@ export type Image = {
     mimeType: string;
 }
 
-export type ImageGalleryData = {
-    images: Image[];
+export type ImageGalleryData<T extends Image = Image> = {
+    images: T[];
 }
 export type ImageGalleryError = { [P in keyof ImageGalleryData]?: string };
 
-export type ImageGalleryProps = {
-    data?: ImageGalleryData;
+export type ImageGalleryProps<T extends Image = Image> = {
+    data?: ImageGalleryData<T>;
     error?: ImageGalleryError;
     className?: string;
-    onChange?: (images: Image[]) => void;
+    onChange?: (images: (T | Image)[]) => void;
 }
 
-export default function ImageGallery({ data, error, className, onChange }: ImageGalleryProps) {
+export default function ImageGallery<T extends Image = Image>({ data, error, className, onChange }: ImageGalleryProps<T>) {
 
     const classNames = [
         className
@@ -98,19 +101,18 @@ export default function ImageGallery({ data, error, className, onChange }: Image
                 const sourceIndex = imagesWithIds.findIndex(image => image.__id === sourceId);
                 const targetIndex = imagesWithIds.findIndex(image => image.__id === targetId);
                 if (sourceIndex === -1 || targetIndex === -1) return;
-                const newValue = [...imagesWithIds.map(image => ({ url: image.url, mimeType: image.mimeType }))];
-                const [movedImage] = newValue.splice(sourceIndex, 1);
-                newValue.splice(targetIndex, 0, movedImage);
-                onChange?.(newValue);
+                const [movedImage] = imagesWithIds.splice(sourceIndex, 1);
+                imagesWithIds.splice(targetIndex, 0, movedImage);
+                onChange?.(imagesWithIds);
             }}
         >
             <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center`}>
                 {
                     imagesWithIds.map((image, index) => (
-                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(imagesWithIds.filter((_, i) => i !== index).map(image => ({ url: image.url, mimeType: image.mimeType })))} />
+                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(imagesWithIds.filter((_, i) => i !== index))} />
                     ))
                 }
-                <ImageSelector onImageSelected={(image) => onChange?.([...imagesWithIds.map(image => ({ url: image.url, mimeType: image.mimeType })), image])} />
+                <ImageSelector onImageSelected={(image) => onChange?.([...imagesWithIds, image])} />
             </div>
             {error?.images && <span className="text-(--error-fc)">{error.images}</span>}
         </DragDropProvider>

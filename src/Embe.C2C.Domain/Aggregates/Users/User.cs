@@ -18,7 +18,7 @@ public class User : Aggregate
         BirthDate birthDate,
         Gender? gender,
         Location? location,
-        ImmutableHashSet<FileDetails>? files,
+        ImmutableHashSet<ImageDetails>? files,
         string identityUserId
     )
     {
@@ -42,12 +42,12 @@ public class User : Aggregate
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
 
-        _files = [];
+        _images = [];
         if (files != null)
         {
             foreach (var file in files)
             {
-                AddFile(Id, file);
+                AddImage(Id, file);
             }
         }
 
@@ -70,11 +70,11 @@ public class User : Aggregate
     public Gender? Gender { get; private set; }
     public Location? Location { get; private set; }
 
-    private readonly List<Entities.File> _files;
+    private readonly List<Entities.Image> _images;
     [NotMapped]
-    public IReadOnlyCollection<Entities.File> Files => _files.AsReadOnly();
+    public IReadOnlyCollection<Entities.Image> Images => _images.AsReadOnly();
     [NotMapped]
-    public Entities.File? ProfilePicture => _files.OrderBy(f => f.FileDetails.Order).FirstOrDefault();
+    public Entities.Image? ProfilePicture => _images.OrderBy(f => f.ImageDetails.Order).FirstOrDefault();
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -128,43 +128,42 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void AddFile(Guid actorId, FileDetails fileDetails)
+    public void AddImage(Guid actorId, ImageDetails imageDetails)
     {
         EnsureActorIsOwner(actorId);
-        if (_files.Count >= 10)
+        if (_images.Count >= 10)
         {
             throw new DomainException(new DomainError<UserError>(UserError.InvalidFileCount));
         }
 
-        var file = Entities.File.Create(Id, fileDetails);
-        _files.Add(file);
+        var image = Entities.Image.Create(Id, imageDetails);
+        _images.Add(image);
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void ChangeFileOrder(Guid actorId, Guid fileId, int newOrder)
+    public void ChangeImageOrder(Guid actorId, Guid imageId, int newOrder)
     {
         EnsureActorIsOwner(actorId);
-        var file = _files.Single(f => f.Id == fileId);
-        file.ChangeOrder(newOrder);
+        var image = _images.Single(f => f.Id == imageId);
+        image.ChangeOrder(newOrder);
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void RemoveFile(Guid actorId, Guid fileId)
+    public void RemoveImage(Guid actorId, Guid imageId)
     {
         EnsureActorIsOwner(actorId);
-        var file = _files.Single(f => f.Id == fileId);
-        file.MarkForDeletion();
-        file.MarkAsDeleted();
+        var image = _images.Single(f => f.Id == imageId);
+        _images.Remove(image);
         UpdatedAt = DateTimeOffset.UtcNow;
-        AddDomainEvent(new UserFileRemovedEvent(file));
+        AddDomainEvent(new UserImageRemovedEvent(image));
     }
 
     public void Remove()
     {
-        var fileIdsToRemove = _files.Select(f => f.Id).ToList();
-        foreach (var fileId in fileIdsToRemove)
+        var imageIdsToRemove = _images.Select(f => f.Id).ToList();
+        foreach (var imageId in imageIdsToRemove)
         {
-            RemoveFile(Id, fileId);
+            RemoveImage(Id, imageId);
         }
     }
 
@@ -183,7 +182,7 @@ public class User : Aggregate
         BirthDate birthDate,
         Gender? gender,
         Location? location,
-        ImmutableHashSet<FileDetails>? files,
+        ImmutableHashSet<ImageDetails>? images,
         string identityUserId
     )
     {
@@ -194,7 +193,7 @@ public class User : Aggregate
             birthDate,
             gender,
             location,
-            files,
+            images,
             identityUserId
         );
     }

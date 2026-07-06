@@ -1,9 +1,9 @@
-import { File } from "@/src/shared/types/domain/entities";
+import { Image } from "@/src/shared/types/domain/entities";
 import { Message } from "../domain/aggregates";
 import { Guid } from "../../cache";
-import { FileDetails } from "../domain/value-objects";
+import { ImageDetails } from "../domain/value-objects";
 
-export type CreateFile = Omit<FileDetails, "name">;
+export type CreateFile = Omit<ImageDetails, "name">;
 export type CreateMessage = Pick<Message, "content" | "replyToMessageId"> & {
     matchingId: Guid;
 };

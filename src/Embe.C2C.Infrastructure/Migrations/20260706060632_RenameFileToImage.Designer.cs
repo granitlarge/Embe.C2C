@@ -5,6 +5,7 @@ using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -13,9 +14,11 @@ using NetTopologySuite.Geometries;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    partial class C2CContextModelSnapshot : ModelSnapshot
+    [Migration("20260706060632_RenameFileToImage")]
+    partial class RenameFileToImage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -878,6 +881,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.OwnsMany("Embe.C2C.Domain.Entities.Image", "_images", b1 =>
                         {
                             b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<DateTimeOffset?>("DeletedAt")

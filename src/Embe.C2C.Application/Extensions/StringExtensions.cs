@@ -8,7 +8,7 @@ public static class StringExtensions
         return $"data:{mimeType};base64,{base64}";
     }
 
-    public static byte[] FromDataUrl(this string dataUrl)
+    public static byte[] DataUrlToBytes(this string dataUrl)
     {
         if (!dataUrl.StartsWith("data:"))
         {

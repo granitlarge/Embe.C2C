@@ -53,17 +53,18 @@ public class UserConfiguration : AggregateConfiguration<User>
             .OnDelete(DeleteBehavior.NoAction);
 
         builder
-            .OwnsMany<Domain.Entities.File>("_files", f =>
+            .OwnsMany<Domain.Entities.Image>("_images", image =>
             {
-                f.HasKey(f => f.Id);
-                f.WithOwner().HasForeignKey(f => f.OwnerUserId);
-                f.OwnsOne(f => f.FileDetails, fd =>
+                image.HasKey(image => image.Id);
+                image.Property(image => image.Id).ValueGeneratedNever();
+                image.WithOwner().HasForeignKey(image => image.OwnerUserId);
+                image.OwnsOne(image => image.ImageDetails, fd =>
                 {
                     fd.Property(d => d.Name);
                     fd.Property(d => d.MimeType);
                     fd.Property(d => d.Order);
                 });
-                f.Property(f => f.RowVersion).IsRowVersion();
+                image.Property(image => image.RowVersion).IsRowVersion();
             });
 
         base.Configure(builder);

@@ -1,6 +1,8 @@
 using Embe.C2C.Api.Extensions;
 using Embe.C2C.Application.Commands.Users;
 using Embe.C2C.Application.Commands.Users.Handlers;
+using Embe.C2C.Application.Queries.Users;
+using Embe.C2C.Application.Queries.Users.Handlers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Embe.C2C.Api.EndPoints;
@@ -14,9 +16,11 @@ public static class UserEndPoints
             .WithTags("Users");
 
         group.MapPost("/register", Register);
-        group.MapPut("/update", Update).RequireAuthorization();
-        group.MapDelete("/delete", Delete).RequireAuthorization();
+        group.MapPut("", Update).RequireAuthorization();
+        group.MapDelete("", Delete).RequireAuthorization();
         group.MapGet("/candidates", GenerateCandidates).RequireAuthorization();
+        group.MapGet("/me", GetMe).RequireAuthorization();
+        group.MapPost("/me/images", UpdateImages).RequireAuthorization();
     }
 
     private static async Task<IResult> Register([FromBody] RegisterCommand command, [FromServices] RegisterHandler handler, CancellationToken cancellationToken = default)
@@ -40,6 +44,18 @@ public static class UserEndPoints
     private static async Task<IResult> GenerateCandidates([FromServices] GenerateCandidatesHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(GenerateCandidatesCommand.Instance, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> GetMe([FromServices] GetMeHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(GetMeQuery.Instance, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> UpdateImages([FromBody] UpdateImagesCommand command, [FromServices] UpdateImagesHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 }

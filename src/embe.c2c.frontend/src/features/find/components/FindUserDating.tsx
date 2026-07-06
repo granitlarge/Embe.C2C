@@ -17,8 +17,8 @@ export default function FindUserDating({ dto, className }: FindUserDatingProps) 
     return (
         <Surface variant="inherit" className={`flex flex-col ${classNames}`}>
             {
-                user.files && user.files.length > 0 &&
-                <ImageGallery imageUrls={user.files.map(file => file.fileDetails.url)} />
+                user.images && user.images.length > 0 &&
+                <ImageGallery imageUrls={user.images.map(file => file.imageDetails.url)} />
             }
             {user.userName && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.userName}</span>}
             {user.age && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.age}</span>}

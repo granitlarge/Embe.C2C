@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Users.Handlers.DeleteHandler>();
         services.AddScoped<Commands.Users.Handlers.UpdateHandler>();
         services.AddScoped<Commands.Users.Handlers.GenerateCandidatesHandler>();
+        services.AddScoped<Commands.Users.Handlers.UpdateImagesHandler>();
 
         services.AddScoped<Commands.Matching.Handlers.UnmatchHandler>();
         services.AddScoped<Commands.Judgements.Handlers.JudgeHandler>();
@@ -47,6 +48,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Messages.Handlers.GetMessageByIdHandler>();
 
         services.AddScoped<Queries.Judgements.Handlers.GetPositiveJudgementsHandler>();
+
+        services.AddScoped<Queries.Users.Handlers.GetUserByIdHandler>();
+        services.AddScoped<Queries.Users.Handlers.GetMeHandler>();
 
         services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();

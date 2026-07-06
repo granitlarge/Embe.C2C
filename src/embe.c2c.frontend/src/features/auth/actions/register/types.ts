@@ -1,4 +1,4 @@
-import { Gender, DatingPreferences, FileDetails } from "@/src/shared/types/domain/value-objects";
+import { Gender, DatingPreferences, ImageDetails } from "@/src/shared/types/domain/value-objects";
 
 export type RegisterRequest = {
     email: string,

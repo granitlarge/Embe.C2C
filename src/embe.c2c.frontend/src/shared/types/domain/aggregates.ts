@@ -1,6 +1,6 @@
 import { Guid } from "../../cache";
 import { ReadDto } from "../dtos/types";
-import { Conversation, File } from "./entities";
+import { Conversation, Image } from "./entities";
 import { DatingPreferences, Gender, Location, Money, TransactionReason, TransactionType } from "./value-objects";
 
 export type User = {
@@ -12,8 +12,8 @@ export type User = {
     gender?: Gender;
     datingPreferences?: DatingPreferences;
     location?: Location;
-    profilePicture?: File;
-    files?: File[];
+    profilePicture?: Image;
+    images?: Image[];
     createdAt?: string;
     updatedAt?: string;
 }

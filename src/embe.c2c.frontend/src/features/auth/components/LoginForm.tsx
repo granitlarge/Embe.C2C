@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { signIn } from "../actions/sign-in/actions";
 import { SignInError } from "../actions/sign-in/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
+import useCurrentUserStore from "@/src/shared/stores/current-user";
+import { getCurrentUser } from "../actions/action";
 
 export type LoginFormProps = {
     className?: string;
@@ -16,6 +18,7 @@ export type LoginFormProps = {
 
 export default function LoginForm({ className }: LoginFormProps) {
 
+    const setCurrentUser = useCurrentUserStore(state => state.setCurrentUser);
     const classNames = [className].filter(Boolean).join(" ");
 
     const router = useRouter();
@@ -35,14 +38,17 @@ export default function LoginForm({ className }: LoginFormProps) {
 
         const validationResult = validationScheme.safeParse({ userName, password });
         if (!validationResult.success) {
+
             const properties = z.treeifyError(validationResult.error).properties;
             setUsernameError(properties?.userName?.errors?.[0]);
             setPasswordError(properties?.password?.errors?.[0]);
             return;
+
         } else {
 
             const error = await signIn(userName!, password!);
             if (error !== undefined) {
+
                 switch (error) {
                     case SignInError.InvalidCredentials:
                         setError("invalid credentials");
@@ -50,8 +56,11 @@ export default function LoginForm({ className }: LoginFormProps) {
                     default:
                         setError("an unknown error occurred");
                 }
+
             } else {
+
                 router.replace("/protected/find");
+
             }
 
         }
@@ -63,7 +72,6 @@ export default function LoginForm({ className }: LoginFormProps) {
         setPasswordError(undefined);
         setError(undefined);
     }
-
     const passwordLabel = <>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></>;
     return (
         <Surface className={`form w-[600px] max-w-full ${classNames}`} variant="secondary">

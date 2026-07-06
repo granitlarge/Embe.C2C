@@ -6,17 +6,17 @@ import { useState } from "react";
 import ProgressBar from "@/src/shared/components/progress-bar/ProgressBar";
 import ImageGallery from "@/src/shared/components/inputs/image/gallery/ImageGallery";
 import * as z from "zod";
-import { accountExists as accountExists } from "../../actions/account-exists/actions";
+import { accountExists as accountExists } from "../actions/account-exists/actions";
 import { useRouter } from "next/navigation";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { register } from "@/src/features/auth/actions/register/actions";
 import { Gender } from "@/src/shared/types/domain/value-objects";
-import SearchProfileBuilderForm, { SearchProfileBuilderFormData, SearchProfileBuilderFormError } from "../SearchProfileBuilderForm";
-import { ImagesFormData, ImagesFormError } from "../ImagesForm";
+import SearchProfileBuilderForm, { SearchProfileBuilderFormData, SearchProfileBuilderFormError } from "./SearchProfileBuilderForm";
+import { ImagesFormData, ImagesFormError } from "./ImagesForm";
 import { Range } from "@/src/shared/types/range";
 import { CreateFile } from "@/src/shared/types/dtos/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
-import BasicProfileForm, { BasicProfileFormData, BasicProfileFormError } from "../BasicProfileForm";
+import BasicProfileForm, { BasicProfileFormData, BasicProfileFormError } from "./BasicProfileForm";
 
 type Step =
     "email" |
@@ -31,7 +31,6 @@ type EmailStepProps = {
     value?: string
     hidden?: boolean;
 }
-
 function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepProps) {
 
     const emailSchema = z.email({ message: "please enter a valid email" });
@@ -289,20 +288,6 @@ function ImagesStep({ finish: finish, hidden, }: ImagesStepProps) {
     )
 
 }
-
-type LocationStepProps = {
-    hidden: boolean;
-}
-function LocationStep({ hidden }: LocationStepProps) {
-    return (
-        <>
-            <div className={`${hidden ? "hidden" : ""}`}>
-
-            </div>
-        </>
-    )
-}
-
 export type RegisterFormProps = {
     className?: string;
 }
