@@ -30,21 +30,23 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
         className
     ].filter(Boolean).join(" ")
 
+    const imageSize = 150;
+    const imageDimensions = `${imageSize}px`;
     return (
         <div className={`relative max-w-max ${classNames}`}>
             {
                 !isEmpty && <Image
-                    className="rounded-full w-[100px] h-[100px] object-cover"
+                    className={`rounded-full w-[${imageDimensions}] h-[${imageDimensions}] object-cover`}
                     src={initialImages.find(image => image.order === 0)?.url ?? ""}
                     alt="User Image"
-                    width={0}
-                    height={0}
+                    width={imageSize}
+                    height={imageSize}
                     unoptimized={process.env.NODE_ENV === "development"}
                 />
             }
             {
                 isEmpty &&
-                <div className="rounded-full w-[100px] h-[100px] flex flex-col items-center justify-center bg-gray-300">
+                <div className={`rounded-full w-[${imageDimensions}] h-[${imageDimensions}] flex flex-col items-center justify-center bg-gray-300`}>
                 </div>
             }
             <button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-(length:--fs-1)">+</button>
