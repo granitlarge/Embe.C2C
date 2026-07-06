@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export type ButtonVariant = "primary" | "secondary";
+export type ButtonVariant = "primary" | "secondary" | "tertiary";
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
     onClick?: () => (void | Promise<void>);
     variant?: ButtonVariant;
@@ -22,7 +22,11 @@ export default function Button({ onClick, variant = "primary", ...props }: Butto
             setLoading(true);
             const result = onClick?.();
             if (result instanceof Promise) {
-                await result;
+                try {
+                    await result;
+                } catch (e) {
+
+                }
             }
             setLoading(false);
         }}>

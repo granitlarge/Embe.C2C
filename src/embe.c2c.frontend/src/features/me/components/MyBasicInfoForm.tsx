@@ -30,23 +30,21 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
         className
     ].filter(Boolean).join(" ")
 
-    const imageSize = 150;
-    const imageDimensions = `${imageSize}px`;
     return (
         <div className={`relative max-w-max ${classNames}`}>
             {
                 !isEmpty && <Image
-                    className={`rounded-full w-[${imageDimensions}] h-[${imageDimensions}] object-cover`}
+                    className={`rounded-full w-[150px] h-[150px] object-cover border-black border-3`}
                     src={initialImages.find(image => image.order === 0)?.url ?? ""}
                     alt="User Image"
-                    width={imageSize}
-                    height={imageSize}
+                    width={150}
+                    height={150}
                     unoptimized={process.env.NODE_ENV === "development"}
                 />
             }
             {
                 isEmpty &&
-                <div className={`rounded-full w-[${imageDimensions}] h-[${imageDimensions}] flex flex-col items-center justify-center bg-gray-300`}>
+                <div className={`rounded-full w-[150px] h-[150px] flex flex-col items-center justify-center bg-gray-300`}>
                 </div>
             }
             <button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-(length:--fs-1)">+</button>
@@ -87,36 +85,45 @@ export default function MyBasicInfoForm({ className, data, error, onChange }: My
     ].filter(Boolean).join(" ")
 
     return (
-        <Surface className={`${classNames} flex flex-col gap-3`} padding="none">
-            <Surface className="flex flex-col gap-2" padding="sm" variant="secondary">
-                <MyImagesForm className="shrink-0 mx-auto" initialImages={data.images ?? []} onChange={(images) => onChange({ ...data, images })} />
-                <BasicProfileForm
-                    config={{
-                        alias: true,
-                        birthDate: true,
-                        gender: true,
-                        location: true
-                    }}
-                    data={{
-                        birthDateRange: getValidBirthdateRange(18, 120),
-                        birthDate: data.birthDate,
-                        alias: data.alias,
-                        gender: data.gender,
-                        location: data.location
-                    }}
-                    onChange={basicProfileFormData => {
-                        onChange(({
-                            ...data,
-                            birthDate: basicProfileFormData.birthDate,
-                            alias: basicProfileFormData.alias,
-                            gender: basicProfileFormData.gender,
-                            location: basicProfileFormData.location
-                        }))
-                    }
-                    }
+        <Surface className={`flex flex-col gap-2 ${classNames}`} padding="md" variant="secondary">
 
-                />
-            </Surface>
+            <MyImagesForm
+                className="shrink-0 mx-auto"
+                initialImages={data.images ?? []}
+                onChange={(images) => onChange({ ...data, images })}
+            />
+
+            <BasicProfileForm
+                error={{
+                    alias: error?.alias,
+                    birthDate: error?.birthDate
+                }}
+                config={{
+                    alias: true,
+                    birthDate: true,
+                    gender: true,
+                    location: true
+                }}
+                data={{
+                    birthDateRange: getValidBirthdateRange(18, 120),
+                    birthDate: data.birthDate,
+                    alias: data.alias,
+                    gender: data.gender,
+                    location: data.location
+                }}
+                onChange={basicProfileFormData => {
+                    onChange(({
+                        ...data,
+                        birthDate: basicProfileFormData.birthDate,
+                        alias: basicProfileFormData.alias,
+                        gender: basicProfileFormData.gender,
+                        location: basicProfileFormData.location
+                    }))
+                }
+                }
+
+            />
+
         </Surface>
     )
 

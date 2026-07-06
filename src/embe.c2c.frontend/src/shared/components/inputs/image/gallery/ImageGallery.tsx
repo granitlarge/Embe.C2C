@@ -7,12 +7,11 @@ import { X } from "@deemlol/next-icons";
 type MyImageProps = {
     id: string;
     src: string;
-    isDragging?: boolean;
     onRemove?: () => void;
 }
 
-function MyImage({ id, src, onRemove, isDragging = false }: MyImageProps) {
-    const { ref: draggableRef } = useDraggable({
+function MyImage({ id, src, onRemove }: MyImageProps) {
+    const { ref: draggableRef, isDragging } = useDraggable({
         id
     });
     const { ref: droppableRef } = useDroppable({
@@ -21,9 +20,9 @@ function MyImage({ id, src, onRemove, isDragging = false }: MyImageProps) {
     return (
         <div ref={droppableRef}>
             <div ref={draggableRef} className="relative">
-                <Image src={src} alt={"An Image"} className={`w-30 h-40 object-cover rounded-lg ${isDragging ? "shadow-2xl" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
-                <button onClick={onRemove} className="bg-gray-300 absolute top-0 right-0 -m-3 rounded-full w-6 h-6 flex items-center justify-center">
-                    <X className="text-black" />
+                <Image src={src} alt={"An Image"} className={`w-30 h-40 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
+                <button onClick={onRemove} className="bg-gray-300 absolute top-0 right-0 -m-3 rounded-full max-w-max max-h-max flex items-center justify-center">
+                    <X className="text-(--primary-fc) w-[16px] h-[16px]" />
                 </button>
             </div>
         </div>
@@ -91,15 +90,10 @@ export default function ImageGallery<T extends Image = Image>({ data, error, cla
         className
     ].filter(Boolean).join(" ");
 
-    const [images, setImages] = useState(data?.images.map(image => ({ ...image, __id: crypto.randomUUID(), __isDragging: false })) ?? []);
+    const images = (data?.images ?? []).map((image) => ({ ...image, __id: crypto.randomUUID() }));
     return (
         <DragDropProvider
-            onDragStart={(event) => {
-                const sourceId = event.operation.source?.id;
-                setImages(prev => prev.map(image => image.__id === sourceId ? { ...image, __isDragging: true } : image));
-            }}
             onDragEnd={(event) => {
-                setImages(prev => prev.map(image => image.__isDragging ? { ...image, __isDragging: false } : image));
                 if (event.canceled) return;
                 const targetId = event.operation.target?.id;
                 const sourceId = event.operation.source?.id;
@@ -109,16 +103,16 @@ export default function ImageGallery<T extends Image = Image>({ data, error, cla
                 if (sourceIndex === -1 || targetIndex === -1) return;
                 const [movedImage] = images.splice(sourceIndex, 1);
                 images.splice(targetIndex, 0, movedImage);
-                onChange?.(images.map(({ __id, __isDragging, ...image }) => image));
+                onChange?.(images.map(({ __id, ...image }) => image));
             }}
         >
             <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center`}>
                 {
                     images.map((image, index) => (
-                        <MyImage key={image.__id} id={image.__id} src={image.url} isDragging={image.__isDragging} onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, __isDragging, ...image }) => image))} />
+                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id,  ...image }) => image))} />
                     ))
                 }
-                <ImageSelector onImageSelected={(image) => onChange?.([...images.map(({ __id, __isDragging, ...image }) => image), image])} />
+                <ImageSelector onImageSelected={(image) => onChange?.([...images.map(({ __id,  ...image }) => image), image])} />
             </div>
             {error?.images && <span className="text-(--error-fc)">{error.images}</span>}
         </DragDropProvider>

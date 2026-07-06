@@ -1,7 +1,7 @@
 "use client";
 
 import Surface from "@/src/shared/components/surfaces/Surface"
-import MyBasicInfoForm, { MyBasicInfoFormData } from "./MyBasicInfoForm"
+import MyBasicInfoForm, { MyBasicInfoFormData, MyBasicInfoFormError } from "./MyBasicInfoForm"
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates"
 import { ReadDto } from "@/src/shared/types/dtos/types"
 import { useState } from "react"
@@ -9,6 +9,7 @@ import Button from "@/src/shared/components/buttons/Button";
 import { updateProfile } from "../actions/action";
 import * as z from "zod";
 import { Gender } from "@/src/shared/types/domain/value-objects";
+import Modal from "@/src/shared/components/modal/Modal";
 
 export type MeProps = {
     className?: string,
@@ -21,6 +22,7 @@ export default function Me({ className, user }: MeProps) {
         className
     ].filter(Boolean).join(" ")
 
+    const [showPreview, setShowPreview] = useState(false);
     const initialBasicFormData = {
         images: user.data?.images
             ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order }))
@@ -33,6 +35,7 @@ export default function Me({ className, user }: MeProps) {
 
     const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyBasicInfoFormData>(initialBasicFormData);
     const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyBasicInfoFormData>(initialBasicFormData);
+    const [basicFormError, setBasicFormError] = useState<MyBasicInfoFormError>({});
 
     const validationScheme = z.object({
         images: z.array(z.object({
@@ -41,8 +44,8 @@ export default function Me({ className, user }: MeProps) {
             mimeType: z.string(),
             order: z.number()
         })).optional(),
-        alias: z.string().min(1),
-        birthDate: z.string().min(1),
+        alias: z.string().min(1, "alias is required"),
+        birthDate: z.string().min(1, "birthDate is required"),
         gender: z.enum(Gender).optional(),
         location: z.object({
             latitude: z.number(),
@@ -51,15 +54,27 @@ export default function Me({ className, user }: MeProps) {
     });
 
     function onCancel() {
+        setBasicFormError({});
         setClientSideBasicFormData(serverSideBasicFormData);
+    }
+
+    function onPreview() {
+
     }
 
     async function onSave() {
 
         const validationResult = validationScheme.safeParse(clientSideBasicFormData);
         if (!validationResult.success) {
-            throw new Error("not implemented");
+            const error = z.treeifyError(validationResult.error);
+            setBasicFormError({
+                alias: error.properties?.alias?.errors?.[0],
+                birthDate: error.properties?.birthDate?.errors?.[0],
+            });
+            return;
         }
+
+        setBasicFormError({});
 
         const imageAndIndex = clientSideBasicFormData.images?.map((image, index) => ({ image, index })) ?? [];
         const imagesToKeep = imageAndIndex.filter(({ image }) => image.id !== undefined).map(({ image, index }) => ({ id: image.id!, order: index }));
@@ -105,7 +120,7 @@ export default function Me({ className, user }: MeProps) {
         // Location
 
         <Surface className={`${classNames} flex flex-col gap-2`} padding="none">
-            <MyBasicInfoForm className="grow-1 overflow-y-scroll" data={clientSideBasicFormData} onChange={(data) => {
+            <MyBasicInfoForm className="grow-1 overflow-y-scroll" error={basicFormError} data={clientSideBasicFormData} onChange={(data) => {
                 setClientSideBasicFormData(prev => ({
                     ...prev,
                     images: data.images?.sort((a, b) => a.order - b.order) ?? [],
@@ -117,7 +132,8 @@ export default function Me({ className, user }: MeProps) {
             }} />
             <div className="flex flex-row gap-3 justify-end">
                 <Button onClick={onSave}>save</Button>
-                <Button variant="secondary" onClick={onCancel}>cancel</Button>
+                <Button onClick={onPreview} variant="secondary">preview</Button>
+                <Button variant="tertiary" onClick={onCancel}>cancel</Button>
             </div>
         </Surface>
 

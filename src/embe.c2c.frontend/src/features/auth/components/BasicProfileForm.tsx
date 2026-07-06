@@ -7,7 +7,6 @@ import Surface from "@/src/shared/components/surfaces/Surface";
 import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import { Range } from "@/src/shared/types/range";
 import * as enums from "@/src/shared/enums";
-import Button from "@/src/shared/components/buttons/Button";
 import LocationInput from "@/src/shared/components/inputs/location-input/LocationInput";
 
 export type BasicProfileFormData = {
@@ -85,10 +84,10 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
                 />
             }
             {
-                config.location && 
+                config.location &&
                 <LocationInput
                     value={data.location}
-                    onChange={(location) => {onChange({ ...data, location })}}
+                    onChange={(location) => { onChange({ ...data, location }) }}
                 />
             }
             {
