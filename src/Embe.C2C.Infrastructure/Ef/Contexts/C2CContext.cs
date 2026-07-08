@@ -251,7 +251,7 @@ public class C2CContext
     {
         var maxDistanceMeters = 1000;
         List<AdminArea> result = [];
-        while (result.Count == 0  && maxDistanceMeters <= 100_000)
+        while (result.Count == 0  && maxDistanceMeters <= 25_000_000)
         {
             var pointFilter = (longitude.HasValue && latitude.HasValue) ? new NetTopologySuite.Geometries.Point(longitude.Value, latitude.Value) { SRID = 4326 } : null;
             var parentIdFilter = !string.IsNullOrEmpty(parentId) ? parentId : null;

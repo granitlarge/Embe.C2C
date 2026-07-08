@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 
 export type Padding = "none" | "sm" | "md" | "lg";
 export type Variant = "primary" | "secondary" | "tertiary" | "inherit" | "none";
@@ -9,6 +9,7 @@ export type SurfaceProps<T extends React.ElementType = "div"> = {
     padding?: Padding;
     variant?: Variant;
     as?: T;
+    sticky?: boolean;
 } & React.ComponentPropsWithoutRef<T>;
 
 export default function Surface<T extends React.ElementType = "div">({
@@ -18,6 +19,7 @@ export default function Surface<T extends React.ElementType = "div">({
     variant = "none",
     as,
     style,
+    sticky = false,
     ...props
 }: SurfaceProps<T>) {
 
@@ -32,6 +34,7 @@ export default function Surface<T extends React.ElementType = "div">({
     ]
         .filter(Boolean)
         .join(" ");
+
     return (
         <Component
             {...props}
