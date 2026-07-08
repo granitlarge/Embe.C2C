@@ -1,6 +1,6 @@
 "use server";
 
-import { ApiResponse, FailureReason, Read } from "../../api";
+import { ApiResponse, FailureReason, Mutate, Read } from "../../api";
 import { AdminArea } from "./types";
 
 export async function getAdminAreaById(id: string): Promise<ApiResponse<AdminArea, FailureReason>> {
@@ -38,6 +38,20 @@ export async function searchAdminAreas(
         `${process.env.API_URL}/api/geography?${queryParams}`,
         {
             method: "GET"
+        }
+    );
+    return response;
+}
+
+export async function reverseGeocode(longitude: number, latitude: number): Promise<ApiResponse<AdminArea[], FailureReason>> {
+    const response = await Mutate<AdminArea[], FailureReason>(
+        `${process.env.API_URL}/api/geography/reverse-geocode`,
+        {
+            method: "POST",
+            body: JSON.stringify({ longitude, latitude }),
+            headers: {
+                "Content-Type": "application/json"
+            }
         }
     );
     return response;

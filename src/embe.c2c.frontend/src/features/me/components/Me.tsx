@@ -9,7 +9,6 @@ import Button from "@/src/shared/components/buttons/Button";
 import { updateProfile } from "../actions/action";
 import * as z from "zod";
 import { Gender } from "@/src/shared/types/domain/value-objects";
-import Modal from "@/src/shared/components/modal/Modal";
 
 export type MeProps = {
     className?: string,

@@ -13,6 +13,7 @@ public static class GeographyEndpoints
         group.MapGet("", SearchAdminAreas);
         group.MapGet("/{id}", GetAdminAreaById);
         group.MapGet("/country", GetCountryAdminAreas);
+        group.MapPost("/reverse-geocode", ReverseGeocode);
     }
 
     private static async Task<IResult> GetCountryAdminAreas([FromServices] GetCountryAdminAreaHandler handler)
@@ -38,6 +39,17 @@ public static class GeographyEndpoints
     private static async Task<IResult> GetAdminAreaById([FromRoute] string id, [FromServices] GetAdminAreaByIdHandler handler)
     {
         var result = await handler.HandleAsync(new GetAdminAreaByIdQuery(id));
+        return result.ToResult();
+    }
+
+    public record ReverseGeocodeRequest(double Longitude, double Latitude);
+    private static async Task<IResult> ReverseGeocode
+    (
+        [FromBody] ReverseGeocodeRequest request,
+        [FromServices] ReverseGeocodeHandler handler
+    )
+    {
+        var result = await handler.HandleAsync(new ReverseGeocodeQuery(request.Longitude, request.Latitude));
         return result.ToResult();
     }
 

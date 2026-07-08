@@ -76,6 +76,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IImmutableList<DomainEvent> DomainEvents { get; }
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+        public Task<List<IAdminArea>> ReverseGeocodeAsync(double longitude, double latitude);
     }
 
     public class SparseRepository : ISparseRepository

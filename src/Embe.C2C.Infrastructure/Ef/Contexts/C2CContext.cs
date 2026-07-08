@@ -268,4 +268,28 @@ public class C2CContext
 
         return [.. result.Cast<IAdminArea>()];
     }
+
+    public async Task<List<IAdminArea>> ReverseGeocodeAsync(double longitude, double latitude)
+    {
+        var adminArea = (await SearchAdminAreasAsync(null, longitude, latitude, 1, 1)).FirstOrDefault();
+        if (adminArea == null)
+        {
+            return [];
+        }
+
+        var adminAreas = new List<IAdminArea> { adminArea };
+        var highestLevelAdminArea = adminAreas[0];
+        while (highestLevelAdminArea.ParentId != null)
+        {
+            var parent = await AdminAreas.AsNoTracking().FirstOrDefaultAsync(aa => aa.Id == highestLevelAdminArea.ParentId);
+            if (parent == null)
+            {
+                break;
+            }
+            adminAreas.Add(parent);
+            highestLevelAdminArea = parent;
+        }
+
+        return adminAreas;
+    }
 }

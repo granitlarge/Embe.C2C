@@ -6,8 +6,9 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { useEffect, useState } from "react";
 import DropDownInput from "../dropdown-input/DropDownInput";
 import { AdminArea } from "@/src/shared/actions/geography/types";
-import { getAdminAreaById, getCountryAdminAreas, searchAdminAreas } from "@/src/shared/actions/geography/actions";
+import { getAdminAreaById, getCountryAdminAreas, reverseGeocode, searchAdminAreas } from "@/src/shared/actions/geography/actions";
 import { Loader } from "@deemlol/next-icons";
+import Surface from "../../surfaces/Surface";
 
 type LocationInputExactProps = {
     value?: Location;
@@ -17,14 +18,38 @@ type LocationInputExactProps = {
 function LocationInputExact({ value, onChange, className }: LocationInputExactProps) {
 
     const [loading, setLoading] = useState(false);
+    const [locationName, setLocationName] = useState<string | undefined>(undefined);
     const classNames = [
         className
     ].filter(Boolean).join(" ");
 
+    useEffect(() => {
+
+        async function loadLocationName() {
+            const response = await reverseGeocode(value!.longitude, value!.latitude);
+            if (!response.success) {
+                throw new Error("not implemented");
+            }
+            const adminAreas = response.value!;
+            if (adminAreas.length === 0) {
+                throw new Error("not implemented");
+            }
+            adminAreas.sort((a, b) => a.level - b.level);
+            setLocationName(adminAreas.map(a => a.name).join(", "));
+        }
+
+        if (value) {
+            loadLocationName();
+        } else {
+            setLocationName(undefined);
+        }
+
+    }, [value]);
+
     function updateLocation() {
 
         setLoading(true);
-        window.navigator.geolocation.getCurrentPosition((position) => {
+        window.navigator.geolocation.getCurrentPosition(async (position) => {
 
             const { latitude, longitude } = position.coords;
             onChange?.({ latitude, longitude });
@@ -40,17 +65,17 @@ function LocationInputExact({ value, onChange, className }: LocationInputExactPr
     }
 
     return (
-        <div className={`input-wrapper ${classNames}`}>
+        <Surface className={`input-wrapper ${classNames}`} variant="tertiary" padding="sm">
             <div className="flex flex-row items-center">
-                <input type="text" disabled value={value ? `${value.latitude}, ${value.longitude}` : "location not set"} />
+                <input className="overflow-x-scroll" type="text" disabled value={locationName ? locationName : value ? `${value.latitude}, ${value.longitude}` : "location not set"} />
                 <button className="max-w-max bg-transparent" onClick={updateLocation}>
                     <RefreshCcw className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc) ${loading ? "animate-[spin_1s_linear_infinite_reverse]" : ""}`} />
                 </button>
-                <button className="max-w-max bg-transparent" onClick={() => onChange?.(undefined)}>
+                <button className="max-w-max bg-transparent" onClick={() => {onChange?.(undefined)}}>
                     <Trash2 className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)`} />
                 </button>
             </div>
-        </div>
+        </Surface>
     )
 
 }
@@ -346,14 +371,14 @@ function LocationInputApproximate({ value, onChange, className }: LocationInputA
         </>
     );
     return (
-        <div className="flex flex-col gap-2 w-full">
+        <Surface className="flex flex-col gap-2 w-full" variant="tertiary" padding="sm">
             {
                 !loading && dropDowns
             }
             {
                 loading && <Loader className="mx-auto animate-spin" />
             }
-        </div>
+        </Surface>
     )
 
 }

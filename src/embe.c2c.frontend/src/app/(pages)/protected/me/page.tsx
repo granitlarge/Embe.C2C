@@ -10,9 +10,9 @@ export default async function MePage() {
     }
 
     return (
-        <div className="flex flex-col grow-1 gap-3 overflow-y-scroll">
+        <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
             <h1>me</h1>
-            <Me className="grow-1 overflow-y-scroll" user={getCurrentUserResponse.value!} />
+            <Me className="grow-1 overflow-y-scroll scrollbar-none" user={getCurrentUserResponse.value!} />
             <MainNav className="grow-0" />
         </div>
     )

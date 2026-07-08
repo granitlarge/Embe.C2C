@@ -54,6 +54,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Geography.Handlers.SearchAdminAreaHandler>();
         services.AddScoped<Queries.Geography.Handlers.GetAdminAreaByIdHandler>();
         services.AddScoped<Queries.Geography.Handlers.GetCountryAdminAreaHandler>();
+        services.AddScoped<Queries.Geography.Handlers.ReverseGeocodeHandler>();
 
         services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();
