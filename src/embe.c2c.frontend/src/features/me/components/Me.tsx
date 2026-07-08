@@ -111,14 +111,6 @@ export default function Me({ className, user }: MeProps) {
 
     return (
 
-        // Information
-        // ------------
-        // Images
-        // Alias
-        // BirthDate
-        // Gender
-        // Location
-
         <Surface className={`${classNames} flex flex-col gap-2`} padding="none">
             <MyBasicInfoForm className="grow-1 overflow-y-scroll" error={basicFormError} data={clientSideBasicFormData} onChange={(data) => {
                 setClientSideBasicFormData(prev => ({

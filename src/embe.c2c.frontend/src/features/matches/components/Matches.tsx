@@ -4,7 +4,7 @@ import { AuthenticatedUser } from "@/src/shared/user";
 import { MatchCompact } from "./MatchCompact";
 import { Matching, MatchingPermission } from "@/src/shared/types/domain/aggregates";
 import { useState } from "react";
-import { InfiniteScroll } from "@/src/shared/components/infinite-scroll/InfiniteScroll";
+import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
 import { getMatchings } from "../actions/action";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 

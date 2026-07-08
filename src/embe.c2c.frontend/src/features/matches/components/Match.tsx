@@ -1,6 +1,6 @@
 "use client";
 
-import { InfiniteScroll } from "@/src/shared/components/infinite-scroll/InfiniteScroll";
+import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
 import { Matching, MatchingPermission, MessagePermission } from "@/src/shared/types/domain/aggregates"
 import { AuthenticatedUser } from "@/src/shared/user";
 import Message from "./Message";
