@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
@@ -53,6 +54,7 @@ public class C2CContext
     public DbSet<Blocking> Blockings { get; set; }
     public DbSet<CandidateEntity> Candidates { get; set; }
     public DbSet<SearchProfile> SearchProfiles { get; set; }
+    public DbSet<AdminArea> AdminAreas { get; set; }
 
     public IImmutableList<DomainEvent> DomainEvents
     {
@@ -158,6 +160,8 @@ public class C2CContext
 
     public IQueryable<SearchProfile> SearchProfilesQuery => SearchProfiles;
 
+    public IQueryable<IAdminArea> AdminAreasQuery => AdminAreas;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -233,5 +237,35 @@ public class C2CContext
         {
             Candidates.Remove(candidate);
         }
+    }
+
+    public async Task<List<IAdminArea>> SearchAdminAreasAsync
+    (
+        string? parentId, 
+        double? longitude, 
+        double? latitude, 
+        int page,
+        int size,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var maxDistanceMeters = 1000;
+        List<AdminArea> result = [];
+        while (result.Count == 0  && maxDistanceMeters <= 100_000)
+        {
+            var pointFilter = (longitude.HasValue && latitude.HasValue) ? new NetTopologySuite.Geometries.Point(longitude.Value, latitude.Value) { SRID = 4326 } : null;
+            var parentIdFilter = !string.IsNullOrEmpty(parentId) ? parentId : null;
+            result = await AdminAreas
+            .AsNoTracking()
+            .Where(aa => pointFilter == null || aa.Point != null && aa.Point.Distance(pointFilter) <= maxDistanceMeters)
+            .Where(aa => parentIdFilter == null || aa.ParentId == parentIdFilter)
+            .OrderBy(aa => pointFilter != null && aa.Point != null ? aa.Point.Distance(pointFilter) : int.MaxValue)
+            .Skip((page - 1) * size)
+            .Take(size)
+            .ToListAsync(cancellationToken);
+            maxDistanceMeters *= 2;
+        }
+
+        return [.. result.Cast<IAdminArea>()];
     }
 }

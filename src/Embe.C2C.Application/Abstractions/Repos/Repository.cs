@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Blockings;
@@ -37,6 +38,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Message> MessagesQuery { get; }
         public IQueryable<Blocking> BlockingsQuery { get; }
         public IQueryable<SearchProfile> SearchProfilesQuery { get; }
+        public IQueryable<IAdminArea> AdminAreasQuery { get; }
 
         public Task<List<User>> GenerateCandidatesForUserIdAsync
         (
@@ -55,6 +57,16 @@ namespace Embe.C2C.Application.Abstractions.Repos
         (
             Guid userId,
             Guid candidateUserId,
+            CancellationToken cancellationToken = default
+        );
+
+        public Task<List<IAdminArea>> SearchAdminAreasAsync
+        (
+            string? parentId,
+            double? longitude,
+            double? latitude,
+            int page,
+            int size,
             CancellationToken cancellationToken = default
         );
     }
@@ -92,6 +104,8 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
         public IQueryable<Blocking> BlockingsQuery => _context.BlockingsQuery;
 
+        public IQueryable<IAdminArea> AdminAreasQuery => _context.AdminAreasQuery;
+
         public Task ClearCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
         {
             return _context.ClearCandidateForUserIdAsync(userId, candidateUserId, cancellationToken);
@@ -105,6 +119,19 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public async Task<bool> IsCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
         {
             return await _context.IsCandidateForUserIdAsync(userId, candidateUserId, cancellationToken);
+        }
+
+        public async Task<List<IAdminArea>> SearchAdminAreasAsync
+        (
+            string? parentId, 
+            double? longitude, 
+            double? latitude, 
+            int page,
+            int size,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return await _context.SearchAdminAreasAsync(parentId, longitude, latitude, page, size, cancellationToken);
         }
     }
 }

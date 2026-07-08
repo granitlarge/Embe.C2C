@@ -51,6 +51,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Users.Handlers.GetUserByIdHandler>();
         services.AddScoped<Queries.Users.Handlers.GetMeHandler>();
 
+        services.AddScoped<Queries.Geography.Handlers.SearchAdminAreaHandler>();
+        services.AddScoped<Queries.Geography.Handlers.GetAdminAreaByIdHandler>();
+        services.AddScoped<Queries.Geography.Handlers.GetCountryAdminAreaHandler>();
+
         services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();
         services.AddScoped<MatchingAuthorizationFactStore>();

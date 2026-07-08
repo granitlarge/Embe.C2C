@@ -466,6 +466,42 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("Conversation");
                 });
 
+            modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.AdminArea", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("EngType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParentId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Point>("Point")
+                        .IsRequired()
+                        .HasColumnType("geography");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("AdminAreas");
+                });
+
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.CandidateEntity", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -950,6 +986,14 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Navigation("LastMessage");
 
                     b.Navigation("Matching");
+                });
+
+            modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.AdminArea", b =>
+                {
+                    b.HasOne("Embe.C2C.Infrastructure.Ef.Entities.AdminArea", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.ClientCascade);
                 });
 
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.CandidateEntity", b =>

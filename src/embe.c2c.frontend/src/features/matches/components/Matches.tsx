@@ -40,7 +40,7 @@ export function Matches({ user, initialMatches, className }: MatchesProps) {
                     <InfiniteScroll className={`flex flex-col gap-3`} callback={loadMore}>
                         {items}
                     </InfiniteScroll> :
-                    <span className={`text-(length:--fs-header-2) mx-auto my-auto font-bold`}>
+                    <span className={`text-(--primary-fc) text-(length:--primary-fs) mx-auto my-auto font-bold`}>
                         no matches yet
                     </span>
             }

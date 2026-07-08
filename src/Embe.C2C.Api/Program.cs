@@ -101,6 +101,7 @@ app.MapMatchingEndPoints();
 app.MapJudgementEndPoints();
 app.MapNotificationEndPoints();
 app.MapMessageEndPoints();
+app.MapGeographyEndpoints();
 
 app.MapHub<MainHub>("/hubs/main", options =>
 {
