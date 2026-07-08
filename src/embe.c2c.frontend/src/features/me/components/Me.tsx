@@ -140,7 +140,7 @@ export default function Me({ className, user }: MeProps) {
                         datingPreferences: user.data?.datingPreferences,
                         location: clientSideBasicFormData.location,
                         distanceKmToQueryingUser: user.data?.distanceKmToQueryingUser,
-                        age: calculateAge(clientSideBasicFormData.birthDate ?? "2000-01-01"),
+                        age: clientSideBasicFormData.birthDate ? calculateAge(clientSideBasicFormData.birthDate) : undefined,
                         createdAt: user.data?.createdAt,
                         updatedAt: user.data?.updatedAt,
                         email: user.data?.email,

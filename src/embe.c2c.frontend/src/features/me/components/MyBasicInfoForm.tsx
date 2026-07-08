@@ -31,23 +31,25 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
     ].filter(Boolean).join(" ")
 
     return (
-        <div className={`relative max-w-max ${classNames}`}>
-            {
-                !isEmpty && <Image
-                    className={`rounded-full w-[150px] h-[150px] object-cover border-black border-3`}
-                    src={initialImages.find(image => image.order === 0)?.url ?? ""}
-                    alt="User Image"
-                    width={150}
-                    height={150}
-                    unoptimized={process.env.NODE_ENV === "development"}
-                />
-            }
-            {
-                isEmpty &&
-                <div className={`rounded-full w-[150px] h-[150px] flex flex-col items-center justify-center bg-gray-300`}>
-                </div>
-            }
-            <button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-(length:--fs-1)">+</button>
+        <div className={`max-w-max ${classNames}`}>
+            <button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent text-(length:--fs-1)">
+                {
+                    !isEmpty && <Image
+                        className={`rounded-full w-[150px] h-[150px] object-cover shadow-(color:--border-color) shadow-md`}
+                        src={initialImages.find(image => image.order === 0)?.url ?? ""}
+                        alt="User Image"
+                        width={150}
+                        height={150}
+                        unoptimized={process.env.NODE_ENV === "development"}
+                    />
+                }
+                {
+                    isEmpty &&
+                    <div className={`rounded-full w-[150px] h-[150px] flex flex-col items-center justify-center bg-gray-300`}>
+                    </div>
+                }
+            </button>
+
             <Modal closed={() => setModalOpen(false)} hidden={!modalOpen} header="images">
                 <ImageGalleryInput<ImageData>
                     data={{ images: initialImages }}

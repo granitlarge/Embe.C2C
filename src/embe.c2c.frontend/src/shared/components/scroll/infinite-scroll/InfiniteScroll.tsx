@@ -92,7 +92,9 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
                 const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < comparisonPixelThreshold;
 
                 if (direction === "down") {
-                    if (isAtTop) {
+                    if (isAtTop && isAtBottom) {
+                        positionRef.current = "end";
+                    } else if (isAtTop) {
                         positionRef.current = "start";
                     } else if (isAtBottom) {
                         positionRef.current = "end";
@@ -101,7 +103,9 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
                         positionRef.current = "center";
                     }
                 } else if (direction === "up") {
-                    if (isAtTop) {
+                    if (isAtTop && isAtBottom) {
+                        positionRef.current = "start";
+                    } else if (isAtTop) {
                         positionRef.current = "end";
                         await loadMore();
                     } else if (isAtBottom) {

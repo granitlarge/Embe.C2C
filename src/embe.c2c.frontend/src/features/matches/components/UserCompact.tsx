@@ -1,6 +1,7 @@
 import Surface, { SurfaceProps } from "@/src/shared/components/surfaces/Surface";
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
+import { User as UserIcon,  } from "@deemlol/next-icons";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -27,6 +28,10 @@ export function UserCompact({ className, dto, style, ...props }: UserCompactProp
                     {
                         user?.profilePicture?.imageDetails?.url &&
                         <Image src={user?.profilePicture?.imageDetails?.url} alt="Profile picture" width={0} height={0} className="w-20 h-20 rounded-full object-cover" unoptimized={process.env.NODE_ENV === "development"} />
+                    }
+                    {
+                        !user?.profilePicture?.imageDetails?.url &&
+                        <UserIcon className="w-20 h-20 rounded-full bg-transparent flex items-center justify-center text-(--primary-fc) text-(length:--primary-fs)" />
                     }
                 </Surface>
             }

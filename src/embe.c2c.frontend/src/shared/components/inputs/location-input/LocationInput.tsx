@@ -65,7 +65,7 @@ function LocationInputExact({ value, onChange, className }: LocationInputExactPr
     }
 
     return (
-        <Surface className={`input-wrapper ${classNames}`} variant="tertiary" padding="sm">
+        <Surface className={`input-wrapper ${classNames}`} variant="inherit" padding="sm">
             <div className="flex flex-row items-center">
                 <input className="overflow-x-scroll" type="text" disabled value={locationName ? locationName : value ? `${value.latitude}, ${value.longitude}` : "location not set"} />
                 <button className="max-w-max bg-transparent" onClick={updateLocation}>
@@ -371,7 +371,7 @@ function LocationInputApproximate({ value, onChange, className }: LocationInputA
         </>
     );
     return (
-        <Surface className="flex flex-col gap-2 w-full" variant="tertiary" padding="sm">
+        <Surface className="flex flex-col gap-2 w-full" variant="inherit" padding="sm">
             {
                 !loading && dropDowns
             }
@@ -398,11 +398,11 @@ export default function LocationInput({ errorMessage, value, onChange, className
     ].filter(Boolean).join(" ");
 
     const exactTabButtonClassNames = [
-        tab === "exact" ? "border-b-3 border-solid border-black" : "",
+        tab === "exact" ? "border-b-3 border-solid border-(--border-color)" : "",
     ].filter(Boolean).join(" ");
 
     const approximateTabButtonClassNames = [
-        tab === "approximate" ? "border-b-3 border-solid border-black" : "",
+        tab === "approximate" ? "border-b-3 border-solid border-(--border-color)" : "",
     ].filter(Boolean).join(" ");
 
     return (

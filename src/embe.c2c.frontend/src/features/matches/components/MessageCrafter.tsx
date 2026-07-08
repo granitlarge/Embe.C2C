@@ -28,11 +28,11 @@ export function MessageCrafter({
     return (
         <div className="relative flex gap-0">
             {
-                mode === "reply" && <Message className="surface-tertiary absolute bottom-full mb-1" dto={replyToMessage!} isOwn={false} />
+                mode === "reply" && <Message className="surface-secondary absolute bottom-full mb-1" dto={replyToMessage!} isOwn={false} />
             }
             <TextAreaInput
-                value={content}
-                onChange={onChange}
+                initialValue={content}
+                onBlur={onChange}
                 placeholder="write a message.."
                 className="surface-secondary w-full p-3 rounded-l-lg grow-1"
             >
@@ -48,7 +48,7 @@ export function MessageCrafter({
                     (mode === "edit" || mode === "reply") &&
                     <div className="flex flex-col gap-2 justify-center">
                         <button className="text-(--primary-fc) text-(length:--primary-fs)" onClick={saveMessage}>{mode === "edit" ? <Save /> : <Send />}</button>
-                        <button className="text-(--primary-fc) text-(length:--primary-fs)" onClick={onCancel}><Ban /></button>
+                        <button className=" bg-(--button-secondary-bg) text-(--button-secondary-fc) text-(length:--primary-fs)" onClick={onCancel}><Ban /></button>
                     </div>
                 }
             </div>

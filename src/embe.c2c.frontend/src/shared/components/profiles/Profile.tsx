@@ -18,7 +18,7 @@ function ProfileShortInfo({ user, className }: { user: User, className?: string 
                     null
                 }
             </div>
-            <span className="text-(--secondary-fc) text-(length:--primary-fs)">{user.age} y.o.</span>
+            {user.age && <span className="text-(--secondary-fc) text-(length:--primary-fs)">{user.age} y.o.</span>}
             {user.distanceKmToQueryingUser !== undefined ? <span className="text-(--secondary-fc) text-(length:--primary-fs)">{user.distanceKmToQueryingUser} km</span> : null}
         </Surface>
     )

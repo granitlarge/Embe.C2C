@@ -27,7 +27,7 @@ export function MatchCompact({ dto, className, user }: MatchCompactProps) {
                 {
                     match.conversation &&
                     <Surface as={Link} className="flex flex-col w-full grow-1 no-underline mb-auto" href={`/protected/matches/${match.id}`} padding="none" variant="inherit">
-                        <ConversationCompact className="grow-1 fs-group-secondary" conversation={match.conversation} user={user} />
+                        <ConversationCompact className="grow-1 fs-group-primary" conversation={match.conversation} user={user} />
                     </Surface>
                 }
             </div>
