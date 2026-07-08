@@ -5,35 +5,38 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class EditMessageHandler : TransactionalCommandHandler<EditMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
 {
-    private readonly MessageAuthorizationPolicy _authorizationPolicy;
+    private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUser;
     private readonly MatchingService _matchingService;
+    private readonly MessageDtoMapper _messageDtoMapper;
 
     public EditMessageHandler
     (
-        MessageAuthorizationPolicy authorizationPolicy,
+        MessageAuthorizationService messageAuthorizationService,
         IAuthenticatedUserService authenticatedUser,
         MatchingService matchingService,
         IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
-        DomainEventStore domainEventStore
+        DomainEventStore domainEventStore,
+        MessageDtoMapper messageDtoMapper
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
-        _authorizationPolicy = authorizationPolicy;
+        _messageAuthorizationService = messageAuthorizationService;
         _authenticatedUser = authenticatedUser;
         _matchingService = matchingService;
+        _messageDtoMapper = messageDtoMapper;
     }
 
     protected async override Task<TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
@@ -43,7 +46,7 @@ public class EditMessageHandler : TransactionalCommandHandler<EditMessageCommand
         CancellationToken cancellationToken = default
     )
     {
-        var permissions = await _authorizationPolicy.GetPermissionsAsync(command.MessageId, cancellationToken);
+        var permissions = await _messageAuthorizationService.GetPermissionsAsync(command.MessageId, cancellationToken);
         if (!permissions.Contains(MessagePermission.Edit))
         {
             var result = Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "You don't have permission to edit this message.");
@@ -65,8 +68,13 @@ public class EditMessageHandler : TransactionalCommandHandler<EditMessageCommand
 
             _matchingService.EditMessage(user, message, MessageContent.Create(command.NewContent));
 
-            var dto = await _authorizationPolicy.ToDtoAsync(message, cancellationToken) ?? throw new InvalidOperationException("A message was edited but failed to convert to DTO.");
-            return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(true, Result<ReadDto<MessageDto, MessagePermission>>.Success(dto));
+            var readDto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
+            if (readDto == null)
+            {
+                return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "You don't have permission to view this message."));
+            }
+
+            return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(true, Result<ReadDto<MessageDto, MessagePermission>>.Success(readDto));
         }
         catch (DomainException ex)
         {

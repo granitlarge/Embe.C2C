@@ -15,7 +15,8 @@ public record UserVariant
         includeProfilePicture: false,
         includeFiles: false,
         includeCreatedAt: false,
-        includeUpdatedAt: false
+        includeUpdatedAt: false,
+        includeDistance: false
     );
 
     public static readonly UserVariant Blocked = new
@@ -29,7 +30,8 @@ public record UserVariant
         includeProfilePicture: false,
         includeFiles: false,
         includeCreatedAt: false,
-        includeUpdatedAt: false
+        includeUpdatedAt: false,
+        includeDistance: false
     );
 
     public static readonly UserVariant Matched = new
@@ -43,7 +45,8 @@ public record UserVariant
         includeProfilePicture: true,
         includeFiles: true,
         includeCreatedAt: false,
-        includeUpdatedAt: false
+        includeUpdatedAt: false,
+        includeDistance: true
     );
 
     public static readonly UserVariant Candidate = new
@@ -57,7 +60,8 @@ public record UserVariant
         includeProfilePicture: true,
         includeFiles: true,
         includeCreatedAt: false,
-        includeUpdatedAt: false
+        includeUpdatedAt: false,
+        includeDistance: true
     );
 
     public static readonly UserVariant PositivelyJudged = new
@@ -71,7 +75,8 @@ public record UserVariant
         includeProfilePicture: true,
         includeFiles: true,
         includeCreatedAt: false,
-        includeUpdatedAt: false
+        includeUpdatedAt: false,
+        includeDistance: true
     );
 
     public static readonly UserVariant Full = new
@@ -85,7 +90,8 @@ public record UserVariant
         includeProfilePicture: true,
         includeFiles: true,
         includeCreatedAt: true,
-        includeUpdatedAt: true
+        includeUpdatedAt: true,
+        includeDistance: true
     );
 
     public UserVariant
@@ -99,7 +105,8 @@ public record UserVariant
         bool includeProfilePicture,
         bool includeFiles,
         bool includeCreatedAt,
-        bool includeUpdatedAt
+        bool includeUpdatedAt,
+        bool includeDistance
     )
     {
         IncludeEmail = includeEmail;
@@ -112,6 +119,7 @@ public record UserVariant
         IncludeImages = includeFiles;
         IncludeCreatedAt = includeCreatedAt;
         IncludeUpdatedAt = includeUpdatedAt;
+        IncludeDistance = includeDistance;
     }
 
     public bool IncludeEmail { get; }
@@ -124,4 +132,5 @@ public record UserVariant
     public bool IncludeImages { get; }
     public bool IncludeCreatedAt { get; }
     public bool IncludeUpdatedAt { get; }
+    public bool IncludeDistance { get; }
 }

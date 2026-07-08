@@ -4,7 +4,7 @@ import Surface from "@/src/shared/components/surfaces/Surface"
 import Image from "next/image";
 import { useState } from "react";
 import Modal from "@/src/shared/components/modal/Modal";
-import ImageGallery from "@/src/shared/components/inputs/image/gallery/ImageGallery";
+import ImageGalleryInput from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
 import { Gender } from "@/src/shared/types/domain/value-objects";
 import { Location } from "@/src/shared/types/domain/value-objects";
 import BasicProfileForm from "../../auth/components/BasicProfileForm";
@@ -49,7 +49,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
             }
             <button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-(length:--fs-1)">+</button>
             <Modal closed={() => setModalOpen(false)} hidden={!modalOpen} header="images">
-                <ImageGallery<ImageData>
+                <ImageGalleryInput<ImageData>
                     data={{ images: initialImages }}
                     onChange={
                         (newImages) => {

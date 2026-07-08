@@ -8,22 +8,22 @@ using Embe.C2C.Domain.Aggregates.Judgements;
 
 namespace Embe.C2C.Application.Authorizations;
 
-public class JudgementAuthorizationPolicy
+public class JudgementAuthorizationService
 {
 
-    private readonly UserAuthorizationPolicy _userAuthorizationPolicy;
+    private readonly UserAuthorizationService _userAuthorizationPolicy;
     private readonly JudgementAuthorizationFactStore _factStore;
 
-    public JudgementAuthorizationPolicy
+    public JudgementAuthorizationService
     (
-        UserAuthorizationPolicy userAuthorizationPolicy,
+        UserAuthorizationService userAuthorizationPolicy,
         JudgementAuthorizationFactStore factStore
     )
     {
         _userAuthorizationPolicy = userAuthorizationPolicy;
         _factStore = factStore;
     }
-
+/*
     public async Task<ReadDto<JudgementDto, JudgementPermission>?> ToDtoAsync
     (
         Judgement judgement,
@@ -42,6 +42,20 @@ public class JudgementAuthorizationPolicy
             return null;
 
         return new ReadDto<JudgementDto, JudgementPermission>(dto, permissions);
+    }
+    */
+
+    public (ImmutableHashSet<JudgementPermission> Permissions, JudgementVariant Variant) Get
+    (
+        Judgement judgement
+    )
+    {
+        var isJudgeFact = _factStore.GetIsJudgeFact(judgement);
+        var isJudgeeFact = _factStore.GetIsJudgeeFact(judgement);
+        var isPositivelyJudgedFact = _factStore.GetIsPositivelyJudgedFact(judgement);
+        var permissions = GetPermissions(isJudgeFact, isJudgeeFact, isPositivelyJudgedFact);
+        var variant = GetVariant(isJudgeFact, isJudgeeFact, isPositivelyJudgedFact);
+        return (permissions, variant);
     }
 
     private JudgementVariant GetVariant

@@ -13,13 +13,13 @@ namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCommand, Result>
 {
-    private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy;
+    private readonly MessageAuthorizationService _messageAuthorizationPolicy;
     private readonly IAuthenticatedUserService _authenticatedUser;
     private readonly MatchingService _matchingService;
 
     public DeleteMessageHandler
     (
-        MessageAuthorizationPolicy messageAuthorizationPolicy,
+        MessageAuthorizationService messageAuthorizationPolicy,
         IAuthenticatedUserService authenticatedUser,
         MatchingService matchingService,
         IRepository context,

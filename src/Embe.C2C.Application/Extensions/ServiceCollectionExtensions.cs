@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Authorizations.FactGenerators;
 using Embe.C2C.Application.Authorizations.FactStores.Conversations;
@@ -5,6 +6,9 @@ using Embe.C2C.Application.Authorizations.FactStores.Judgements;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
+using Embe.C2C.Application.Dtos;
+using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
@@ -66,10 +70,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MatchingFactGenerator>();
         services.AddScoped<MessageFactGenerator>();
 
-        services.AddScoped<MatchingAuthorizationPolicy>();
-        services.AddScoped<UserAuthorizationPolicy>();
-        services.AddScoped<MessageAuthorizationPolicy>();
-        services.AddScoped<JudgementAuthorizationPolicy>();
+        services.AddScoped<MatchingAuthorizationService>();
+        services.AddScoped<UserAuthorizationService>();
+        services.AddScoped<MessageAuthorizationService>();
+        services.AddScoped<JudgementAuthorizationService>();
 
         services.AddScoped<DomainEventHandler>();
         services.AddScoped<IntegrationEventHandler>();
@@ -78,6 +82,19 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UserService>();
         services.AddScoped<MatchingService>();
         services.AddScoped<JudgementService>();
+
+        services.AddScoped<UserDtoMapper>();
+        services.AddScoped<ImageDtoMapper>();
+        services.AddScoped<JudgementDtoMapper>();
+        services.AddScoped<MessageDtoMapper>();
+        services.AddScoped<ConversationDtoMapper>();
+        services.AddScoped<MatchingDtoMapper>();
+        services.AddScoped<IFileUrlGenerator, FileUrlGenerator>((services) =>
+        {
+            var service = services.GetRequiredService<IFileService>();
+            var sasDuration = TimeSpan.FromMinutes(30);
+            return new FileUrlGenerator(service, sasDuration);
+        });
 
         return services;
     }

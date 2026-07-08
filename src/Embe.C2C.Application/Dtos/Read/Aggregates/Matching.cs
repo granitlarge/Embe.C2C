@@ -16,11 +16,16 @@ public record MatchingDto
     ReadDto<UserDto, UserPermission>? User2
 );
 
-public static class MatchingDtoExtensions
+public class MatchingDtoMapper
 {
-    public static MatchingDto? ToDto
+    public MatchingDtoMapper()
+    {
+
+    }
+
+    public MatchingDto? ToDto
     (
-        this Matching matching,
+        Matching matching,
         MatchingVariant variant,
         ConversationDto? conversation,
         ReadDto<UserDto, UserPermission>? user1,
@@ -28,9 +33,7 @@ public static class MatchingDtoExtensions
     )
     {
         if (variant == MatchingVariant.Empty)
-        {
             return null;
-        }
 
         return new MatchingDto
         (
@@ -42,5 +45,6 @@ public static class MatchingDtoExtensions
             user1,
             user2
         );
+
     }
 }

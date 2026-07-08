@@ -12,14 +12,14 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
 {
-    private readonly UserAuthorizationPolicy _authorizationPolicy;
+    private readonly UserAuthorizationService _authorizationPolicy;
     private readonly UserService _userService;
     private readonly IAuthService _authService;
 
     public DeleteHandler
     (
         IRepository context,
-        UserAuthorizationPolicy authorizationPolicy,
+        UserAuthorizationService authorizationPolicy,
         UserService userService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,

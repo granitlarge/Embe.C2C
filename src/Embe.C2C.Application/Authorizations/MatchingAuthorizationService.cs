@@ -10,19 +10,19 @@ using Embe.C2C.Domain.Aggregates.Matchings;
 
 namespace Embe.C2C.Application.Authorizations;
 
-public class MatchingAuthorizationPolicy
+public class MatchingAuthorizationService
 {
     private readonly IRepository _repo;
     private readonly MatchingAuthorizationFactStore _facts;
-    private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy;
-    private readonly UserAuthorizationPolicy _userAuthorizationPolicy;
+    private readonly MessageAuthorizationService _messageAuthorizationPolicy;
+    private readonly UserAuthorizationService _userAuthorizationPolicy;
 
-    public MatchingAuthorizationPolicy
+    public MatchingAuthorizationService
     (
         IRepository repo,
         MatchingAuthorizationFactStore facts,
-        MessageAuthorizationPolicy messageAuthorizationPolicy,
-        UserAuthorizationPolicy userAuthorizationPolicy
+        MessageAuthorizationService messageAuthorizationPolicy,
+        UserAuthorizationService userAuthorizationPolicy
     )
     {
         _repo = repo;
@@ -42,7 +42,7 @@ public class MatchingAuthorizationPolicy
     {
         return GetPermissions(await _facts.GetIsParticipantFactAsync(matchingId, cancellationToken));
     }
-
+/*
     public async Task<ReadDto<MatchingDto, MatchingPermission>?> ToDtoAsync
     (
         Matching matching,
@@ -82,8 +82,8 @@ public class MatchingAuthorizationPolicy
         }
         return new ReadDto<MatchingDto, MatchingPermission>(matchingDto, permissions);
     }
-
-    private (ImmutableHashSet<MatchingPermission> Permissions, MatchingVariant Variant) Get
+*/
+    public (ImmutableHashSet<MatchingPermission> Permissions, MatchingVariant Variant) Get
     (
         Matching matching
     )

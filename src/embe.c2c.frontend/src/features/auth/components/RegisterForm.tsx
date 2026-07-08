@@ -4,7 +4,7 @@ import Button from "@/src/shared/components/buttons/Button";
 import { EmailInput } from "@/src/shared/components/inputs/email-input/EmailInput";
 import { useState } from "react";
 import ProgressBar from "@/src/shared/components/progress-bar/ProgressBar";
-import ImageGallery from "@/src/shared/components/inputs/image/gallery/ImageGallery";
+import ImageGalleryInput from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
 import * as z from "zod";
 import { accountExists as accountExists } from "../actions/account-exists/actions";
 import { useRouter } from "next/navigation";
@@ -274,7 +274,7 @@ function ImagesStep({ finish: finish, hidden, }: ImagesStepProps) {
 
     return (
         <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 w-full items-center pt-3`}>
-            <ImageGallery
+            <ImageGalleryInput
                 data={imagesData}
                 error={imagesError}
                 onChange={(newImages) => setImagesData(prev => ({ ...prev, images: newImages.map((image, index) => ({ ...image, order: index })) }))}

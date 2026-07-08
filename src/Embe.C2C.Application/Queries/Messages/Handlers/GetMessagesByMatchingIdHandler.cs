@@ -11,16 +11,19 @@ namespace Embe.C2C.Application.Queries.Messages.Handlers;
 public class GetMessagesByMatchingIdHandler
 {
     private readonly IRepository _repository;
-    private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy;
+    private readonly MessageAuthorizationService _messageAuthorizationService;
+    private readonly MessageDtoMapper _messageDtoMapper;
 
     public GetMessagesByMatchingIdHandler
     (
         IRepository repository,
-        MessageAuthorizationPolicy messageAuthorizationPolicy
+        MessageAuthorizationService messageAuthorizationPolicy,
+        MessageDtoMapper messageDtoMapper
     )
     {
         _repository = repository;
-        _messageAuthorizationPolicy = messageAuthorizationPolicy;
+        _messageAuthorizationService = messageAuthorizationPolicy;
+        _messageDtoMapper = messageDtoMapper;
     }
 
     public async Task<Result<List<ReadDto<MessageDto, MessagePermission>>>> HandleAsync(GetMessagesByMatchingIdQuery query, CancellationToken cancellationToken)
@@ -36,9 +39,10 @@ public class GetMessagesByMatchingIdHandler
         var dtos = new List<ReadDto<MessageDto, MessagePermission>>();
         foreach (var message in messages)
         {
-            var dto = await _messageAuthorizationPolicy.ToDtoAsync(message, cancellationToken);
+            var (permissions, variant) = await _messageAuthorizationService.GetAsync(message, cancellationToken);
+            var dto = _messageDtoMapper.ToDto(message, variant);
             if (dto != null)
-                dtos.Add(dto);
+                dtos.Add(new ReadDto<MessageDto, MessagePermission>(dto, permissions));
         }
 
         return Result<List<ReadDto<MessageDto, MessagePermission>>>.Success(dtos);

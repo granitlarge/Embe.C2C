@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
 import Surface from "../../../surfaces/Surface";
@@ -84,7 +84,7 @@ export type ImageGalleryProps<T extends Image = Image> = {
     onChange?: (images: (T | Image)[]) => void;
 }
 
-export default function ImageGallery<T extends Image = Image>({ data, error, className, onChange }: ImageGalleryProps<T>) {
+export default function ImageGalleryInput<T extends Image = Image>({ data, error, className, onChange }: ImageGalleryProps<T>) {
 
     const classNames = [
         className
@@ -109,10 +109,10 @@ export default function ImageGallery<T extends Image = Image>({ data, error, cla
             <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center`}>
                 {
                     images.map((image, index) => (
-                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id,  ...image }) => image))} />
+                        <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, ...image }) => image))} />
                     ))
                 }
-                <ImageSelector onImageSelected={(image) => onChange?.([...images.map(({ __id,  ...image }) => image), image])} />
+                <ImageSelector onImageSelected={(image) => onChange?.([...images.map(({ __id, ...image }) => image), image])} />
             </div>
             {error?.images && <span className="text-(--error-fc)">{error.images}</span>}
         </DragDropProvider>

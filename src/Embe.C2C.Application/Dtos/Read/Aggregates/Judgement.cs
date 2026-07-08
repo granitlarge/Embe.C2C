@@ -16,12 +16,16 @@ public record JudgementDto
     ReadDto<UserDto, UserPermission>? Judge
 );
 
-public static class JudgementDtoExtensions
+public class JudgementDtoMapper
 {
+    public JudgementDtoMapper()
+    {
 
-    public static JudgementDto? ToDto
+    }
+
+    public JudgementDto? ToDto
     (
-        this Judgement judgement,
+        Judgement judgement,
         JudgementVariant variant,
         ReadDto<UserDto, UserPermission>? judge = null
     )
@@ -42,5 +46,4 @@ public static class JudgementDtoExtensions
         );
 
     }
-
 }

@@ -19,20 +19,23 @@ public record ConversationDto
     ReadDto<MessageDto, MessagePermission>[]? Messages
 );
 
-public static class ConversationDtoExtensions
+public class ConversationDtoMapper
 {
-    public static ConversationDto? ToDto
+    public ConversationDtoMapper()
+    {
+
+    }
+
+    public ConversationDto? ToDto
     (
-        this Domain.Entities.Conversation conversation, 
+        Domain.Entities.Conversation conversation,
         ConversationVariant variant,
         ReadDto<MessageDto, MessagePermission>? lastMessage,
         ReadDto<MessageDto, MessagePermission>[]? messages
     )
     {
         if (variant == ConversationVariant.Empty)
-        {
             return null;
-        }
 
         return new ConversationDto
         (
@@ -47,5 +50,6 @@ public static class ConversationDtoExtensions
             lastMessage,
             messages
         );
+
     }
 }

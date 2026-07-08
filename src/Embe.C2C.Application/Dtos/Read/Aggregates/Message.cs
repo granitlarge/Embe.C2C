@@ -18,10 +18,23 @@ public record MessageDto
     ReadDto<MessageDto, MessagePermission>? ReplyToMessage
 );
 
-public static class MessageDtoExtensions
+public class MessageDtoMapper
 {
-    public static MessageDto ToDto(this Message message, MessageVariant variant, ReadDto<MessageDto, MessagePermission>? replyToMessageDto = null)
+    public MessageDtoMapper()
     {
+
+    }
+
+    public MessageDto? ToDto
+    (
+        Message message,
+        MessageVariant variant,
+        ReadDto<MessageDto, MessagePermission>? replyToMessageDto = null
+    )
+    {
+        if (variant == MessageVariant.Empty)
+            return null;
+
         return new MessageDto
         (
             message.Id,

@@ -11,14 +11,13 @@ using Embe.C2C.Domain.Aggregates.Users;
 
 namespace Embe.C2C.Application.Authorizations;
 
-public class UserAuthorizationPolicy
+public class UserAuthorizationService
 {
-
     private readonly UserAuthorizationFactStore _facts;
 
     private readonly IFileUrlGenerator _fileUrlGenerator;
 
-    public UserAuthorizationPolicy
+    public UserAuthorizationService
     (
         UserAuthorizationFactStore facts,
         IFileService fileService
@@ -27,14 +26,13 @@ public class UserAuthorizationPolicy
         _facts = facts;
         _fileUrlGenerator = new FileUrlGenerator(fileService, TimeSpan.FromSeconds(15));
     }
-
+/*
     public async Task<ReadDto<UserDto, UserPermission>?> ToDtoAsync
     (
         User user,
         CancellationToken cancellationToken = default
     )
     {
-
         var (permissions, variant) = await GetAsync(user.Id, cancellationToken);
 
         var dto = await user.ToDtoAsync(variant, _fileUrlGenerator, cancellationToken);
@@ -48,6 +46,7 @@ public class UserAuthorizationPolicy
         );
 
     }
+    */
 
     public async ValueTask<(ImmutableHashSet<UserPermission> Permissions, UserVariant Variant)> GetAsync
     (

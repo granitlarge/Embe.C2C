@@ -13,11 +13,11 @@ public class MarkMessagesAsSeenHandler
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
-    MessageAuthorizationPolicy messageAuthoriztionPolicy,
+    MessageAuthorizationService messageAuthoriztionPolicy,
     DomainEventStore domainEventStore
 ) : TransactionalCommandHandler<MarkMessagesAsSeenCommand, Result>(domainEventStore, context, domainEventHandler, integrationEventHandler)
 {
-    private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy = messageAuthoriztionPolicy;
+    private readonly MessageAuthorizationService _messageAuthorizationPolicy = messageAuthoriztionPolicy;
 
     protected async override Task<TransactionalCommandResult<Result>> HandleAsync
     (

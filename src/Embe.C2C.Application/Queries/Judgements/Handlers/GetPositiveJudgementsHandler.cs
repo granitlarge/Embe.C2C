@@ -12,13 +12,15 @@ public class GetPositiveJudgementsHandler
 (
     IRepository repository,
     IAuthenticatedUserService authenticatedUserService,
-    JudgementAuthorizationPolicy authorizationPolicy
+    JudgementAuthorizationService authorizationPolicy,
+    JudgementDtoMapper judgementDtoMapper
 )
 {
 
     private readonly IRepository _repository = repository;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
-    private readonly JudgementAuthorizationPolicy _authorizationPolicy = authorizationPolicy;
+    private readonly JudgementAuthorizationService _authorizationPolicy = authorizationPolicy;
+    private readonly JudgementDtoMapper _judgementDtoMapper = judgementDtoMapper;
 
     public async Task<Result<List<ReadDto<JudgementDto, JudgementPermission>>>> HandleAsync
     (
@@ -40,12 +42,13 @@ public class GetPositiveJudgementsHandler
         var judgementDtos = new List<ReadDto<JudgementDto, JudgementPermission>>();
         foreach (var judgement in judgements)
         {
-            var judgementDto = await _authorizationPolicy.ToDtoAsync(judgement, cancellationToken);
-            if (judgementDto == null || !judgementDto.Permissions.Contains(JudgementPermission.View))
+            var (permissions, variant) = _authorizationPolicy.Get(judgement);
+            var dto = _judgementDtoMapper.ToDto(judgement, variant);
+            if (dto == null || !permissions.Contains(JudgementPermission.View))
             {
                 return Result<List<ReadDto<JudgementDto, JudgementPermission>>>.Failure(FailureReason.Forbidden, "User does not have permission to view some of the judgements.");
             }
-            judgementDtos.Add(judgementDto);
+            judgementDtos.Add(new ReadDto<JudgementDto, JudgementPermission>(dto, permissions));
         }
 
         return Result<List<ReadDto<JudgementDto, JudgementPermission>>>.Success(judgementDtos);

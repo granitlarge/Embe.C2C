@@ -1,6 +1,6 @@
 import React from "react";
 
-export type Padding = "none" | "sm" | "md" | "lg";
+export type Padding = "none" | "xs" | "sm" | "md" | "lg";
 export type Variant = "primary" | "secondary" | "tertiary" | "inherit" | "none";
 
 export type SurfaceProps<T extends React.ElementType = "div"> = {
@@ -26,9 +26,10 @@ export default function Surface<T extends React.ElementType = "div">({
         className,
         variant === "none" ? "" : `surface-${variant}`,
         padding === "none" ? "" :
-            padding === "sm" ? "p-2" :
-                padding === "md" ? "p-4" :
-                    "p-6"
+            padding === "xs" ? "p-1" :
+                padding === "sm" ? "p-2" :
+                    padding === "md" ? "p-4" :
+                        "p-6"
     ]
         .filter(Boolean)
         .join(" ");

@@ -8,13 +8,13 @@ using Embe.C2C.Domain.Aggregates.Messages;
 
 namespace Embe.C2C.Application.Authorizations;
 
-public class MessageAuthorizationPolicy
+public class MessageAuthorizationService
 (
     MessageAuthorizationFactStore facts
 )
 {
     private readonly MessageAuthorizationFactStore _facts = facts;
-
+/*
     public async Task<ReadDto<MessageDto, MessagePermission>?> ToDtoAsync
     (
         Message message,
@@ -31,7 +31,7 @@ public class MessageAuthorizationPolicy
         var messageDto = message.ToDto(variant, messageReplyToDto);
         return new ReadDto<MessageDto, MessagePermission>(messageDto, permissions);
     }
-
+*/
     public async Task<ImmutableHashSet<MessagePermission>> GetPermissionsAsync
     (
         Guid messageId,
@@ -42,7 +42,7 @@ public class MessageAuthorizationPolicy
         return permissions;
     }
 
-    private async ValueTask<(ImmutableHashSet<MessagePermission> Permissions, MessageVariant Variant)> GetAsync
+    public async ValueTask<(ImmutableHashSet<MessagePermission> Permissions, MessageVariant Variant)> GetAsync
     (
         Message message,
         CancellationToken cancellationToken

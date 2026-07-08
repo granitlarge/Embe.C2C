@@ -9,6 +9,8 @@ import Button from "@/src/shared/components/buttons/Button";
 import { updateProfile } from "../actions/action";
 import * as z from "zod";
 import { Gender } from "@/src/shared/types/domain/value-objects";
+import Modal from "@/src/shared/components/modal/Modal";
+import Profile from "@/src/shared/components/profiles/Profile";
 
 export type MeProps = {
     className?: string,
@@ -58,7 +60,7 @@ export default function Me({ className, user }: MeProps) {
     }
 
     function onPreview() {
-
+        setShowPreview(true);
     }
 
     async function onSave() {
@@ -126,6 +128,45 @@ export default function Me({ className, user }: MeProps) {
                 <Button onClick={onPreview} variant="secondary">preview</Button>
                 <Button variant="tertiary" onClick={onCancel}>cancel</Button>
             </div>
+            <Modal className="surface-secondary" hidden={!showPreview} closed={() => setShowPreview(false)} header="profile preview">
+                <Profile 
+                    user = {{
+                        id: user.data?.id!,
+                        alias: clientSideBasicFormData.alias,
+                        birthDate: clientSideBasicFormData.birthDate,
+                        gender: clientSideBasicFormData.gender,
+                        datingPreferences: user.data?.datingPreferences,
+                        location: clientSideBasicFormData.location,
+                        profilePicture: {
+                            id: "",
+                            ownerUserId: "",
+                            imageDetails: {
+                                url: clientSideBasicFormData.images?.[0]?.url ?? "",
+                                mimeType: clientSideBasicFormData.images?.[0]?.mimeType ?? "",
+                                order: 0,
+                                name: "",
+                            },
+                            markedForDeletionAt: null,
+                            deletedAt: null,
+                            createdAt: ""
+                        },
+                        images: clientSideBasicFormData.images?.map((image, index) => ({
+                            id: image.id ?? "",
+                            ownerUserId: "",
+                            createdAt: user.data?.createdAt ?? "",
+                            updatedAt: new Date().toISOString(),
+                            imageDetails: {
+                                url: image.url,
+                                mimeType: image.mimeType,
+                                order: index,
+                                name: "",
+                            },
+                            markedForDeletionAt: null,
+                            deletedAt: null
+                        })) ?? []
+                    }} 
+                />
+            </Modal>
         </Surface>
 
     )

@@ -2,7 +2,7 @@ import { UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { User as UserTypeDef } from "@/src/shared/types/domain/aggregates";
 import Surface from "@/src/shared/components/surfaces/Surface";
-import ImageGallery from "@/src/shared/components/image-gallery/ImageGallery";
+import ImageGallery from "@/src/shared/components/images/ImageGallery";
 
 export type FindUserDatingProps = {
     dto: ReadDto<UserTypeDef, UserPermission>;

@@ -42,12 +42,11 @@ export default function Modal({ children, className, closed, hidden, header, ...
                 p-5 
                 flex 
                 flex-col 
-                w-[70%] h-[70%] 
                 m-auto 
                 rounded-lg 
                 scrollbar-gutter-stable
                 `} {...props}>
-            <h2 className="mr-auto ml-auto text-(--surface-font-color)">{header}</h2>
+            <h2 className="mx-auto text-(--primary-fc)">{header}</h2>
             {children}
         </dialog>
     );

@@ -11,7 +11,7 @@ namespace Embe.C2C.Application.Commands.Matching.Handlers;
 
 public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result>
 {
-    private readonly MatchingAuthorizationPolicy _authorizationPolicy;
+    private readonly MatchingAuthorizationService _authorizationPolicy;
     private readonly IAuthenticatedUserService _userService;
 
     public UnmatchHandler
@@ -19,7 +19,7 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
         IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
-        MatchingAuthorizationPolicy authorizationPolicy,
+        MatchingAuthorizationService authorizationPolicy,
         IAuthenticatedUserService userService,
         DomainEventStore domainEventStore
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)

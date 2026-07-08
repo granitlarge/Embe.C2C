@@ -5,6 +5,8 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Dtos.Read.Entities;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
@@ -20,11 +22,23 @@ public class GetMatchingsHandler
 (
     IRepository repository,
     IFileService fileService,
-    MatchingAuthorizationPolicy authorizationPolicy
+    MatchingAuthorizationService matchingAuthorizationService,
+    MatchingDtoMapper matchingDtoMapper,
+    UserAuthorizationService userAuthorizationService,
+    UserDtoMapper userDtoMapper,
+    MessageAuthorizationService messageAuthorizationService,
+    MessageDtoMapper messageDtoMapper,
+    ConversationDtoMapper conversationDtoMapper
 ) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
     private readonly IFileService _fileService = fileService;
-    private readonly MatchingAuthorizationPolicy _authorizationPolicy = authorizationPolicy;
+    private readonly MatchingAuthorizationService _matchingAuthorizationService = matchingAuthorizationService;
+    private readonly MatchingDtoMapper _matchingDtoMapper = matchingDtoMapper;
+    private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;
+    private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
+    private readonly MessageAuthorizationService _messageAuthorizationService = messageAuthorizationService;
+    private readonly MessageDtoMapper _messageDtoMapper = messageDtoMapper;
+    private readonly ConversationDtoMapper _conversationDtoMapper = conversationDtoMapper;
 
     protected override async Task<Result<List<ReadDto<MatchingDto, MatchingPermission>>>> ExecuteAsync
     (
@@ -33,8 +47,7 @@ public class GetMatchingsHandler
         CancellationToken cancellationToken
     )
     {
-        var fileUrlGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromSeconds(15));
-        var viewable = _authorizationPolicy.GetViewable();
+        var viewable = _matchingAuthorizationService.GetViewable();
         var matchings = await viewable
             .AsNoTracking()
             .AsSplitQuery()
@@ -50,10 +63,23 @@ public class GetMatchingsHandler
         var dtos = new List<ReadDto<MatchingDto, MatchingPermission>>();
         foreach (var matching in matchings)
         {
-            var dto = await _authorizationPolicy.ToDtoAsync(matching, cancellationToken);
-            if (dto is not null)
+            var readDto = await matching.ToDtoAsync
+            (
+                matching.User1,
+                matching.User2,
+                _matchingAuthorizationService,
+                _matchingDtoMapper,
+                _userAuthorizationService,
+                _userDtoMapper,
+                _messageAuthorizationService,
+                _messageDtoMapper,
+                _conversationDtoMapper,
+                cancellationToken
+            );
+
+            if (readDto is not null)
             {
-                dtos.Add(dto);
+                dtos.Add(readDto);
             }
         }
 

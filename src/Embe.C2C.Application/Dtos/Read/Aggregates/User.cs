@@ -23,13 +23,19 @@ public record UserDto
     DateTimeOffset? UpdatedAt
 );
 
-public static class UserDtoExtensions
+public class UserDtoMapper
 {
-    public static async Task<UserDto?> ToDtoAsync
+    private readonly ImageDtoMapper _imageDtoMapper;
+
+    public UserDtoMapper(ImageDtoMapper imageDtoMapper)
+    {
+        _imageDtoMapper = imageDtoMapper;
+    }
+
+    public async Task<UserDto?> ToDtoAsync
     (
-        this User user,
+        User user,
         UserVariant variant,
-        IFileUrlGenerator fileUrlGenerator,
         CancellationToken cancellationToken = default
     )
     {
@@ -38,8 +44,8 @@ public static class UserDtoExtensions
             return null;
         }
 
-        var images = user.Images != null && variant.IncludeImages ? await Task.WhenAll(user.Images.Select(f => f.ToDtoAsync(fileUrlGenerator, cancellationToken))) : null;
-        var profilePicture = user.ProfilePicture != null && variant.IncludeProfilePicture ? await user.ProfilePicture.ToDtoAsync(fileUrlGenerator, cancellationToken) : null;
+        var images = user.Images != null && variant.IncludeImages ? await Task.WhenAll(user.Images.Select(f => _imageDtoMapper.ToDtoAsync(f, cancellationToken))) : null;
+        var profilePicture = user.ProfilePicture != null && variant.IncludeProfilePicture ? await _imageDtoMapper.ToDtoAsync(user.ProfilePicture, cancellationToken) : null;
 
         return new UserDto
         (

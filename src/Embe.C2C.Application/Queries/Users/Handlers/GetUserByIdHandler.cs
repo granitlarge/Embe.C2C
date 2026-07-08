@@ -11,13 +11,13 @@ namespace Embe.C2C.Application.Queries.Users.Handlers;
 
 public class GetUserByIdHandler
 (
-    UserAuthorizationPolicy authorizationPolicy,
+    UserAuthorizationService authorizationPolicy,
     IRepository context,
-    IFileService fileService
+    UserDtoMapper userDtoMapper
 ) : TransactionalQueryHandler<GetUserByIdQuery, Result<ReadDto<UserDto, UserPermission>?>>(context)
 {
-    private readonly UserAuthorizationPolicy _authorizationPolicy = authorizationPolicy;
-    private readonly IFileService _fileService = fileService;
+    private readonly UserAuthorizationService _authorizationService = authorizationPolicy;
+    private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
 
     protected override async Task<Result<ReadDto<UserDto, UserPermission>?>> ExecuteAsync
     (
@@ -26,19 +26,18 @@ public class GetUserByIdHandler
         CancellationToken cancellationToken
     )
     {
-        var (permissions, variant) = await _authorizationPolicy.GetAsync(request.Id, cancellationToken);
+        var (permissions, variant) = await _authorizationService.GetAsync(request.Id, cancellationToken);
         if (!permissions.Contains(UserPermission.View))
         {
             return Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.Forbidden, "You are not authorized to view this user.");
         }
 
         var user = await repo.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
-
         if (user is null)
             return Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found.");
 
-        var fileUrlGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromMinutes(15));
-        var dto = await _authorizationPolicy.ToDtoAsync(user, cancellationToken);
-        return Result<ReadDto<UserDto, UserPermission>?>.Success(dto);
+        var dto = await _userDtoMapper.ToDtoAsync(user, variant, cancellationToken);
+        var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
+        return Result<ReadDto<UserDto, UserPermission>?>.Success(readDto);
     }
 }

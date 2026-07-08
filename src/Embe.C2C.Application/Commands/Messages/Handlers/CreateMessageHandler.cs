@@ -5,39 +5,42 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Policies;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class CreateMessageHandler : TransactionalCommandHandler<CreateMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
 {
-    private readonly MatchingAuthorizationPolicy _matchingAuthorizationPolicy;
-    private readonly MessageAuthorizationPolicy _messageAuthorizationPolicy;
+    private readonly MatchingAuthorizationService _matchingAuthorizationService;
+    private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUser;
     private readonly MatchingService _matchingService;
+    private readonly MessageDtoMapper _messageDtoMapper;
 
     public CreateMessageHandler
     (
         DomainEventStore domainEventStore,
-        MatchingAuthorizationPolicy matchingAuthorizationPolicy,
-        MessageAuthorizationPolicy messageAuthorizationPolicy,
+        MatchingAuthorizationService matchingAuthorizationService,
+        MessageAuthorizationService messageAuthorizationService,
         IAuthenticatedUserService authenticatedUser,
         MatchingService matchingService,
         IRepository context,
         DomainEventHandler domainEventHandler,
-        IntegrationEventHandler integrationEventHandler
+        IntegrationEventHandler integrationEventHandler,
+        MessageDtoMapper messageDtoMapper
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
-        _matchingAuthorizationPolicy = matchingAuthorizationPolicy;
-        _messageAuthorizationPolicy = messageAuthorizationPolicy;
+        _matchingAuthorizationService = matchingAuthorizationService;
+        _messageAuthorizationService = messageAuthorizationService;
         _authenticatedUser = authenticatedUser;
         _matchingService = matchingService;
+        _messageDtoMapper = messageDtoMapper;
     }
 
     protected async override Task<TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
@@ -47,7 +50,7 @@ public class CreateMessageHandler : TransactionalCommandHandler<CreateMessageCom
         CancellationToken cancellationToken = default
     )
     {
-        var permissions = await _matchingAuthorizationPolicy.GetPermissionsAsync(command.MatchingId, cancellationToken);
+        var permissions = await _matchingAuthorizationService.GetPermissionsAsync(command.MatchingId, cancellationToken);
         if (!permissions.Contains(MatchingPermission.Chat))
         {
             return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "You don't have permission to send messages in this matching."));
@@ -80,9 +83,11 @@ public class CreateMessageHandler : TransactionalCommandHandler<CreateMessageCom
             var communicationPolicy = new CommunicationPolicy(user, receiver, matching, blocking1, blocking2);
             var message = _matchingService.SendMessage(user, matching, messageContent, communicationPolicy, replyToMessage);
             context.Messages.Add(message);
-            var dto = await _messageAuthorizationPolicy.ToDtoAsync(message, cancellationToken) ??
+
+            var readDto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken) ??
                 throw new InvalidOperationException("The message should be viewable to the sender right after sending it.");
-            var result = Result<ReadDto<MessageDto, MessagePermission>>.Success(dto);
+
+            var result = Result<ReadDto<MessageDto, MessagePermission>>.Success(readDto);
             return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(true, result);
         }
         catch (DomainException ex)

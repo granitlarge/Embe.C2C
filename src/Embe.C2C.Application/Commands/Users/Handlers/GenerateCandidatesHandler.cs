@@ -14,12 +14,13 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 public class GenerateCandidatesHandler
 (
     IAuthenticatedUserService authenticatedUserService,
-    UserAuthorizationPolicy userAuthorizationPolicy,
+    UserAuthorizationService userAuthorizationPolicy,
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
     UserAuthorizationFactStore userAuthorizationFactStore,
-    DomainEventStore domainEventStore
+    DomainEventStore domainEventStore,
+    UserDtoMapper userDtoMapper
 ) : TransactionalCommandHandler<GenerateCandidatesCommand, Result<List<ReadDto<UserDto, UserPermission>>>>
 (
     domainEventStore,
@@ -29,8 +30,9 @@ public class GenerateCandidatesHandler
 )
 {
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
-    private readonly UserAuthorizationPolicy _userAuthorizationPolicy = userAuthorizationPolicy;
+    private readonly UserAuthorizationService _userAuthorizationPolicy = userAuthorizationPolicy;
     private readonly UserAuthorizationFactStore _userAuthorizationFactStore = userAuthorizationFactStore;
+    private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
 
     protected override async Task<TransactionalCommandResult<Result<List<ReadDto<UserDto, UserPermission>>>>> HandleAsync
     (
@@ -40,15 +42,16 @@ public class GenerateCandidatesHandler
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-        var users = await context.GenerateCandidatesForUserIdAsync(userId);
+        var users = await context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         var dtos = new List<ReadDto<UserDto, UserPermission>>();
         foreach (var user in users)
         {
             _userAuthorizationFactStore.SetCandidateUserFact(user.Id, true);
-            var dto = await _userAuthorizationPolicy.ToDtoAsync(user, cancellationToken);
+            var (permissions, variant) = await _userAuthorizationPolicy.GetAsync(user.Id, cancellationToken);
+            var dto = await _userDtoMapper.ToDtoAsync(user, variant, cancellationToken);
             if (dto is not null)
             {
-                dtos.Add(dto);
+                dtos.Add(new ReadDto<UserDto, UserPermission>(dto, permissions));
             }
         }
         var result = Result<List<ReadDto<UserDto, UserPermission>>>.Success(dtos);

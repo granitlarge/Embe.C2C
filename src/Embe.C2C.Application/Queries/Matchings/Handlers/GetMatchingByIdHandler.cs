@@ -5,30 +5,46 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Dtos.Read.Entities;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
 public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQuery, Result<ReadDto<MatchingDto, MatchingPermission>>>
 {
-    private readonly IFileService _fileService;
-    private readonly MatchingAuthorizationPolicy _authorizationPolicy;
+    private readonly MatchingAuthorizationService _matchingAuthorizationService;
+    private readonly MatchingDtoMapper _matchingDtoMapper;
+    private readonly UserAuthorizationService _userAuthorizationService;
+    private readonly UserDtoMapper _userDtoMapper;
+    private readonly MessageAuthorizationService _messageAuthorizationService;
+    private readonly MessageDtoMapper _messageDtoMapper;
+    private readonly ConversationDtoMapper _conversationDtoMapper;
 
     public GetMatchingByIdHandler
     (
         IRepository repository,
-        IFileService fileService,
-        MatchingAuthorizationPolicy authorizationPolicy
+        MatchingAuthorizationService matchingAuthorizationService,
+        MatchingDtoMapper matchingDtoMapper,
+        UserAuthorizationService userAuthorizationService,
+        UserDtoMapper userDtoMapper,
+        MessageAuthorizationService messageAuthorizationService,
+        MessageDtoMapper messageDtoMapper,
+        ConversationDtoMapper conversationDtoMapper
     ) : base(repository)
     {
-        _fileService = fileService;
-        _authorizationPolicy = authorizationPolicy;
+        _matchingAuthorizationService = matchingAuthorizationService;
+        _matchingDtoMapper = matchingDtoMapper;
+        _userAuthorizationService = userAuthorizationService;
+        _userDtoMapper = userDtoMapper;
+        _messageAuthorizationService = messageAuthorizationService;
+        _messageDtoMapper = messageDtoMapper;
+        _conversationDtoMapper = conversationDtoMapper;
     }
 
     protected override async Task<Result<ReadDto<MatchingDto, MatchingPermission>>> ExecuteAsync(GetMatchingByIdQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
     {
-        var fileGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromMinutes(15));
-        var permissions = await _authorizationPolicy.GetPermissionsAsync(query.MatchingId, cancellationToken);
+        var permissions = await _matchingAuthorizationService.GetPermissionsAsync(query.MatchingId, cancellationToken);
         if (!permissions.Contains(MatchingPermission.View))
         {
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.Forbidden, "You do not have permission to view this matching.");
@@ -50,12 +66,25 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.NotFound, "Matching not found.");
         }
 
-        var dto = await _authorizationPolicy.ToDtoAsync(matching, cancellationToken);
-        if (dto == null)
+        var readDto = await matching.ToDtoAsync
+        (
+            matching.User1,
+            matching.User2,
+            _matchingAuthorizationService,
+            _matchingDtoMapper,
+            _userAuthorizationService,
+            _userDtoMapper,
+            _messageAuthorizationService,
+            _messageDtoMapper,
+            _conversationDtoMapper,
+            cancellationToken
+        );
+
+        if (readDto == null)
         {
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.Forbidden, "You do not have permission to view this matching.");
         }
 
-        return Result<ReadDto<MatchingDto, MatchingPermission>>.Success(dto);
+        return Result<ReadDto<MatchingDto, MatchingPermission>>.Success(readDto);
     }
 }

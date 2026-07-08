@@ -4,7 +4,6 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Authorizations;
-using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
@@ -19,26 +18,29 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<ReadDto<UserDto, UserPermission>?>>
 {
     private readonly IAuthenticatedUserService _user;
-    private readonly UserAuthorizationPolicy _authorizationPolicy;
+    private readonly UserAuthorizationService _authorizationPolicy;
     private readonly IFileService _fileService;
     private readonly IWorkItemService _workItemService;
+    private readonly UserDtoMapper _userDtoMapper;
 
     public UpdateHandler
     (
         IAuthenticatedUserService user,
         IRepository context,
-        UserAuthorizationPolicy authorizationPolicy,
+        UserAuthorizationService authorizationPolicy,
         IFileService fileService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IWorkItemService workItemService,
-        DomainEventStore domainEventStore
+        DomainEventStore domainEventStore,
+        UserDtoMapper userDtoMapper
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _user = user;
         _authorizationPolicy = authorizationPolicy;
         _fileService = fileService;
         _workItemService = workItemService;
+        _userDtoMapper = userDtoMapper;
     }
 
     protected override async Task<TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
@@ -98,8 +100,10 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
 
             success = true;
 
-            var fileGenerator = new FileUrlGenerator(_fileService, TimeSpan.FromMinutes(15));
-            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(true, Result<ReadDto<UserDto, UserPermission>?>.Success(await _authorizationPolicy.ToDtoAsync(user, cancellationToken)));
+            var dto = await _userDtoMapper.ToDtoAsync(user, variant, cancellationToken);
+            var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
+
+            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(true, Result<ReadDto<UserDto, UserPermission>?>.Success(readDto));
         }
         catch (DomainException)
         {

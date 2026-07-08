@@ -1,5 +1,6 @@
 .modal {
     min-width: 768px;
+    min-height:70%;
     position: relative;
 }
 
@@ -10,7 +11,7 @@
 @media (max-width: 832px) {
     .modal {
         min-width: 0px;
-        height: 80%;
-        width: 100%;
+        height: 100dvh;
+        width: 100dvw;
     }
 }
