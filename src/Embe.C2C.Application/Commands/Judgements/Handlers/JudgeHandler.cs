@@ -114,8 +114,10 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         if (matching == null)
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(null));
 
+        var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         var readDto = await matching.ToDtoAsync
         (
+            queryingUser,
             judge,
             judgee,
             _matchingAuthorizationService,

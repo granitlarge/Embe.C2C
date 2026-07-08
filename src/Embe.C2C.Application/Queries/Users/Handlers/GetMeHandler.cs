@@ -31,8 +31,9 @@ public class GetMeHandler : TransactionalQueryHandler<GetMeQuery, Result<ReadDto
     protected override async Task<Result<ReadDto<UserDto, UserPermission>>> ExecuteAsync(GetMeQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
     {
         var userId = _authenticatedUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
-        var user = await repository.DomainUsersQuery.SingleAsync(u => u.Id == userId, cancellationToken);
-        var readDto = await user.ToDtoAsync(_userAuthorizationService, _userDtoMapper);
+        var user = await repository.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == userId, cancellationToken);
+        var enrichedUser = user.Enrich(user);
+        var readDto = await enrichedUser.ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken: cancellationToken);
         if (readDto is null)
             return Result<ReadDto<UserDto, UserPermission>>.Failure(FailureReason.Forbidden, "User does not have permission to view their own profile.");
         return Result<ReadDto<UserDto, UserPermission>>.Success(readDto);

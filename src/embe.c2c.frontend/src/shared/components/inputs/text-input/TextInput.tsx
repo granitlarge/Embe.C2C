@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Surface from "../../surfaces/Surface";
 
 export type InputProps = {
@@ -6,8 +7,8 @@ export type InputProps = {
 
 export type TextInputProps = InputProps & {
     className?: string;
-    onChange?: (value: string) => void;
-    value?: string;
+    onBlur?: (value: string) => void;
+    initialValue?: string;
     label?: React.ReactNode;
     type?: string;
     placeholder?: string;
@@ -16,16 +17,20 @@ export type TextInputProps = InputProps & {
 export default function TextInput({
     label,
     className,
-    onChange,
+    onBlur,
     type = "text",
-    value,
+    initialValue,
     errorMessage,
     placeholder,
     children
 }: TextInputProps) {
+
+    const [value, setValue] = useState(initialValue ?? "");
+
     const shellClassNames = [
         className
     ].filter(Boolean).join(" ");
+
     return (
         <Surface className={`input-wrapper ${shellClassNames}`} padding="none" variant="inherit">
             {label && <span className="label">{label}</span>}
@@ -33,8 +38,9 @@ export default function TextInput({
                 className="input"
                 placeholder={placeholder ?? ""}
                 type={type}
-                value={value ?? ""}
-                onChange={(e) => onChange?.(e.target.value)}
+                value={value}
+                onChange={(e) => { setValue(e.target.value); }}
+                onBlur={(e) => { onBlur?.(value) }}
             />
             {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
             {children}

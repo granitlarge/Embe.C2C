@@ -12,10 +12,10 @@ function PaginationDots({ total, current, className }: PaginationDotsProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
     return (
-        <div className={`${classNames} rounded-md flex gap-5 width-[25%] space-between`}>
+        <div className={`${classNames} rounded-md flex gap-1 justify-center overflow-x-hidden`}>
             {
                 Array.from({ length: total }, (_, index) => (
-                    <div key={index} className={`rounded-full ${index === current ? "bg-(--universal-primary-bg)" : "bg-(--universal-primary-fc)"} w-2 h-2`}></div>
+                    <div key={index} className={`rounded-full ${index === current ? "bg-(--universal-primary-bg)" : "bg-(--universal-primary-fc)"} w-1 h-1`}></div>
                 ))
             }
         </div>
@@ -31,7 +31,7 @@ type ImageGalleryImageProps = {
 function ImageGalleryImage({ src, alt, className }: ImageGalleryImageProps) {
     const classNames = [className].filter(Boolean).join(" ");
     return (
-        <Image src={src} alt={alt} className={`${classNames} ${styles.image}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
+        <Image src={src} alt={alt} className={`${classNames} ${styles.image} rounded-md`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
     )
 }
 

@@ -58,8 +58,8 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
                 config.alias &&
                 <TextInput
                     label={"alias"}
-                    value={data?.alias}
-                    onChange={(alias) => onChange({ ...data, alias })}
+                    initialValue={data?.alias}
+                    onBlur={(alias) => onChange({ ...data, alias })}
                     errorMessage={error?.alias}
                 />
             }
@@ -69,8 +69,8 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
                     label={"date of birth"}
                     minDate={data.birthDateRange.lower}
                     maxDate={data.birthDateRange.upper}
-                    value={data?.birthDate}
-                    onChange={(birthDate) => onChange({ ...data, birthDate })}
+                    initialValue={data?.birthDate}
+                    onBlur={(birthDate) => onChange({ ...data, birthDate })}
                 />
             }
             {

@@ -16,7 +16,7 @@ export type User = {
     images?: Image[];
     createdAt?: string;
     updatedAt?: string;
-    distanceKm?: number;
+    distanceKmToQueryingUser?: number;
 }
 
 export enum UserPermission {

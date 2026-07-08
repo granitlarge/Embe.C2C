@@ -11,6 +11,7 @@ import * as z from "zod";
 import { Gender } from "@/src/shared/types/domain/value-objects";
 import Modal from "@/src/shared/components/modal/Modal";
 import Profile from "@/src/shared/components/profiles/Profile";
+import { calculateAge } from "@/src/shared/time";
 
 export type MeProps = {
     className?: string,
@@ -128,15 +129,21 @@ export default function Me({ className, user }: MeProps) {
                 <Button onClick={onPreview} variant="secondary">preview</Button>
                 <Button variant="tertiary" onClick={onCancel}>cancel</Button>
             </div>
-            <Modal className="surface-secondary" hidden={!showPreview} closed={() => setShowPreview(false)} header="profile preview">
-                <Profile 
-                    user = {{
+            {
+                showPreview && <Modal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">
+                <Profile
+                    user={{
                         id: user.data?.id!,
                         alias: clientSideBasicFormData.alias,
                         birthDate: clientSideBasicFormData.birthDate,
                         gender: clientSideBasicFormData.gender,
                         datingPreferences: user.data?.datingPreferences,
                         location: clientSideBasicFormData.location,
+                        distanceKmToQueryingUser: user.data?.distanceKmToQueryingUser,
+                        age: calculateAge(clientSideBasicFormData.birthDate ?? "2000-01-01"),
+                        createdAt: user.data?.createdAt,
+                        updatedAt: user.data?.updatedAt,
+                        email: user.data?.email,
                         profilePicture: {
                             id: "",
                             ownerUserId: "",
@@ -164,9 +171,10 @@ export default function Me({ className, user }: MeProps) {
                             markedForDeletionAt: null,
                             deletedAt: null
                         })) ?? []
-                    }} 
+                    }}
                 />
             </Modal>
+            }
         </Surface>
 
     )

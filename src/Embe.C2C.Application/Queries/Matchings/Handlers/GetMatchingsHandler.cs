@@ -28,7 +28,8 @@ public class GetMatchingsHandler
     UserDtoMapper userDtoMapper,
     MessageAuthorizationService messageAuthorizationService,
     MessageDtoMapper messageDtoMapper,
-    ConversationDtoMapper conversationDtoMapper
+    ConversationDtoMapper conversationDtoMapper,
+    IAuthenticatedUserService authenticatedUserService
 ) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
     private readonly IFileService _fileService = fileService;
@@ -39,11 +40,12 @@ public class GetMatchingsHandler
     private readonly MessageAuthorizationService _messageAuthorizationService = messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper = messageDtoMapper;
     private readonly ConversationDtoMapper _conversationDtoMapper = conversationDtoMapper;
+    private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
 
     protected override async Task<Result<List<ReadDto<MatchingDto, MatchingPermission>>>> ExecuteAsync
     (
         GetMatchingsQuery query,
-        ISparseRepository _,
+        ISparseRepository repo,
         CancellationToken cancellationToken
     )
     {
@@ -60,11 +62,14 @@ public class GetMatchingsHandler
             .Take(query.Size)
             .ToListAsync(cancellationToken);
 
+        var userId = _authenticatedUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
+        var queryingUser = await repo.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         var dtos = new List<ReadDto<MatchingDto, MatchingPermission>>();
         foreach (var matching in matchings)
         {
             var readDto = await matching.ToDtoAsync
             (
+                queryingUser,
                 matching.User1,
                 matching.User2,
                 _matchingAuthorizationService,

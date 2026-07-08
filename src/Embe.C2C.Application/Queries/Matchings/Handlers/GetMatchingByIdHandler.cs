@@ -20,6 +20,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper;
     private readonly ConversationDtoMapper _conversationDtoMapper;
+    private readonly IAuthenticatedUserService _authenticatedUserService;
 
     public GetMatchingByIdHandler
     (
@@ -30,7 +31,8 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         UserDtoMapper userDtoMapper,
         MessageAuthorizationService messageAuthorizationService,
         MessageDtoMapper messageDtoMapper,
-        ConversationDtoMapper conversationDtoMapper
+        ConversationDtoMapper conversationDtoMapper,
+        IAuthenticatedUserService authenticatedUserService
     ) : base(repository)
     {
         _matchingAuthorizationService = matchingAuthorizationService;
@@ -40,6 +42,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         _messageAuthorizationService = messageAuthorizationService;
         _messageDtoMapper = messageDtoMapper;
         _conversationDtoMapper = conversationDtoMapper;
+        _authenticatedUserService = authenticatedUserService;
     }
 
     protected override async Task<Result<ReadDto<MatchingDto, MatchingPermission>>> ExecuteAsync(GetMatchingByIdQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
@@ -65,9 +68,10 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         {
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.NotFound, "Matching not found.");
         }
-
+        var queryingUser = await repository.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == _authenticatedUserService.UserId, cancellationToken);
         var readDto = await matching.ToDtoAsync
         (
+            queryingUser,
             matching.User1,
             matching.User2,
             _matchingAuthorizationService,

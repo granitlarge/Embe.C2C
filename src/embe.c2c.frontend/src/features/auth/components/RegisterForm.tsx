@@ -135,15 +135,15 @@ function PasswordStep({
             <TextInput
                 label="password"
                 type="password"
-                value={password}
-                onChange={(pw) => { setPasswordState(pw); clearErrors(); }}
+                initialValue={password}
+                onBlur={(pw) => { setPasswordState(pw); clearErrors(); }}
                 errorMessage={undefined}
             />
             <TextInput
                 label="confirm password"
                 type="password"
-                value={confirmPassword}
-                onChange={(pw) => { setConfirmPasswordState(pw); clearErrors(); }}
+                initialValue={confirmPassword}
+                onBlur={(pw) => { setConfirmPasswordState(pw); clearErrors(); }}
                 errorMessage={error}
             />
             <Button onClick={next}>next</Button>

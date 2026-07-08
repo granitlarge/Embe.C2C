@@ -5,6 +5,7 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Users.Handlers;
@@ -13,11 +14,13 @@ public class GetUserByIdHandler
 (
     UserAuthorizationService authorizationPolicy,
     IRepository context,
-    UserDtoMapper userDtoMapper
+    UserDtoMapper userDtoMapper,
+    IAuthenticatedUserService authenticatedUserService
 ) : TransactionalQueryHandler<GetUserByIdQuery, Result<ReadDto<UserDto, UserPermission>?>>(context)
 {
     private readonly UserAuthorizationService _authorizationService = authorizationPolicy;
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
+    private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
 
     protected override async Task<Result<ReadDto<UserDto, UserPermission>?>> ExecuteAsync
     (
@@ -32,11 +35,13 @@ public class GetUserByIdHandler
             return Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.Forbidden, "You are not authorized to view this user.");
         }
 
+        var queryingUser = await repo.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == _authenticatedUserService.UserId, cancellationToken);
         var user = await repo.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
         if (user is null)
             return Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found.");
 
-        var dto = await _userDtoMapper.ToDtoAsync(user, variant, cancellationToken);
+        var enrichedUser = user.Enrich(queryingUser);
+        var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
         var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
         return Result<ReadDto<UserDto, UserPermission>?>.Success(readDto);
     }

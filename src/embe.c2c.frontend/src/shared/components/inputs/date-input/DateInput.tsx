@@ -1,18 +1,20 @@
-import Button from "../../buttons/Button";
+import { useState } from "react";
 import Surface from "../../surfaces/Surface";
 
 export type DateInputProps = {
     minDate: string;
     maxDate: string;
     label: string;
-    value?: string;
-    onChange?: (value: string) => void;
+    initialValue?: string;
+    onBlur?: (value: string) => void;
     className?: string;
     required?: boolean
     errorMessage?: string;
 }
 
-export default function DateInput({ label, value, onChange, minDate, maxDate, className, required = true, errorMessage }: DateInputProps) {
+export default function DateInput({ label, initialValue, onBlur, minDate, maxDate, className, required = true, errorMessage }: DateInputProps) {
+
+    const [value, setValue] = useState(initialValue ?? "");
 
     const shellClassNames = [
         className
@@ -30,7 +32,8 @@ export default function DateInput({ label, value, onChange, minDate, maxDate, cl
                 className={inputClassNames}
                 type="date"
                 value={value}
-                onChange={(e) => onChange?.(e.target.value)}
+                onChange={(e) => setValue(e.target.value)}
+                onBlur={() => onBlur?.(value)}
                 min={minDate}
                 max={maxDate}
                 required={required} />

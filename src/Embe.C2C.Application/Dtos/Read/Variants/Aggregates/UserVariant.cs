@@ -119,7 +119,7 @@ public record UserVariant
         IncludeImages = includeFiles;
         IncludeCreatedAt = includeCreatedAt;
         IncludeUpdatedAt = includeUpdatedAt;
-        IncludeDistance = includeDistance;
+        IncludeDistanceToQueryingUser = includeDistance;
     }
 
     public bool IncludeEmail { get; }
@@ -132,5 +132,5 @@ public record UserVariant
     public bool IncludeImages { get; }
     public bool IncludeCreatedAt { get; }
     public bool IncludeUpdatedAt { get; }
-    public bool IncludeDistance { get; }
+    public bool IncludeDistanceToQueryingUser { get; }
 }

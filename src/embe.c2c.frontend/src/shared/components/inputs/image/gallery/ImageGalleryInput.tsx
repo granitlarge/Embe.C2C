@@ -30,7 +30,7 @@ function MyImage({ id, src, onRemove }: MyImageProps) {
 }
 
 type ImageSelectorProps = {
-    onImageSelected?: (image: { url: string, mimeType: string }) => void;
+    onImageSelected?: (image: { url: string, mimeType: string }[]) => void;
 }
 
 function ImageSelector({ onImageSelected }: ImageSelectorProps) {
@@ -39,14 +39,22 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
 
     function onChange(event: React.ChangeEvent<HTMLInputElement>) {
         const target = event.target as HTMLInputElement;
-        if (target.files && target.files[0]) {
-            const file = target.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageSrc = e.target?.result as string;
-                onImageSelected?.({ url: imageSrc, mimeType: file.type });
-            }
-            reader.readAsDataURL(file);
+        if (target.files && target.files.length > 0) {
+            const countFiles = target.files.length;
+            let images = [];
+            const files = Array.from(target.files);
+            files.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const url = e.target?.result as string;
+                    const mimeType = file.type;
+                    images.push({ url, mimeType });
+                    if (images.length === countFiles) {
+                        onImageSelected?.(images);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
     }
@@ -60,7 +68,7 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
         <Surface
             className="relative w-30 h-40 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}
             variant="tertiary">
-            <input ref={inputRef} type="file" className="hidden" accept="image/*" onChange={onChange} />
+            <input ref={inputRef} type="file" multiple className="hidden" accept="image/*" onChange={onChange} />
             <span className="text-3xl text-(--secondary-fc)">+</span>
         </Surface>
 
@@ -112,7 +120,7 @@ export default function ImageGalleryInput<T extends Image = Image>({ data, error
                         <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, ...image }) => image))} />
                     ))
                 }
-                <ImageSelector onImageSelected={(image) => onChange?.([...images.map(({ __id, ...image }) => image), image])} />
+                <ImageSelector onImageSelected={(image) => onChange?.([...images.map(({ __id, ...image }) => image), ...image])} />
             </div>
             {error?.images && <span className="text-(--error-fc)">{error.images}</span>}
         </DragDropProvider>

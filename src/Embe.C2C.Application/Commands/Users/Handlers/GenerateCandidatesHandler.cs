@@ -6,8 +6,9 @@ using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
@@ -42,13 +43,15 @@ public class GenerateCandidatesHandler
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
+        var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         var users = await context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         var dtos = new List<ReadDto<UserDto, UserPermission>>();
         foreach (var user in users)
         {
             _userAuthorizationFactStore.SetCandidateUserFact(user.Id, true);
             var (permissions, variant) = await _userAuthorizationPolicy.GetAsync(user.Id, cancellationToken);
-            var dto = await _userDtoMapper.ToDtoAsync(user, variant, cancellationToken);
+            var enrichedUser = user.Enrich(queryingUser);
+            var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
             if (dto is not null)
             {
                 dtos.Add(new ReadDto<UserDto, UserPermission>(dto, permissions));

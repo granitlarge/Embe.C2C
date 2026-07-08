@@ -1,20 +1,25 @@
-import { useEffect, useState } from "react";
-import { calculateAge } from "../../time";
+import { Mars, Transgender, Venus } from "lucide-react";
 import { User } from "../../types/domain/aggregates"
+import { Gender } from "../../types/domain/value-objects";
 import ImageGallery from "../images/ImageGallery"
 import Surface from "../surfaces/Surface";
-import { reverseGeocode } from "../../actions/geography/actions";
 
 function ProfileShortInfo({ user, className }: { user: User, className?: string }) {
 
     const classNames = [className].filter(Boolean).join(" ");
-    const [locationName, setLocationName] = useState<string | undefined>(undefined);
-
     return (
         <Surface className={`${classNames} flex flex-col max-w-full`} padding="sm" variant="tertiary">
-            <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.alias}</span>
-            <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{calculateAge(user.birthDate ?? "2000-01-01")} years old</span>
-            {user.distanceKm !== undefined ? <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{user.distanceKm} km away</span> : null}
+            <div className="flex flex-row gap-1 items-center">
+                <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.alias}</span>
+                {
+                    user.gender === Gender.Male ? <Mars className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
+                    user.gender === Gender.Female ? <Venus className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
+                    user.gender === Gender.TransFemale || user.gender === Gender.TransMale ? <Transgender className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
+                    null
+                }
+            </div>
+            <span className="text-(--secondary-fc) text-(length:--primary-fs)">{user.age} y.o.</span>
+            {user.distanceKmToQueryingUser !== undefined ? <span className="text-(--secondary-fc) text-(length:--primary-fs)">{user.distanceKmToQueryingUser} km</span> : null}
         </Surface>
     )
 

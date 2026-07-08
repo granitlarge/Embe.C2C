@@ -3,7 +3,7 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Dtos.Read.ValueObjects;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
-using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Application.Enrichment.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Dtos.Read.Aggregates;
@@ -20,7 +20,8 @@ public record UserDto
     ImageDto? ProfilePicture,
     ImmutableHashSet<ImageDto>? Images,
     DateTimeOffset? CreatedAt,
-    DateTimeOffset? UpdatedAt
+    DateTimeOffset? UpdatedAt,
+    double? DistanceKmToQueryingUser
 );
 
 public class UserDtoMapper
@@ -34,7 +35,7 @@ public class UserDtoMapper
 
     public async Task<UserDto?> ToDtoAsync
     (
-        User user,
+        UserEnriched userEnriched,
         UserVariant variant,
         CancellationToken cancellationToken = default
     )
@@ -44,6 +45,7 @@ public class UserDtoMapper
             return null;
         }
 
+        var user = userEnriched.User;
         var images = user.Images != null && variant.IncludeImages ? await Task.WhenAll(user.Images.Select(f => _imageDtoMapper.ToDtoAsync(f, cancellationToken))) : null;
         var profilePicture = user.ProfilePicture != null && variant.IncludeProfilePicture ? await _imageDtoMapper.ToDtoAsync(user.ProfilePicture, cancellationToken) : null;
 
@@ -59,7 +61,8 @@ public class UserDtoMapper
             variant.IncludeProfilePicture ? profilePicture : null,
             variant.IncludeImages ? images?.ToImmutableHashSet() : null,
             variant.IncludeCreatedAt ? user.CreatedAt : null,
-            variant.IncludeUpdatedAt ? user.UpdatedAt : null
+            variant.IncludeUpdatedAt ? user.UpdatedAt : null,
+            variant.IncludeDistanceToQueryingUser ? userEnriched.DistanceKmToQueryingUser : null
         );
     }
 }

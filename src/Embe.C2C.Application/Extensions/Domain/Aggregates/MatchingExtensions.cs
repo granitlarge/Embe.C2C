@@ -13,6 +13,7 @@ public static class MatchingExtensions
     public static async Task<ReadDto<MatchingDto, MatchingPermission>?> ToDtoAsync
     (
         this Matching matching,
+        User? queryingUser,
         User? user1,
         User? user2,
         MatchingAuthorizationService matchingAuthorizationService,
@@ -31,8 +32,10 @@ public static class MatchingExtensions
             return null;
         }
 
-        var user1Dto = await (user1?.ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<UserDto, UserPermission>?>(null));
-        var user2Dto = await (user2?.ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<UserDto, UserPermission>?>(null));
+        var enrichedUser1 = user1?.Enrich(queryingUser);
+        var enrichedUser2 = user2?.Enrich(queryingUser);
+        var user1Dto = await (enrichedUser1?.ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<UserDto, UserPermission>?>(null));
+        var user2Dto = await (enrichedUser2?.ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<UserDto, UserPermission>?>(null));
 
         var messageDtos = new List<ReadDto<MessageDto, MessagePermission>>();
         foreach (var message in matching.Conversation.Messages ?? [])

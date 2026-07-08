@@ -8,6 +8,7 @@ using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
@@ -98,10 +99,12 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
                 uploadedFileUrls.Add(uploadImageResult.Url);
             }
 
-            success = true;
-
-            var dto = await _userDtoMapper.ToDtoAsync(user, variant, cancellationToken);
+            var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == actorId, cancellationToken);
+            var enrichedUser = user.Enrich(queryingUser);
+            var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
             var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
+
+            success = true;
 
             return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(true, Result<ReadDto<UserDto, UserPermission>?>.Success(readDto));
         }
