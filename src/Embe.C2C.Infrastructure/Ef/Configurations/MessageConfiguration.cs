@@ -20,12 +20,12 @@ public class MessageConfiguration : AggregateConfiguration<Message>
         builder.HasOne(m => m.ReplyToMessage)
             .WithMany()
             .HasForeignKey(m => m.ReplyToMessageId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(m => m.AuthorUserId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .Property(m => m.Content)

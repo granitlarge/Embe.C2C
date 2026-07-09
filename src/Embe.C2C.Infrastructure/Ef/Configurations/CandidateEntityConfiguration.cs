@@ -19,6 +19,6 @@ public class CandidateEntityConfiguration : IEntityTypeConfiguration<CandidateEn
         builder.HasOne(c => c.Candidate)
             .WithMany()
             .HasForeignKey(c => c.CandidateUserId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

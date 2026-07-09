@@ -45,7 +45,8 @@ public class UserConfiguration : AggregateConfiguration<User>
                     SRID = 4326
                 },
                 value => value == null ? null : new Domain.ValueObjects.Location(value.Y, value.X)
-            );
+            )
+            .HasColumnType("geography");
 
         builder.HasIndex(u => u.Email).IsUnique();
         builder.HasIndex(u => u.IdentityUserId).IsUnique();

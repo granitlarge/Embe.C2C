@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -20,34 +20,35 @@ namespace Embe.C2C.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Accounts.Account", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsOpen")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Balance", "Embe.C2C.Domain.Aggregates.Accounts.Account.Balance#Money", b1 =>
                         {
                             b1.IsRequired();
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)");
+                                .HasColumnType("numeric");
 
                             b1.ComplexProperty(typeof(Dictionary<string, object>), "Currency", "Embe.C2C.Domain.Aggregates.Accounts.Account.Balance#Money.Currency#Currency", b2 =>
                                 {
@@ -55,15 +56,15 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Name")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Symbol")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
                                 });
                         });
 
@@ -79,22 +80,22 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("BlockedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("BlockedUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("BlockerUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -109,28 +110,28 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("EditedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsPositive")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("JudgeUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("JudgeeUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -145,22 +146,22 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<Guid>("UserId1")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId2")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -175,38 +176,38 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("AuthorUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("ConversationId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("EditedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsReply")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("ReplyToMessageId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<DateTimeOffset?>("SeenAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -223,27 +224,27 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NotificationType")
                         .IsRequired()
                         .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
+                        .HasColumnType("character varying(21)");
 
                     b.Property<DateTimeOffset?>("ReadAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("RecipientUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -262,46 +263,46 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("AgeRangeMax")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("AgeRangeMin")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<double?>("MaximumDistance")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Engagement", "Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile.Engagement#Engagement", b1 =>
                         {
                             b1.IsRequired();
 
                             b1.Property<int>("Boundedness")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<DateOnly?>("EndDate")
                                 .HasColumnType("date");
 
                             b1.Property<int>("Frequency")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("Medium")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<DateOnly?>("StartDate")
                                 .HasColumnType("date");
@@ -316,38 +317,38 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("AccountId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Reason")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<DateTimeOffset>("TransactionDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Amount", "Embe.C2C.Domain.Aggregates.Transactions.Transaction.Amount#Money", b1 =>
                         {
                             b1.IsRequired();
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)");
+                                .HasColumnType("numeric");
 
                             b1.ComplexProperty(typeof(Dictionary<string, object>), "Currency", "Embe.C2C.Domain.Aggregates.Transactions.Transaction.Amount#Money.Currency#Currency", b2 =>
                                 {
@@ -355,15 +356,15 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Name")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Symbol")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
                                 });
                         });
 
@@ -378,43 +379,43 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Alias")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Gender")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("IdentityUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<Point>("Location")
                         .HasColumnType("geography");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -431,37 +432,36 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("LastMessageId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("MatchingId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<long>("MessageCount")
                         .HasColumnType("bigint");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId1")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId2")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LastMessageId")
-                        .IsUnique()
-                        .HasFilter("[LastMessageId] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("MatchingId")
                         .IsUnique();
@@ -473,22 +473,22 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("EngType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Level")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ParentId")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<Point>("Point")
                         .IsRequired()
@@ -496,11 +496,15 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("Point");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Point"), "GIST");
 
                     b.ToTable("AdminAreas");
                 });
@@ -508,10 +512,10 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.CandidateEntity", b =>
                 {
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CandidateUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("UserId", "CandidateUserId");
 
@@ -524,13 +528,13 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -542,54 +546,54 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Embe.C2C.Infrastructure.Identity.MyIdentityUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
@@ -598,8 +602,7 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -607,26 +610,25 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
                 });
@@ -635,19 +637,19 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -660,19 +662,19 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -684,17 +686,17 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -706,10 +708,10 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -721,16 +723,16 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -742,18 +744,17 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Notification");
 
                     b.Property<Guid>("MatchingId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("PartnerProfileImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("PartnerUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("PartnerUserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasIndex("MatchingId");
 
@@ -790,7 +791,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
                         .WithMany("BlockedBy")
                         .HasForeignKey("BlockedUserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
@@ -811,7 +812,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
                         .WithMany("JudgementsReceived")
                         .HasForeignKey("JudgeeUserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Judge");
@@ -828,7 +829,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "User2")
                         .WithMany("Matchings2")
                         .HasForeignKey("UserId2")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User1");
@@ -841,7 +842,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
                         .WithMany()
                         .HasForeignKey("AuthorUserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Embe.C2C.Domain.Entities.Conversation", "Conversation")
@@ -853,7 +854,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Messages.Message", "ReplyToMessage")
                         .WithMany()
                         .HasForeignKey("ReplyToMessageId")
-                        .OnDelete(DeleteBehavior.ClientCascade);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Conversation");
 
@@ -875,14 +876,16 @@ namespace Embe.C2C.Infrastructure.Migrations
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
-                            b1.Property<byte[]>("RowVersion")
-                                .IsRequired()
-                                .HasColumnType("varbinary(max)");
+                            b1.Property<uint>("RowVersion")
+                                .IsConcurrencyToken()
+                                .ValueGeneratedOnAddOrUpdate()
+                                .HasColumnType("xid")
+                                .HasColumnName("xmin");
 
                             b1.Property<Guid>("SearchProfileId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.HasKey("Id");
 
@@ -917,22 +920,22 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.OwnsMany("Embe.C2C.Domain.Entities.Image", "_images", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<DateTimeOffset?>("DeletedAt")
-                                .HasColumnType("datetimeoffset");
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<DateTimeOffset?>("MarkedForDeletionAt")
-                                .HasColumnType("datetimeoffset");
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<Guid>("OwnerUserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
-                            b1.Property<byte[]>("RowVersion")
+                            b1.Property<uint>("RowVersion")
                                 .IsConcurrencyToken()
-                                .IsRequired()
                                 .ValueGeneratedOnAddOrUpdate()
-                                .HasColumnType("rowversion");
+                                .HasColumnType("xid")
+                                .HasColumnName("xmin");
 
                             b1.HasKey("Id");
 
@@ -946,18 +949,18 @@ namespace Embe.C2C.Infrastructure.Migrations
                             b1.OwnsOne("Embe.C2C.Domain.ValueObjects.ImageDetails", "ImageDetails", b2 =>
                                 {
                                     b2.Property<Guid>("ImageId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("MimeType")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Name")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.Property<int>("Order")
-                                        .HasColumnType("int");
+                                        .HasColumnType("integer");
 
                                     b2.HasKey("ImageId");
 
@@ -996,7 +999,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Infrastructure.Ef.Entities.AdminArea", null)
                         .WithMany()
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.ClientCascade);
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.CandidateEntity", b =>
@@ -1004,7 +1007,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "Candidate")
                         .WithMany()
                         .HasForeignKey("CandidateUserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
@@ -1081,13 +1084,13 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.Matchings.Matching", null)
                         .WithMany()
                         .HasForeignKey("MatchingId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
                         .WithMany()
                         .HasForeignKey("PartnerUserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

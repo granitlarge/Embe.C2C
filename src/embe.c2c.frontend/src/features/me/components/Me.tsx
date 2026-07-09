@@ -73,7 +73,7 @@ export default function Me({ className, user }: MeProps) {
             const error = z.treeifyError(validationResult.error);
             setBasicFormError({
                 alias: error.properties?.alias?.errors?.[0],
-                birthDate: error.properties?.birthDate?.errors?.[0],
+                birthDate: error.properties?.birthDate?.errors?.[0]
             });
             return;
         }
@@ -119,6 +119,7 @@ export default function Me({ className, user }: MeProps) {
 
         <Surface className={`${classNames} flex flex-col gap-2`} padding="none">
             <MyInfoForm className="grow-1 overflow-y-scroll" error={basicFormError} data={clientSideBasicFormData} onChange={(data) => {
+                console.log("changing client side basic form data", data);
                 setClientSideBasicFormData(prev => ({
                     ...prev,
                     images: data.images?.sort((a, b) => a.order - b.order) ?? [],
@@ -145,7 +146,7 @@ export default function Me({ className, user }: MeProps) {
                         gender: clientSideBasicFormData.gender,
                         datingPreferences: user.data?.datingPreferences,
                         location: clientSideBasicFormData.location,
-                        distanceKmToQueryingUser: user.data?.distanceKmToQueryingUser,
+                        distanceKmToQueryingUser: user.data?.distanceKmToQueryingUser || 0,
                         age: clientSideBasicFormData.birthDate ? calculateAge(clientSideBasicFormData.birthDate) : undefined,
                         createdAt: user.data?.createdAt,
                         updatedAt: user.data?.updatedAt,

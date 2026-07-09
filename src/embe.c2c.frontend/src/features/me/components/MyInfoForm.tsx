@@ -118,6 +118,7 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
                         location: data.location,
                     }}
                     onChange={basicProfileFormData => {
+                        console.log("changing basic profile form data", basicProfileFormData);
                         onChange(({
                             ...data,
                             birthDate: basicProfileFormData.birthDate,

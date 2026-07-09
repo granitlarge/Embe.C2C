@@ -1,6 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Embe.C2C.Domain.Entities;
 
 public abstract class Entity
 {
-    public byte[] RowVersion { get; private set; } = null!;
+    [Timestamp]
+    public uint RowVersion { get; private set; }
 }

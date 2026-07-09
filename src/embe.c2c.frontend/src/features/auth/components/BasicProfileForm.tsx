@@ -88,7 +88,7 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
                 config.location &&
                 <LocationInput
                     value={data.location}
-                    onChange={(location) => { onChange({ ...data, location: location }) }}
+                    onChange={(location) => { onChange({ ...data, location }) }}
                 />
             }
             {

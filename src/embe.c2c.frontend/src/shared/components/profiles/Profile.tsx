@@ -36,7 +36,7 @@ export default function Profile({ user, className}: ProfileProps) {
     ].filter(Boolean).join(" ")
     return (
         <Surface className={`flex flex-col gap-2 ${classNames}`} padding="none" variant="secondary">
-            <ImageGallery imageUrls={user.images?.map(i => i.imageDetails.url) ?? []} />
+            <ImageGallery imageUrls={user.images?.sort((a,b) => a.imageDetails.order - b.imageDetails.order).map(i => i.imageDetails.url) ?? []} />
             <ProfileShortInfo className="bottom-2 left-2" user={user} />
             {
                 user.bio &&

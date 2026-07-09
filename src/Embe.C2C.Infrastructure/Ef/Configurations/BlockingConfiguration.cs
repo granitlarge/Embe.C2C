@@ -18,7 +18,7 @@ public class BlockingConfiguration : AggregateConfiguration<Domain.Aggregates.Bl
         builder.HasOne<Domain.Aggregates.Users.User>()
             .WithMany(u => u.BlockedBy)
             .HasForeignKey(b => b.BlockedUserId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.Configure(builder);
     }

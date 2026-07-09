@@ -19,7 +19,7 @@ public class JudgementConfiguration : AggregateConfiguration<Judgement>
         builder.HasOne<Domain.Aggregates.Users.User>()
             .WithMany(u => u.JudgementsReceived)
             .HasForeignKey(j => j.JudgeeUserId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.Configure(builder);
     }

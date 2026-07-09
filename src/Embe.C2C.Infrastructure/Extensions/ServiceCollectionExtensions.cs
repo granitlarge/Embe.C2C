@@ -41,7 +41,7 @@ public static class ServiceCollectionExtensions
 
         services.AddDbContext<IRepository, C2CContext>
         (
-            options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), x => x.UseNetTopologySuite())
+            options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), x => x.UseNetTopologySuite())
         );
 
         services.AddScoped<IFileService, BlobStorageFileService>();

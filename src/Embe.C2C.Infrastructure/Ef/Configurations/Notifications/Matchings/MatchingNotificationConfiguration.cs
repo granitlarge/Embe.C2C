@@ -15,13 +15,13 @@ public class MatchingNotificationConfiguration : IEntityTypeConfiguration<Matchi
         builder.HasOne<Matching>()
             .WithMany()
             .HasForeignKey(n => n.MatchingId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
         .HasOne<User>()
             .WithMany()
             .HasForeignKey(n => n.PartnerUserId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(n => n.PartnerUserName);
         builder.Property(n => n.PartnerProfileImageUrl);

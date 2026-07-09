@@ -10,13 +10,15 @@ public class AdminAreaConfiguration : IEntityTypeConfiguration<AdminArea>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasMaxLength(50);
+        builder.Property(x => x.Point).HasColumnType("geography");
         builder.Property(x => x.ParentId).HasMaxLength(50);
         builder
             .HasOne<AdminArea>()
             .WithMany()
             .HasForeignKey(x => x.ParentId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(x => x.ParentId);
+        builder.HasIndex(x => x.Point).HasMethod("GIST");
     }
 }
