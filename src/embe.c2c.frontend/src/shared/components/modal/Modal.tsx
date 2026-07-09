@@ -39,7 +39,6 @@ export default function Modal({ children, className, closed, hidden, header, ...
                 ${classNames}
                 flex flex-col items-center gap-5
                 ${styles.modal}
-                p-5 
                 flex 
                 flex-col 
                 m-auto 

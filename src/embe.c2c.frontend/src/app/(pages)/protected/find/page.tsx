@@ -11,9 +11,9 @@ export default async function FindPage({ }: FindPageProps) {
         throw new Error("Not implemented");
     }
     return (
-        <div className="flex flex-col grow-1 gap-3">
+        <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
             <h1>find</h1>
-            <Find className="grow-1" candidates={getCandidatesResponse.value || []} />
+            <Find className="grow-1 overflow-y-scroll scrollbar-none" candidates={getCandidatesResponse.value || []} />
             <MainNav className="grow-0" />
         </div>
     )

@@ -20,6 +20,7 @@ public static class UserEndPoints
         group.MapDelete("", Delete).RequireAuthorization();
         group.MapGet("/candidates", GenerateCandidates).RequireAuthorization();
         group.MapGet("/me", GetMe).RequireAuthorization();
+        group.MapGet("/{id:guid}", GetById).RequireAuthorization();
     }
 
     private static async Task<IResult> Register([FromBody] RegisterCommand command, [FromServices] RegisterHandler handler, CancellationToken cancellationToken = default)
@@ -49,6 +50,12 @@ public static class UserEndPoints
     private static async Task<IResult> GetMe([FromServices] GetMeHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(GetMeQuery.Instance, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> GetById([FromRoute] Guid id, [FromServices] GetUserByIdHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(new GetUserByIdQuery(id), cancellationToken);
         return result.ToResult();
     }
 }

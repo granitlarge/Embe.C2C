@@ -30,13 +30,13 @@ export type ProfileProps = {
     user: User,
     className?: string
 }
-export default function Profile({ user, className}: ProfileProps) {
+export default function Profile({ user, className }: ProfileProps) {
     const classNames = [
         className
     ].filter(Boolean).join(" ")
     return (
-        <Surface className={`flex flex-col gap-2 ${classNames}`} padding="none" variant="secondary">
-            <ImageGallery imageUrls={user.images?.sort((a,b) => a.imageDetails.order - b.imageDetails.order).map(i => i.imageDetails.url) ?? []} />
+        <Surface className={`flex flex-col gap-2 ${classNames}`} padding="md" variant="secondary">
+            <ImageGallery className="h-[450px]" imageUrls={user.images?.sort((a, b) => a.imageDetails.order - b.imageDetails.order).map(i => i.imageDetails.url) ?? []} />
             <ProfileShortInfo className="bottom-2 left-2" user={user} />
             {
                 user.bio &&
