@@ -48,6 +48,8 @@ public class UserConfiguration : AggregateConfiguration<User>
             )
             .HasColumnType("geography");
 
+        builder.HasIndex(x => x.Location).HasMethod("GIST");
+
         builder.HasIndex(u => u.Email).IsUnique();
         builder.HasIndex(u => u.IdentityUserId).IsUnique();
 
@@ -70,6 +72,7 @@ public class UserConfiguration : AggregateConfiguration<User>
                 });
                 image.Property(image => image.RowVersion).IsRowVersion();
             });
+    
 
         base.Configure(builder);
     }

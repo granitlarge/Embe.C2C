@@ -1,22 +1,27 @@
-DECLARE @json NVARCHAR(MAX);
-
-SELECT @json = BulkColumn
-FROM OPENROWSET(
-    BULK 'C:\Users\Miro\source\repos\Embe.C2C\data\ADM_202607072036.json',
-    SINGLE_NCLOB
-) AS j;
-
-INSERT INTO AdminAreas (id, parentid, level, name, type, engtype, Point)
-SELECT
-    id, parentid, level, name, type, engtype, geography::Point(latitude, longitude, 4326)
-FROM OPENJSON(@json, '$.ADM')
-WITH (
-    Id nvarchar(450) '$.Id',
-    ParentId nvarchar(450) '$.ParentId',
-    Level int '$.Level',
-    Name nvarchar(max) '$.Name',
-    Type nvarchar(max) '$.Type',
-    EngType nvarchar(max) '$.EngType',
-    Longitude float '$.Longitude',
-    Latitude float '$.Latitude'
+INSERT INTO public."AdminAreas"
+(
+    "Id",
+    "ParentId",
+    "Level",
+    "Name",
+    "Type",
+    "EngType",
+    "Point"
 )
+SELECT
+    j->>'Id',
+    j->>'ParentId',
+    (j->>'Level')::int,
+    j->>'Name',
+    j->>'Type',
+    j->>'EngType',
+    ST_SetSRID(
+        ST_MakePoint(
+            (j->>'Longitude')::double precision,
+            (j->>'Latitude')::double precision
+        ),
+        4326
+    )::geography
+FROM jsonb_array_elements(
+    (pg_read_file('C:/Users/Miro/source/repos/Embe.C2C/data/ADM_202607072036.json')::jsonb)->'ADM'
+) AS j;
