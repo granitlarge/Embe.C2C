@@ -12,7 +12,8 @@ public record UpdateCommand
     Gender? Gender,
     LocationWriteDto? Location,
     ImmutableHashSet<UpdateImageDto>? ImagesToKeep,
-    ImmutableHashSet<CreateImageDto>? ImagesToAdd
+    ImmutableHashSet<CreateImageDto>? ImagesToAdd,
+    string? Bio
 );
 
 public record UpdateImageDto

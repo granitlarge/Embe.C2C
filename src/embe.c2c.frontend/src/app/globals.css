@@ -19,7 +19,7 @@
 
     /* surfaces */
     --primary-bg: rgb(143, 151, 240);
-    --primary-fc-primary: black;
+    --primary-fc-primary: white;
     --primary-fc-secondary: rgb(49, 49, 49);
     --primary-fc-tertiary: rgb(85, 85, 85);
     --primary-border-color: var(--primary-fc-primary);
@@ -32,7 +32,7 @@
     --secondary-border-color: rgb(184, 183, 183);
     --secondary-error-fc: rgb(255, 0, 0);
 
-    --tertiary-bg: rgb(216, 216, 216);
+    --tertiary-bg: rgb(240, 240, 240);
     --tertiary-fc-primary: black;
     --tertiary-fc-secondary: rgb(49,49,49);
     --tertiary-fc-tertiary: rgb(85, 85, 85);

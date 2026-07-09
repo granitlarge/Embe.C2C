@@ -1,7 +1,7 @@
 "use client";
 
 import Surface from "@/src/shared/components/surfaces/Surface"
-import MyBasicInfoForm, { MyBasicInfoFormData, MyBasicInfoFormError } from "./MyBasicInfoForm"
+import MyInfoForm, { MyInfoFormData, MyInfoFormError } from "./MyInfoForm"
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates"
 import { ReadDto } from "@/src/shared/types/dtos/types"
 import { useState } from "react"
@@ -32,12 +32,13 @@ export default function Me({ className, user }: MeProps) {
         alias: user.data?.alias!,
         birthDate: user.data?.birthDate!,
         gender: user.data?.gender,
-        location: user.data?.location
+        location: user.data?.location,
+        bio: user.data?.bio
     };
 
-    const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyBasicInfoFormData>(initialBasicFormData);
-    const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyBasicInfoFormData>(initialBasicFormData);
-    const [basicFormError, setBasicFormError] = useState<MyBasicInfoFormError>({});
+    const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(initialBasicFormData);
+    const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(initialBasicFormData);
+    const [basicFormError, setBasicFormError] = useState<MyInfoFormError>({});
 
     const validationScheme = z.object({
         images: z.array(z.object({
@@ -52,7 +53,8 @@ export default function Me({ className, user }: MeProps) {
         location: z.object({
             latitude: z.number(),
             longitude: z.number()
-        }).optional()
+        }).optional(),
+        bio: z.string().optional()
     });
 
     function onCancel() {
@@ -89,7 +91,8 @@ export default function Me({ className, user }: MeProps) {
             clientSideBasicFormData.gender,
             clientSideBasicFormData.location,
             imagesToKeep,
-            imagesToAdd.map(({ image, index }) => ({ url: image.url, mimeType: image.mimeType, order: index }))
+            imagesToAdd.map(({ image, index }) => ({ url: image.url, mimeType: image.mimeType, order: index })),
+            clientSideBasicFormData.bio
         );
 
         if (!response.success) {
@@ -104,7 +107,8 @@ export default function Me({ className, user }: MeProps) {
             alias: responseReadDto.data.alias!,
             birthDate: responseReadDto.data.birthDate!,
             gender: responseReadDto.data.gender,
-            location: responseReadDto.data.location
+            location: responseReadDto.data.location,
+            bio: responseReadDto.data.bio
         };
 
         setServerSideBasicFormData(newServerSideBasicFormData);
@@ -114,14 +118,15 @@ export default function Me({ className, user }: MeProps) {
     return (
 
         <Surface className={`${classNames} flex flex-col gap-2`} padding="none">
-            <MyBasicInfoForm className="grow-1 overflow-y-scroll" error={basicFormError} data={clientSideBasicFormData} onChange={(data) => {
+            <MyInfoForm className="grow-1 overflow-y-scroll" error={basicFormError} data={clientSideBasicFormData} onChange={(data) => {
                 setClientSideBasicFormData(prev => ({
                     ...prev,
                     images: data.images?.sort((a, b) => a.order - b.order) ?? [],
                     alias: data.alias,
                     birthDate: data.birthDate,
                     gender: data.gender,
-                    location: data.location
+                    location: data.location,
+                    bio: data.bio
                 }));
             }} />
             <div className="flex flex-row gap-3 justify-end">
@@ -134,6 +139,7 @@ export default function Me({ className, user }: MeProps) {
                 <Profile
                     user={{
                         id: user.data?.id!,
+                        bio: clientSideBasicFormData.bio,
                         alias: clientSideBasicFormData.alias,
                         birthDate: clientSideBasicFormData.birthDate,
                         gender: clientSideBasicFormData.gender,

@@ -9,6 +9,7 @@ import { Gender } from "@/src/shared/types/domain/value-objects";
 import { Location } from "@/src/shared/types/domain/value-objects";
 import BasicProfileForm from "../../auth/components/BasicProfileForm";
 import { getValidBirthdateRange } from "@/src/shared/time";
+import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAreaInput";
 
 export type ImageData = {
     id?: string,
@@ -64,69 +65,84 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
     )
 }
 
-export type MyBasicInfoFormData = {
+export type MyInfoFormData = {
     alias?: string;
     birthDate?: string;
     images?: ImageData[];
     gender?: Gender;
     location?: Location;
+    bio?: string;
 }
 
-export type MyBasicInfoFormError = { [P in keyof MyBasicInfoFormData]?: string }
+export type MyInfoFormError = { [P in keyof MyInfoFormData]?: string }
 
-export type MyBasicInfoFormProps = {
+export type MyInfoFormProps = {
     className?: string
-    data: MyBasicInfoFormData,
-    error?: MyBasicInfoFormError,
-    onChange: (data: MyBasicInfoFormData) => void
+    data: MyInfoFormData,
+    error?: MyInfoFormError,
+    onChange: (data: MyInfoFormData) => void
 }
-export default function MyBasicInfoForm({ className, data, error, onChange }: MyBasicInfoFormProps) {
+export default function MyInfoForm({ className, data, error, onChange }: MyInfoFormProps) {
 
     const classNames = [
         className
     ].filter(Boolean).join(" ")
 
     return (
-        <Surface className={`flex flex-col gap-2 ${classNames}`} padding="md" variant="secondary">
+        <div className={`flex flex-col gap-2 ${classNames}`}>
 
-            <MyImagesForm
-                className="shrink-0 mx-auto"
-                initialImages={data.images ?? []}
-                onChange={(images) => onChange({ ...data, images })}
-            />
+            <Surface className={`flex flex-col gap-2`} padding="md" variant="secondary">
 
-            <BasicProfileForm
-                error={{
-                    alias: error?.alias,
-                    birthDate: error?.birthDate
-                }}
-                config={{
-                    alias: true,
-                    birthDate: true,
-                    gender: true,
-                    location: true
-                }}
-                data={{
-                    birthDateRange: getValidBirthdateRange(18, 120),
-                    birthDate: data.birthDate,
-                    alias: data.alias,
-                    gender: data.gender,
-                    location: data.location
-                }}
-                onChange={basicProfileFormData => {
-                    onChange(({
-                        ...data,
-                        birthDate: basicProfileFormData.birthDate,
-                        alias: basicProfileFormData.alias,
-                        gender: basicProfileFormData.gender,
-                        location: basicProfileFormData.location
-                    }))
-                }
-                }
+                <MyImagesForm
+                    className="shrink-0 mx-auto"
+                    initialImages={data.images ?? []}
+                    onChange={(images) => onChange({ ...data, images })}
+                />
 
-            />
+                <BasicProfileForm
+                    error={{
+                        alias: error?.alias,
+                        birthDate: error?.birthDate
+                    }}
+                    config={{
+                        alias: true,
+                        birthDate: true,
+                        gender: true,
+                        location: true
+                    }}
+                    data={{
+                        birthDateRange: getValidBirthdateRange(18, 120),
+                        birthDate: data.birthDate,
+                        alias: data.alias,
+                        gender: data.gender,
+                        location: data.location,
+                    }}
+                    onChange={basicProfileFormData => {
+                        onChange(({
+                            ...data,
+                            birthDate: basicProfileFormData.birthDate,
+                            alias: basicProfileFormData.alias,
+                            gender: basicProfileFormData.gender,
+                            location: basicProfileFormData.location
+                        }))
+                    }
+                    }
 
-        </Surface>
+                />
+            </Surface>
+
+            <Surface variant="secondary" padding="md">
+                <TextAreaInput
+                    size="lg"
+                    placeholder="tell the world about yourself..."
+                    label="bio"
+                    initialValue={data.bio}
+                    onBlur={(value) => onChange({ ...data, bio: value })}
+                    errorMessage={error?.bio}
+                />
+            </Surface>
+
+        </div>
     )
 
 }

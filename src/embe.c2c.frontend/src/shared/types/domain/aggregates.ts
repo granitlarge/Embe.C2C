@@ -17,6 +17,7 @@ export type User = {
     createdAt?: string;
     updatedAt?: string;
     distanceKmToQueryingUser?: number;
+    bio?: string;
 }
 
 export enum UserPermission {

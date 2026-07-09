@@ -16,7 +16,8 @@ public record UserVariant
         includeFiles: false,
         includeCreatedAt: false,
         includeUpdatedAt: false,
-        includeDistance: false
+        includeDistance: false,
+        includeBio: false
     );
 
     public static readonly UserVariant Blocked = new
@@ -31,7 +32,8 @@ public record UserVariant
         includeFiles: false,
         includeCreatedAt: false,
         includeUpdatedAt: false,
-        includeDistance: false
+        includeDistance: false,
+        includeBio: false
     );
 
     public static readonly UserVariant Matched = new
@@ -46,7 +48,8 @@ public record UserVariant
         includeFiles: true,
         includeCreatedAt: false,
         includeUpdatedAt: false,
-        includeDistance: true
+        includeDistance: true,
+        includeBio: true
     );
 
     public static readonly UserVariant Candidate = new
@@ -61,7 +64,8 @@ public record UserVariant
         includeFiles: true,
         includeCreatedAt: false,
         includeUpdatedAt: false,
-        includeDistance: true
+        includeDistance: true,
+        includeBio: true
     );
 
     public static readonly UserVariant PositivelyJudged = new
@@ -76,7 +80,8 @@ public record UserVariant
         includeFiles: true,
         includeCreatedAt: false,
         includeUpdatedAt: false,
-        includeDistance: true
+        includeDistance: true,
+        includeBio: false
     );
 
     public static readonly UserVariant Full = new
@@ -91,7 +96,8 @@ public record UserVariant
         includeFiles: true,
         includeCreatedAt: true,
         includeUpdatedAt: true,
-        includeDistance: true
+        includeDistance: true,
+        includeBio: true
     );
 
     public UserVariant
@@ -106,7 +112,8 @@ public record UserVariant
         bool includeFiles,
         bool includeCreatedAt,
         bool includeUpdatedAt,
-        bool includeDistance
+        bool includeDistance,
+        bool includeBio
     )
     {
         IncludeEmail = includeEmail;
@@ -120,6 +127,7 @@ public record UserVariant
         IncludeCreatedAt = includeCreatedAt;
         IncludeUpdatedAt = includeUpdatedAt;
         IncludeDistanceToQueryingUser = includeDistance;
+        IncludeBio = includeBio;
     }
 
     public bool IncludeEmail { get; }
@@ -133,4 +141,5 @@ public record UserVariant
     public bool IncludeCreatedAt { get; }
     public bool IncludeUpdatedAt { get; }
     public bool IncludeDistanceToQueryingUser { get; }
+    public bool IncludeBio { get; }
 }

@@ -21,7 +21,8 @@ public record UserDto
     ImmutableHashSet<ImageDto>? Images,
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt,
-    double? DistanceKmToQueryingUser
+    double? DistanceKmToQueryingUser,
+    string? Bio
 );
 
 public class UserDtoMapper
@@ -62,7 +63,8 @@ public class UserDtoMapper
             variant.IncludeImages ? images?.ToImmutableHashSet() : null,
             variant.IncludeCreatedAt ? user.CreatedAt : null,
             variant.IncludeUpdatedAt ? user.UpdatedAt : null,
-            variant.IncludeDistanceToQueryingUser ? userEnriched.DistanceKmToQueryingUser : null
+            variant.IncludeDistanceToQueryingUser ? userEnriched.DistanceKmToQueryingUser : null,
+            variant.IncludeBio ? user.Bio : null
         );
     }
 }

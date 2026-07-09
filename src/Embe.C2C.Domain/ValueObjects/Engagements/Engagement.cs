@@ -52,6 +52,7 @@ public record Engagement
 
     private Engagement()
     {
+
     }
 
     public EngagementMedium Medium { get; private set; }

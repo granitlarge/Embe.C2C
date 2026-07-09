@@ -19,6 +19,7 @@ public class User : Aggregate
         Gender? gender,
         Location? location,
         ImmutableHashSet<ImageDetails>? files,
+        string? bio,
         string identityUserId
     )
     {
@@ -39,6 +40,7 @@ public class User : Aggregate
         BirthDate = birthDate;
         Gender = gender;
         Location = location;
+        Bio = bio;
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
 
@@ -75,6 +77,8 @@ public class User : Aggregate
     public IReadOnlyCollection<Entities.Image> Images => _images.AsReadOnly();
     [NotMapped]
     public Entities.Image? ProfilePicture => _images.OrderBy(f => f.ImageDetails.Order).FirstOrDefault();
+
+    public string? Bio { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -158,6 +162,13 @@ public class User : Aggregate
         AddDomainEvent(new UserImageRemovedEvent(image));
     }
 
+    public void UpdateBio(Guid actorId, string? newBio)
+    {
+        EnsureActorIsOwner(actorId);
+        Bio = newBio;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
     public void Remove()
     {
         var imageIdsToRemove = _images.Select(f => f.Id).ToList();
@@ -183,6 +194,7 @@ public class User : Aggregate
         Gender? gender,
         Location? location,
         ImmutableHashSet<ImageDetails>? images,
+        string? bio,
         string identityUserId
     )
     {
@@ -194,6 +206,7 @@ public class User : Aggregate
             gender,
             location,
             images,
+            bio,
             identityUserId
         );
     }

@@ -8,6 +8,7 @@ import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import { Range } from "@/src/shared/types/range";
 import * as enums from "@/src/shared/enums";
 import LocationInput from "@/src/shared/components/inputs/location-input/LocationInput";
+import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAreaInput";
 
 export type BasicProfileFormData = {
     birthDateRange: Range<string>;
@@ -21,7 +22,7 @@ export type BasicProfileFormConfig = {
     birthDate: boolean,
     alias: boolean,
     gender: boolean,
-    location: boolean
+    location: boolean,
 }
 
 export type BasicProfileFormError = { [P in keyof BasicProfileFormData]?: string };

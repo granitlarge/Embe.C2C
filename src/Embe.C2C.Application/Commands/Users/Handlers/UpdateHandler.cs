@@ -68,6 +68,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
             var birthDate = new BirthDate(command.BirthDate);
             var gender = command.Gender;
             var location = command.Location != null ? new Location(command.Location.Latitude, command.Location.Longitude) : null;
+            var bio = string.IsNullOrWhiteSpace(command.Bio) ? null : command.Bio;
 
             var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
             if (user == null)
@@ -79,6 +80,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
             user.UpdateBirthDate(actorId, birthDate);
             user.UpdateGender(actorId, gender);
             user.UpdateLocation(actorId, location);
+            user.UpdateBio(actorId, bio);
 
             var imagesToRemove = user.Images.Where(f => !command.ImagesToKeep?.Any(itk => itk.Id == f.Id) ?? true).ToList();
             foreach (var image in imagesToRemove)

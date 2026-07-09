@@ -40,7 +40,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
 
             var files = new HashSet<ImageDetails>();
             var identityUserId = registerUserResult.Value!.Id;
-            var user = User.Register(email, alias, birthDate, gender: null, location: null, images: null, identityUserId);
+            var user = User.Register(email, alias, birthDate, gender: null, location: null, images: null, bio: null, identityUserId);
 
             context.DomainUsers.Add(user);
 
