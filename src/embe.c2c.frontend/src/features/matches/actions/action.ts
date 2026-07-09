@@ -123,3 +123,13 @@ export async function getMessage(messageId: Guid): Promise<ApiResponse<ReadDto<M
         );
     return response;
 }
+
+export async function unmatch(matchId: Guid): Promise<ApiResponse<void, FailureReason>> {
+    const response = await Mutate<void>(
+        `${process.env.API_URL}/api/matching/${matchId}`,
+        {
+            method: "DELETE",
+        }
+    )
+    return response;
+}

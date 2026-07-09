@@ -49,6 +49,8 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
         }
 
         matching.Remove(actorId);
+        context.Matchings.Remove(matching);
+
         return new TransactionalCommandResult<Result>(true, Result.Success());
     }
 }

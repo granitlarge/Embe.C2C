@@ -8,7 +8,7 @@ public abstract class MatchingNotification : Notification
         Guid matchingId,
         Guid partnerUserId,
         string partnerUserName,
-        string partnerProfileImageUrl
+        string? partnerProfileImageUrl
     ) : base(recipientUserId)
     {
         MatchingId = matchingId;
@@ -27,5 +27,5 @@ public abstract class MatchingNotification : Notification
     public Guid MatchingId { get; }
     public Guid PartnerUserId { get; }
     public string PartnerUserName { get; }
-    public string PartnerProfileImageUrl { get; }
+    public string? PartnerProfileImageUrl { get; }
 }

@@ -5,7 +5,7 @@ import { Matching, MatchingPermission, MessagePermission, User } from "@/src/sha
 import { AuthenticatedUser } from "@/src/shared/user";
 import Message from "./Message";
 import { useEffect, useRef, useState } from "react";
-import { createMessage, deleteMessage, getMessage, getMessages, markMessageAsSeen, updateMessage } from "../actions/action";
+import { createMessage, deleteMessage, getMessage, getMessages, markMessageAsSeen, unmatch, updateMessage } from "../actions/action";
 import { Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
 import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
 import { Guid } from "@/src/shared/cache";
@@ -17,15 +17,25 @@ import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { Ellipsis } from "lucide-react";
 import Button from "@/src/shared/components/buttons/Button";
+import { useRouter } from "next/router";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
 }
 
 type MatchHeaderProps = {
-    partner?: User
+    partner?: User,
+    matchId: Guid
 }
-function MatchHeader({ partner }: MatchHeaderProps) {
+function MatchHeader({ partner, matchId }: MatchHeaderProps) {
+
+    async function onUnmatch() {
+        const response = await unmatch(matchId)
+        if (!response) {
+            throw new Error("not implemented");
+        }
+    }
+
     return (
         <div className="flex flex-row items-center">
             {
@@ -45,7 +55,7 @@ function MatchHeader({ partner }: MatchHeaderProps) {
                 <DropdownMenu.Portal>
                     <DropdownMenu.Content className="flex flex-col gap-1 surface-secondary p-2 rounded-md ">
                         <DropdownMenu.Item>
-                            <Button intent="destructive">
+                            <Button intent="destructive" onClick={onUnmatch}>
                                 unmatch
                             </Button>
                         </DropdownMenu.Item>
@@ -471,7 +481,7 @@ export default function Match({ match, user, className }: MatchProps) {
 
     return (
         <div className={`flex flex-col justify-between gap-3 ${className}`}>
-            <MatchHeader partner={partner} />
+            <MatchHeader partner={partner} matchId={match.data.id}/>
             <InfiniteScroll direction="up" className="flex flex-col gap-3 grow-1" callback={loadMessages}>
                 {items}
             </InfiniteScroll>

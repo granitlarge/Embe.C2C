@@ -18,7 +18,7 @@ public static class MatchingEndPoints
 
         group.MapGet("/", Get);
         group.MapGet("/{matchingId:guid}", GetById);
-        group.MapPost("/unmatch", Unmatch);
+        group.MapDelete("/{matchingId:guid}", Unmatch);
     }
 
     private static async Task<IResult> GetById([FromRoute] Guid matchingId, [FromServices] GetMatchingByIdHandler handler, CancellationToken cancellationToken = default)
@@ -33,9 +33,9 @@ public static class MatchingEndPoints
         return result.ToResult();
     }
 
-    private static async Task<IResult> Unmatch([FromBody] UnmatchCommand command, [FromServices] UnmatchHandler handler, CancellationToken cancellationToken = default)
+    private static async Task<IResult> Unmatch([FromRoute] Guid matchingId, [FromServices] UnmatchHandler handler, CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command, cancellationToken);
+        var result = await handler.HandleAsync(new UnmatchCommand(matchingId), cancellationToken);
         return result.ToResult();
     }
 }

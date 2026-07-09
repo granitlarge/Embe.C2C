@@ -8,7 +8,7 @@ public class MatchingCreated : MatchingNotification
         Guid matchingId,
         Guid partnerUserId,
         string partnerUserName,
-        string partnerProfileImageUrl
+        string? partnerProfileImageUrl
     ) : base
     (
         recipientUserId,
