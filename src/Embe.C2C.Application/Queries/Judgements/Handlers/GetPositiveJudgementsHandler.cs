@@ -4,6 +4,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Judgements.Handlers;
@@ -13,14 +14,18 @@ public class GetPositiveJudgementsHandler
     IRepository repository,
     IAuthenticatedUserService authenticatedUserService,
     JudgementAuthorizationService authorizationPolicy,
-    JudgementDtoMapper judgementDtoMapper
+    JudgementDtoMapper judgementDtoMapper,
+    UserAuthorizationService userAuthorizationService,
+    UserDtoMapper userDtoMapper
 )
 {
 
     private readonly IRepository _repository = repository;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
-    private readonly JudgementAuthorizationService _authorizationPolicy = authorizationPolicy;
+    private readonly JudgementAuthorizationService _judgementAuthorizationService = authorizationPolicy;
     private readonly JudgementDtoMapper _judgementDtoMapper = judgementDtoMapper;
+    private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;
+    private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
 
     public async Task<Result<List<ReadDto<JudgementDto, JudgementPermission>>>> HandleAsync
     (
@@ -30,6 +35,7 @@ public class GetPositiveJudgementsHandler
     {
 
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User must be authenticated to get positive judgements.");
+        var queryingUser = await _repository.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         var judgements = await _repository
             .JudgementsQuery
                 .Include(j => j.Judge)
@@ -42,13 +48,17 @@ public class GetPositiveJudgementsHandler
         var judgementDtos = new List<ReadDto<JudgementDto, JudgementPermission>>();
         foreach (var judgement in judgements)
         {
-            var (permissions, variant) = _authorizationPolicy.Get(judgement);
-            var dto = _judgementDtoMapper.ToDto(judgement, variant);
-            if (dto == null || !permissions.Contains(JudgementPermission.View))
-            {
-                return Result<List<ReadDto<JudgementDto, JudgementPermission>>>.Failure(FailureReason.Forbidden, "User does not have permission to view some of the judgements.");
-            }
-            judgementDtos.Add(new ReadDto<JudgementDto, JudgementPermission>(dto, permissions));
+            var readDto = await judgement.ToDtoAsync
+            (
+                queryingUser,
+                _judgementAuthorizationService,
+                _judgementDtoMapper, 
+                _userAuthorizationService,
+                _userDtoMapper,
+                cancellationToken
+            );
+            if (readDto != null)
+                judgementDtos.Add(readDto);
         }
 
         return Result<List<ReadDto<JudgementDto, JudgementPermission>>>.Success(judgementDtos);

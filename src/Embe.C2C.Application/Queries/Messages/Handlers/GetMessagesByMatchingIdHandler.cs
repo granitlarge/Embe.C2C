@@ -4,6 +4,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Messages.Handlers;
@@ -39,10 +40,9 @@ public class GetMessagesByMatchingIdHandler
         var dtos = new List<ReadDto<MessageDto, MessagePermission>>();
         foreach (var message in messages)
         {
-            var (permissions, variant) = await _messageAuthorizationService.GetAsync(message, cancellationToken);
-            var dto = _messageDtoMapper.ToDto(message, variant);
-            if (dto != null)
-                dtos.Add(new ReadDto<MessageDto, MessagePermission>(dto, permissions));
+            var readDto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
+            if (readDto != null)
+                dtos.Add(readDto);
         }
 
         return Result<List<ReadDto<MessageDto, MessagePermission>>>.Success(dtos);

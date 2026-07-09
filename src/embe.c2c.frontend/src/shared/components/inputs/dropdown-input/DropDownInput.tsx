@@ -13,8 +13,8 @@ export type DropDownInputProps = {
 export default function DropDownInput({ label, options, value, onChange, placeholder }: DropDownInputProps) {
     return (
         <div className="input-wrapper">
-            {label && <label className="className">{label}</label>}
-            <select  value={value ?? ""} onChange={(e) => onChange?.(e.target.value)} className="input">
+            {label && <label className="label">{label}</label>}
+            <select value={value ?? ""} onChange={(e) => onChange?.(e.target.value)} className="input">
                 <option value={""} disabled>{placeholder}</option>
                 {
                     options.map((option) => (

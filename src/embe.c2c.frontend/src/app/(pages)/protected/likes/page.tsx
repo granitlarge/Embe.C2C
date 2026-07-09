@@ -13,11 +13,11 @@ export default async function LikesPage() {
 
     return (
 
-        <div className="flex flex-col grow-1 gap-3">
+        <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
 
             <h1>likes</h1>
 
-            <Likes className="grow-1" initialLikes={positiveJudgements} />
+            <Likes className="grow-1 overflow-y-scroll scrollbar-none" initialLikes={positiveJudgements} />
 
             <MainNav className="grow-0" />
 

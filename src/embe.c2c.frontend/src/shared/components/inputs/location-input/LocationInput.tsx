@@ -67,11 +67,11 @@ function LocationInputExact({ value, onChange, className }: LocationInputExactPr
     return (
         <Surface className={`input-wrapper ${classNames}`} variant="inherit" padding="sm">
             <div className="flex flex-row items-center">
-                <input className="overflow-x-scroll" type="text" disabled value={locationName ? locationName : value ? `${value.latitude}, ${value.longitude}` : "location not set"} />
-                <button className="max-w-max bg-transparent" onClick={updateLocation}>
+                <input className="input overflow-x-scroll" type="text" disabled value={locationName ? locationName : value ? `${value.latitude}, ${value.longitude}` : "location not set"} />
+                <button className="max-w-max bg-transparent button" onClick={updateLocation}>
                     <RefreshCcw className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc) ${loading ? "animate-[spin_1s_linear_infinite_reverse]" : ""}`} />
                 </button>
-                <button className="max-w-max bg-transparent" onClick={() => {onChange?.(undefined)}}>
+                <button className="max-w-max bg-transparent button" onClick={() => { onChange?.(undefined) }}>
                     <Trash2 className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)`} />
                 </button>
             </div>
@@ -411,17 +411,17 @@ export default function LocationInput({ errorMessage, value, onChange, className
             <span className="mx-auto label">location</span>
             <Tabs.Root value={tab} onValueChange={(value) => setTab(value as "exact" | "approximate")} className={`${classNames} w-full flex flex-col gap-3`}>
                 <Tabs.List className="flex flex-row gap-0 w-full">
-                    <Tabs.Trigger value="exact" className={`w-full rounded-none rounded-l-md ${exactTabButtonClassNames}`} >
+                    <Tabs.Trigger value="exact" className={`w-full rounded-none rounded-l-md ${exactTabButtonClassNames} button button-default`} >
                         exact
                     </Tabs.Trigger>
-                    <Tabs.Trigger value="approximate" className={`w-full rounded-none rounded-r-md ${approximateTabButtonClassNames}`} >
+                    <Tabs.Trigger value="approximate" className={`w-full rounded-none rounded-r-md ${approximateTabButtonClassNames} button button-default`} >
                         approximate
                     </Tabs.Trigger>
                 </Tabs.List>
-                <Tabs.Content value="exact" className={``}>
+                <Tabs.Content value="exact">
                     <LocationInputExact value={value} onChange={onChange} className={classNames} />
                 </Tabs.Content>
-                <Tabs.Content value="approximate" className={``}>
+                <Tabs.Content value="approximate" className={`-mt-3`}>
                     <LocationInputApproximate value={value} onChange={onChange} className={classNames} />
                 </Tabs.Content>
             </Tabs.Root>

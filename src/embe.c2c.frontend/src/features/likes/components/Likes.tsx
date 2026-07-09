@@ -27,7 +27,7 @@ export default function Likes({ initialLikes, className }: LikesProps) {
             <li key={like.data.id}>
                 <Surface className="flex gap-2 items-center" variant="secondary" padding="sm">
                     <UserCompact dto={like.data.judge} />
-                    <span className="text-(--primary-fc) text-(length:--primary-fs)">liked you on {new Date(like.data.editedAt!).toLocaleDateString()}</span>
+                    <span className="text-(--primary-fc) text-(length:--primary-fs) mx-auto">liked you on {new Date(like.data.editedAt!).toLocaleDateString()}</span>
                 </Surface>
             </li>
 

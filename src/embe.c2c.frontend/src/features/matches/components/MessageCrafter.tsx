@@ -37,18 +37,18 @@ export function MessageCrafter({
                 className="surface-secondary w-full p-3 rounded-l-lg grow-1"
             >
             </TextAreaInput>
-            <div className="surface-secondary rounded-r-lg flex flex-col justify-center p-2">
+            <div className="surface-secondary rounded-r-lg flex flex-col justify-center pr-3 pt-2 pb-2">
                 {
                     mode === "create" &&
-                    <button className="max-w-max max-h-max my-auto" onClick={saveMessage}>
-                        <Send className="text-(--primary-fc) text-(length:--primary-fs)" />
+                    <button className="button button-save max-w-max max-h-max my-auto" onClick={saveMessage}>
+                        <Send />
                     </button>
                 }
                 {
                     (mode === "edit" || mode === "reply") &&
                     <div className="flex flex-col gap-2 justify-center">
-                        <button className="text-(--primary-fc) text-(length:--primary-fs)" onClick={saveMessage}>{mode === "edit" ? <Save /> : <Send />}</button>
-                        <button className=" bg-(--button-secondary-bg) text-(--button-secondary-fc) text-(length:--primary-fs)" onClick={onCancel}><Ban /></button>
+                        <button className="button button-save" onClick={saveMessage}>{mode === "edit" ? <Save /> : <Send />}</button>
+                        <button className="button button-cancel" onClick={onCancel}><Ban /></button>
                     </div>
                 }
             </div>

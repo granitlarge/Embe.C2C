@@ -3,9 +3,9 @@
 import { User as UserTypeDef, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { useCallback, useState } from "react";
-import FindUserDating from "./FindUserDating";
 import JudgeOverlay from "./JudgeOverlay";
 import * as api from "../actions/action";
+import Profile from "@/src/shared/components/profiles/Profile";
 
 export type FindProps = {
     candidates: ReadDto<UserTypeDef, UserPermission>[];
@@ -46,7 +46,7 @@ export default function Find({ candidates: initialCandidates, className }: FindP
             {
                 candidates[0] &&
                 <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
-                    <FindUserDating className="grow-1" dto={candidates[0]} />
+                    <Profile className="grow-1" user={candidates[0].data} />
                 </JudgeOverlay>
             } {
                 !candidates[0] &&

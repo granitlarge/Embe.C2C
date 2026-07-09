@@ -1,7 +1,7 @@
 "use client";
 
 import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
-import { Matching, MatchingPermission, MessagePermission } from "@/src/shared/types/domain/aggregates"
+import { Matching, MatchingPermission, MessagePermission, User } from "@/src/shared/types/domain/aggregates"
 import { AuthenticatedUser } from "@/src/shared/user";
 import Message from "./Message";
 import { useEffect, useRef, useState } from "react";
@@ -13,9 +13,57 @@ import Surface from "@/src/shared/components/surfaces/Surface";
 import { getOrCreateConnection } from "@/src/shared/signal-r";
 import { HubConnection } from "@microsoft/signalr";
 import { MessageCrafter } from "./MessageCrafter";
+import Link from "next/link";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import { Ellipsis } from "lucide-react";
+import Button from "@/src/shared/components/buttons/Button";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
+}
+
+type MatchHeaderProps = {
+    partner?: User
+}
+function MatchHeader({ partner }: MatchHeaderProps) {
+    return (
+        <div className="flex flex-row items-center">
+            {
+                partner &&
+                <Link href={`/users/${partner.id}`} className="no-underline text-(--primary-fc)">
+                    <h1 className="truncate">{partner?.alias}</h1>
+                </Link>
+            }
+
+            <DropdownMenu.Root modal={false}>
+                <DropdownMenu.Trigger asChild>
+                    <button className="bg-transparent max-w-max ml-auto p-0">
+                        <Ellipsis />
+                    </button>
+                </DropdownMenu.Trigger>
+
+                <DropdownMenu.Portal>
+                    <DropdownMenu.Content className="flex flex-col gap-1 surface-secondary p-2 rounded-md ">
+                        <DropdownMenu.Item>
+                            <Button intent="destructive">
+                                unmatch
+                            </Button>
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item>
+                            <Button intent="default">
+                                block
+                            </Button>
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item>
+                            <Button intent="default">
+                                report
+                            </Button>
+                        </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+        </div>
+    )
 }
 
 export type MatchProps = {
@@ -26,7 +74,7 @@ export type MatchProps = {
 export default function Match({ match, user, className }: MatchProps) {
 
     const matchRef = useRef(match);
-    const partner = match.data.userId1 === user.userId ? match.data.user2 : match.data.user1;
+    const partner = match.data.userId1 === user.userId ? match.data.user2?.data : match.data.user1?.data;
     const connection = useRef<HubConnection | null>(null);
 
     const [partnerIsTyping, setPartnerIsTyping] = useState(false);
@@ -423,11 +471,12 @@ export default function Match({ match, user, className }: MatchProps) {
 
     return (
         <div className={`flex flex-col justify-between gap-3 ${className}`}>
+            <MatchHeader partner={partner} />
             <InfiniteScroll direction="up" className="flex flex-col gap-3 grow-1" callback={loadMessages}>
                 {items}
             </InfiniteScroll>
             {
-                partnerIsTyping && <span className="text-(--primary-fc) text-(length:--primary-fs) italic">{partner?.data.alias} is typing...</span>
+                partnerIsTyping && <span className="text-(--primary-fc) text-(length:--primary-fs) italic">{partner?.alias} is typing...</span>
             }
             <MessageCrafter
                 saveMessage={saveMessage}

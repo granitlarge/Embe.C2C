@@ -47,10 +47,24 @@ export default function ImageGallery({ className, imageUrls }: ImageGalleryProps
 
     return (
         <div className={`${classNames} relative`}>
-            <ImageGalleryImage src={currentImageUrl} alt={`Image ${currentImageUrlIndex + 1}`} />
-            <button onClick={() => setCurrentImageUrlIndex(prev => (prev - 1 + imageUrls.length) % imageUrls.length)} className="rounded-full absolute -left-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronLeft className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></button>
-            <button onClick={() => setCurrentImageUrlIndex(prev => (prev + 1) % imageUrls.length)} className="rounded-full absolute -right-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronRight className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></button>
-            <PaginationDots total={imageUrls.length} current={currentImageUrlIndex} className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
+            {
+                currentImageUrl &&
+                <ImageGalleryImage src={currentImageUrl} alt={`Image ${currentImageUrlIndex + 1}`} />
+            }
+            {
+                !currentImageUrl &&
+                <div className="rounded-md w-full h-64 flex flex-col items-center justify-center bg-gray-300">
+                    <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">no images</span>
+                </div>
+            }
+            {
+                imageUrls.length > 1 &&
+                <>
+                    <button onClick={() => setCurrentImageUrlIndex(prev => (prev - 1 + imageUrls.length) % imageUrls.length)} className="rounded-full absolute -left-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronLeft className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></button>
+                    <button onClick={() => setCurrentImageUrlIndex(prev => (prev + 1) % imageUrls.length)} className="rounded-full absolute -right-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronRight className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></button>
+                    <PaginationDots total={imageUrls.length} current={currentImageUrlIndex} className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
+                </>
+            }
         </div>
     )
 

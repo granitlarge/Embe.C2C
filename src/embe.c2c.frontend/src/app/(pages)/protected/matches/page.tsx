@@ -16,7 +16,7 @@ export default async function MatchesPage() {
   const matches = response.value || [];
 
   return (
-    <div className="flex flex-col grow-1">
+    <div className="flex flex-col gap-3 grow-1">
       <h1>matches</h1>
       <Matches className="grow-1" user={user} initialMatches={matches} />
       <MainNav className="grow-0"/>

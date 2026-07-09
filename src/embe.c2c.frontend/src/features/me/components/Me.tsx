@@ -130,9 +130,9 @@ export default function Me({ className, user }: MeProps) {
                 }));
             }} />
             <div className="flex flex-row gap-3 justify-end">
-                <Button onClick={onSave}>save</Button>
-                <Button onClick={onPreview} variant="secondary">preview</Button>
-                <Button variant="tertiary" onClick={onCancel}>cancel</Button>
+                <Button onClick={onSave} intent="save">save</Button>
+                <Button onClick={onPreview} intent="preview">preview</Button>
+                <Button onClick={onCancel} intent="cancel">cancel</Button>
             </div>
             {
                 showPreview && <Modal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">

@@ -34,7 +34,7 @@
 
     --tertiary-bg: rgb(240, 240, 240);
     --tertiary-fc-primary: black;
-    --tertiary-fc-secondary: rgb(49,49,49);
+    --tertiary-fc-secondary: rgb(49, 49, 49);
     --tertiary-fc-tertiary: rgb(85, 85, 85);
     --tertiary-border-color: var(--tertiary-fc-primary);
     --tertiary-error-fc: rgb(255, 0, 0);
@@ -44,7 +44,7 @@
     --message-fc-secondary: black;
     --message-fc-tertiary: black;
     --message-border-color: var(--message-fc-primary);
-    --message-error-fc: orange;
+    --message-error-fc: rgb(255, 0, 0);
 
     /* font size groups*/
     --primary-label-fs: var(--fs-4);
@@ -62,18 +62,11 @@
     --tertiary-fs-secondary: var(--fs-8);
     --tertiary-fs-tertiary: var(--fs-9);
     /*
-      SEMANTIC ELEMENTS BEGIN
-    */
-
+        SEMANTIC ELEMENTS BEGIN
+      */
     /*universal colors work on all surface*/
     --universal-primary-bg: rgb(46, 77, 255);
     --universal-primary-fc: white;
-
-    --universal-secondary-bg: rgb(255, 217, 0);
-    --universal-secondary-fc: black;
-
-    --universal-tertiary-bg: lightgray;
-    --universal-tertiary-fc: black;
 
     --primary-fc: none;
     --secondary-fc: none;
@@ -82,14 +75,20 @@
     --border-color: none;
     --link-fc: var(--universal-primary-bg);
 
-    --button-primary-bg: var(--universal-primary-bg);
-    --button-primary-fc: var(--universal-primary-fc);
+    --button-default-bg: lightgray;
+    --button-default-fc: black;
 
-    --button-secondary-bg: var(--universal-secondary-bg);
-    --button-secondary-fc: var(--universal-secondary-fc);
+    --button-save-bg: var(--universal-primary-bg);
+    --button-save-fc: var(--universal-primary-fc);
 
-    --button-tertiary-bg: var(--universal-tertiary-bg);
-    --button-tertiary-fc: var(--universal-tertiary-fc);
+    --button-destructive-bg: rgb(255, 75, 75);
+    --button-destructive-fc: black;
+
+    --button-preview-bg: rgb(255, 255, 255);
+    --button-preview-fc: black;
+
+    --button-cancel-bg: lightgray;
+    --button-cancel-fc: black;
 
     --message-own-bg: none;
 
@@ -99,8 +98,8 @@
     --tertiary-fs: inherit;
 
     /*
-      SEMANTIC ELEMENTS END
-    */
+        SEMANTIC ELEMENTS END
+      */
   }
 
   * {
@@ -220,7 +219,6 @@
   }
 
   /*forms*/
-  form,
   .form {
     width: 100%;
     display: flex;
@@ -237,7 +235,6 @@
     gap: 10px;
   }
 
-  label,
   .label {
     color: var(--primary-fc);
     font-size: var(--label-fs);
@@ -245,7 +242,6 @@
     font-weight: 500;
   }
 
-  input,
   .input {
     width: 100%;
     border: solid 2px var(--border-color);
@@ -280,29 +276,39 @@
   /*forms*/
 
   /*buttons*/
-  button,
   .button {
     width: 100%;
-    background-color: var(--button-primary-bg);
-    color: var(--button-primary-fc);
     font-size: var(--primary-fs);
     border-radius: 20px;
     padding: 0.5rem;
   }
 
-  .button-secondary {
-    background-color: var(--button-secondary-bg);
-    color: var(--button-secondary-fc);
+  .button-default {
+    background-color: var(--button-default-bg);
+    color: var(--button-default-fc);
   }
 
-  .button-tertiary {
-    background-color: var(--button-tertiary-bg);
-    color: var(--button-tertiary-fc);
+  .button-save {
+    background-color: var(--button-save-bg);
+    color: var(--button-save-fc);
   }
 
-  button:hover,
+  .button-preview {
+    background-color: var(--button-preview-bg);
+    color: var(--button-preview-fc);
+  }
+
+  .button-destructive {
+    background-color: var(--button-destructive-bg);
+    color: var(--button-destructive-fc);
+  }
+
+  .button-cancel {
+    background-color: var(--button-cancel-bg);
+    color: var(--button-cancel-fc);
+  }
+
   .button:hover {
     cursor: pointer;
   }
-
 }

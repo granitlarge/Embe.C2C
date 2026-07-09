@@ -2,20 +2,24 @@
 
 import { useState } from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "tertiary";
+export type ButtonIntent = "save" | "destructive" | "cancel" | "preview" | "default";
+
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
     onClick?: () => (void | Promise<void>);
-    variant?: ButtonVariant;
+    intent?: ButtonIntent;
 }
 
-export default function Button({ onClick, variant = "primary", ...props }: ButtonProps) {
+export default function Button({ onClick, intent = "default", ...props }: ButtonProps) {
 
     const [loading, setLoading] = useState(false);
     const classNames = [
         props.className,
-        variant === "primary" ? "button-primary" :
-            variant === "secondary" ? "button-secondary" : 
-            variant === "tertiary" ? "button-tertiary" : ""
+        "button",
+        intent === "save" ? "button-save" :
+            intent === "destructive" ? "button-destructive" :
+                intent === "cancel" ? "button-cancel" :
+                    intent === "preview" ? "button-preview" :
+                        intent === "default" ? "button-default" : ""
     ].filter(Boolean).join(" ");
 
     return (

@@ -21,7 +21,7 @@ export default function DateInput({ label, initialValue, onBlur, minDate, maxDat
     ].filter(Boolean).join(" ");
 
     const inputClassNames = [
-        "input w-full",
+        "input",
         (value && (value < minDate || value > maxDate)) ? "input-invalid" : ""
     ].filter(Boolean).join(" ");
 
