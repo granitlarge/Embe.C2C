@@ -37,7 +37,7 @@ export default function Modal({ children, className, closed, hidden, header, ...
     return (
         <dialog closedby="any" ref={dialog} className={`
                 ${classNames}
-                flex flex-col items-center gap-5
+                flex flex-col items-center gap-0
                 ${styles.modal}
                 flex 
                 flex-col 

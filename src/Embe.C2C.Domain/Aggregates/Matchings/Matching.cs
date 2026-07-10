@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
+using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Entities;
 using Embe.C2C.Domain.Exceptions;
@@ -10,7 +11,9 @@ public class Matching : Aggregate
     private Matching
     (
         Guid userId1,
-        Guid userId2
+        Guid userId2,
+        Guid userId1SearchProfileId,
+        Guid userId2SearchProfileId
     )
     {
         if (userId1 == userId2)
@@ -21,6 +24,8 @@ public class Matching : Aggregate
         Id = Guid.CreateVersion7();
         UserId1 = userId1;
         UserId2 = userId2;
+        UserId1SearchProfileId = userId1SearchProfileId;
+        UserId2SearchProfileId = userId2SearchProfileId;
         Conversation = Conversation.Create(Id, userId1, userId2);
         CreatedAt = DateTimeOffset.UtcNow;
     }
@@ -29,10 +34,12 @@ public class Matching : Aggregate
     private Matching() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-    public Guid Id { get; }
-    public Guid UserId1 { get; }
-    public Guid UserId2 { get; }
-    public Conversation Conversation { get; }
+    public Guid Id { get; private set; }
+    public Guid UserId1 { get; private set; }
+    public Guid UserId2 { get; private set; }
+    public Guid? UserId1SearchProfileId { get; private set; }
+    public Guid? UserId2SearchProfileId { get; private set; }
+    public Conversation Conversation { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 
     public void Remove(Guid actorUserId)
@@ -44,9 +51,15 @@ public class Matching : Aggregate
         AddDomainEvent(new MatchingRemovedEvent(actorUserId, this));
     }
 
-    internal static Matching Create(Guid userId1, Guid userId2)
+    internal static Matching Create
+    (
+        Guid userId1,
+        Guid userId2,
+        Guid userId1SearchProfileId,
+        Guid userId2SearchProfileId
+    )
     {
-        return new Matching(userId1, userId2);
+        return new Matching(userId1, userId2, userId1SearchProfileId, userId2SearchProfileId);
     }
 
     public Guid? GetOtherUserId(Guid? userId)
@@ -59,6 +72,8 @@ public class Matching : Aggregate
     #region Read Only Navigation Properties
     public User? User1 { get; private set; }
     public User? User2 { get; private set; }
+    public SearchProfile? User1SearchProfile { get; private set; }
+    public SearchProfile? User2SearchProfile { get; private set; }
     #endregion
 }
 

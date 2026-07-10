@@ -33,7 +33,7 @@ export default function MessageCompact({ className, messageDto, user, ...props }
             </div>
             {
                 message && message.createdAt &&
-                <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{formatTimeAgo(message.createdAt)}</span>
+                <span className="text-(--secondary-fc) text-(length:--secondary-fs)" suppressHydrationWarning>{formatTimeAgo(message.createdAt)}</span>
             }
         </Surface>
 

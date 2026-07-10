@@ -1,11 +1,14 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using Embe.C2C.Domain.Aggregates.Blockings;
+using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
+using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
+using NetTopologySuite.Geometries;
 
 namespace Embe.C2C.Domain.Aggregates.Users;
 
@@ -17,7 +20,7 @@ public class User : Aggregate
         Alias alias,
         BirthDate birthDate,
         Gender? gender,
-        Location? location,
+        ValueObjects.Location? location,
         ImmutableHashSet<ImageDetails>? files,
         string? bio,
         string identityUserId
@@ -39,7 +42,7 @@ public class User : Aggregate
         Alias = alias;
         BirthDate = birthDate;
         Gender = gender;
-        Location = location;
+        Coordinates = location != null ? new Point(location.Longitude, location.Latitude) { SRID = 4326 } : null;
         Bio = bio;
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
@@ -70,7 +73,8 @@ public class User : Aggregate
     public BirthDate BirthDate { get; private set; }
     public Age Age => new(BirthDate);
     public Gender? Gender { get; private set; }
-    public Location? Location { get; private set; }
+    public Point? Coordinates { get; private set; }
+    public ValueObjects.Location? Location => Coordinates != null ? new ValueObjects.Location(Coordinates.Y, Coordinates.X) : null;
 
     private readonly List<Entities.Image> _images;
     [NotMapped]
@@ -88,8 +92,13 @@ public class User : Aggregate
     public ICollection<Blocking>? BlockedBy { get; private set; }
     public ICollection<Matching>? Matchings1 { get; private set; }
     public ICollection<Matching>? Matchings2 { get; private set; }
-    public ICollection<Judgement>? JudgementsPassed { get; private set; }
-    public ICollection<Judgement>? JudgementsReceived { get; private set; }
+    public ICollection<SearchProfile>? SearchProfiles { get; private set; }
+
+    // These are all the candidates where this user is the "user" (the one who is judging)
+    public ICollection<Candidate>? CandidateUsers { get; private set; }
+
+    // These are all the candidates where this user is the "candidate" (the one being judged)
+    public ICollection<Candidate>? CandidateCandidates { get; private set; }
     #endregion
 
     public void UpdateEmail(Guid actorId, Email newEmail)
@@ -125,10 +134,10 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void UpdateLocation(Guid actorId, Location? newLocation)
+    public void UpdateLocation(Guid actorId, ValueObjects.Location? newLocation)
     {
         EnsureActorIsOwner(actorId);
-        Location = newLocation;
+        Coordinates = newLocation != null ? new Point(newLocation.Longitude, newLocation.Latitude) { SRID = 4326 } : null;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
@@ -192,7 +201,7 @@ public class User : Aggregate
         Alias alias,
         BirthDate birthDate,
         Gender? gender,
-        Location? location,
+        ValueObjects.Location? location,
         ImmutableHashSet<ImageDetails>? images,
         string? bio,
         string identityUserId

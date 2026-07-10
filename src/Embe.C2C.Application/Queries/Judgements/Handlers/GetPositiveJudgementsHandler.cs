@@ -33,13 +33,13 @@ public class GetPositiveJudgementsHandler
         CancellationToken cancellationToken
     )
     {
-
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User must be authenticated to get positive judgements.");
         var queryingUser = await _repository.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         var judgements = await _repository
             .JudgementsQuery
-                .Include(j => j.Judge)
-            .Where(j => j.JudgeeUserId == userId && j.IsPositive)
+                .Include(j => j.Candidate)
+                .ThenInclude(c => c!.User)
+            .Where(j => j.Candidate!.CandidateUserId == userId && j.IsPositive)
             .OrderByDescending(j => j.EditedAt)
             .Skip((query.Page - 1) * query.Size)
             .Take(query.Size)

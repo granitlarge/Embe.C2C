@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Judgements.Events;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Exceptions;
@@ -8,19 +9,12 @@ public class Judgement : Aggregate
 {
     private Judgement
     (
-        Guid judgeUserId,
-        Guid judgeeUserId,
+        Guid candidateId,
         bool isPositive
     )
     {
-        if (judgeUserId == judgeeUserId)
-        {
-            throw new DomainException(new DomainError<JudgementError>(JudgementError.SelfJudgement));
-        }
-
         Id = Guid.CreateVersion7();
-        JudgeUserId = judgeUserId;
-        JudgeeUserId = judgeeUserId;
+        CandidateId = candidateId;
         IsPositive = isPositive;
         CreatedAt = DateTimeOffset.UtcNow;
         EditedAt = CreatedAt;
@@ -29,15 +23,14 @@ public class Judgement : Aggregate
 
     private Judgement() { }
 
-    public Guid Id { get; }
-    public Guid JudgeUserId { get; }
-    public Guid JudgeeUserId { get; }
+    public Guid Id { get; private set; }
+    public Guid CandidateId { get; private set; }
     public bool IsPositive { get; private set; }
     public DateTimeOffset EditedAt { get; private set; }
-    public DateTimeOffset CreatedAt { get; private set;}
+    public DateTimeOffset CreatedAt { get; private set; }
 
     #region read-only navigation properties
-    public User? Judge { get; private set; }
+    public Candidate? Candidate { get; private set; }
     #endregion
 
     public void Edit(bool isPositive)
@@ -57,9 +50,9 @@ public class Judgement : Aggregate
 
     }
 
-    internal static Judgement Create(Guid judgeUserId, Guid judgeeUserId, bool isPositive)
+    internal static Judgement Create(Guid candidateId, bool isPositive)
     {
-        return new Judgement(judgeUserId, judgeeUserId, isPositive);
+        return new Judgement(candidateId, isPositive);
     }
 }
 

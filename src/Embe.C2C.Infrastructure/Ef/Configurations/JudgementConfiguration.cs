@@ -11,14 +11,9 @@ public class JudgementConfiguration : AggregateConfiguration<Judgement>
     {
         builder.HasKey(j => j.Id);
 
-        builder.HasOne(u => u.Judge)
-            .WithMany(u => u.JudgementsPassed)
-            .HasForeignKey(j => j.JudgeUserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne<Domain.Aggregates.Users.User>()
-            .WithMany(u => u.JudgementsReceived)
-            .HasForeignKey(j => j.JudgeeUserId)
+        builder.HasOne(u => u.Candidate)
+            .WithOne(c => c.Judgement)
+            .HasForeignKey<Judgement>(j => j.CandidateId)
             .OnDelete(DeleteBehavior.Cascade);
 
         base.Configure(builder);

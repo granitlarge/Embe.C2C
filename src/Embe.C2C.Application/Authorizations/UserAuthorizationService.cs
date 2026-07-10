@@ -1,13 +1,8 @@
 using System.Collections.Immutable;
-using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactStores.Judgements.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
-using Embe.C2C.Application.Dtos;
-using Embe.C2C.Application.Dtos.Read;
-using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
-using Embe.C2C.Domain.Aggregates.Users;
 
 namespace Embe.C2C.Application.Authorizations;
 
@@ -15,16 +10,12 @@ public class UserAuthorizationService
 {
     private readonly UserAuthorizationFactStore _facts;
 
-    private readonly IFileUrlGenerator _fileUrlGenerator;
-
     public UserAuthorizationService
     (
-        UserAuthorizationFactStore facts,
-        IFileService fileService
+        UserAuthorizationFactStore facts
     )
     {
         _facts = facts;
-        _fileUrlGenerator = new FileUrlGenerator(fileService, TimeSpan.FromSeconds(15));
     }
 /*
     public async Task<ReadDto<UserDto, UserPermission>?> ToDtoAsync

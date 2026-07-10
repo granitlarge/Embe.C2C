@@ -20,12 +20,12 @@ public static class JudgementExtensions
     )
     {
         ReadDto<UserDto, UserPermission>? judgeReadDto = null;
-        if (judgement.Judge != null)
+        if (judgement.Candidate?.User != null)
         {
-            var enrichedUser = judgement.Judge.Enrich(queryingUser);
+            var enrichedUser = judgement.Candidate.User.Enrich(queryingUser);
             judgeReadDto = await enrichedUser.ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken);
         }
-        var (permissions, variant) = authorizationService.Get(judgement);
+        var (permissions, variant) = await authorizationService.GetAsync(judgement);
         var dto = judgementDtoMapper.ToDto(judgement, variant, judgeReadDto);
         if (dto != null)
             return new ReadDto<JudgementDto, JudgementPermission>(dto, permissions);

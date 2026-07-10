@@ -20,9 +20,9 @@ function MyImage({ id, src, onRemove }: MyImageProps) {
     return (
         <div ref={droppableRef}>
             <div ref={draggableRef} className="relative">
-                <Image src={src} alt={"An Image"} className={`w-30 h-40 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
-                <button onClick={onRemove} className="bg-gray-300 absolute top-0 right-0 -m-3 rounded-full max-w-max max-h-max flex items-center justify-center">
-                    <X className="text-(--primary-fc) w-[16px] h-[16px]" />
+                <Image src={src} alt={"An Image"} className={`w-20 h-30 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
+                <button onClick={onRemove} className="button bg-gray-300 absolute top-0 right-0 -m-3 rounded-full max-w-max max-h-max flex items-center justify-center">
+                    <X className="text-(--primary-fc) w-[12px] h-[12px]" />
                 </button>
             </div>
         </div>
@@ -66,7 +66,7 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
 
     return (
         <Surface
-            className="relative w-30 h-40 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}
+            className="relative w-20 h-30 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}
             variant="tertiary">
             <input ref={inputRef} type="file" multiple className="hidden" accept="image/*" onChange={onChange} />
             <span className="text-3xl text-(--secondary-fc)">+</span>
@@ -114,7 +114,7 @@ export default function ImageGalleryInput<T extends Image = Image>({ data, error
                 onChange?.(images.map(({ __id, ...image }) => image));
             }}
         >
-            <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center`}>
+            <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center p-3`}>
                 {
                     images.map((image, index) => (
                         <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, ...image }) => image))} />

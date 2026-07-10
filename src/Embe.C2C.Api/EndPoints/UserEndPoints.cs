@@ -21,6 +21,7 @@ public static class UserEndPoints
         group.MapGet("/candidates", GenerateCandidates).RequireAuthorization();
         group.MapGet("/me", GetMe).RequireAuthorization();
         group.MapGet("/{id:guid}", GetById).RequireAuthorization();
+        group.MapGet("/has-search-profile", HasSearchProfile).RequireAuthorization();
     }
 
     private static async Task<IResult> Register([FromBody] RegisterCommand command, [FromServices] RegisterHandler handler, CancellationToken cancellationToken = default)
@@ -56,6 +57,12 @@ public static class UserEndPoints
     private static async Task<IResult> GetById([FromRoute] Guid id, [FromServices] GetUserByIdHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(new GetUserByIdQuery(id), cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> HasSearchProfile([FromServices] GetHasSearchProfileHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(GetHasSearchProfileQuery.Instance, cancellationToken);
         return result.ToResult();
     }
 }

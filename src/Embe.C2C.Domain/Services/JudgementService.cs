@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
@@ -17,7 +18,7 @@ public class JudgementService : DomainService
     public (Matching? Matching, Judgement Judgement) Judge
     (
         User judge,
-        User judgee,
+        Candidate candidate,
         bool isPositive,
         Judgement? existingJudgement = null,
         Judgement? oppositeJudgement = null
@@ -31,11 +32,18 @@ public class JudgementService : DomainService
         }
         else
         {
-            judgement = Judgement.Create(judge.Id, judgee.Id, isPositive);
+            judgement = Judgement.Create(candidate.Id, isPositive);
         }
 
         var isMatch = judgement.IsPositive && oppositeJudgement?.IsPositive == true;
-        var match = isMatch ? Matching.Create(judge.Id, judgee.Id) : null;
+        var match = isMatch ? Matching.Create
+        (
+            judge.Id, 
+            candidate.CandidateUserId, 
+            candidate.UserSearchProfileId, 
+            candidate.CandidateSearchProfileId
+        ) : null;
+
         if (match != null)
         {
             _domainEventStore.AddDomainEvent(new MatchingCreatedEvent(judge.Id, match));

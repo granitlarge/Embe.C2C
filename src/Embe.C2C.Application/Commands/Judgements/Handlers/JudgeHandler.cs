@@ -11,6 +11,7 @@ using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
+using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 namespace Embe.C2C.Application.Commands.Judgements.Handlers;
@@ -66,16 +67,16 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
     )
     {
         var userId = _userService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-        var isCandidate = await context.IsCandidateForUserIdAsync(userId, command.JudgeeUserId, cancellationToken);
-        if (!isCandidate)
+        var candidate = await context.CandidatesQuery.SingleOrDefaultAsync(c => c.Id == command.CandidateId && c.UserId == userId, cancellationToken);
+        if (candidate == null)
         {
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "Judgee is not a candidate for the judge."));
         }
 
-        _userAuthorizationFactStore.SetCandidateUserFact(command.JudgeeUserId, isCandidate: true);
+        _userAuthorizationFactStore.SetCandidateUserFact(candidate.CandidateUserId, isCandidate: true);
 
-        var (judgeePermissions, judgeeVariant) = await _userAuthorizationService.GetAsync(command.JudgeeUserId, cancellationToken);
-        if (!judgeePermissions.Contains(UserPermission.Judge))
+        var (candidatePermissions, candidateVariant) = await _userAuthorizationService.GetAsync(candidate.CandidateUserId, cancellationToken);
+        if (!candidatePermissions.Contains(UserPermission.Judge))
         {
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to judge."));
         }
@@ -86,21 +87,39 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "User not found."));
         }
 
-        var judgee = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == command.JudgeeUserId, cancellationToken);
+        var judgee = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == candidate.CandidateUserId, cancellationToken);
         if (judgee == null)
         {
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Judgee not found."));
         }
 
-        var existingJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.JudgeUserId == userId && j.JudgeeUserId == command.JudgeeUserId, cancellationToken);
-        var oppositeJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.JudgeUserId == command.JudgeeUserId && j.JudgeeUserId == userId, cancellationToken);
+        var existingJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.CandidateId == candidate.Id, cancellationToken);
+        var oppositeCandidate = await context.CandidatesQuery.SingleOrDefaultAsync
+        (
+            c => c.UserId == candidate.CandidateUserId &&
+                c.CandidateUserId == userId &&
+                c.UserSearchProfileId == candidate.CandidateSearchProfileId &&
+                c.CandidateSearchProfileId == candidate.UserSearchProfileId,
+                cancellationToken
+        );
 
-        var (matching, judgement) = _judgementService.Judge(judge, judgee, command.IsPositive, existingJudgement, oppositeJudgement);
+        Judgement? oppositeJudgement = null;
+        if (oppositeCandidate != null)
+        {
+            oppositeJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.CandidateId == oppositeCandidate.Id, cancellationToken);
+        }
+
+        var (matching, judgement) = _judgementService.Judge(judge, candidate, command.IsPositive, existingJudgement, oppositeJudgement);
         if (matching != null)
         {
+            candidate.Remove();
+            oppositeCandidate?.Remove();
+            context.Candidates.Remove(candidate);
+            context.Candidates.Remove(oppositeCandidate ?? throw new InvalidOperationException("opposite candidate cannot be null when a match is created."));
             context.Matchings.Add(matching);
             if (oppositeJudgement != null)
             {
+                oppositeJudgement.Remove();
                 context.Judgements.Remove(oppositeJudgement);
             }
         }
@@ -108,8 +127,6 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         {
             context.Judgements.Add(judgement);
         }
-
-        await context.ClearCandidateForUserIdAsync(userId, command.JudgeeUserId, cancellationToken);
 
         if (matching == null)
             return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(null));

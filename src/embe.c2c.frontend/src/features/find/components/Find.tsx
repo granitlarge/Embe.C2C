@@ -5,14 +5,15 @@ import { ReadDto } from "@/src/shared/types/dtos/types";
 import { useCallback, useState } from "react";
 import JudgeOverlay from "./JudgeOverlay";
 import * as api from "../actions/action";
-import Profile from "@/src/shared/components/profiles/Profile";
+import Profile from "@/src/shared/components/user/Profile";
 
 export type FindProps = {
+    hasSearchProfiles: boolean;
     candidates: ReadDto<UserTypeDef, UserPermission>[];
     className?: string;
 }
 
-export default function Find({ candidates: initialCandidates, className }: FindProps) {
+export default function Find({ hasSearchProfiles, candidates: initialCandidates, className }: FindProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
 
@@ -44,12 +45,18 @@ export default function Find({ candidates: initialCandidates, className }: FindP
     return (
         <>
             {
-                candidates[0] &&
+                !hasSearchProfiles &&
+                <div className={`${classNames} flex flex-col items-center justify-center`}>
+                    <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">no search profile</span>
+                </div>
+            }
+            {
+                hasSearchProfiles && candidates[0] &&
                 <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
                     <Profile className="grow-1" user={candidates[0].data} />
                 </JudgeOverlay>
             } {
-                !candidates[0] &&
+                hasSearchProfiles && !candidates[0] &&
                 <div className={`${classNames} flex flex-col items-center justify-center`}>
                     <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">no more candidates</span>
                 </div>

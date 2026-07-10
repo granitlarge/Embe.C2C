@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    [Migration("20260709174925_IndexUserLocation")]
-    partial class IndexUserLocation
+    [Migration("20260709230440_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -291,6 +291,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Engagement", "Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile.Engagement#Engagement", b1 =>
                         {
                             b1.IsRequired();
@@ -312,6 +315,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                         });
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SearchProfiles");
                 });
@@ -394,6 +399,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
+                    b.Property<Point>("Coordinates")
+                        .HasColumnType("geography");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -401,15 +409,12 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Gender")
-                        .HasColumnType("text");
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
 
                     b.Property<string>("IdentityUserId")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Point>("Location")
-                        .HasColumnType("geography");
 
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
@@ -422,15 +427,15 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Coordinates");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Coordinates"), "GIST");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("IdentityUserId")
                         .IsUnique();
-
-                    b.HasIndex("Location");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Location"), "GIST");
 
                     b.ToTable("DomainUsers");
                 });
@@ -879,11 +884,20 @@ namespace Embe.C2C.Infrastructure.Migrations
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
                 {
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
+                        .WithMany("SearchProfiles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsMany("Embe.C2C.Domain.Entities.SearchProfiles.SearchProfileGender", "_genders", b1 =>
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
+
+                            b1.Property<int>("Gender")
+                                .HasColumnType("integer");
 
                             b1.Property<uint>("RowVersion")
                                 .IsConcurrencyToken()
@@ -1120,6 +1134,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Navigation("Matchings1");
 
                     b.Navigation("Matchings2");
+
+                    b.Navigation("SearchProfiles");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Entities.Conversation", b =>

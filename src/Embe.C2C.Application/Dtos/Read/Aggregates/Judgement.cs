@@ -8,8 +8,7 @@ namespace Embe.C2C.Application.Dtos.Read.Aggregates;
 public record JudgementDto
 (
     Guid Id,
-    Guid JudgeUserId,
-    Guid JudgeeUserId,
+    Guid CandidateId,
     bool? IsPositive,
     DateTimeOffset? EditedAt,
     DateTimeOffset? CreatedAt,
@@ -30,15 +29,13 @@ public class JudgementDtoMapper
         ReadDto<UserDto, UserPermission>? judge = null
     )
     {
-
         if (variant == JudgementVariant.Empty)
             return null;
 
         return new JudgementDto
         (
             judgement.Id,
-            judgement.JudgeUserId,
-            judgement.JudgeeUserId,
+            judgement.CandidateId,
             variant.IncludeIsPositive ? judgement.IsPositive : null,
             variant.IncludeEditedAt ? judgement.EditedAt : null,
             variant.IncludeCreatedAt ? judgement.CreatedAt : null,

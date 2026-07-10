@@ -10,7 +10,7 @@ import { updateProfile } from "../actions/action";
 import * as z from "zod";
 import { Gender } from "@/src/shared/types/domain/value-objects";
 import Modal from "@/src/shared/components/modal/Modal";
-import Profile from "@/src/shared/components/profiles/Profile";
+import Profile from "@/src/shared/components/user/Profile";
 import { calculateAge } from "@/src/shared/time";
 
 export type MeProps = {

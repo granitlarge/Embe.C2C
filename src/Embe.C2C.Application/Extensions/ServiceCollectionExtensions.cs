@@ -5,6 +5,7 @@ using Embe.C2C.Application.Authorizations.FactStores.Conversations;
 using Embe.C2C.Application.Authorizations.FactStores.Judgements;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
+using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
@@ -54,6 +55,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Queries.Users.Handlers.GetUserByIdHandler>();
         services.AddScoped<Queries.Users.Handlers.GetMeHandler>();
+        services.AddScoped<Queries.Users.Handlers.GetHasSearchProfileHandler>();
 
         services.AddScoped<Queries.Geography.Handlers.SearchAdminAreaHandler>();
         services.AddScoped<Queries.Geography.Handlers.GetAdminAreaByIdHandler>();
@@ -65,15 +67,19 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MatchingAuthorizationFactStore>();
         services.AddScoped<MessageAuthorizationFactStore>();
         services.AddScoped<JudgementAuthorizationFactStore>();
+        services.AddScoped<SearchProfileAuthorizationFactStore>();
 
         services.AddScoped<UserFactGenerator>();
         services.AddScoped<MatchingFactGenerator>();
         services.AddScoped<MessageFactGenerator>();
+        services.AddScoped<SearchProfileFactGenerator>();
+        services.AddScoped<JudgementAuthorizationFactGenerator>();
 
         services.AddScoped<MatchingAuthorizationService>();
         services.AddScoped<UserAuthorizationService>();
         services.AddScoped<MessageAuthorizationService>();
         services.AddScoped<JudgementAuthorizationService>();
+        services.AddScoped<SearchProfileAuthorizationService>();
 
         services.AddScoped<DomainEventHandler>();
         services.AddScoped<IntegrationEventHandler>();
@@ -89,6 +95,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MessageDtoMapper>();
         services.AddScoped<ConversationDtoMapper>();
         services.AddScoped<MatchingDtoMapper>();
+        services.AddScoped<SearchProfileDtoMapper>();
+
         services.AddScoped<IFileUrlGenerator, FileUrlGenerator>((services) =>
         {
             var service = services.GetRequiredService<IFileService>();

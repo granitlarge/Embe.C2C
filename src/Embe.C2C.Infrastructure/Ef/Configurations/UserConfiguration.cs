@@ -14,11 +14,7 @@ public class UserConfiguration : AggregateConfiguration<User>
     {
         builder.HasKey(u => u.Id);
 
-        builder.Property(u => u.Gender).HasConversion
-        (
-            gender => gender != null ? Enum.GetName(gender.Value)! : null,
-            value => value != null ? Enum.Parse<Gender>(value) : null
-        );
+        builder.Property(u => u.Gender);
 
         builder.Property(u => u.Email)
             .HasConversion(
@@ -38,17 +34,8 @@ public class UserConfiguration : AggregateConfiguration<User>
                 value => new BirthDate(value))
             .IsRequired();
 
-        builder.Property(u => u.Location)
-            .HasConversion(
-                location => location == null ? null : new Point(location.Longitude, location.Latitude)
-                {
-                    SRID = 4326
-                },
-                value => value == null ? null : new Domain.ValueObjects.Location(value.Y, value.X)
-            )
-            .HasColumnType("geography");
-
-        builder.HasIndex(x => x.Location).HasMethod("GIST");
+        builder.Property(u => u.Coordinates).HasColumnType("geography");
+        builder.HasIndex(x => x.Coordinates).HasMethod("GIST");
 
         builder.HasIndex(u => u.Email).IsUnique();
         builder.HasIndex(u => u.IdentityUserId).IsUnique();
@@ -72,7 +59,6 @@ public class UserConfiguration : AggregateConfiguration<User>
                 });
                 image.Property(image => image.RowVersion).IsRowVersion();
             });
-    
 
         base.Configure(builder);
     }

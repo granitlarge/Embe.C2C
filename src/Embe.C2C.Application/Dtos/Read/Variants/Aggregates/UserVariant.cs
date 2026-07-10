@@ -81,7 +81,7 @@ public record UserVariant
         includeCreatedAt: false,
         includeUpdatedAt: false,
         includeDistance: true,
-        includeBio: false
+        includeBio: true
     );
 
     public static readonly UserVariant Full = new

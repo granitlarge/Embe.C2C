@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    [Migration("20260709172613_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260710023305_DomainCandidate")]
+    partial class DomainCandidate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,10 +109,51 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("Blockings");
                 });
 
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Candidates.Candidate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CandidateSearchProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CandidateUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserSearchProfileId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateSearchProfileId");
+
+                    b.HasIndex("CandidateUserId");
+
+                    b.HasIndex("UserSearchProfileId");
+
+                    b.HasIndex("UserId", "CandidateUserId", "UserSearchProfileId", "CandidateSearchProfileId")
+                        .IsUnique();
+
+                    b.ToTable("Candidates");
+                });
+
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Judgements.Judgement", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CandidateId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -124,12 +165,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<bool>("IsPositive")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("JudgeUserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("JudgeeUserId")
-                        .HasColumnType("uuid");
-
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -138,9 +173,8 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("JudgeUserId");
-
-                    b.HasIndex("JudgeeUserId");
+                    b.HasIndex("CandidateId")
+                        .IsUnique();
 
                     b.ToTable("Judgements");
                 });
@@ -163,14 +197,24 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Guid>("UserId1")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("UserId1SearchProfileId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("UserId2")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UserId2SearchProfileId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId1");
 
+                    b.HasIndex("UserId1SearchProfileId");
+
                     b.HasIndex("UserId2");
+
+                    b.HasIndex("UserId2SearchProfileId");
 
                     b.ToTable("Matchings");
                 });
@@ -291,6 +335,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Engagement", "Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile.Engagement#Engagement", b1 =>
                         {
                             b1.IsRequired();
@@ -312,6 +359,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                         });
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SearchProfiles");
                 });
@@ -394,6 +443,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
+                    b.Property<Point>("Coordinates")
+                        .HasColumnType("geography");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -401,15 +453,12 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Gender")
-                        .HasColumnType("text");
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
 
                     b.Property<string>("IdentityUserId")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Point>("Location")
-                        .HasColumnType("geography");
 
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
@@ -421,6 +470,10 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Coordinates");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Coordinates"), "GIST");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -510,21 +563,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Point"), "GIST");
 
                     b.ToTable("AdminAreas");
-                });
-
-            modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.CandidateEntity", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CandidateUserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("UserId", "CandidateUserId");
-
-                    b.HasIndex("CandidateUserId");
-
-                    b.ToTable("Candidates");
                 });
 
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.RefreshTokenEntity", b =>
@@ -742,6 +780,21 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SearchProfileSearchProfile", b =>
+                {
+                    b.Property<Guid>("CandidateSearchProfilesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserSearchProfilesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CandidateSearchProfilesId", "UserSearchProfilesId");
+
+                    b.HasIndex("UserSearchProfilesId");
+
+                    b.ToTable("SearchProfileSearchProfile");
+                });
+
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification", b =>
                 {
                     b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Notification");
@@ -804,21 +857,50 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Candidates.Candidate", b =>
+                {
+                    b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "CandidateSearchProfile")
+                        .WithMany()
+                        .HasForeignKey("CandidateSearchProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "CandidateUser")
+                        .WithMany("CandidateCandidates")
+                        .HasForeignKey("CandidateUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "User")
+                        .WithMany("CandidateUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "UserSearchProfile")
+                        .WithMany()
+                        .HasForeignKey("UserSearchProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CandidateSearchProfile");
+
+                    b.Navigation("CandidateUser");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserSearchProfile");
+                });
+
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Judgements.Judgement", b =>
                 {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "Judge")
-                        .WithMany("JudgementsPassed")
-                        .HasForeignKey("JudgeUserId")
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Candidates.Candidate", "Candidate")
+                        .WithOne("Judgement")
+                        .HasForeignKey("Embe.C2C.Domain.Aggregates.Judgements.Judgement", "CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
-                        .WithMany("JudgementsReceived")
-                        .HasForeignKey("JudgeeUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Judge");
+                    b.Navigation("Candidate");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Matchings.Matching", b =>
@@ -829,15 +911,29 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "User1SearchProfile")
+                        .WithMany("MatchingsUserId1")
+                        .HasForeignKey("UserId1SearchProfileId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "User2")
                         .WithMany("Matchings2")
                         .HasForeignKey("UserId2")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "User2SearchProfile")
+                        .WithMany("MatchingsUserId2")
+                        .HasForeignKey("UserId2SearchProfileId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.Navigation("User1");
 
+                    b.Navigation("User1SearchProfile");
+
                     b.Navigation("User2");
+
+                    b.Navigation("User2SearchProfile");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Messages.Message", b =>
@@ -875,11 +971,20 @@ namespace Embe.C2C.Infrastructure.Migrations
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
                 {
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "User")
+                        .WithMany("SearchProfiles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsMany("Embe.C2C.Domain.Entities.SearchProfiles.SearchProfileGender", "_genders", b1 =>
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
+
+                            b1.Property<int>("Gender")
+                                .HasColumnType("integer");
 
                             b1.Property<uint>("RowVersion")
                                 .IsConcurrencyToken()
@@ -899,6 +1004,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("SearchProfileId");
                         });
+
+                    b.Navigation("User");
 
                     b.Navigation("_genders");
                 });
@@ -1005,23 +1112,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.CandidateEntity", b =>
-                {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "Candidate")
-                        .WithMany()
-                        .HasForeignKey("CandidateUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Candidate");
-                });
-
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.RefreshTokenEntity", b =>
                 {
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
@@ -1082,6 +1172,21 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SearchProfileSearchProfile", b =>
+                {
+                    b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", null)
+                        .WithMany()
+                        .HasForeignKey("CandidateSearchProfilesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", null)
+                        .WithMany()
+                        .HasForeignKey("UserSearchProfilesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification", b =>
                 {
                     b.HasOne("Embe.C2C.Domain.Aggregates.Matchings.Matching", null)
@@ -1097,10 +1202,22 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Candidates.Candidate", b =>
+                {
+                    b.Navigation("Judgement");
+                });
+
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Matchings.Matching", b =>
                 {
                     b.Navigation("Conversation")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
+                {
+                    b.Navigation("MatchingsUserId1");
+
+                    b.Navigation("MatchingsUserId2");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Users.User", b =>
@@ -1109,13 +1226,15 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Navigation("BlockedBy");
 
-                    b.Navigation("JudgementsPassed");
+                    b.Navigation("CandidateCandidates");
 
-                    b.Navigation("JudgementsReceived");
+                    b.Navigation("CandidateUsers");
 
                     b.Navigation("Matchings1");
 
                     b.Navigation("Matchings2");
+
+                    b.Navigation("SearchProfiles");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Entities.Conversation", b =>

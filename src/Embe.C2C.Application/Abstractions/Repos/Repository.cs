@@ -3,6 +3,7 @@ using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Blockings;
+using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
@@ -29,6 +30,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IDbSet<Message> Messages { get; }
         public IDbSet<Blocking> Blockings { get; }
         public IDbSet<SearchProfile> SearchProfiles { get; }
+        public IDbSet<Candidate> Candidates { get; }
 
         public IQueryable<User> DomainUsersQuery { get; }
         public IQueryable<Account> AccountsQuery { get; }
@@ -39,24 +41,11 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<Blocking> BlockingsQuery { get; }
         public IQueryable<SearchProfile> SearchProfilesQuery { get; }
         public IQueryable<IAdminArea> AdminAreasQuery { get; }
+        public IQueryable<Candidate> CandidatesQuery { get; }
 
-        public Task<List<User>> GenerateCandidatesForUserIdAsync
+        public Task<bool> GenerateCandidatesForUserIdAsync
         (
             Guid userId,
-            CancellationToken cancellationToken = default
-        );
-
-        public Task<bool> IsCandidateForUserIdAsync
-        (
-            Guid userId,
-            Guid candidateUserId,
-            CancellationToken cancellationToken = default
-        );
-
-        public Task ClearCandidateForUserIdAsync
-        (
-            Guid userId,
-            Guid candidateUserId,
             CancellationToken cancellationToken = default
         );
 
@@ -104,29 +93,22 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IQueryable<SearchProfile> SearchProfilesQuery => _context.SearchProfilesQuery;
         public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
         public IQueryable<Blocking> BlockingsQuery => _context.BlockingsQuery;
+        public IQueryable<Candidate> CandidatesQuery => _context.CandidatesQuery;
 
         public IQueryable<IAdminArea> AdminAreasQuery => _context.AdminAreasQuery;
 
-        public Task ClearCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
-        {
-            return _context.ClearCandidateForUserIdAsync(userId, candidateUserId, cancellationToken);
-        }
+        public IDbSet<Candidate> Candidates => _context.Candidates;
 
-        public async Task<List<User>> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<bool> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         }
 
-        public async Task<bool> IsCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
-        {
-            return await _context.IsCandidateForUserIdAsync(userId, candidateUserId, cancellationToken);
-        }
-
         public async Task<List<IAdminArea>> SearchAdminAreasAsync
         (
-            string? parentId, 
-            double? longitude, 
-            double? latitude, 
+            string? parentId,
+            double? longitude,
+            double? latitude,
             int page,
             int size,
             CancellationToken cancellationToken = default

@@ -59,7 +59,7 @@ public class UserFactGenerator
                 IsBlocking = u.Blocked!.Any(bu => bu.BlockedUserId == userId),
                 IsBlockedBy = u.BlockedBy!.Any(bu => bu.BlockerUserId == userId),
                 IsMatched = u.Matchings1!.Any(m => m.UserId2 == userId) || u.Matchings2!.Any(m => m.UserId1 == userId),
-                IsPositivelyJudged = u.JudgementsReceived!.Any(j => j.JudgeUserId == userId && j.IsPositive)
+                IsPositivelyJudged = u.CandidateCandidates!.Any(c => c.UserId == userId && c.Judgement!.IsPositive)
             })
             .SingleOrDefaultAsync(cancellationToken);
 

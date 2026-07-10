@@ -45,14 +45,14 @@ public class JudgementAuthorizationService
     }
     */
 
-    public (ImmutableHashSet<JudgementPermission> Permissions, JudgementVariant Variant) Get
+    public async Task<(ImmutableHashSet<JudgementPermission> Permissions, JudgementVariant Variant)> GetAsync
     (
         Judgement judgement
     )
     {
-        var isJudgeFact = _factStore.GetIsJudgeFact(judgement);
-        var isJudgeeFact = _factStore.GetIsJudgeeFact(judgement);
-        var isPositivelyJudgedFact = _factStore.GetIsPositivelyJudgedFact(judgement);
+        var isJudgeFact = await _factStore.GetIsJudgeFactAsync(judgement);
+        var isJudgeeFact = await _factStore.GetIsJudgeeFactAsync(judgement);
+        var isPositivelyJudgedFact = await _factStore.GetIsPositivelyJudgedFactAsync(judgement);
         var permissions = GetPermissions(isJudgeFact, isJudgeeFact, isPositivelyJudgedFact);
         var variant = GetVariant(isJudgeFact, isJudgeeFact, isPositivelyJudgedFact);
         return (permissions, variant);

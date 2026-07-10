@@ -15,7 +15,8 @@ export type Set =
     "matching" |
     "message" |
     "transaction" |
-    "notification";
+    "notification" |
+    "search-profile";
 
 export type Entity = `${Set}:${Guid}`;
 export type Collection = `${Set}:${Guid}:${Set}`;

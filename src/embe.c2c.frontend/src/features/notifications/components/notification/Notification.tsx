@@ -88,7 +88,7 @@ export default function Notification({ markAsRead, remove, markAsUnread, notific
                     </button>
 
                 </div>
-                <div className="ml-auto text-(--surface-font-color-muted) text-(length:--fs-sm)">{timeAgo}</div>
+                <div className="ml-auto text-(--surface-font-color-muted) text-(length:--fs-sm)" suppressHydrationWarning>{timeAgo}</div>
             </div>
         </div>
     )

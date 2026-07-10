@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
+using Embe.C2C.Domain.Aggregates.Matchings;
+using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Entities.SearchProfiles;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
@@ -60,6 +62,12 @@ public class SearchProfile : Aggregate
     public Age? AgeRangeMin { get; private set; }
     public Age? AgeRangeMax { get; private set; }
     public Distance? MaximumDistance { get; private set; }
+
+    #region read-only navigation properties
+    public User? User { get; private set; }
+    public ICollection<Matching>? MatchingsUserId1 { get; private set; }
+    public ICollection<Matching>? MatchingsUserId2 { get; private set; }
+    #endregion
 
     public void AddGender(Gender gender)
     {

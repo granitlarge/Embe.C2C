@@ -4,12 +4,14 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Blockings;
+using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Entities.SearchProfiles;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -52,9 +54,9 @@ public class C2CContext
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Blocking> Blockings { get; set; }
-    public DbSet<CandidateEntity> Candidates { get; set; }
     public DbSet<SearchProfile> SearchProfiles { get; set; }
     public DbSet<AdminArea> AdminAreas { get; set; }
+    public DbSet<Candidate> Candidates { get; set; }
 
     public IImmutableList<DomainEvent> DomainEvents
     {
@@ -162,6 +164,10 @@ public class C2CContext
 
     public IQueryable<IAdminArea> AdminAreasQuery => AdminAreas;
 
+    IDbSet<Candidate> ISparseRepository.Candidates => throw new NotImplementedException();
+
+    public IQueryable<Candidate> CandidatesQuery => throw new NotImplementedException();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -173,70 +179,63 @@ public class C2CContext
         return Database.BeginTransactionAsync(System.Data.IsolationLevel.Snapshot, cancellationToken);
     }
 
-    public async Task<List<User>> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<bool> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var existingCandidates = await Candidates
-            .Include(c => c.Candidate)
-            .Where(c => c.UserId == userId).ToListAsync(cancellationToken);
-
-        if (existingCandidates.Count != 0)
+        var existingCandidates = await Candidates.AnyAsync(c => c.UserId == userId, cancellationToken);
+        if (existingCandidates)
         {
-            return [.. existingCandidates.Select(c => c.Candidate!)];
+            return true;
         }
 
-        // User has not blocked Candidate
-        // Candidate has not blocked User
-        // User's preferences align with Candidate's information.
-        // Candidate's preferences align with User's information.
-        // User and Candidate are not matched.
-        // User has not already judged Candidate. 2nd chances? Show the same candidate again after a certain period of time? (e.g., 1 month)
-        // Candidate has not already judged User negatively.
+#warning This query needs to order results by relevance, but for now it just returns the first 20 candidates that match the criteria. The ordering can be improved later.
 
-        // Then we need to prioritize candidates based on the following criteria:
-        // 1. Candidates who have liked the user
-        // 2. Candidates who have not been judged by the user yet
+        var candidateIds = await Database.SqlQueryRaw<(Guid CandidateId, Guid UserSearchProfileId, Guid CandidateSearchProfileId)>($"""
+            
+            select c."Id" CandidateId, usp."Id" UserSearchProfileId, csp."Id" CandidateSearchProfileId
+            from "DomainUsers" u
+            inner join "SearchProfiles" usp on u."Id" = usp."UserId"
+            inner join "DomainUsers" c on (ST_Distance(u."Coordinates", c."Coordinates") <= usp."MaximumDistance" * 1000 or usp."MaximumDistance" is null)
+            inner join "SearchProfiles" csp on csp."UserId" = c."Id" and (ST_Distance(u."Coordinates", c."Coordinates") <= csp."MaximumDistance" * 1000 or csp."MaximumDistance" is null)
+            where 1=1
+            and u."Id" = '{userId}'
+            and c."Id" != u."Id"
+            and (
+                exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id" and spg."Gender" = c."Gender")
+                or (select count(1) from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id") = 0
+            )
+            and (
+                exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id" and spg."Gender" = u."Gender")
+                or (select count(1) from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id") = 0
+            )
+            and extract(year from age(CURRENT_DATE, u."BirthDate")) between coalesce(usp."AgeRangeMin", 0) and coalesce(usp."AgeRangeMax", 120)
+            and usp."Engagement_Frequency" = csp."Engagement_Frequency"
+            and usp."Engagement_Boundedness" = csp."Engagement_Boundedness"
+            and usp."Engagement_Medium" = csp."Engagement_Medium"
+            and (
+                usp."Engagement_Boundedness" != 2 
+                or daterange(usp."Engagement_StartDate", usp."Engagement_EndDate") && daterange(csp."Engagement_StartDate", csp."Engagement_EndDate")
+            )
+            and not exists (select * from "Blockings" b where b."BlockerUserId" = u."Id" and b."BlockedUserId" = c."Id")
+            and not exists (select * from "Blockings" b where b."BlockerUserId" = c."Id" and b."BlockedUserId" = u."Id")
+            and not exists (select * from "Matchings" m where m."UserId1" = u."Id" and m."UserId2" = c."Id")
+            and not exists (select * from "Matchings" m where m."UserId1" = c."Id" and m."UserId2" = u."Id")
+            and not exists (select * 
+                            from "Judgements" j 
+                            inner join "Candidates" can on can."Id" = j."CandidateId"
+                            where can."UserId" = u."Id" and can."CandidateUserId" = c."Id")
+            and not exists (select * 
+                            from "Judgements" j 
+                            inner join "Candidates" can on can."Id" = j."CandidateId"
+                            where can."UserId" = c."Id" and can."CandidateUserId" = u."Id" and j."IsPositive" = false)
+            and not exists (select * from "Candidates" can where can."UserId" = u."Id" and can."CandidateUserId" = c."Id" and can."UserSearchProfileId" = usp."Id" and can."CandidateSearchProfileId" = csp."Id")
+            offset 0 
+            limit 20
 
-        var query =
-        (
+        """).ToListAsync(cancellationToken);
 
-            from user in DomainUsers
-            from candidate in DomainUsers
-
-            where 1 == 1 &&
-            user.Id == userId &&
-            user.Id != candidate.Id &&
-
-            !user.Blocked!.Any(b => b.BlockedUserId == candidate.Id) &&
-            !user.BlockedBy!.Any(b => b.BlockerUserId == candidate.Id) &&
-
-            !user.Matchings1!.Any(m => m.UserId2 == candidate.Id) &&
-            !user.Matchings2!.Any(m => m.UserId1 == candidate.Id) &&
-
-            !user.JudgementsPassed!.Any(j => j.JudgeUserId == user.Id && j.JudgeeUserId == candidate.Id && !j.IsPositive) &&
-            !user.JudgementsReceived!.Any(j => j.JudgeUserId == candidate.Id && j.JudgeeUserId == user.Id && !j.IsPositive)
-
-            select candidate
-
-        );
-
-        var users = await query.Take(20).ToListAsync(cancellationToken);
-        var candidates = users.Select(u => new CandidateEntity(userId, u.Id));
+        var candidates = candidateIds.Select(c => Candidate.Create(userId, c.CandidateId, c.UserSearchProfileId, c.CandidateSearchProfileId)).ToList();
         Candidates.AddRange(candidates);
-        return users;
-    }
-
-    public Task<bool> IsCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
-    {
-        return Candidates.AnyAsync(c => c.UserId == userId && c.CandidateUserId == candidateUserId, cancellationToken);
-    }
-
-    public async Task ClearCandidateForUserIdAsync(Guid userId, Guid candidateUserId, CancellationToken cancellationToken = default)
-    {
-        var candidate = await Candidates.FirstOrDefaultAsync(c => c.UserId == userId && c.CandidateUserId == candidateUserId, cancellationToken);
-        if (candidate is not null)
-        {
-            Candidates.Remove(candidate);
-        }
+        return candidates.Count > 0;
     }
 
     public async Task<List<IAdminArea>> SearchAdminAreasAsync
@@ -291,5 +290,10 @@ public class C2CContext
         }
 
         return adminAreas;
+    }
+
+    public Task<bool> IsCandidateSearchProfileForUserIdAsync(Guid userId, Guid searchProfileId, CancellationToken cancellationToken = default)
+    {
+        return Candidates.AnyAsync(c => c.UserId == userId && c.CandidateSearchProfileId == searchProfileId, cancellationToken);
     }
 }

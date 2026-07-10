@@ -1,8 +1,7 @@
 import { getProfile } from "@/src/shared/actions/user/action";
 import { Guid } from "@/src/shared/cache";
 import MainNav from "@/src/shared/components/nav/MainNav";
-import Profile from "@/src/shared/components/profiles/Profile";
-import Surface from "@/src/shared/components/surfaces/Surface";
+import Profile from "@/src/shared/components/user/Profile";
 
 export type ProfilePageProps = {
     params: Promise<{

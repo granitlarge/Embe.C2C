@@ -79,28 +79,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SearchProfiles",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    AgeRangeMin = table.Column<int>(type: "integer", nullable: true),
-                    AgeRangeMax = table.Column<int>(type: "integer", nullable: true),
-                    MaximumDistance = table.Column<double>(type: "double precision", nullable: true),
-                    Engagement_Boundedness = table.Column<int>(type: "integer", nullable: false),
-                    Engagement_EndDate = table.Column<DateOnly>(type: "date", nullable: true),
-                    Engagement_Frequency = table.Column<int>(type: "integer", nullable: false),
-                    Engagement_Medium = table.Column<int>(type: "integer", nullable: false),
-                    Engagement_StartDate = table.Column<DateOnly>(type: "date", nullable: true),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SearchProfiles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -215,8 +193,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     Alias = table.Column<string>(type: "text", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Gender = table.Column<string>(type: "text", nullable: true),
-                    Location = table.Column<Point>(type: "geography", nullable: true),
+                    Gender = table.Column<int>(type: "integer", nullable: true),
+                    Coordinates = table.Column<Point>(type: "geography", nullable: true),
                     Bio = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -230,25 +208,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                         column: x => x.IdentityUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SearchProfileGender",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SearchProfileId = table.Column<Guid>(type: "uuid", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SearchProfileGender", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SearchProfileGender_SearchProfiles_SearchProfileId",
-                        column: x => x.SearchProfileId,
-                        principalTable: "SearchProfiles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -426,6 +385,35 @@ namespace Embe.C2C.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SearchProfiles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    AgeRangeMin = table.Column<int>(type: "integer", nullable: true),
+                    AgeRangeMax = table.Column<int>(type: "integer", nullable: true),
+                    MaximumDistance = table.Column<double>(type: "double precision", nullable: true),
+                    Engagement_Boundedness = table.Column<int>(type: "integer", nullable: false),
+                    Engagement_EndDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    Engagement_Frequency = table.Column<int>(type: "integer", nullable: false),
+                    Engagement_Medium = table.Column<int>(type: "integer", nullable: false),
+                    Engagement_StartDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SearchProfiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SearchProfiles_DomainUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "DomainUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transaction",
                 columns: table => new
                 {
@@ -487,6 +475,26 @@ namespace Embe.C2C.Infrastructure.Migrations
                         name: "FK_Notifications_Matchings_MatchingId",
                         column: x => x.MatchingId,
                         principalTable: "Matchings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SearchProfileGender",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SearchProfileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Gender = table.Column<int>(type: "integer", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SearchProfileGender", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SearchProfileGender_SearchProfiles_SearchProfileId",
+                        column: x => x.SearchProfileId,
+                        principalTable: "SearchProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -635,6 +643,12 @@ namespace Embe.C2C.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_DomainUsers_Coordinates",
+                table: "DomainUsers",
+                column: "Coordinates")
+                .Annotation("Npgsql:IndexMethod", "GIST");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DomainUsers_Email",
                 table: "DomainUsers",
                 column: "Email",
@@ -715,6 +729,11 @@ namespace Embe.C2C.Infrastructure.Migrations
                 name: "IX_SearchProfileGender_SearchProfileId",
                 table: "SearchProfileGender",
                 column: "SearchProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SearchProfiles_UserId",
+                table: "SearchProfiles",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transaction_AccountId",

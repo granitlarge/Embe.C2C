@@ -17,7 +17,7 @@ import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { Ellipsis } from "lucide-react";
 import Button from "@/src/shared/components/buttons/Button";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
@@ -29,11 +29,13 @@ type MatchHeaderProps = {
 }
 function MatchHeader({ partner, matchId }: MatchHeaderProps) {
 
+    const router = useRouter();
     async function onUnmatch() {
         const response = await unmatch(matchId)
         if (!response) {
             throw new Error("not implemented");
         }
+        router.push("/protected/matches");
     }
 
     return (
