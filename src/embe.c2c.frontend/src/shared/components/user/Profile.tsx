@@ -42,7 +42,7 @@ export default function Profile({ user, className }: ProfileProps) {
                 user.bio &&
                 <div className="flex flex-col gap-1">
                     <Surface className="flex flex-col gap-1" padding="sm" variant="tertiary">
-                        <p className="wrap-anywhere text-(--primary-fc) text-(length:--primary-fs)">{user.bio}</p>
+                        <p className="wrap-anywhere whitespace-pre-wrap text-(--primary-fc) text-(length:--primary-fs)">{user.bio}</p>
                     </Surface>
                 </div>
             }

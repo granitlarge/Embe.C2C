@@ -40,6 +40,9 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
 
+        services.AddScoped<Commands.SearchProfiles.Handlers.CreateSearchProfileHandler>();
+        services.AddScoped<Commands.SearchProfiles.Handlers.UpdateSearchProfileHandler>();
+
         services.AddScoped<Queries.Auth.Handlers.AccountExistsHandler>();
 
         services.AddScoped<Queries.Notifications.Handlers.GetNotificationsHandler>();
@@ -61,6 +64,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Geography.Handlers.GetAdminAreaByIdHandler>();
         services.AddScoped<Queries.Geography.Handlers.GetCountryAdminAreaHandler>();
         services.AddScoped<Queries.Geography.Handlers.ReverseGeocodeHandler>();
+
+        services.AddScoped<Queries.SearchProfiles.Handlers.GetSearchProfileHandler>();
 
         services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();

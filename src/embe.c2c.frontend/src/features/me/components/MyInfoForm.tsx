@@ -17,7 +17,6 @@ export type ImageData = {
     mimeType: string,
     order: number
 }
-
 type MyImagesFormProps = {
     initialImages: ImageData[]
     onChange?: (images: ImageData[]) => void
@@ -89,6 +88,7 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
     ].filter(Boolean).join(" ")
 
     return (
+
         <div className={`flex flex-col gap-2 ${classNames}`}>
 
             <Surface className={`flex flex-col gap-2`} padding="md" variant="secondary">
@@ -118,7 +118,6 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
                         location: data.location,
                     }}
                     onChange={basicProfileFormData => {
-                        console.log("changing basic profile form data", basicProfileFormData);
                         onChange(({
                             ...data,
                             birthDate: basicProfileFormData.birthDate,
@@ -144,6 +143,7 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
             </Surface>
 
         </div>
+
     )
 
 }

@@ -119,7 +119,6 @@ export default function Me({ className, user }: MeProps) {
 
         <Surface className={`${classNames} flex flex-col gap-2`} padding="none">
             <MyInfoForm className="grow-1 overflow-y-scroll" error={basicFormError} data={clientSideBasicFormData} onChange={(data) => {
-                console.log("changing client side basic form data", data);
                 setClientSideBasicFormData(prev => ({
                     ...prev,
                     images: data.images?.sort((a, b) => a.order - b.order) ?? [],

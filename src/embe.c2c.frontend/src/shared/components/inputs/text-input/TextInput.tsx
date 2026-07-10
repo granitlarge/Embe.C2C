@@ -42,7 +42,7 @@ export default function TextInput({
                 onChange={(e) => { setValue(e.target.value); }}
                 onBlur={(e) => { onBlur?.(value) }}
             />
-            {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
+            {errorMessage && <span className="mx-auto text-(length:--primary-fs) text-(--error-fc)">{errorMessage}</span>}
             {children}
         </Surface>
     )

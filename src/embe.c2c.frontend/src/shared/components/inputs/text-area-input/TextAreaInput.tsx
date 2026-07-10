@@ -45,7 +45,7 @@ export default function TextAreaInput({ initialValue, onBlur, label, className, 
                 {...props}
             >
             </textarea>
-            {errorMessage && <span className="text-(--error-fc)">{errorMessage}</span>}
+            {errorMessage && <span className="mx-auto text-(length:--primary-fs) text-(--error-fc)">{errorMessage}</span>}
         </div>
     )
 }

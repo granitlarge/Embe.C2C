@@ -84,7 +84,7 @@
     --button-destructive-bg: rgb(255, 75, 75);
     --button-destructive-fc: black;
 
-    --button-preview-bg: rgb(255, 255, 255);
+    --button-preview-bg: lightgray;
     --button-preview-fc: black;
 
     --button-cancel-bg: lightgray;

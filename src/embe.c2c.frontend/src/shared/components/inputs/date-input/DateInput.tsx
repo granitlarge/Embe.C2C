@@ -2,8 +2,8 @@ import { useState } from "react";
 import Surface from "../../surfaces/Surface";
 
 export type DateInputProps = {
-    minDate: string;
-    maxDate: string;
+    minDate?: string;
+    maxDate?: string;
     label: string;
     initialValue?: string;
     onBlur?: (value: string) => void;
@@ -22,7 +22,7 @@ export default function DateInput({ label, initialValue, onBlur, minDate, maxDat
 
     const inputClassNames = [
         "input",
-        (value && (value < minDate || value > maxDate)) ? "input-invalid" : ""
+        (value && ((minDate && value < minDate) || (maxDate && value > maxDate))) ? "input-invalid" : ""
     ].filter(Boolean).join(" ");
 
     return (

@@ -58,12 +58,12 @@ namespace Embe.C2C.Application.Abstractions.Repos
             int size,
             CancellationToken cancellationToken = default
         );
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 
     public interface IRepository : ISparseRepository
     {
         public IImmutableList<DomainEvent> DomainEvents { get; }
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
         public Task<List<IAdminArea>> ReverseGeocodeAsync(double longitude, double latitude);
     }
@@ -102,6 +102,11 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public async Task<bool> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
+        }
+
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return _context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<List<IAdminArea>> SearchAdminAreasAsync

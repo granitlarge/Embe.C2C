@@ -29,6 +29,8 @@ public class SearchProfileConfiguration : AggregateConfiguration<SearchProfile>
 
         });
 
+        builder.Property(sp => sp.RelationshipType);
+
         builder.Property(sp => sp.AgeRangeMin).HasConversion
         (
             age => age != null ? age.Value : (int?)null,

@@ -35,6 +35,7 @@ public class SearchProfileFactGenerator
             new IsMatchedFact(searchProfileId, result?.IsMatchedWithUser ?? false),
             new IsCandidateForUserFact(searchProfileId, result?.IsCandidateForUser ?? false)
         };
+
         return facts;
     }
 

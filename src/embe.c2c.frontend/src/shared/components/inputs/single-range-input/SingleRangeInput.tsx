@@ -35,7 +35,7 @@ export default function SingleRangeInput({ label, className, min, max, step, val
                     <Slider.Range className="absolute h-full rounded-full bg-(--universal-primary-bg)" />
                 </Slider.Track>
                 <Slider.Thumb className="block h-5 w-5 rounded-full border-2 border-(--border-color) bg-(--primary-fc) focus:outline-none" >
-                    <span className="absolute -bottom-8">{value ?? min}</span>
+                    <span className="absolute -bottom-6 right-0">{value ?? min}{value === max ? "+" : ""}</span>
                 </Slider.Thumb>
             </Slider.Root>
         </Surface>

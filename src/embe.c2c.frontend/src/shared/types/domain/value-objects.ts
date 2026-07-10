@@ -72,7 +72,7 @@ export enum EngagementBoundedness {
 }
 
 export enum EngagementFrequency {
-    One = 0,
+    Once = 0,
     Daily = 1,
     Weekly = 2,
     Monthly = 3,
@@ -84,4 +84,12 @@ export enum RelationshipType {
     Romantic = 0,
     Platonic = 1,
     Professional = 2
+}
+
+export type Engagement = {
+    medium: EngagementMedium;
+    boundedness: EngagementBoundedness;
+    frequency: EngagementFrequency;
+    startDate: string;
+    endDate: string;
 }

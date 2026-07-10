@@ -12,21 +12,21 @@ public class SearchProfileAuthorizationFactStore
 {
     private readonly SearchProfileFactGenerator _searchProfileFactGenerator = searchProfileFactGenerator;
 
-    public void SetIsOwnedByUserFact(Guid searchProfileId, bool isOwnedByUser)
+    public void SetIsOwnedByUserFact(Guid searchProfileId, bool value)
     {
-        var fact = new IsOwnerFact(searchProfileId, isOwnedByUser);
+        var fact = new IsOwnerFact(searchProfileId, value);
         SetFact(fact);
     }
 
-    public void SetIsCandidateForUserFact(Guid searchProfileId, bool isCandidateForUser)
+    public void SetIsCandidateForUserFact(Guid searchProfileId, bool value)
     {
-        var fact = new IsCandidateForUserFact(searchProfileId, isCandidateForUser);
+        var fact = new IsCandidateForUserFact(searchProfileId, value);
         SetFact(fact);
     }
 
-    public void SetIsMatchedWithUserFact(Guid searchProfileId, bool isMatchedWithUser)
+    public void SetIsMatchedWithUserFact(Guid searchProfileId, bool value)
     {
-        var fact = new IsMatchedFact(searchProfileId, isMatchedWithUser);
+        var fact = new IsMatchedFact(searchProfileId, value);
         SetFact(fact);
     }
 

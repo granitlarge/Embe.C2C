@@ -1,0 +1,50 @@
+"use server";
+
+import { ApiResponse, FailureReason, Mutate, Read } from "@/src/shared/api";
+import { ReadDto } from "@/src/shared/types/dtos/types";
+import { SearchProfileWriteDto } from "./types";
+import { SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
+import { getAuthenticatedUser } from "@/src/shared/user";
+import { Guid, NullGuid } from "@/src/shared/cache";
+
+export async function createSearchProfile(body: SearchProfileWriteDto): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>> {
+    const response = await Mutate<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>(
+        `${process.env.API_URL}/api/search-profile`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        }
+    )
+    return response;
+}
+
+export async function updateSearchProfile(body: SearchProfileWriteDto): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>> {
+    const response = await Mutate<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>(
+        `${process.env.API_URL}/api/search-profile`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        }
+    )
+    return response;
+}
+
+export async function getSearchProfile(id: Guid): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>> {
+    const user = await getAuthenticatedUser();
+    const response = await Read<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>(`${process.env.API_URL}/api/search-profile/${id}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        next: {
+            tags: [`user:${user?.userId || NullGuid}:search-profile`, `search-profile:${id}`],
+        }
+    });
+    return response;
+}

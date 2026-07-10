@@ -14,9 +14,9 @@ public record SearchProfileDto
     RelationshipType? RelationshipType,
     Engagement? Engagement,
     IReadOnlyCollection<Gender>? Genders,
-    Age? AgeRangeMin,
-    Age? AgeRangeMax,
-    Distance? MaximumDistance
+    int? AgeRangeMin,
+    int? AgeRangeMax,
+    double? MaximumDistanceKm
 );
 
 public class SearchProfileDtoMapper
@@ -40,9 +40,9 @@ public class SearchProfileDtoMapper
             variant.IncludeRelationshipType ? searchProfile.RelationshipType : null,
             variant.IncludeEngagement ? searchProfile.Engagement : null,
             variant.IncludeGenders ? searchProfile.Genders.Select(g => g.Gender).ToList() : null,
-            variant.IncludeAgeRange ? searchProfile.AgeRangeMin : null,
-            variant.IncludeAgeRange ? searchProfile.AgeRangeMax : null,
-            variant.IncludeMaximumDistance ? searchProfile.MaximumDistance : null
+            variant.IncludeAgeRange ? searchProfile.AgeRangeMin?.Value : null,
+            variant.IncludeAgeRange ? searchProfile.AgeRangeMax?.Value : null,
+            variant.IncludeMaximumDistance ? searchProfile.MaximumDistance?.ToKilometers().Value : null
         );
     }
 }

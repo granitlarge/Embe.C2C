@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 export type ButtonIntent = "save" | "destructive" | "cancel" | "preview" | "default";
-
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
     onClick?: () => (void | Promise<void>);
     intent?: ButtonIntent;

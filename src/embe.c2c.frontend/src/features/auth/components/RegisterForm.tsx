@@ -322,7 +322,6 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         if (response.success) {
             router.push("/public/login");
         } else {
-            console.log(response);
             throw new Error("not implemented");
         }
 

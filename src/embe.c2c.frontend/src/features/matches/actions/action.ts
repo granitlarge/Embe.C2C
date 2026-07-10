@@ -73,7 +73,6 @@ export async function deleteMessage(messageId: Guid): Promise<ApiResponse<void, 
                 method: "DELETE",
             }
         )
-    console.log("Delete Message Response:", response);
     return response;
 }
 

@@ -24,6 +24,17 @@ public record SearchProfileVariant
         includeMaximumDistance: false
     );
 
+    public static readonly SearchProfileVariant Matched = new
+    (
+        includeName: false,
+        includeDescription: true,
+        includeRelationshipType: true,
+        includeEngagement: true,
+        includeGenders: false,
+        includeAgeRange: false,
+        includeMaximumDistance: false
+    );
+
     public static readonly SearchProfileVariant Full = new
     (
         includeName: true,

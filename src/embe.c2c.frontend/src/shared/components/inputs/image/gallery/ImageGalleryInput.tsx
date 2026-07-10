@@ -91,7 +91,6 @@ export type ImageGalleryProps<T extends Image = Image> = {
     className?: string;
     onChange?: (images: (T | Image)[]) => void;
 }
-
 export default function ImageGalleryInput<T extends Image = Image>({ data, error, className, onChange }: ImageGalleryProps<T>) {
 
     const classNames = [
@@ -114,7 +113,7 @@ export default function ImageGalleryInput<T extends Image = Image>({ data, error
                 onChange?.(images.map(({ __id, ...image }) => image));
             }}
         >
-            <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center p-3`}>
+            <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center p-2`}>
                 {
                     images.map((image, index) => (
                         <MyImage key={image.__id} id={image.__id} src={image.url} onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, ...image }) => image))} />
@@ -125,4 +124,5 @@ export default function ImageGalleryInput<T extends Image = Image>({ data, error
             {error?.images && <span className="text-(--error-fc)">{error.images}</span>}
         </DragDropProvider>
     )
+
 }

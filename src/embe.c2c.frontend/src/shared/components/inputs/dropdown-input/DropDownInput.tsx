@@ -9,8 +9,9 @@ export type DropDownInputProps = {
     options: Option[];
     value?: string;
     onChange?: (value: string) => void;
+    errorMessage?: string;
 }
-export default function DropDownInput({ label, options, value, onChange, placeholder }: DropDownInputProps) {
+export default function DropDownInput({ label, options, value, onChange, placeholder, errorMessage }: DropDownInputProps) {
     return (
         <div className="input-wrapper">
             {label && <label className="label">{label}</label>}
@@ -24,6 +25,7 @@ export default function DropDownInput({ label, options, value, onChange, placeho
                     ))
                 }
             </select>
+            {errorMessage && <span className="mx-auto text-(length:--primary-fs) text-(--error-fc)">{errorMessage}</span>}
         </div>
     )
 }

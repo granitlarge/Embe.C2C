@@ -1,7 +1,7 @@
 import { Guid } from "../../cache";
 import { ReadDto } from "../dtos/types";
 import { Conversation, Image } from "./entities";
-import { DatingPreferences, Gender, Location, Money, TransactionReason, TransactionType } from "./value-objects";
+import { DatingPreferences, Engagement, Gender, Location, Money, RelationshipType, TransactionReason, TransactionType } from "./value-objects";
 
 export type User = {
     id: Guid;
@@ -58,8 +58,7 @@ export type ContactRequest = {
 
 export type Judgement = {
     id: Guid;
-    judgeUserId: Guid;
-    judgeeUserId: Guid;
+    candidateId: Guid;
     isPositive?: boolean;
     editedAt?: string;
     createdAt?: string;
@@ -145,4 +144,22 @@ export type Transaction = {
     transactionDate: string;
     note: string | null;
     createdAt: string;
+}
+
+export type SearchProfile = {
+    id: Guid;
+    userId: Guid;
+    name?: string;
+    description?: string;
+    relationshipType?: RelationshipType;
+    engagement?: Engagement;
+    genders?: Gender[];
+    ageRangeMin?: number;
+    ageRangeMax?: number;
+    maximumDistanceKm?: number;
+}
+
+export enum SearchProfilePermission {
+    View = 0,
+    Modify = 1
 }

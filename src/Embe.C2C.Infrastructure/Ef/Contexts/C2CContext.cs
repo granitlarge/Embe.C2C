@@ -190,46 +190,64 @@ public class C2CContext
 #warning This query needs to order results by relevance, but for now it just returns the first 20 candidates that match the criteria. The ordering can be improved later.
 
         var candidateIds = await Database.SqlQueryRaw<(Guid CandidateId, Guid UserSearchProfileId, Guid CandidateSearchProfileId)>($"""
-            
-            select c."Id" CandidateId, usp."Id" UserSearchProfileId, csp."Id" CandidateSearchProfileId
-            from "DomainUsers" u
-            inner join "SearchProfiles" usp on u."Id" = usp."UserId"
-            inner join "DomainUsers" c on (ST_Distance(u."Coordinates", c."Coordinates") <= usp."MaximumDistance" * 1000 or usp."MaximumDistance" is null)
-            inner join "SearchProfiles" csp on csp."UserId" = c."Id" and (ST_Distance(u."Coordinates", c."Coordinates") <= csp."MaximumDistance" * 1000 or csp."MaximumDistance" is null)
-            where 1=1
-            and u."Id" = '{userId}'
-            and c."Id" != u."Id"
-            and (
-                exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id" and spg."Gender" = c."Gender")
-                or (select count(1) from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id") = 0
-            )
-            and (
-                exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id" and spg."Gender" = u."Gender")
-                or (select count(1) from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id") = 0
-            )
-            and extract(year from age(CURRENT_DATE, u."BirthDate")) between coalesce(usp."AgeRangeMin", 0) and coalesce(usp."AgeRangeMax", 120)
-            and usp."Engagement_Frequency" = csp."Engagement_Frequency"
-            and usp."Engagement_Boundedness" = csp."Engagement_Boundedness"
-            and usp."Engagement_Medium" = csp."Engagement_Medium"
-            and (
-                usp."Engagement_Boundedness" != 2 
-                or daterange(usp."Engagement_StartDate", usp."Engagement_EndDate") && daterange(csp."Engagement_StartDate", csp."Engagement_EndDate")
-            )
-            and not exists (select * from "Blockings" b where b."BlockerUserId" = u."Id" and b."BlockedUserId" = c."Id")
-            and not exists (select * from "Blockings" b where b."BlockerUserId" = c."Id" and b."BlockedUserId" = u."Id")
-            and not exists (select * from "Matchings" m where m."UserId1" = u."Id" and m."UserId2" = c."Id")
-            and not exists (select * from "Matchings" m where m."UserId1" = c."Id" and m."UserId2" = u."Id")
-            and not exists (select * 
-                            from "Judgements" j 
-                            inner join "Candidates" can on can."Id" = j."CandidateId"
-                            where can."UserId" = u."Id" and can."CandidateUserId" = c."Id")
-            and not exists (select * 
-                            from "Judgements" j 
-                            inner join "Candidates" can on can."Id" = j."CandidateId"
-                            where can."UserId" = c."Id" and can."CandidateUserId" = u."Id" and j."IsPositive" = false)
-            and not exists (select * from "Candidates" can where can."UserId" = u."Id" and can."CandidateUserId" = c."Id" and can."UserSearchProfileId" = usp."Id" and can."CandidateSearchProfileId" = csp."Id")
-            offset 0 
-            limit 20
+
+        select c."Id" CandidateId, usp."Id" UserSearchProfileId, csp."Id" CandidateSearchProfileId
+        from "DomainUsers" u
+        inner join "SearchProfiles" usp on u."Id" = usp."UserId"
+        inner join "DomainUsers" c on (ST_Distance(u."Coordinates", c."Coordinates") <= usp."MaximumDistance" * 1000 or usp."MaximumDistance" is null)
+        inner join "SearchProfiles" csp on csp."UserId" = c."Id" and (ST_Distance(u."Coordinates", c."Coordinates") <= csp."MaximumDistance" * 1000 or csp."MaximumDistance" is null)
+        where 1=1
+        and u."Id" = '{userId}'
+        and c."Id" != u."Id"
+        and usp."RelationshipType" = csp."RelationshipType"
+        and (
+            exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id" and spg."Gender" = c."Gender")
+        )
+        and (
+            exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id" and spg."Gender" = u."Gender")
+        )
+        and extract(year from age(CURRENT_DATE, u."BirthDate")) between coalesce(csp."AgeRangeMin", 0) and coalesce(csp."AgeRangeMax", 120)
+        and extract(year from age(CURRENT_DATE, c."BirthDate")) between coalesce(usp."AgeRangeMin", 0) and coalesce(usp."AgeRangeMax", 120)
+        and (
+            -- we're adding some fuzziness to the search
+            -- if the desired frequency differs from "once" accept a mismatch of 1 step, so those who seek daily will be able to see those who seek weekly,
+            -- those who seek weekly will be able to see those who seek monthly, and vice versa.
+            (usp."Engagement_Frequency" = 0 or csp."Engagement_Frequency" = 0) and usp."Engagement_Frequency" = csp."Engagement_Frequency"
+            or abs(usp."Engagement_Frequency" - csp."Engagement_Frequency") <= 1
+        )
+        and usp."Engagement_Boundedness" = csp."Engagement_Boundedness"
+        and (
+            -- fuzzying here as well
+            -- if someone is searching for "hybrid" and someone else is searching for "virtual", we'll show em to each other despite there
+            -- not being a perfect match, one of them could compromise 	
+            usp."Engagement_Medium" = csp."Engagement_Medium"
+            or usp."Engagement_Medium" = 2
+            or csp."Engagement_Medium" = 2
+        )
+        and (
+            usp."Engagement_Boundedness" != 2 
+            or daterange(usp."Engagement_StartDate", usp."Engagement_EndDate") && daterange(csp."Engagement_StartDate", csp."Engagement_EndDate")
+        )
+        and not exists (select * from "Blockings" b where b."BlockerUserId" = u."Id" and b."BlockedUserId" = c."Id")
+        and not exists (select * from "Blockings" b where b."BlockerUserId" = c."Id" and b."BlockedUserId" = u."Id")
+        and not exists (select * from "Matchings" m where m."UserId1" = u."Id" and m."UserId2" = c."Id")
+        and not exists (select * from "Matchings" m where m."UserId1" = c."Id" and m."UserId2" = u."Id")
+        and not exists (select * 
+                        from "Judgements" j 
+                        inner join "Candidates" can on can."Id" = j."CandidateId"
+                        where can."UserId" = u."Id" and can."CandidateUserId" = c."Id")
+        and not exists (select * 
+                        from "Judgements" j 
+                        inner join "Candidates" can on can."Id" = j."CandidateId"
+                        where can."UserId" = c."Id" and can."CandidateUserId" = u."Id" and j."IsPositive" = false)
+        and not exists (select * 
+                        from "Candidates" can 
+                        where can."UserId" = u."Id" 
+                        and can."CandidateUserId" = c."Id"
+                        and can."UserSearchProfileId" = usp."Id" 
+                        and can."CandidateSearchProfileId" = csp."Id")
+        offset 0 
+        limit 20
 
         """).ToListAsync(cancellationToken);
 

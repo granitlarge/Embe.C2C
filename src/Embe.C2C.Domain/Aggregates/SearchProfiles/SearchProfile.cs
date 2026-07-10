@@ -52,7 +52,7 @@ public class SearchProfile : Aggregate
     public Guid UserId { get; }
     public string Name { get; private set; }
     public string Description { get; private set; }
-    public RelationshipType RelationshipType { get; }
+    public RelationshipType RelationshipType { get; private set; }
     public Engagement Engagement { get; private set; }
 
     private readonly List<SearchProfileGender> _genders;
@@ -168,6 +168,41 @@ public class SearchProfile : Aggregate
             ageRangeMax,
             maximumDistance
         );
+    }
+
+    public void ChangeRelationshipType(RelationshipType relationshipType)
+    {
+        RelationshipType = relationshipType;
+    }
+
+    public void ChangeGenders(ImmutableHashSet<Gender> genders)
+    {
+        ValidateGenders(genders);
+
+        var deleted = _genders.Where(g => !genders.Contains(g.Gender)).ToList();
+        var added = genders.Where(g => !_genders.Any(spg => spg.Gender == g)).ToList();
+        foreach (var d in deleted)
+        {
+            _genders.Remove(d);
+        }
+
+        foreach (var a in added)
+        {
+            _genders.Add(SearchProfileGender.Create(Id, a));
+        }
+    }
+
+    public void ChangeAgeRange(Age? ageRangeMin, Age? ageRangeMax)
+    {
+        ValidateAgeRange(ageRangeMin, ageRangeMax);
+
+        AgeRangeMin = ageRangeMin;
+        AgeRangeMax = ageRangeMax;
+    }
+
+    public void ChangeMaximumDistance(Distance? distance)
+    {
+        MaximumDistance = distance;
     }
 }
 
