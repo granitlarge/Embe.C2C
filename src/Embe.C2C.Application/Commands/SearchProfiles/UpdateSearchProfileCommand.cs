@@ -13,5 +13,6 @@ public record UpdateSearchProfileCommand
     ImmutableHashSet<Gender> Genders,
     int? AgeRangeMin,
     int? AgeRangeMax,
-    int? MaximumDistanceKm
+    int? MaximumDistanceKm,
+    bool Active
 );

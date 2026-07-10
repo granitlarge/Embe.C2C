@@ -12,11 +12,12 @@ import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import Surface from "@/src/shared/components/surfaces/Surface"
 import * as enums from "@/src/shared/enums";
 import { EngagementBoundedness, EngagementFrequency, EngagementMedium, Gender, RelationshipType } from "@/src/shared/types/domain/value-objects";
-import { useState } from "react";
+import { act, useState } from "react";
 import * as z from "zod";
 import { createSearchProfile as createSearchProfile, updateSearchProfile } from "../actions";
 import { useRouter } from "next/navigation";
 import { SearchProfile } from "@/src/shared/types/domain/aggregates";
+import CheckboxInput from "@/src/shared/components/inputs/checkbox-input/CheckBoxInput";
 
 export type SearchProfileFormProps = {
     className?: string;
@@ -48,7 +49,8 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
 
         ageRange: (searchProfile?.ageRangeMin ? [searchProfile.ageRangeMin, searchProfile.ageRangeMax ?? maxAge] : [minAge, maxAge]) as [number, number | undefined],
         maximumDistance: (searchProfile?.maximumDistanceKm ?? maxDistance) as number | undefined,
-        genders: searchProfile?.genders ?? enums.enumerate(Gender).map(({ value }) => value)
+        genders: searchProfile?.genders ?? enums.enumerate(Gender).map(({ value }) => value),
+        active: searchProfile?.active ?? true
     }
 
     const [serverSideState, setServerSideState] = useState(initialState);
@@ -133,7 +135,8 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                 genders: clientSideState.genders,
                 ageRangeMin: clientSideState.ageRange.length > 0 ? clientSideState.ageRange[0] : undefined,
                 ageRangeMax: clientSideState.ageRange.length > 1 && clientSideState.ageRange[1] !== maxAge ? clientSideState.ageRange[1] : undefined,
-                maximumDistance: clientSideState.maximumDistance === maxDistance ? undefined : clientSideState.maximumDistance
+                maximumDistance: clientSideState.maximumDistance === maxDistance ? undefined : clientSideState.maximumDistance,
+                active: clientSideState.active
             };
 
             if (clientSideState.id) {
@@ -159,6 +162,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                     ageRange: [updatedSearchProfile.ageRangeMin!, updatedSearchProfile.ageRangeMax ?? maxAge] as [number, number | undefined],
                     maximumDistance: updatedSearchProfile.maximumDistanceKm ?? maxDistance,
                     genders: updatedSearchProfile.genders!,
+                    active: updatedSearchProfile.active!
                 }
 
                 setServerSideState(newState);
@@ -302,7 +306,11 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                     placeholder="name your search profile..."
                     onBlur={(name) => setClientSideState(prev => ({ ...prev, name }))}
                 />
-
+                <CheckboxInput
+                    value={clientSideState.active}
+                    label={`${clientSideState.active ? "active" : "inactive"}`}
+                    onChange={(active) => setClientSideState(prev => ({ ...prev, active }))}
+                />
             </Surface>
 
             <div className="flex flex-row gap-2 justify-between grow-0">

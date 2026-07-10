@@ -4,12 +4,14 @@ export type CheckboxInputProps = {
     value?: boolean;
     label: string;
     onChange?: (value: boolean) => void;
+    className?: string;
 }
 
-export default function CheckboxInput({ value = false, label, onChange }: CheckboxInputProps) {
+export default function CheckboxInput({ value = false, label, onChange, className }: CheckboxInputProps) {
 
     const classNames = [
-        value ? "input-checked" : ""
+        value ? "input-checked" : "",
+        className
     ].filter(Boolean).join(" ");
     return (
         <div

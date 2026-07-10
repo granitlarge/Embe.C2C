@@ -149,6 +149,7 @@ export type Transaction = {
 export type SearchProfile = {
     id: Guid;
     userId: Guid;
+    active?: boolean;
     name?: string;
     description?: string;
     relationshipType?: RelationshipType;
@@ -157,6 +158,8 @@ export type SearchProfile = {
     ageRangeMin?: number;
     ageRangeMax?: number;
     maximumDistanceKm?: number;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export enum SearchProfilePermission {

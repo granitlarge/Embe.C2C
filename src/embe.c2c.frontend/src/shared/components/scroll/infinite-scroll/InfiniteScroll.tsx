@@ -33,6 +33,7 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
             surface.current.scrollTo({
                 top: direction === "up" ? surface.current.scrollHeight : 0,
             })
+
         } else if (positionRef.current === "end") {
             surface.current.scrollTo({
                 top: direction === "down" ? surface.current.scrollHeight : 0,

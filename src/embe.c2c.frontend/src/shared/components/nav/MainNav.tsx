@@ -35,9 +35,9 @@ export default function MainNav({
                     </Link>
                 </li>
                 <li>
-                    <Link href="/protected/find" className={linkClassNames}>
+                    <Link href="/protected/search" className={linkClassNames}>
                         <Users size={iconSize} className="inline" />
-                        <span className={linkTextClassNames}>find</span>
+                        <span className={linkTextClassNames}>search</span>
                     </Link>
                 </li>
                 <li>

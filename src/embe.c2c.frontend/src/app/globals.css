@@ -74,6 +74,8 @@
     --error-fc: none;
     --border-color: none;
     --link-fc: var(--universal-primary-bg);
+    --active-color: var(--universal-primary-bg);
+    --inactive-color: red; 
 
     --button-default-bg: lightgray;
     --button-default-fc: black;
@@ -89,6 +91,9 @@
 
     --button-cancel-bg: lightgray;
     --button-cancel-fc: black;
+
+    --button-navigate-bg: var(--universal-primary-bg);
+    --button-navigate-fc: var(--universal-primary-fc);
 
     --message-own-bg: none;
 
@@ -306,6 +311,11 @@
   .button-cancel {
     background-color: var(--button-cancel-bg);
     color: var(--button-cancel-fc);
+  }
+
+  .button-navigate {
+    background-color: var(--button-navigate-bg);
+    color: var(--button-navigate-fc);
   }
 
   .button:hover {

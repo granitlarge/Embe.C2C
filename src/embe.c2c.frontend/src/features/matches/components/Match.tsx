@@ -39,7 +39,7 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
     }
 
     return (
-        <div className="flex flex-row items-center">
+        <header className="flex flex-row items-center">
             {
                 partner &&
                 <Link href={`/user/${partner.id}`} className="no-underline text-(--primary-fc)">
@@ -55,7 +55,7 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
                 </DropdownMenu.Trigger>
 
                 <DropdownMenu.Portal>
-                    <DropdownMenu.Content className="flex flex-col gap-1 surface-secondary p-2 rounded-md ">
+                    <DropdownMenu.Content className="flex flex-col gap-1 surface-secondary p-2 rounded-md">
                         <DropdownMenu.Item>
                             <Button intent="destructive" onClick={onUnmatch}>
                                 unmatch
@@ -74,7 +74,7 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
                     </DropdownMenu.Content>
                 </DropdownMenu.Portal>
             </DropdownMenu.Root>
-        </div>
+        </header>
     )
 }
 

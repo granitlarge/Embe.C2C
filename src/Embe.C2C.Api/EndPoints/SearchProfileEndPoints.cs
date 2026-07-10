@@ -19,6 +19,7 @@ public static class SearchProfileEndPoints
         group.MapPost("", Create);
         group.MapPut("", Update);
         group.MapGet("{id}", Get);
+        group.MapGet("", GetAll);
     }
 
     private static async Task<IResult> Create
@@ -51,6 +52,18 @@ public static class SearchProfileEndPoints
     )
     {
         var result = await handler.HandleAsync(new GetSearchProfileQuery(id), cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> GetAll
+    (
+        [FromQuery] int page,
+        [FromQuery] int pageSize,
+        [FromServices] GetAllSearchProfilesHandler handler,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var result = await handler.HandleAsync(new GetAllSearchProfilesQuery(page, pageSize), cancellationToken);
         return result.ToResult();
     }
 }

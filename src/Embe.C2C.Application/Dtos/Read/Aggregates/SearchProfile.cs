@@ -9,6 +9,7 @@ public record SearchProfileDto
 (
     Guid Id,
     Guid UserId,
+    bool? Active,
     string? Name,
     string? Description,
     RelationshipType? RelationshipType,
@@ -16,7 +17,9 @@ public record SearchProfileDto
     IReadOnlyCollection<Gender>? Genders,
     int? AgeRangeMin,
     int? AgeRangeMax,
-    double? MaximumDistanceKm
+    double? MaximumDistanceKm,
+    DateTimeOffset? CreatedAt,
+    DateTimeOffset? UpdatedAt
 );
 
 public class SearchProfileDtoMapper
@@ -35,6 +38,7 @@ public class SearchProfileDtoMapper
         (
             searchProfile.Id,
             searchProfile.UserId,
+            variant.IncludeActive ? searchProfile.Active : null,
             variant.IncludeName ? searchProfile.Name : null,
             variant.IncludeDescription ? searchProfile.Description : null,
             variant.IncludeRelationshipType ? searchProfile.RelationshipType : null,
@@ -42,7 +46,9 @@ public class SearchProfileDtoMapper
             variant.IncludeGenders ? searchProfile.Genders.Select(g => g.Gender).ToList() : null,
             variant.IncludeAgeRange ? searchProfile.AgeRangeMin?.Value : null,
             variant.IncludeAgeRange ? searchProfile.AgeRangeMax?.Value : null,
-            variant.IncludeMaximumDistance ? searchProfile.MaximumDistance?.ToKilometers().Value : null
+            variant.IncludeMaximumDistance ? searchProfile.MaximumDistance?.ToKilometers().Value : null,
+            variant.IncludeCreatedAt ? searchProfile.CreatedAt : null,
+            variant.IncludeUpdatedAt ? searchProfile.UpdatedAt : null
         );
     }
 }

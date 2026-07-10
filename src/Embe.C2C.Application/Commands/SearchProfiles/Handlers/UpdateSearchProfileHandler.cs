@@ -83,6 +83,7 @@ public class UpdateSearchProfileHandler
             var ageRangeMin = command.AgeRangeMin is not null ? new Age(command.AgeRangeMin.Value) : null;
             var ageRangeMax = command.AgeRangeMax is not null ? new Age(command.AgeRangeMax.Value) : null;
             var distance = command.MaximumDistanceKm is not null ? new Distance(command.MaximumDistanceKm.Value, LengthUnit.Kilometers) : null;
+            var active = command.Active;
 
             searchProfile.ChangeName(command.Name);
             searchProfile.ChangeDescription(command.Description);
@@ -91,6 +92,10 @@ public class UpdateSearchProfileHandler
             searchProfile.ChangeGenders(genders);
             searchProfile.ChangeAgeRange(ageRangeMin, ageRangeMax);
             searchProfile.ChangeMaximumDistance(distance);
+            if (searchProfile.Active != active)
+            {
+                searchProfile.ToggleActive();
+            }
 
             await context.SaveChangesAsync(cancellationToken);
 

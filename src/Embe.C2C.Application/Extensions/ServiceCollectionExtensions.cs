@@ -66,6 +66,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Geography.Handlers.ReverseGeocodeHandler>();
 
         services.AddScoped<Queries.SearchProfiles.Handlers.GetSearchProfileHandler>();
+        services.AddScoped<Queries.SearchProfiles.Handlers.GetAllSearchProfilesHandler>();
 
         services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();

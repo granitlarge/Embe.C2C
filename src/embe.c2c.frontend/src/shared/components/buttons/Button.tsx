@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export type ButtonIntent = "save" | "destructive" | "cancel" | "preview" | "default";
+export type ButtonIntent = "save" | "destructive" | "cancel" | "preview" | "navigate" | "default";
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
     onClick?: () => (void | Promise<void>);
     intent?: ButtonIntent;
@@ -15,10 +15,11 @@ export default function Button({ onClick, intent = "default", ...props }: Button
         props.className,
         "button",
         intent === "save" ? "button-save" :
-            intent === "destructive" ? "button-destructive" :
-                intent === "cancel" ? "button-cancel" :
-                    intent === "preview" ? "button-preview" :
-                        intent === "default" ? "button-default" : ""
+        intent === "destructive" ? "button-destructive" :
+        intent === "cancel" ? "button-cancel" :
+        intent === "preview" ? "button-preview" :
+        intent === "default" ? "button-default" : 
+        intent === "navigate" ? "button-navigate" : ""
     ].filter(Boolean).join(" ");
 
     return (

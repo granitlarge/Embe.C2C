@@ -30,6 +30,7 @@ public class SearchProfile : Aggregate
         ValidateAgeRange(ageRangeMin, ageRangeMax);
 
         Id = Guid.CreateVersion7();
+        Active = true;
         UserId = userId;
         Name = name;
         Description = description;
@@ -39,6 +40,9 @@ public class SearchProfile : Aggregate
         AgeRangeMin = ageRangeMin;
         AgeRangeMax = ageRangeMax;
         MaximumDistance = maximumDistance;
+
+        CreatedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = CreatedAt;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -48,8 +52,9 @@ public class SearchProfile : Aggregate
 
     }
 
-    public Guid Id { get; }
-    public Guid UserId { get; }
+    public Guid Id { get; private set; }
+    public Guid UserId { get; private set; }
+    public bool Active { get; private set; }
     public string Name { get; private set; }
     public string Description { get; private set; }
     public RelationshipType RelationshipType { get; private set; }
@@ -62,6 +67,9 @@ public class SearchProfile : Aggregate
     public Age? AgeRangeMin { get; private set; }
     public Age? AgeRangeMax { get; private set; }
     public Distance? MaximumDistance { get; private set; }
+
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset UpdatedAt { get; private set; }
 
     #region read-only navigation properties
     public User? User { get; private set; }
@@ -77,6 +85,7 @@ public class SearchProfile : Aggregate
         }
 
         _genders.Add(SearchProfileGender.Create(Id, gender));
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void RemoveGender(Gender gender)
@@ -92,23 +101,33 @@ public class SearchProfile : Aggregate
         }
 
         _genders.RemoveAll(g => g.Gender == gender);
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void ToggleActive()
+    {
+        Active = !Active;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void ChangeEngagement(Engagement engagement)
     {
         Engagement = engagement;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void ChangeName(string name)
     {
         ValidateName(name);
         Name = name;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void ChangeDescription(string description)
     {
         ValidateDescription(description);
         Description = description;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     private static void ValidateName(string name)

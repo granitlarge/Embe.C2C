@@ -4,59 +4,75 @@ public record SearchProfileVariant
 {
     public static readonly SearchProfileVariant Empty = new
     (
+        includeActive: false,
         includeName: false,
         includeDescription: false,
         includeRelationshipType: false,
         includeEngagement: false,
         includeGenders: false,
         includeAgeRange: false,
-        includeMaximumDistance: false
+        includeMaximumDistance: false,
+        includeCreatedAt: false,
+        includeUpdatedAt: false
     );
 
     public static readonly SearchProfileVariant Candidate = new
     (
+        includeActive: false,
         includeName: false,
         includeDescription: true,
         includeRelationshipType: true,
         includeEngagement: true,
         includeGenders: false,
         includeAgeRange: false,
-        includeMaximumDistance: false
+        includeMaximumDistance: false,
+        includeCreatedAt: false,
+        includeUpdatedAt: false
     );
 
     public static readonly SearchProfileVariant Matched = new
     (
+        includeActive: false,
         includeName: false,
         includeDescription: true,
         includeRelationshipType: true,
         includeEngagement: true,
         includeGenders: false,
         includeAgeRange: false,
-        includeMaximumDistance: false
+        includeMaximumDistance: false,
+        includeCreatedAt: false,
+        includeUpdatedAt: false
     );
 
     public static readonly SearchProfileVariant Full = new
     (
+        includeActive: true,
         includeName: true,
         includeDescription: true,
         includeRelationshipType: true,
         includeEngagement: true,
         includeGenders: true,
         includeAgeRange: true,
-        includeMaximumDistance: true
+        includeMaximumDistance: true,
+        includeCreatedAt: true,
+        includeUpdatedAt: true
     );
 
     private SearchProfileVariant
     (
+        bool includeActive,
         bool includeName,
         bool includeDescription,
         bool includeRelationshipType,
         bool includeEngagement,
         bool includeGenders,
         bool includeAgeRange,
-        bool includeMaximumDistance
+        bool includeMaximumDistance,
+        bool includeCreatedAt,
+        bool includeUpdatedAt
     )
     {
+        IncludeActive = includeActive;
         IncludeName = includeName;
         IncludeDescription = includeDescription;
         IncludeRelationshipType = includeRelationshipType;
@@ -64,8 +80,11 @@ public record SearchProfileVariant
         IncludeGenders = includeGenders;
         IncludeAgeRange = includeAgeRange;
         IncludeMaximumDistance = includeMaximumDistance;
+        IncludeCreatedAt = includeCreatedAt;
+        IncludeUpdatedAt = includeUpdatedAt;
     }
 
+    public bool IncludeActive { get; }
     public bool IncludeName { get; }
     public bool IncludeDescription { get; }
     public bool IncludeRelationshipType { get; }
@@ -73,4 +92,6 @@ public record SearchProfileVariant
     public bool IncludeGenders { get; }
     public bool IncludeAgeRange { get; }
     public bool IncludeMaximumDistance { get; }
+    public bool IncludeCreatedAt { get; }
+    public bool IncludeUpdatedAt { get; }
 }

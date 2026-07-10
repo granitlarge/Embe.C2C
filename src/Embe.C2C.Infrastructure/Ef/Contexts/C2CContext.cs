@@ -199,6 +199,8 @@ public class C2CContext
         where 1=1
         and u."Id" = '{userId}'
         and c."Id" != u."Id"
+        and usp."Active" = true
+        and csp."Active" = true
         and usp."RelationshipType" = csp."RelationshipType"
         and (
             exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id" and spg."Gender" = c."Gender")
