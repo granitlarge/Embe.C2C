@@ -17,7 +17,7 @@ jobs:
     
     defaults:
       run: 
-        working-directory: ./src/
+        working-directory: ./src/Embe.C2C.Api
         
     steps:
       - uses: actions/checkout@v4
