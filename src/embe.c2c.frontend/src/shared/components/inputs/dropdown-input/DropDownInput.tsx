@@ -10,16 +10,24 @@ export type DropDownInputProps = {
     value?: string;
     onChange?: (value: string) => void;
     errorMessage?: string;
+    optionClassName?: string
+    className?: string
 }
-export default function DropDownInput({ label, options, value, onChange, placeholder, errorMessage }: DropDownInputProps) {
+export default function DropDownInput({ className, label, options, value, onChange, placeholder, errorMessage, optionClassName }: DropDownInputProps) {
+    const classNames=[
+        className
+    ].filter(Boolean).join(" ");
+    const optionClassNames = [
+        optionClassName
+    ].filter(Boolean).join(" ");
     return (
-        <div className="input-wrapper">
+        <div className={`input-wrapper ${classNames}`}>
             {label && <label className="label">{label}</label>}
             <select value={value ?? ""} onChange={(e) => onChange?.(e.target.value)} className="input">
-                <option value={""} disabled>{placeholder}</option>
+                <option className={optionClassNames} value={""} disabled>{placeholder}</option>
                 {
                     options.map((option) => (
-                        <option key={option.value} value={option.value}>
+                        <option key={option.value} value={option.value} className={optionClassNames}>
                             {option.label}
                         </option>
                     ))

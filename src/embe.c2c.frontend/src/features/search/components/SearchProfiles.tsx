@@ -7,10 +7,10 @@ import { useEffect, useState } from "react";
 import SearchProfileCompact from "./SearchProfileCompact";
 import { getAllSearchProfiles } from "../actions/action";
 
-export type SearchConfigurationProps = {
+export type SearchProfilesProps = {
     className?: string;
 }
-export default function SearchConfiguration({ className }: SearchConfigurationProps) {
+export default function SearchProfiles({ className }: SearchProfilesProps) {
 
     const [searchProfiles, setSearchProfiles] = useState<ReadDto<SearchProfile, SearchProfilePermission>[]>([]);
     const page = searchProfiles.length > 0 ? 2 : 1;

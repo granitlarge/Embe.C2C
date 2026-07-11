@@ -10,7 +10,7 @@ import MainNav from "@/src/shared/components/nav/MainNav";
 import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 import Modal from "@/src/shared/components/modal/Modal";
-import SearchConfiguration from "./SearchConfiguration";
+import SearchProfiles from "./SearchProfiles";
 
 type HeaderProps = {
 
@@ -31,9 +31,9 @@ function Header({ }: HeaderProps) {
                 className="surface-secondary p-3 gap-3"
                 closed={() => setIsSearchConfigurationOpen(false)}
                 hidden={!isSearchConfigurationOpen}
-                header="find configuration"
+                header="search profiles"
             >
-                <SearchConfiguration />
+                <SearchProfiles />
             </Modal>
         </div>
     )

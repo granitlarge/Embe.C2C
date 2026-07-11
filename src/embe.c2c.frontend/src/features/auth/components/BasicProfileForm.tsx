@@ -50,7 +50,7 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
         className
     ].filter(Boolean).join(" ");
 
-    const genderOptions = enums.enumerate(Gender).map(gender => ({ value: gender.key, label: gender.key }));
+    const genderOptions = enums.enumerate(Gender).map(gender => ({ value: gender.key, label: enums.formatGender(gender.value) }));
     const genderValue = enums.enumerate(Gender).find(gender => gender.value === data.gender)?.key;
 
     return (
@@ -77,6 +77,7 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
             {
                 config.gender &&
                 <SelectInput
+                    optionClassName="lowercase"
                     multiple={false}
                     options={genderOptions}
                     label={"gender"}

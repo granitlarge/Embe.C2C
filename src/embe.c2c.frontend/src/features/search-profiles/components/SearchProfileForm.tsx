@@ -48,9 +48,11 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
             ) as { startDate: string, endDate: string } | undefined,
 
         ageRange: (searchProfile?.ageRangeMin ? [searchProfile.ageRangeMin, searchProfile.ageRangeMax ?? maxAge] : [minAge, maxAge]) as [number, number | undefined],
-        maximumDistance: (searchProfile?.maximumDistanceKm ?? maxDistance) as number | undefined,
+        maximumDistanceKm: (searchProfile?.maximumDistanceKm ?? maxDistance) as number | undefined,
         genders: searchProfile?.genders ?? enums.enumerate(Gender).map(({ value }) => value),
-        active: searchProfile?.active ?? true
+        active: searchProfile?.active ?? true,
+        createdAt: searchProfile?.createdAt,
+        updatedAt: searchProfile?.updatedAt
     }
 
     const [serverSideState, setServerSideState] = useState(initialState);
@@ -135,7 +137,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                 genders: clientSideState.genders,
                 ageRangeMin: clientSideState.ageRange.length > 0 ? clientSideState.ageRange[0] : undefined,
                 ageRangeMax: clientSideState.ageRange.length > 1 && clientSideState.ageRange[1] !== maxAge ? clientSideState.ageRange[1] : undefined,
-                maximumDistance: clientSideState.maximumDistance === maxDistance ? undefined : clientSideState.maximumDistance,
+                maximumDistanceKm: clientSideState.maximumDistanceKm === maxDistance ? undefined : clientSideState.maximumDistanceKm,
                 active: clientSideState.active
             };
 
@@ -160,9 +162,11 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                         endDate: updatedSearchProfile.engagement!.endDate,
                     } : undefined,
                     ageRange: [updatedSearchProfile.ageRangeMin!, updatedSearchProfile.ageRangeMax ?? maxAge] as [number, number | undefined],
-                    maximumDistance: updatedSearchProfile.maximumDistanceKm ?? maxDistance,
+                    maximumDistanceKm: updatedSearchProfile.maximumDistanceKm ?? maxDistance,
                     genders: updatedSearchProfile.genders!,
-                    active: updatedSearchProfile.active!
+                    active: updatedSearchProfile.active!,
+                    createdAt: updatedSearchProfile.createdAt,
+                    updatedAt: updatedSearchProfile.updatedAt
                 }
 
                 setServerSideState(newState);
@@ -195,31 +199,34 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
             <Surface className="flex flex-col gap-2 grow-1 overflow-y-scroll scrollbar-none" variant="secondary" padding="sm">
                 <InfoWindow text={"A search-profile is a set of criteria that define the type of relationship you're looking for."} />
                 <DropDownInput
+                    optionClassName="lowercase"
                     errorMessage={relationshipError}
                     label="relationship type"
                     value={enums.enumerate(RelationshipType).find(({ value }) => value === clientSideState.relationship)?.key}
                     placeholder={"relationship type"}
                     options={
-                        enums.enumerate(RelationshipType).map(({ key }) => ({ label: key.toLowerCase(), value: key }))
+                        enums.enumerate(RelationshipType).map(({ key, value }) => ({ label: enums.formatRelationshipType(value).toLocaleLowerCase(), value: key }))
                     }
                     onChange={(relationship) => setClientSideState(prev => ({ ...prev, relationship: enums.parse(RelationshipType, relationship) }))}
                 />
 
                 <DropDownInput
+                    optionClassName="lowercase"
                     errorMessage={mediumError}
                     label="medium"
                     value={enums.enumerate(EngagementMedium).find(({ value }) => value === clientSideState.medium)?.key}
                     placeholder={"medium"}
-                    options={enums.enumerate(EngagementMedium).map(({ key }) => ({ label: key.toLowerCase(), value: key }))}
+                    options={enums.enumerate(EngagementMedium).map(({ key, value }) => ({ label: enums.formatEngagementMedium(value).toLocaleLowerCase(), value: key }))}
                     onChange={(medium) => setClientSideState(prev => ({ ...prev, medium: enums.parse(EngagementMedium, medium) }))}
                 />
 
                 <DropDownInput
+                    optionClassName="lowercase"
                     errorMessage={durationError}
                     label="duration"
                     value={enums.enumerate(EngagementBoundedness).find(({ value }) => value === clientSideState.duration)?.key}
                     placeholder="duration"
-                    options={enums.enumerate(EngagementBoundedness).map(({ key }) => ({ label: key.toLowerCase(), value: key }))}
+                    options={enums.enumerate(EngagementBoundedness).map(({ key, value }) => ({ label: enums.formatEngagementBoundedness(value).toLocaleLowerCase(), value: key }))}
                     onChange={(duration) => {
                         setClientSideState(prev => ({ ...prev, duration: enums.parse(EngagementBoundedness, duration) }))
                         if (enums.parse(EngagementBoundedness, duration) === EngagementBoundedness.OneTime) {
@@ -250,19 +257,21 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                 {
                     clientSideState.duration !== EngagementBoundedness.OneTime &&
                     <DropDownInput
+                        optionClassName="lowercase"
                         label="frequency"
                         errorMessage={frequencyError}
                         value={enums.enumerate(EngagementFrequency).find(({ value }) => value === clientSideState.frequency)?.key}
                         placeholder="frequency"
-                        options={enums.enumerate(EngagementFrequency).filter(ef => ef.value != EngagementFrequency.Once).map(({ key }) => ({ label: key.toLowerCase(), value: key }))}
+                        options={enums.enumerate(EngagementFrequency).filter(ef => ef.value != EngagementFrequency.Once).map(({ key, value }) => ({ label: enums.formatEngagementFrequency(value).toLocaleLowerCase(), value: key }))}
                         onChange={(frequency) => setClientSideState(prev => ({ ...prev, frequency: enums.parse(EngagementFrequency, frequency) }))}
                     />
                 }
 
                 <SelectInput
+                    optionClassName="lowercase"
                     multiple={true}
                     value={clientSideState.genders.map(g => enums.enumerate(Gender).find(({ value }) => value === g)!.key)}
-                    options={enums.enumerate(Gender).map(({ key }) => ({ label: key.toLowerCase(), value: key }))}
+                    options={enums.enumerate(Gender).map(({ key, value }) => ({ label: enums.formatGender(value).toLocaleLowerCase(), value: key }))}
                     label={"genders"}
                     onChange={(genders) => {
                         setClientSideState(prev => ({ ...prev, genders: genders.map((value) => enums.parse(Gender, value)!) }))
@@ -279,14 +288,13 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                 />
 
                 {
-                    (clientSideState.medium === EngagementMedium.InPerson || clientSideState.medium === EngagementMedium.Hybrid) &&
                     <SingleRangeInput
-                        value={clientSideState.maximumDistance}
+                        value={clientSideState.maximumDistanceKm}
                         label={"max distance (km)"}
                         min={minDistance}
                         max={maxDistance}
                         step={1}
-                        onChange={(maximumDistance) => setClientSideState(prev => ({ ...prev, maximumDistance }))}
+                        onChange={(maximumDistanceKm) => setClientSideState(prev => ({ ...prev, maximumDistanceKm }))}
                     />
                 }
 

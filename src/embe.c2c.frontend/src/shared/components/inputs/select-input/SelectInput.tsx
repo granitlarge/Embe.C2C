@@ -15,12 +15,17 @@ export type SelectInputProps = InputProps & {
     className?: string;
     multiple?: boolean;
     required?: boolean
+    optionClassName?: string;
 }
 
-export default function SelectInput({ options, value, onChange, label, className, multiple = false, required = false, errorMessage }: SelectInputProps) {
+export default function SelectInput({ options, value, onChange, label, className, multiple = false, required = false, errorMessage, optionClassName }: SelectInputProps) {
 
     const classNames = [
         className
+    ].filter(Boolean).join(" ");
+
+    const optionClassNames = [
+        optionClassName
     ].filter(Boolean).join(" ");
 
     return (
@@ -30,6 +35,7 @@ export default function SelectInput({ options, value, onChange, label, className
                 {
                     options.map((option) =>
                         <CheckboxInput
+                            className={optionClassNames}
                             key={option.value}
                             value={value?.includes(option.value)}
                             label={option.label}

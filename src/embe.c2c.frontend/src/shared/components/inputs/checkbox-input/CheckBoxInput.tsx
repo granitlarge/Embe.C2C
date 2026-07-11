@@ -14,7 +14,7 @@ export default function CheckboxInput({ value = false, label, onChange, classNam
         className
     ].filter(Boolean).join(" ");
     return (
-        <div
+        <button
             className={`input flex items-center justify-between w-full ${classNames}`}
             onClick={() => onChange?.(!value)}
         >
@@ -26,6 +26,6 @@ export default function CheckboxInput({ value = false, label, onChange, classNam
 
             <Check className={`w-(--primary-fs) h-(--primary-fs) transition-opacity ${value ? "opacity-100" : "opacity-0"}`}
             />
-        </div>
+        </button>
     )
 }
