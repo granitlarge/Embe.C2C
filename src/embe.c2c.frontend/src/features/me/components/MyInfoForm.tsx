@@ -89,12 +89,12 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
 
     return (
 
-        <div className={`flex flex-col gap-2 ${classNames}`}>
+        <div className={`w-full flex flex-col gap-2 ${classNames}`}>
 
-            <Surface className={`flex flex-col gap-2`} padding="md" variant="secondary">
+            <Surface className={`w-full flex flex-col gap-2`} padding="md" variant="secondary">
 
                 <MyImagesForm
-                    className="shrink-0 mx-auto"
+                    className="w-full shrink-0 mx-auto"
                     initialImages={data.images ?? []}
                     onChange={(images) => onChange({ ...data, images })}
                 />

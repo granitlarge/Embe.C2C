@@ -43,7 +43,7 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
         className
     ].filter(Boolean).join(" ")
     return (
-        <Surface className={`flex flex-col gap-2 ${classNames}`} padding="md" variant="secondary">
+        <Surface className={`w-full flex flex-col gap-2 ${classNames}`} padding="md" variant="secondary">
             {
                 userSearchProfile?.name &&
                 <Surface className="mx-auto w-full flex flex-col" variant="tertiary" padding="sm">

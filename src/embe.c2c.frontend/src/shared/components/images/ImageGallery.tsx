@@ -57,10 +57,10 @@ export default function ImageGallery({ className, imageUrls }: ImageGalleryProps
     const currentImageUrl = imageUrls[currentImageUrlIndex];
 
     return (
-        <div className={`${classNames} relative flex flex-col items-center justify-center`}>
+        <div className={`${classNames} w-full relative flex flex-col items-center justify-center`}>
             {
                 currentImageUrl &&
-                <ImageGalleryImage src={currentImageUrl} alt={`Image ${currentImageUrlIndex + 1}`} />
+                <ImageGalleryImage className="w-full" src={currentImageUrl} alt={`Image ${currentImageUrlIndex + 1}`} />
             }
             {
                 !currentImageUrl &&
