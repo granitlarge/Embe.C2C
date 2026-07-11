@@ -14,11 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
-    
     defaults:
-      run: 
-        working-directory: ./src/
-        
+      run:
+        working-directory: ./src/Embe.C2C.Api
+
     steps:
       - uses: actions/checkout@v4
 
@@ -56,4 +55,4 @@ jobs:
           app-name: 'relationshipfinder-api'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E4D29272445F40E6AA1406BAA5312C67 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AF3F6F5BC9DA45D687FA778C2D6A0FED }}
