@@ -5,7 +5,7 @@ import { SearchProfile, SearchProfilePermission } from "@/src/shared/types/domai
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import * as enums from "@/src/shared/enums";
 import { EngagementBoundedness, EngagementMedium, Gender, RelationshipType } from "@/src/shared/types/domain/value-objects";
-import { ArrowRight, Calendar, Calendars, Clock, Globe, Handshake, Heart, MapPin, Mars, Radius, Transgender, Users, Venus } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Globe, Handshake, Heart, Mars, Radius, Transgender, Users, Venus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 function Chip({ children }: { children: React.ReactNode }) {
@@ -106,7 +106,7 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
                     {
                         ageRange &&
                         <Chip>
-                            <span className="text-(--primary-fc) text-(length:--primary-fs)">age: {ageRange}</span>
+                            <span className="text-(--primary-fc) text-(length:--primary-fs)">{ageRange}</span>
                         </Chip>
                     }
                     {

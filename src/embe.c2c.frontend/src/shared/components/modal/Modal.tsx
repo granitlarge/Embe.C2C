@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import styles from "./Modal.module.css";
 
-export type ModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>, "children" | "className" | "ref" | "closedby" | "hidden"> & {
+export type ModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>, "children" | "className" | "ref" | "closedby" | "hidden" | "onClick"> & {
     className?: string;
     children: React.ReactNode;
     closed: () => void;
@@ -35,7 +35,7 @@ export default function Modal({ children, className, closed, hidden, header, ...
     }, [closed, hidden]);
 
     return (
-        <dialog closedby="any" ref={dialog} className={`
+        <dialog ref={dialog} className={`
                 ${classNames}
                 flex flex-col items-center gap-0
                 ${styles.modal}
@@ -44,7 +44,24 @@ export default function Modal({ children, className, closed, hidden, header, ...
                 m-auto 
                 rounded-lg 
                 scrollbar-gutter-stable
-                `} {...props}>
+                `}
+            onClick={(e) => {
+                const dialog = e.currentTarget;
+                const rect = dialog.getBoundingClientRect();
+
+                const isInDialog =
+                    e.clientX >= rect.left &&
+                    e.clientX <= rect.right &&
+                    e.clientY >= rect.top &&
+                    e.clientY <= rect.bottom;
+
+                if (!isInDialog) {
+                    close();
+                    dialog.close();
+                }
+            }}
+            {...props}
+        >
             {header && <h2 className="mx-auto text-(--primary-fc)">{header}</h2>}
             {children}
         </dialog>

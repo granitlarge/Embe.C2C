@@ -20,7 +20,6 @@ type HeaderProps = {
 function Header({ hasSearchProfiles }: HeaderProps) {
 
     const router = useRouter();
-    const [isSearchConfigurationOpen, setIsSearchConfigurationOpen] = useState(false);
 
     return (
         <div>
@@ -28,29 +27,11 @@ function Header({ hasSearchProfiles }: HeaderProps) {
                 <h1 className="truncate">search</h1>
                 {
                     hasSearchProfiles &&
-                    <button className="ml-auto" onClick={() => setIsSearchConfigurationOpen(true)}>
+                    <button className="ml-auto" onClick={() => router.push("/protected/search-profile")}>
                         <SlidersHorizontal className="w-6 h-6" />
                     </button>
                 }
             </header>
-            <Modal
-                className="surface-secondary p-3 gap-3"
-                closed={() => setIsSearchConfigurationOpen(false)}
-                hidden={!isSearchConfigurationOpen}
-            >
-                <div className="flex flex-row items-center gap-3 w-full">
-                    <h2>search profiles</h2>
-                    <Button
-                        className="max-w-max max-h-max px-5 ml-auto flex flex-row gap-1 items-center justify-between"
-                        intent="create"
-                        onClick={() => { router.push("/protected/search-profile") }}
-                    >
-                        <Plus />
-                        <span>create</span>
-                    </Button>
-                </div>
-                <SearchProfiles />
-            </Modal>
         </div>
     )
 

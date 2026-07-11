@@ -9,8 +9,6 @@ import { useRouter } from "next/navigation";
 import { signIn } from "../actions/sign-in/actions";
 import { SignInError } from "../actions/sign-in/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
-import useCurrentUserStore from "@/src/shared/stores/current-user";
-import { getCurrentUser } from "../actions/action";
 
 export type LoginFormProps = {
     className?: string;
@@ -18,7 +16,6 @@ export type LoginFormProps = {
 
 export default function LoginForm({ className }: LoginFormProps) {
 
-    const setCurrentUser = useCurrentUserStore(state => state.setCurrentUser);
     const classNames = [className].filter(Boolean).join(" ");
 
     const router = useRouter();
@@ -59,7 +56,7 @@ export default function LoginForm({ className }: LoginFormProps) {
 
             } else {
 
-                router.replace("/protected/search");
+                router.push("/protected/search");
 
             }
 

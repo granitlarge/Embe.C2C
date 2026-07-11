@@ -26,10 +26,8 @@ export default async function EditSearchProfilePage({ params }: EditSearchProfil
             <h1>search-profile</h1>
             <SearchProfileForm 
                 searchProfile={getSearchProfileResponse.value?.data} 
-                user={getMeResponse.value?.data!}
                 className="grow-1 overflow-y-scroll scrollbar-none" 
             />
-            <MainNav />
         </div>
     );
 }

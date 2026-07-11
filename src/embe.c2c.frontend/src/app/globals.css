@@ -3,7 +3,7 @@
 @layer base {
   :root {
 
-    --fs-ratio: .80;
+    --fs-ratio: .85;
     --fs-1: 2.0rem;
     --fs-2: calc(var(--fs-1) * var(--fs-ratio));
     --fs-3: calc(var(--fs-2) * var(--fs-ratio));
