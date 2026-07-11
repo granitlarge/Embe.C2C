@@ -1,4 +1,5 @@
 using Embe.C2C.Api.EndPoints;
+using Embe.C2C.Api.OpenApi;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Infrastructure;
 using Embe.C2C.Infrastructure.Extensions;
@@ -7,11 +8,12 @@ using Embe.C2C.Infrastructure.SignalR.Hubs;
 var builder = WebApplication.CreateBuilder(args);
 var settings = new Settings(builder.Configuration);
 
+builder.Services.AddOpenApiConfiguration();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:3000", "https://embec2cfrontend.bakovicmiro.workers.dev")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -103,6 +105,7 @@ app.MapNotificationEndPoints();
 app.MapMessageEndPoints();
 app.MapGeographyEndpoints();
 app.MapSearchProfileEndPoints();
+app.MapOpenApiEndpoints();
 
 app.MapHub<MainHub>("/hubs/main", options =>
 {
