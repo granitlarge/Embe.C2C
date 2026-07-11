@@ -28,7 +28,15 @@ export default function MessageCompact({ className, messageDto, user, ...props }
                 {isOwn && isSeen && <CheckCheck className="text-(--universal-primary-bg)" size={12} />}
                 {!isOwn && !isSeen && <span className="text-(--universal-primary-bg)">•</span>}
                 <span className="max-w-[170px] text-nowrap text-center overflow-hidden text-ellipsis text-(length:--primary-fs)">
-                    {isOwn ? <span className="text-(--secondary-fc) text-(length:--secondary-fs)">you: </span> : <span className="text-(--secondary-fc) text-(length:--secondary-fs) align-middle">they: </span>} {message.content}
+                    {
+                        isOwn ? <span className="text-(--secondary-fc) text-(length:--secondary-fs)">you: </span> : 
+                        <span className="text-(--secondary-fc) text-(length:--secondary-fs) align-middle">
+                            they: 
+                        </span>
+                    } 
+                    {
+                        message.content
+                    }
                 </span>
             </div>
             {

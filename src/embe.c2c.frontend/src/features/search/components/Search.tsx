@@ -10,12 +10,16 @@ import { SlidersHorizontal } from "lucide-react";
 import Modal from "@/src/shared/components/modal/Modal";
 import SearchProfiles from "./SearchProfiles";
 import { GeneratedCandidate } from "../actions/type";
+import Button from "@/src/shared/components/buttons/Button";
+import { Plus } from "@deemlol/next-icons";
+import { useRouter } from "next/navigation";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;
 }
 function Header({ hasSearchProfiles }: HeaderProps) {
 
+    const router = useRouter();
     const [isSearchConfigurationOpen, setIsSearchConfigurationOpen] = useState(false);
 
     return (
@@ -33,14 +37,24 @@ function Header({ hasSearchProfiles }: HeaderProps) {
                 className="surface-secondary p-3 gap-3"
                 closed={() => setIsSearchConfigurationOpen(false)}
                 hidden={!isSearchConfigurationOpen}
-                header="search profiles"
             >
+                <div className="flex flex-row items-center gap-3 w-full">
+                    <h2>search profiles</h2>
+                    <Button
+                        className="max-w-max max-h-max px-5 ml-auto flex flex-row gap-1 items-center justify-between"
+                        intent="create"
+                        onClick={() => { router.push("/protected/search-profile") }}
+                    >
+                        <Plus />
+                        <span>create</span>
+                    </Button>
+                </div>
                 <SearchProfiles />
             </Modal>
         </div>
     )
 
-} 
+}
 
 export type SearchProps = {
     hasSearchProfiles: boolean;
@@ -85,7 +99,7 @@ export default function Search({ candidates: initialCandidates, className, hasSe
                     {
                         candidates[0] &&
                         <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
-                                <Profile className="grow-1" candidate={candidates[0].candidate.data} candidateSearchProfile={candidates[0].candidateSearchProfile.data} />
+                            <Profile className="grow-1" candidate={candidates[0].candidate.data} candidateSearchProfile={candidates[0].candidateSearchProfile.data} />
                         </JudgeOverlay>
                     } {
                         !candidates[0] &&

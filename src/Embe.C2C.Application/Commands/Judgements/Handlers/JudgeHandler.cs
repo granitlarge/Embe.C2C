@@ -28,6 +28,8 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper;
     private readonly ConversationDtoMapper _conversationDtoMapper;
+    private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
+    private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
 
     public JudgeHandler
     (
@@ -44,7 +46,9 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         UserDtoMapper userDtoMapper,
         MessageAuthorizationService messageAuthorizationService,
         MessageDtoMapper messageDtoMapper,
-        ConversationDtoMapper conversationDtoMapper
+        ConversationDtoMapper conversationDtoMapper,
+        SearchProfileAuthorizationService searchProfileAuthorizationService,
+        SearchProfileDtoMapper searchProfileDtoMapper
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _userAuthorizationService = userAuthorizationPolicy;
@@ -57,6 +61,8 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         _messageAuthorizationService = messageAuthorizationService;
         _messageDtoMapper = messageDtoMapper;
         _conversationDtoMapper = conversationDtoMapper;
+        _searchProfileAuthorizationService = searchProfileAuthorizationService;
+        _searchProfileDtoMapper = searchProfileDtoMapper;
     }
 
     protected override async Task<TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
@@ -153,6 +159,8 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
             _messageAuthorizationService,
             _messageDtoMapper,
             _conversationDtoMapper,
+            _searchProfileAuthorizationService,
+            _searchProfileDtoMapper,
             cancellationToken
         );
 

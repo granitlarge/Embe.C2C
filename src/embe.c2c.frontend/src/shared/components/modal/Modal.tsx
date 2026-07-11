@@ -6,7 +6,7 @@ export type ModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttributes
     children: React.ReactNode;
     closed: () => void;
     hidden: boolean;
-    header: string;
+    header?: string;
 };
 
 export default function Modal({ children, className, closed, hidden, header, ...props }: ModalProps) {
@@ -45,7 +45,7 @@ export default function Modal({ children, className, closed, hidden, header, ...
                 rounded-lg 
                 scrollbar-gutter-stable
                 `} {...props}>
-            <h2 className="mx-auto text-(--primary-fc)">{header}</h2>
+            {header && <h2 className="mx-auto text-(--primary-fc)">{header}</h2>}
             {children}
         </dialog>
     );

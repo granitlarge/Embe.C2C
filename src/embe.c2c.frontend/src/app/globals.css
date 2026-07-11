@@ -95,6 +95,9 @@
     --button-navigate-bg: var(--universal-primary-bg);
     --button-navigate-fc: var(--universal-primary-fc);
 
+    --button-create-bg: var(--universal-primary-bg);
+    --button-create-fc: var(--universal-primary-fc);
+
     --message-own-bg: none;
 
     --label-fs: inherit;
@@ -316,6 +319,11 @@
   .button-navigate {
     background-color: var(--button-navigate-bg);
     color: var(--button-navigate-fc);
+  }
+
+  .button-create {
+    background-color: var(--button-create-bg);
+    color: var(--button-create-fc);
   }
 
   .button:hover {

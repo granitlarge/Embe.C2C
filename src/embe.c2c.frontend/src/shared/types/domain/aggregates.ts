@@ -73,10 +73,14 @@ export type Matching = {
     id: Guid;
     userId1: Guid;
     userId2: Guid;
+    userId1SearchProfileId?: Guid;
+    userId2SearchProfileId?: Guid;
     conversation?: Conversation;
     createdAt?: string;
     user1?: ReadDto<User, UserPermission>;
     user2?: ReadDto<User, UserPermission>;
+    user1SearchProfile?: ReadDto<SearchProfile, SearchProfilePermission>;
+    user2SearchProfile?: ReadDto<SearchProfile, SearchProfilePermission>;
 }
 
 export enum MatchingPermission {

@@ -23,6 +23,8 @@ public static class MatchingExtensions
         MessageAuthorizationService messageAuthorizationService,
         MessageDtoMapper messageDtoMapper,
         ConversationDtoMapper conversationDtoMapper,
+        SearchProfileAuthorizationService searchProfileAuthorizationService,
+        SearchProfileDtoMapper searchProfileDtoMapper,
         CancellationToken cancellationToken = default
     )
     {
@@ -56,13 +58,17 @@ public static class MatchingExtensions
             [.. messageDtos]
         );
 
+        var user1SearchProfileDto = await (matching.User1SearchProfile?.ToDtoAsync(searchProfileAuthorizationService, searchProfileDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<SearchProfileDto, SearchProfilePermission>?>(null));
+        var user2SearchProfileDto = await (matching.User2SearchProfile?.ToDtoAsync(searchProfileAuthorizationService, searchProfileDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<SearchProfileDto, SearchProfilePermission>?>(null));
         var matchingDto = matchingDtoMapper.ToDto
         (
             matching,
             matchingVariant,
             conversation: conversation,
             user1: user1Dto,
-            user2: user2Dto
+            user2: user2Dto,
+            user1SearchProfile: user1SearchProfileDto,
+            user2SearchProfile: user2SearchProfileDto
         );
 
         return matchingDto != null ? new ReadDto<MatchingDto, MatchingPermission>(matchingDto, matchingPermissions) : null;

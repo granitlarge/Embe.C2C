@@ -17,10 +17,13 @@ export function MatchCompact({ dto, className, user }: MatchCompactProps) {
 
     const match = dto.data;
     const otherUser = match.userId1 === user.userId ? match.user2 : match.user1;
+    const searchProfile = match.userId1 === user.userId ? match.user1SearchProfile : match.user2SearchProfile;
+    const otherSearchProfile = match.userId1 === user.userId ? match.user2SearchProfile : match.user1SearchProfile;
     const classNames = [className].filter(Boolean).join(" ");
 
     return (
         <Surface padding="sm" className={`${classNames} flex flex-col`} variant="secondary">
+            {searchProfile && <span className="mx-auto text-(--primary-fc) text-(length:--primary-fs) font-bold" >{searchProfile?.data.name}</span>}
             <div className="flex flex-row justify-between gap-3 w-full">
                 <UserCompact dto={otherUser} />
                 <div className="flex flex-col items-end gap-2 w-full">

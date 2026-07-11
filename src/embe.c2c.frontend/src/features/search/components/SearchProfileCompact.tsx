@@ -4,10 +4,17 @@ import Surface from "@/src/shared/components/surfaces/Surface";
 import { SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates"
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import * as enums from "@/src/shared/enums";
-import { EngagementBoundedness, Gender } from "@/src/shared/types/domain/value-objects";
-import { Mars, Transgender, Venus } from "lucide-react";
+import { EngagementBoundedness, EngagementMedium, Gender, RelationshipType } from "@/src/shared/types/domain/value-objects";
+import { ArrowRight, Calendar, Calendars, Clock, Globe, Handshake, Heart, MapPin, Mars, Radius, Transgender, Users, Venus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+function Chip({ children }: { children: React.ReactNode }) {
+    return (
+        <Surface className="flex gap-1 items-center p-1" variant="primary" padding="none">
+            {children}
+        </Surface>
+    )
+}
 export type SearchProfileCompactProps = {
     searchProfile: ReadDto<SearchProfile, SearchProfilePermission>;
 }
@@ -21,15 +28,13 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
     const boundedness = searchProfile.engagement?.boundedness;
     const frequency = searchProfile.engagement?.frequency;
 
-    const dateRange = searchProfile.engagement?.boundedness === EngagementBoundedness.FixedTerm &&
-        searchProfile.engagement.startDate && searchProfile.engagement.endDate
-        ? `${searchProfile.engagement.startDate} - ${searchProfile.engagement.endDate}`
-        : undefined;
+    const dateStart = searchProfile.engagement?.boundedness === EngagementBoundedness.FixedTerm ? searchProfile.engagement?.startDate : undefined;
+    const dateEnd = searchProfile.engagement?.boundedness === EngagementBoundedness.FixedTerm ? searchProfile.engagement?.endDate : undefined;
 
     const genders = searchProfile.genders ?? [];
     const ageRange = searchProfile.ageRangeMin !== undefined ?
         searchProfile.ageRangeMax !== undefined ? `${searchProfile.ageRangeMin}-${searchProfile.ageRangeMax}` : `${searchProfile.ageRangeMin}+` : undefined;
-    const distance = searchProfile.maximumDistanceKm !== undefined ? `<=${searchProfile.maximumDistanceKm} km` : undefined;
+    const distance = searchProfile.maximumDistanceKm !== undefined ? `${searchProfile.maximumDistanceKm} km` : undefined;
     const active = searchProfile.active;
 
     return (
@@ -39,76 +44,89 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
             <>
                 {
                     active !== undefined && active &&
-                    <span className={`absolute right-1 top-1 w-2 h-2 rounded-full bg-(--active-color) mb-auto`} />
+                    <span className={`absolute right-3 top-3 w-2 h-2 rounded-full bg-(--active-color) mb-auto`} />
                 }
                 {
                     active !== undefined && !active &&
-                    <span className={`absolute right-1 top-1 w-2 h-2 rounded-full bg-(--inactive-color) mb-auto`} />
+                    <span className={`absolute right-3 top-3 w-2 h-2 rounded-full bg-(--inactive-color) mb-auto`} />
                 }
                 <div className="flex flex-col items-center">
-                    <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold mx-auto">{searchProfile.name}</span>
-                    <div className="flex flex-row items-center gap-1">
-                        {relationshipType !== undefined && <span className="text-(--secondary-fc) text-(length:--primary-fs) lowercase">{enums.formatRelationshipType(relationshipType)}</span>}
-                        <div className="flex flex-row gap-0 items-center">
-                            {
-                                genders.some(gender => gender === Gender.Male) && <Mars className="w-(--primary-fs) h-(--primary-fs)" />
-                            }
-                            {
-                                genders.some(gender => gender === Gender.Female) && <Venus className="w-(--primary-fs) h-(--primary-fs)" />
-                            }
-                            {
-                                genders.some(gender => gender === Gender.TransFemale || gender === Gender.TransMale) && <Transgender className="w-(--primary-fs) h-(--primary-fs)" />
-                            }
-                        </div>
-                    </div>
+                    <h3>{searchProfile.name}</h3>
                 </div>
-                <div className="flex flex-row gap-10 justify-between">
-                    <ul className="flex flex-col gap-2">
+                <div className="flex flex-row gap-2 flex-wrap justify-start items-center">
+                    {
+                        relationshipType !== undefined &&
+                        <Chip>
+                            {
+                                relationshipType === RelationshipType.Romantic && <Heart className="w-(--primary-fs) h-(--primary-fs)" /> ||
+                                relationshipType === RelationshipType.Platonic && <Users className="w-(--primary-fs) h-(--primary-fs)" /> ||
+                                relationshipType === RelationshipType.Professional && <Handshake className="w-(--primary-fs) h-(--primary-fs)" />
+                            }
+                            <span className="text-(--primary-fc) text-(length:--primary-fs) lowercase">
+                                {enums.formatRelationshipType(relationshipType)}
+                            </span>
+                        </Chip>
+                    }
+                    {
+                        medium !== undefined &&
+                        <Chip>
+                            {
+                                medium === EngagementMedium.Virtual && <Globe className="w-(--primary-fs) h-(--primary-fs)" /> ||
+                                medium === EngagementMedium.InPerson && <Users className="w-(--primary-fs) h-(--primary-fs)" /> 
+                            }
+                            <span className="text-(--primary-fc) text-(length:--primary-fs) lowercase">
+                                {enums.formatEngagementMedium(medium)}
+                            </span>
+                        </Chip>
+                    }
+                    {
+                        boundedness !== undefined && boundedness !== EngagementBoundedness.FixedTerm &&
+                        <Chip>
+                            <Clock className="w-(--primary-fs) h-(--primary-fs)" />
+                            <span className="text-(--primary-fc) text-(length:--primary-fs) lowercase">
+                                {enums.formatEngagementBoundedness(boundedness)}
+                            </span>
+                        </Chip>
+                    }
+                    {
+                        dateStart && dateEnd &&
+                        <Chip>
+                            <span className="text-(--primary-fc) text-(length:--primary-fs)">{dateStart}</span>
+                            <ArrowRight className="w-(--primary-fs) h-(--primary-fs)" />
+                            <span className="text-(--primary-fc) text-(length:--primary-fs)">{dateEnd}</span>
+                        </Chip>
+                    }
+                    {
+                        frequency !== undefined && boundedness !== EngagementBoundedness.OneTime &&
+                        <Chip>
+                            <Calendar className="w-(--primary-fs) h-(--primary-fs)" />
+                            <span className="text-(--primary-fc) text-(length:--primary-fs) lowercase">{enums.formatEngagementFrequency(frequency)}</span>
+                        </Chip>
+                    }
+                    {
+                        ageRange &&
+                        <Chip>
+                            <span className="text-(--primary-fc) text-(length:--primary-fs)">age: {ageRange}</span>
+                        </Chip>
+                    }
+                    {
+                        distance &&
+                        <Chip>
+                            <Radius className="w-(--primary-fs) h-(--primary-fs)" />
+                            <span className="text-(--primary-fc) text-(length:--primary-fs)">{distance}</span>
+                        </Chip>
+                    }
+                    <Chip>
                         {
-                            medium !== undefined &&
-                            <li className="list-disc list-inside">
-                                <span className="text-(--secondary-fc) text-(length:--primary-fs) lowercase">
-                                    {enums.formatEngagementMedium(medium)}
-                                </span>
-                            </li>
+                            genders.some(gender => gender === Gender.Male) && <Mars className="w-5 h-5" />
                         }
                         {
-                            boundedness !== undefined && boundedness !== EngagementBoundedness.FixedTerm &&
-                            <li className="list-disc list-inside">
-                                <span className="text-(--secondary-fc) text-(length:--primary-fs) lowercase">
-                                    {enums.formatEngagementBoundedness(boundedness)}
-                                </span>
-                            </li>
+                            genders.some(gender => gender === Gender.Female) && <Venus className="w-5 h-5" />
                         }
                         {
-                            frequency !== undefined && boundedness !== EngagementBoundedness.OneTime &&
-                            <li className="list-disc list-inside">
-                                <span className="text-(--secondary-fc) text-(length:--primary-fs) lowercase">{enums.formatEngagementFrequency(frequency)}</span>
-                            </li>
+                            genders.some(gender => gender === Gender.TransFemale || gender === Gender.TransMale) && <Transgender className="w-5 h-5" />
                         }
-                        {
-                            dateRange &&
-                            <li className="list-disc list-inside">
-                                <span className="text-(--secondary-fc) text-(length:--primary-fs)">{dateRange}</span>
-                            </li>
-                        }
-                    </ul>
-                    <div className="flex flex-col gap-2">
-
-                        {
-                            ageRange &&
-                            <li className="list-disc list-inside">
-                                <span className="text-(--secondary-fc) text-(length:--primary-fs)">{ageRange}</span>
-                            </li>
-                        }
-                        {
-                            distance &&
-                            <li className="list-disc list-inside">
-                                <span className="text-(--secondary-fc) text-(length:--primary-fs)">{distance}</span>
-                            </li>
-                        }
-
-                    </div>
+                    </Chip>
                 </div>
             </>
         </Surface>

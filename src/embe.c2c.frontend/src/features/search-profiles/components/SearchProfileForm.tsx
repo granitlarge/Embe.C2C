@@ -16,11 +16,8 @@ import { useState } from "react";
 import * as z from "zod";
 import { createSearchProfile as createSearchProfile, deleteSearchProfile, updateSearchProfile } from "../actions";
 import { useRouter } from "next/navigation";
-import { SearchProfile, User } from "@/src/shared/types/domain/aggregates";
+import { SearchProfile } from "@/src/shared/types/domain/aggregates";
 import CheckboxInput from "@/src/shared/components/inputs/checkbox-input/CheckBoxInput";
-import Modal from "@/src/shared/components/modal/Modal";
-import { Guid } from "@/src/shared/cache";
-import Profile from "@/src/shared/components/user/Profile";
 
 export type SearchProfileFormProps = {
     className?: string;
@@ -47,7 +44,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
             (
                 searchProfile?.engagement?.startDate && searchProfile?.engagement?.endDate ?
                     { startDate: searchProfile?.engagement?.startDate, endDate: searchProfile?.engagement?.endDate } : undefined
-            ) as { startDate: string, endDate: string } | undefined,
+            ) as { startDate?: string, endDate?: string } | undefined,
 
         ageRange: (searchProfile?.ageRangeMin ? [searchProfile.ageRangeMin, searchProfile.ageRangeMax ?? maxAge] : [minAge, maxAge]) as [number, number | undefined],
         maximumDistanceKm: (searchProfile?.maximumDistanceKm ?? maxDistanceKm) as number | undefined,
@@ -81,7 +78,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                 endDate: z.string()
             }).optional().refine((data) => {
                 if (clientSideState.duration === EngagementBoundedness.FixedTerm) {
-                    return data?.startDate && data?.endDate;
+                    return data?.startDate !== undefined && data?.endDate !== undefined;
                 }
                 return true;
             }, "start and end dates are required for fixed term engagements")
@@ -249,11 +246,15 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                     clientSideState.duration === EngagementBoundedness.FixedTerm &&
                     <>
                         <DateInput
+                            initialValue={clientSideState.dateRange?.startDate}   
+                            onBlur={(value) => setClientSideState(prev => ({ ...prev, dateRange: { ...prev.dateRange, startDate: value } }))}
                             minDate={new Date().toISOString().split("T")[0]}
                             maxDate="2099-01-01"
                             label={"start date"}
                         />
                         <DateInput
+                            initialValue={clientSideState.dateRange?.endDate}
+                            onBlur={(value) => setClientSideState(prev => ({ ...prev, dateRange: { ...prev.dateRange, endDate: value } }))}
                             minDate={new Date().toISOString().split("T")[0]}
                             maxDate="2099-01-01"
                             label={"end date"}

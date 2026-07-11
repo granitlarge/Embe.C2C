@@ -2,7 +2,6 @@ using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
-using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Entities;
@@ -21,6 +20,8 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
     private readonly MessageDtoMapper _messageDtoMapper;
     private readonly ConversationDtoMapper _conversationDtoMapper;
     private readonly IAuthenticatedUserService _authenticatedUserService;
+    private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
+    private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
 
     public GetMatchingByIdHandler
     (
@@ -32,7 +33,9 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         MessageAuthorizationService messageAuthorizationService,
         MessageDtoMapper messageDtoMapper,
         ConversationDtoMapper conversationDtoMapper,
-        IAuthenticatedUserService authenticatedUserService
+        IAuthenticatedUserService authenticatedUserService,
+        SearchProfileAuthorizationService searchProfileAuthorizationService,
+        SearchProfileDtoMapper searchProfileDtoMapper
     ) : base(repository)
     {
         _matchingAuthorizationService = matchingAuthorizationService;
@@ -43,6 +46,8 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         _messageDtoMapper = messageDtoMapper;
         _conversationDtoMapper = conversationDtoMapper;
         _authenticatedUserService = authenticatedUserService;
+        _searchProfileAuthorizationService = searchProfileAuthorizationService;
+        _searchProfileDtoMapper = searchProfileDtoMapper;
     }
 
     protected override async Task<Result<ReadDto<MatchingDto, MatchingPermission>>> ExecuteAsync(GetMatchingByIdQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
@@ -59,6 +64,8 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             .AsSplitQuery()
             .Include(m => m.User1)
             .Include(m => m.User2)
+            .Include(m => m.User1SearchProfile)
+            .Include(m => m.User2SearchProfile)
             .Include(m => m.Conversation)
                 .ThenInclude(c => c.Messages!.OrderByDescending(m => m.CreatedAt).Take(50))
                     .ThenInclude(m => m.ReplyToMessage)
@@ -81,6 +88,8 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             _messageAuthorizationService,
             _messageDtoMapper,
             _conversationDtoMapper,
+            _searchProfileAuthorizationService,
+            _searchProfileDtoMapper,
             cancellationToken
         );
 

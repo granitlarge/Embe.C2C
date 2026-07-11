@@ -42,7 +42,7 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
         <header className="flex flex-row items-center">
             {
                 partner &&
-                <Link href={`/user/${partner.id}`} className="no-underline text-(--primary-fc)">
+                <Link href={`/protected/user/${partner.id}`} className="no-underline text-(--primary-fc)">
                     <h1 className="truncate">{partner?.alias}</h1>
                 </Link>
             }

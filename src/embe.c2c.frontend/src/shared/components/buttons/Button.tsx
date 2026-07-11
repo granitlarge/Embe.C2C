@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export type ButtonIntent = "save" | "destructive" | "cancel" | "preview" | "navigate" | "default";
+export type ButtonIntent = "save" | "destructive" | "cancel" | "preview" | "navigate" | "create" | "default";
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
     onClick?: () => (void | Promise<void>);
     intent?: ButtonIntent;
@@ -19,7 +19,8 @@ export default function Button({ onClick, intent = "default", ...props }: Button
         intent === "cancel" ? "button-cancel" :
         intent === "preview" ? "button-preview" :
         intent === "default" ? "button-default" : 
-        intent === "navigate" ? "button-navigate" : ""
+        intent === "navigate" ? "button-navigate" :
+        intent === "create" ? "button-create": ""
     ].filter(Boolean).join(" ");
 
     return (
@@ -38,4 +39,5 @@ export default function Button({ onClick, intent = "default", ...props }: Button
             {loading ? "loading..." : props.children}
         </button>
     );
+
 }

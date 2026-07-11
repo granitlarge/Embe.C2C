@@ -28,7 +28,9 @@ public class GetMatchingsHandler
     MessageAuthorizationService messageAuthorizationService,
     MessageDtoMapper messageDtoMapper,
     ConversationDtoMapper conversationDtoMapper,
-    IAuthenticatedUserService authenticatedUserService
+    IAuthenticatedUserService authenticatedUserService,
+    SearchProfileAuthorizationService searchProfileAuthorizationService,
+    SearchProfileDtoMapper searchProfileDtoMapper
 ) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
     private readonly IFileService _fileService = fileService;
@@ -40,6 +42,8 @@ public class GetMatchingsHandler
     private readonly MessageDtoMapper _messageDtoMapper = messageDtoMapper;
     private readonly ConversationDtoMapper _conversationDtoMapper = conversationDtoMapper;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
+    private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
+    private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
 
     protected override async Task<Result<List<ReadDto<MatchingDto, MatchingPermission>>>> ExecuteAsync
     (
@@ -54,6 +58,8 @@ public class GetMatchingsHandler
             .AsSplitQuery()
             .Include(m => m.User1)
             .Include(m => m.User2)
+            .Include(m => m.User1SearchProfile)
+            .Include(m => m.User2SearchProfile)
             .Include(m => m.Conversation)
                 .ThenInclude(c => c.LastMessage)
             .OrderByDescending(m => m.CreatedAt)
@@ -78,6 +84,8 @@ public class GetMatchingsHandler
                 _messageAuthorizationService,
                 _messageDtoMapper,
                 _conversationDtoMapper,
+                _searchProfileAuthorizationService,
+                _searchProfileDtoMapper,
                 cancellationToken
             );
 
