@@ -1,8 +1,9 @@
 "use server";
 
-import { ApiResponse, FailureReason, Mutate } from "@/src/shared/api";
 import { User } from "@/src/shared/types/domain/aggregates";
 import { RegisterRequest, RegisterUserFailureReason } from "./types";
+import { ApiResponse } from "@/src/shared/apis/type";
+import { Mutate } from "@/src/shared/apis/api";
 
 export async function register(request: RegisterRequest): Promise<ApiResponse<User, RegisterUserFailureReason>> {
 

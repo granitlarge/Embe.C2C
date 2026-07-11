@@ -2,17 +2,8 @@
 
 import { cookies } from "next/headers";
 import { AccessTokenName, RefreshTokenName, TokenCookieOptions } from "./constants";
-import { ApiResponse, FailureReason } from "../api";
 import * as jwtdecode from "jwt-decode";
-
-export type Token = {
-    token: string;
-    expiresAt: string;
-}
-
-export type RefreshToken = Token & {
-    id: string;
-}
+import { RefreshAccessTokenResponse, RefreshToken, Token } from "./types";
 
 export async function saveAccessToken(token: Token) {
     await saveToken(AccessTokenName, token);
@@ -66,7 +57,6 @@ export async function clearTokens() {
     await deleteToken(RefreshTokenName);
 }
 
-export type RefreshAccessTokenResponse = ApiResponse<{ accessToken: Token }, FailureReason>;
 export async function refreshAccessToken(): Promise<Token | undefined> {
 
     const refreshToken = await getRefreshToken();

@@ -1,6 +1,7 @@
 "use server";
 
-import { ApiResponse, FailureReason, Read } from "@/src/shared/api";
+import { Read } from "@/src/shared/apis/api";
+import { ApiResponse, FailureReason,  } from "@/src/shared/apis/type";
 
 export async function accountExists(email: string): Promise<ApiResponse<boolean, FailureReason>> {
 

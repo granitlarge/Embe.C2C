@@ -1,6 +1,7 @@
 "use server";
 
-import { ApiResponse, FailureReason, Mutate, Read } from "../../api";
+import { Read, Mutate } from "../../apis/api";
+import { ApiResponse, FailureReason } from "../../apis/type";
 import { AdminArea } from "./types";
 
 export async function getAdminAreaById(id: string): Promise<ApiResponse<AdminArea, FailureReason>> {

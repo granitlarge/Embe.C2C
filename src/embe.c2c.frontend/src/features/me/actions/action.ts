@@ -1,4 +1,5 @@
-import { ApiResponse, FailureReason, Mutate } from "@/src/shared/api";
+import { Mutate } from "@/src/shared/apis/api";
+import { ApiResponse, FailureReason, } from "@/src/shared/apis/type";
 import { Guid } from "@/src/shared/cache";
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { Gender, Location} from "@/src/shared/types/domain/value-objects";

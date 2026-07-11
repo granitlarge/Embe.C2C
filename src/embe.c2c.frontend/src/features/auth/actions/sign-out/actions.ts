@@ -1,6 +1,6 @@
 "use server";
 
-import { Mutate } from "@/src/shared/api";
+import { Mutate } from "@/src/shared/apis/api";
 import { clearTokens, getRefreshToken } from "@/src/shared/security/functions";
 
 export async function signOut(): Promise<void> {

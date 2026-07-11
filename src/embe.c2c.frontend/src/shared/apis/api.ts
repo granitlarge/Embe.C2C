@@ -1,10 +1,8 @@
 "use server";
-
+import type { ApiResponse, FailureReason, ReadRequest, MutationRequest } from "./type";
 import { redirect } from "next/navigation";
-import { ApiError } from "./api-errors";
-import { getAccessToken } from "./security/functions";
-import { Tag } from "./cache";
-
+import { ApiError } from "../api-errors";
+import { getAccessToken } from "../security/functions";
 
 async function parseResponse<T>(response: Response): Promise<T | undefined> {
 
@@ -60,32 +58,6 @@ async function SendUnauthenticatedRequest<T>(request: Request): Promise<T> {
     }
     const error = await ApiError.fromResponse(response);
     throw error;
-}
-
-export type ApiResponse<T_Value, T_Error> = {
-    success: boolean;
-    value?: T_Value;
-    reason?: T_Error;
-    message?: string;
-}
-
-export enum FailureReason {
-    NotFound = 0,
-    Forbidden = 1,
-    DomainError = 2,
-    Unknown = 3
-}
-
-export type ReadRequest = Omit<RequestInit, "method" | "next"> & {
-    method: "GET" | "HEAD";
-    next?: Omit<RequestInit["next"], "tags"> & {
-        tags?: [...Tag[]]
-    }
-}
-
-export type MutationRequest = Omit<RequestInit, "method"> & {
-    method: "POST" | "PUT" | "PATCH" | "DELETE";
-    next?: Omit<RequestInit["next"], "tags">
 }
 
 export async function Read<T>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T, FailureReason>>;

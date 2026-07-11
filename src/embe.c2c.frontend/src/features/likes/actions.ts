@@ -1,4 +1,4 @@
-import { Read } from "@/src/shared/api";
+import { Read } from "@/src/shared/apis/api";
 import { NullGuid } from "@/src/shared/cache";
 import { Judgement, JudgementPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";

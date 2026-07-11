@@ -1,4 +1,4 @@
-import { ApiResponse, FailureReason } from "../api";
+import { ApiResponse, FailureReason } from "../apis/type";
 
 export async function getHasUnseenLikes(): Promise<ApiResponse<boolean, FailureReason>> {
     throw new Error("Not implemented");

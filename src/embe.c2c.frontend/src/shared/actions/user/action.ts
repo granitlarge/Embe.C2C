@@ -1,4 +1,5 @@
-import { ApiResponse, FailureReason, Read } from "../../api";
+import { Read } from "../../apis/api";
+import { ApiResponse, FailureReason } from "../../apis/type";
 import { Guid, NullGuid } from "../../cache";
 import { User, UserPermission } from "../../types/domain/aggregates";
 import { ReadDto } from "../../types/dtos/types";

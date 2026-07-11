@@ -1,6 +1,7 @@
 "use server";
 
-import { ApiResponse, FailureReason, Mutate, Read } from "@/src/shared/api";
+import { Read, Mutate } from "@/src/shared/apis/api";
+import { ApiResponse, FailureReason, } from "@/src/shared/apis/type";
 import { NullGuid, Tag } from "@/src/shared/cache";
 import { Notification } from "@/src/shared/types/domain/aggregates";
 import { getAuthenticatedUser } from "@/src/shared/user";

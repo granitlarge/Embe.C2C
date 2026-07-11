@@ -1,9 +1,9 @@
 "use server";
 
-import { Mutate } from "@/src/shared/api";
 import { Credentials } from "@/src/shared/types/application/types";
 import { SignInError } from "./types";
 import { saveAccessToken, saveRefreshToken } from "@/src/shared/security/functions";
+import { Mutate } from "@/src/shared/apis/api";
 export async function signIn(email: string, password: string): Promise<SignInError | undefined> {
 
     const response = await Mutate<Credentials, SignInError>

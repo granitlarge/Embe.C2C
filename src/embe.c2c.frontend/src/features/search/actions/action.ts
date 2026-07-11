@@ -1,11 +1,12 @@
 "use server";
 
-import { ApiResponse, FailureReason, Mutate, Read } from "@/src/shared/api";
+import { ApiResponse, FailureReason } from "@/src/shared/apis/type";
 import { Guid, NullGuid } from "@/src/shared/cache";
 import { Matching, MatchingPermission, SearchProfile, SearchProfilePermission, User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { getAuthenticatedUser } from "@/src/shared/user";
 import { GenerateCandidatesResponse } from "./type";
+import { Read, Mutate } from "@/src/shared/apis/api";
 
 export async function generateCandidates(): Promise<ApiResponse<GenerateCandidatesResponse, FailureReason>> {
 
