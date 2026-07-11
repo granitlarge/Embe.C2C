@@ -15,7 +15,7 @@ export async function saveRefreshToken(token: RefreshToken) {
 
 async function saveToken(name: string, token: Token) {
     const cookie = await cookies();
-    cookie.set(name, token.token, { ...TokenCookieOptions, expires: new Date(token.expiresAt) });
+    cookie.set(name, token.token, { ...TokenCookieOptions, expires: new Date(token.expiresAt) } as any);
 }
 
 async function deleteToken(name: typeof AccessTokenName | typeof RefreshTokenName) {

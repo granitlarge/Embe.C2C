@@ -10,12 +10,12 @@ export async function proxy(request: NextRequest) {
             const newAccessToken = await refreshAccessToken(request);
             if (!newAccessToken) {
                 const response = NextResponse.redirect(new URL("/public/login", request.url));
-                response.cookies.set(AccessTokenName, "", { ...TokenCookieOptions, expires: new Date(0) });
-                response.cookies.set(RefreshTokenName, "", { ...TokenCookieOptions, expires: new Date(0) });
+                response.cookies.set(AccessTokenName, "", { ...TokenCookieOptions, expires: new Date(0) } as any);
+                response.cookies.set(RefreshTokenName, "", { ...TokenCookieOptions, expires: new Date(0) } as any);
                 return response;
             } else {
                 const response = NextResponse.next();
-                response.cookies.set(AccessTokenName, newAccessToken.token, { ...TokenCookieOptions, expires: new Date(newAccessToken.expiresAt) });
+                response.cookies.set(AccessTokenName, newAccessToken.token, { ...TokenCookieOptions, expires: new Date(newAccessToken.expiresAt) } as any);
                 return response;
             }
         }
