@@ -1,4 +1,4 @@
-import { getCandidates } from "@/src/features/search/actions/action";
+import { generateCandidates } from "@/src/features/search/actions/action";
 import Search from "@/src/features/search/components/Search";
 import { getHasSearchProfile } from "@/src/shared/actions/user/action";
 
@@ -7,9 +7,9 @@ export type SearchPageProps = {
 }
 export default async function SearchPage({ }: SearchPageProps) {
 
-    const getCandidatesResponse = await getCandidates();
+    const getCandidatesResponse = await generateCandidates();
     if (!getCandidatesResponse.success) {
-        throw new Error("Not implemented");
+        throw new Error("not implemented");
     }
 
     let hasSearchProfiles = true;

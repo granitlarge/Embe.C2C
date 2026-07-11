@@ -1,15 +1,16 @@
 "use server";
 
 import { ApiResponse, FailureReason, Mutate, Read } from "@/src/shared/api";
-import { NullGuid } from "@/src/shared/cache";
+import { Guid, NullGuid } from "@/src/shared/cache";
 import { Matching, MatchingPermission, SearchProfile, SearchProfilePermission, User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { getAuthenticatedUser } from "@/src/shared/user";
+import { GenerateCandidatesResponse } from "./type";
 
-export async function getCandidates(): Promise<ApiResponse<ReadDto<User, UserPermission>[], FailureReason>> {
+export async function generateCandidates(): Promise<ApiResponse<GenerateCandidatesResponse, FailureReason>> {
 
     const user = await getAuthenticatedUser();
-    const response = await Read<ReadDto<User, UserPermission>[]>(
+    const response = await Read<GenerateCandidatesResponse>(
         `${process.env.API_URL}/api/user/candidates`,
         {
             method: "GET",
@@ -23,12 +24,12 @@ export async function getCandidates(): Promise<ApiResponse<ReadDto<User, UserPer
 
 }
 
-export async function judge(candidateId: string, isPositive: boolean): Promise<ApiResponse<ReadDto<Matching | undefined, MatchingPermission>, FailureReason>> {
+export async function judge(candidateId: Guid, isPositive: boolean): Promise<ApiResponse<ReadDto<Matching | undefined, MatchingPermission>, FailureReason>> {
     const response = await Mutate<ReadDto<Matching | undefined, MatchingPermission>>(
         `${process.env.API_URL}/api/judgement`,
         {
             method: "POST",
-            body: JSON.stringify({ judgeeUserId: candidateId, isPositive }),
+            body: JSON.stringify({ candidateId, isPositive }),
             headers: {
                 "Content-Type": "application/json"
             }

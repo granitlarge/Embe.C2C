@@ -1,7 +1,5 @@
 "use client";
 
-import { User as UserTypeDef, UserPermission } from "@/src/shared/types/domain/aggregates";
-import { ReadDto } from "@/src/shared/types/dtos/types";
 import { useCallback, useState } from "react";
 import JudgeOverlay from "./JudgeOverlay";
 import * as api from "../actions/action";
@@ -11,11 +9,12 @@ import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 import Modal from "@/src/shared/components/modal/Modal";
 import SearchProfiles from "./SearchProfiles";
+import { GeneratedCandidate } from "../actions/type";
 
 type HeaderProps = {
-
+    hasSearchProfiles: boolean;
 }
-function Header({ }: HeaderProps) {
+function Header({ hasSearchProfiles }: HeaderProps) {
 
     const [isSearchConfigurationOpen, setIsSearchConfigurationOpen] = useState(false);
 
@@ -23,9 +22,12 @@ function Header({ }: HeaderProps) {
         <div>
             <header className="flex flex-row items-center">
                 <h1 className="truncate">search</h1>
-                <button className="ml-auto" onClick={() => setIsSearchConfigurationOpen(true)}>
-                    <SlidersHorizontal className="w-6 h-6" />
-                </button>
+                {
+                    hasSearchProfiles &&
+                    <button className="ml-auto" onClick={() => setIsSearchConfigurationOpen(true)}>
+                        <SlidersHorizontal className="w-6 h-6" />
+                    </button>
+                }
             </header>
             <Modal
                 className="surface-secondary p-3 gap-3"
@@ -42,7 +44,7 @@ function Header({ }: HeaderProps) {
 
 export type SearchProps = {
     hasSearchProfiles: boolean;
-    candidates: ReadDto<UserTypeDef, UserPermission>[];
+    candidates: GeneratedCandidate[];
     className?: string;
 }
 export default function Search({ candidates: initialCandidates, className, hasSearchProfiles }: SearchProps) {
@@ -53,7 +55,7 @@ export default function Search({ candidates: initialCandidates, className, hasSe
     const judgeCallback = useCallback(judge, [candidates[0]]);
 
     async function loadCandidates() {
-        const response = await api.getCandidates();
+        const response = await api.generateCandidates();
         if (!response.success) {
             throw new Error("Not implemented");
         } else {
@@ -62,7 +64,7 @@ export default function Search({ candidates: initialCandidates, className, hasSe
     }
 
     async function judge(isPositive: boolean) {
-        const response = await api.judge(candidates[0].data.id, isPositive);
+        const response = await api.judge(candidates[0].id, isPositive);
         if (!response.success) {
             throw new Error("Not implemented");
         } else {
@@ -76,14 +78,14 @@ export default function Search({ candidates: initialCandidates, className, hasSe
 
     return (
         <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
-            <Header />
+            <Header hasSearchProfiles={hasSearchProfiles} />
             {
                 hasSearchProfiles &&
                 <>
                     {
                         candidates[0] &&
                         <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
-                            <Profile className="grow-1" user={candidates[0].data} />
+                                <Profile className="grow-1" candidate={candidates[0].candidate.data} candidateSearchProfile={candidates[0].candidateSearchProfile.data} />
                         </JudgeOverlay>
                     } {
                         !candidates[0] &&

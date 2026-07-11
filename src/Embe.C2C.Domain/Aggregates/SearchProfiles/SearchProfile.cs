@@ -223,6 +223,11 @@ public class SearchProfile : Aggregate
     {
         MaximumDistance = distance;
     }
+
+    public void Remove()
+    {
+
+    }
 }
 
 public enum SearchProfileDomainError

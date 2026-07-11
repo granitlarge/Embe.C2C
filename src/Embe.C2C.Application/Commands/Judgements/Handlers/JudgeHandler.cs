@@ -70,7 +70,15 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         var candidate = await context.CandidatesQuery.SingleOrDefaultAsync(c => c.Id == command.CandidateId && c.UserId == userId, cancellationToken);
         if (candidate == null)
         {
-            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "Judgee is not a candidate for the judge."));
+            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>
+            (
+                CommitChanges: false,
+                Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure
+                (
+                    FailureReason.Forbidden,
+                    "Judgee is not a candidate for the judge."
+                )
+            );
         }
 
         _userAuthorizationFactStore.SetCandidateUserFact(candidate.CandidateUserId, isCandidate: true);
@@ -112,6 +120,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         var (matching, judgement) = _judgementService.Judge(judge, candidate, command.IsPositive, existingJudgement, oppositeJudgement);
         if (matching != null)
         {
+            judgement.Remove();
             candidate.Remove();
             oppositeCandidate?.Remove();
             context.Candidates.Remove(candidate);

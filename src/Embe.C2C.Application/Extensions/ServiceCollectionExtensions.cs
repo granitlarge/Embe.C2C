@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Commands.SearchProfiles.Handlers.CreateSearchProfileHandler>();
         services.AddScoped<Commands.SearchProfiles.Handlers.UpdateSearchProfileHandler>();
+        services.AddScoped<Commands.SearchProfiles.Handlers.DeleteSearchProfileHandler>();
 
         services.AddScoped<Queries.Auth.Handlers.AccountExistsHandler>();
 

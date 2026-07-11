@@ -20,6 +20,7 @@ public class SearchProfileConfiguration : AggregateConfiguration<SearchProfile>
         builder.OwnsMany<SearchProfileGender>("_genders", g =>
         {
             g.HasKey(g => g.Id);
+            g.Property(g => g.Id).ValueGeneratedNever();
             g.Property(g => g.Gender);
             g.WithOwner().HasForeignKey(g => g.SearchProfileId);
         });

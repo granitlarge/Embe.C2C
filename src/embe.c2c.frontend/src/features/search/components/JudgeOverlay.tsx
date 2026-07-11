@@ -15,7 +15,7 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
 
     return (
 
-        <Surface className={`${classNames} relative`} variant="secondary">
+        <Surface className={`${classNames} relative`} variant="secondary" padding="none">
             {children}
             <button
                 onClick={judgeNegative}

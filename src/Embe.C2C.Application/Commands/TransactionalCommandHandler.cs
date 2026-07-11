@@ -27,7 +27,11 @@ public abstract class TransactionalCommandHandler<T_Command, T_Result>
         _integrationEventHandler = integrationEventHandler;
     }
 
-    public async Task<T_Result> HandleAsync(T_Command command, CancellationToken cancellationToken = default)
+    public async Task<T_Result> HandleAsync
+    (
+        T_Command command, 
+        CancellationToken cancellationToken = default
+    )
     {
         using var transaction = await _context.BeginTransactionAsync(cancellationToken);
         var result = await HandleAsync(new SparseRepository(_context), command, cancellationToken);

@@ -48,3 +48,13 @@ export async function getSearchProfile(id: Guid): Promise<ApiResponse<ReadDto<Se
     });
     return response;
 }
+
+export async function deleteSearchProfile(id: Guid): Promise<ApiResponse<void, FailureReason>> {
+    const response = await Mutate<void, FailureReason>(`${process.env.API_URL}/api/search-profile/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return response;
+}

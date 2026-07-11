@@ -137,7 +137,7 @@ export default function Me({ className, user }: MeProps) {
             {
                 showPreview && <Modal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">
                 <Profile
-                    user={{
+                    candidate={{
                         id: user.data?.id!,
                         bio: clientSideBasicFormData.bio,
                         alias: clientSideBasicFormData.alias,

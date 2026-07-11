@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    partial class C2CContextModelSnapshot : ModelSnapshot
+    [Migration("20260711014915_SearchProfileGenderKeyNeverGenerated")]
+    partial class SearchProfileGenderKeyNeverGenerated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -908,7 +911,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "User1SearchProfile")
                         .WithMany("MatchingsUserId1")
                         .HasForeignKey("UserId1SearchProfileId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "User2")
                         .WithMany("Matchings2")
@@ -919,7 +922,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "User2SearchProfile")
                         .WithMany("MatchingsUserId2")
                         .HasForeignKey("UserId2SearchProfileId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User1");
 

@@ -164,9 +164,9 @@ public class C2CContext
 
     public IQueryable<IAdminArea> AdminAreasQuery => AdminAreas;
 
-    IDbSet<Candidate> ISparseRepository.Candidates => throw new NotImplementedException();
+    public IQueryable<Candidate> CandidatesQuery => Candidates;
 
-    public IQueryable<Candidate> CandidatesQuery => throw new NotImplementedException();
+    IDbSet<Candidate> ISparseRepository.Candidates => new MyDbSet<Candidate>(Candidates);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -179,9 +179,15 @@ public class C2CContext
         return Database.BeginTransactionAsync(System.Data.IsolationLevel.Snapshot, cancellationToken);
     }
 
+    public record CandidateIds
+    (
+        Guid CandidateId,
+        Guid UserSearchProfileId,
+        Guid CandidateSearchProfileId
+    );
     public async Task<bool> GenerateCandidatesForUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var existingCandidates = await Candidates.AnyAsync(c => c.UserId == userId, cancellationToken);
+        var existingCandidates = await Candidates.AnyAsync(c => c.UserId == userId && c.Judgement == null, cancellationToken);
         if (existingCandidates)
         {
             return true;
@@ -189,7 +195,7 @@ public class C2CContext
 
 #warning This query needs to order results by relevance, but for now it just returns the first 20 candidates that match the criteria. The ordering can be improved later.
 
-        var candidateIds = await Database.SqlQueryRaw<(Guid CandidateId, Guid UserSearchProfileId, Guid CandidateSearchProfileId)>($"""
+        var candidateIds = await Database.SqlQueryRaw<CandidateIds>($"""
 
         select c."Id" CandidateId, usp."Id" UserSearchProfileId, csp."Id" CandidateSearchProfileId
         from "DomainUsers" u
@@ -253,9 +259,14 @@ public class C2CContext
 
         """).ToListAsync(cancellationToken);
 
-        var candidates = candidateIds.Select(c => Candidate.Create(userId, c.CandidateId, c.UserSearchProfileId, c.CandidateSearchProfileId)).ToList();
-        Candidates.AddRange(candidates);
-        return candidates.Count > 0;
+        var candidates1 = candidateIds.Select(c => Candidate.Create(userId, c.CandidateId, c.UserSearchProfileId, c.CandidateSearchProfileId)).ToList();
+        var candidates2 = candidateIds.Select(c => Candidate.Create(c.CandidateId, userId, c.CandidateSearchProfileId, c.UserSearchProfileId)).ToList();
+        Candidates.AddRange(candidates1);
+        Candidates.AddRange(candidates2);
+
+        await SaveChangesAsync(cancellationToken);
+
+        return candidates1.Count > 0;
     }
 
     public async Task<List<IAdminArea>> SearchAdminAreasAsync

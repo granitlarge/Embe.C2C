@@ -12,26 +12,28 @@ import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import Surface from "@/src/shared/components/surfaces/Surface"
 import * as enums from "@/src/shared/enums";
 import { EngagementBoundedness, EngagementFrequency, EngagementMedium, Gender, RelationshipType } from "@/src/shared/types/domain/value-objects";
-import { act, useState } from "react";
+import { useState } from "react";
 import * as z from "zod";
-import { createSearchProfile as createSearchProfile, updateSearchProfile } from "../actions";
+import { createSearchProfile as createSearchProfile, deleteSearchProfile, updateSearchProfile } from "../actions";
 import { useRouter } from "next/navigation";
-import { SearchProfile } from "@/src/shared/types/domain/aggregates";
+import { SearchProfile, User } from "@/src/shared/types/domain/aggregates";
 import CheckboxInput from "@/src/shared/components/inputs/checkbox-input/CheckBoxInput";
+import Modal from "@/src/shared/components/modal/Modal";
+import { Guid } from "@/src/shared/cache";
+import Profile from "@/src/shared/components/user/Profile";
 
 export type SearchProfileFormProps = {
     className?: string;
-    searchProfile?: SearchProfile
+    searchProfile?: SearchProfile,
 }
 export default function SearchProfileForm({ className, searchProfile }: SearchProfileFormProps) {
 
-    const maxDistance = 160;
+    const maxDistanceKm = 160;
     const minDistance = 1;
     const maxAge = 120;
     const minAge = 18;
 
     const router = useRouter();
-    const [preview, setPreview] = useState(false);
 
     const initialState = {
         id: searchProfile?.id,
@@ -48,7 +50,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
             ) as { startDate: string, endDate: string } | undefined,
 
         ageRange: (searchProfile?.ageRangeMin ? [searchProfile.ageRangeMin, searchProfile.ageRangeMax ?? maxAge] : [minAge, maxAge]) as [number, number | undefined],
-        maximumDistanceKm: (searchProfile?.maximumDistanceKm ?? maxDistance) as number | undefined,
+        maximumDistanceKm: (searchProfile?.maximumDistanceKm ?? maxDistanceKm) as number | undefined,
         genders: searchProfile?.genders ?? enums.enumerate(Gender).map(({ value }) => value),
         active: searchProfile?.active ?? true,
         createdAt: searchProfile?.createdAt,
@@ -137,7 +139,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                 genders: clientSideState.genders,
                 ageRangeMin: clientSideState.ageRange.length > 0 ? clientSideState.ageRange[0] : undefined,
                 ageRangeMax: clientSideState.ageRange.length > 1 && clientSideState.ageRange[1] !== maxAge ? clientSideState.ageRange[1] : undefined,
-                maximumDistanceKm: clientSideState.maximumDistanceKm === maxDistance ? undefined : clientSideState.maximumDistanceKm,
+                maximumDistanceKm: clientSideState.maximumDistanceKm === maxDistanceKm ? undefined : clientSideState.maximumDistanceKm,
                 active: clientSideState.active
             };
 
@@ -162,7 +164,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                         endDate: updatedSearchProfile.engagement!.endDate,
                     } : undefined,
                     ageRange: [updatedSearchProfile.ageRangeMin!, updatedSearchProfile.ageRangeMax ?? maxAge] as [number, number | undefined],
-                    maximumDistanceKm: updatedSearchProfile.maximumDistanceKm ?? maxDistance,
+                    maximumDistanceKm: updatedSearchProfile.maximumDistanceKm ?? maxDistanceKm,
                     genders: updatedSearchProfile.genders!,
                     active: updatedSearchProfile.active!,
                     createdAt: updatedSearchProfile.createdAt,
@@ -186,6 +188,14 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
 
         }
 
+    }
+
+    async function onDelete() {
+        const deleteResponse = await deleteSearchProfile(serverSideState.id!);
+        if (!deleteResponse.success) {
+            throw new Error("not implemented");
+        }
+        router.push("/protected/search");
     }
 
     function onCancel() {
@@ -292,7 +302,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                         value={clientSideState.maximumDistanceKm}
                         label={"max distance (km)"}
                         min={minDistance}
-                        max={maxDistance}
+                        max={maxDistanceKm}
                         step={1}
                         onChange={(maximumDistanceKm) => setClientSideState(prev => ({ ...prev, maximumDistanceKm }))}
                     />
@@ -323,10 +333,12 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
 
             <div className="flex flex-row gap-2 justify-between grow-0">
                 <Button intent="save" onClick={onSave}>save</Button>
-                <Button intent="preview" onClick={() => setPreview(true)}>preview</Button>
+                {
+                    serverSideState.id &&
+                    <Button intent="destructive" onClick={onDelete}>delete</Button>
+                }
                 <Button intent="cancel" onClick={onCancel}>cancel</Button>
             </div>
-
         </Surface>
     )
 

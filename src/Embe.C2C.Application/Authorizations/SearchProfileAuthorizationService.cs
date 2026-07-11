@@ -53,6 +53,7 @@ public class SearchProfileAuthorizationService
         {
             permissions.Add(SearchProfilePermission.View);
             permissions.Add(SearchProfilePermission.Modify);
+            permissions.Add(SearchProfilePermission.Delete);
         }
 
         if (isMatchedFact.Value)
@@ -64,6 +65,7 @@ public class SearchProfileAuthorizationService
         {
             permissions.Add(SearchProfilePermission.View);
         }
+
         return permissions.ToImmutable();
     }
 
@@ -90,5 +92,6 @@ public class SearchProfileAuthorizationService
 public enum SearchProfilePermission
 {
     View,
-    Modify
+    Modify,
+    Delete
 }

@@ -47,7 +47,7 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
                 }
                 <div className="flex flex-col items-center">
                     <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold mx-auto">{searchProfile.name}</span>
-                    <div className="flex flex-row items-center">
+                    <div className="flex flex-row items-center gap-1">
                         {relationshipType !== undefined && <span className="text-(--secondary-fc) text-(length:--primary-fs) lowercase">{enums.formatRelationshipType(relationshipType)}</span>}
                         <div className="flex flex-row gap-0 items-center">
                             {

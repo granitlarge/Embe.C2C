@@ -68,7 +68,6 @@ public class GenerateCandidatesHandler
         foreach (var candidate in candidates)
         {
             var user = candidate.CandidateUser!;
-            var userSearchProfileId = candidate.UserSearchProfileId;
             var candidateSearchProfile = candidate.CandidateSearchProfile!;
 
             _userAuthorizationFactStore.SetCandidateUserFact(user.Id, true);
@@ -81,7 +80,8 @@ public class GenerateCandidatesHandler
             {
                 throw new InvalidOperationException($"User DTO for user {user.Id} or candidate search profile DTO is null.");
             }
-            dtos.Add(new GeneratedCandidate(userDto, userSearchProfileId, candidateSearchProfileDto));
+
+            dtos.Add(new GeneratedCandidate(candidate.Id, userDto, candidate.UserSearchProfileId, candidateSearchProfileDto));
         }
 
         var result = Result<List<GeneratedCandidate>>.Success(dtos);
@@ -91,6 +91,7 @@ public class GenerateCandidatesHandler
 
 public record GeneratedCandidate
 (
+    Guid Id,
     ReadDto<UserDto, UserPermission> Candidate,
     Guid UserSearchProfileId,
     ReadDto<SearchProfileDto, SearchProfilePermission> CandidateSearchProfile
