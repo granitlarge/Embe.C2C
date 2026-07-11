@@ -3,7 +3,7 @@ import { RefreshAccessTokenResponse, Token } from "./shared/security/types";
 import * as jwtdecode from "jwt-decode";
 import { AccessTokenName, RefreshTokenName, TokenCookieOptions } from "./shared/security/constants";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith("/protected")) {
         const accessToken = await getAccessToken(request);
         if (!accessToken) {
