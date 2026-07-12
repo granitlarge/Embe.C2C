@@ -179,7 +179,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                     throw new Error("not implemented");
                 }
 
-                router.push("/protected/search-profile/" + createSearchProfileResponse.value?.data.id);
+                router.replace("/protected/search-profile/" + createSearchProfileResponse.value?.data.id);
 
             }
 
