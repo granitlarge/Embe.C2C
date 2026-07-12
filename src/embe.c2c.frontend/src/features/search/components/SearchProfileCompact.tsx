@@ -38,7 +38,7 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
     const active = searchProfile.active;
 
     return (
-        <Surface variant="tertiary" padding="md" className="relative w-full flex flex-col gap-3" onClick={() => {
+        <Surface variant="secondary" padding="md" className="relative w-full flex flex-col gap-3" onClick={() => {
             router.push(`/protected/search-profile/${searchProfile.id}`);
         }}>
             <>
