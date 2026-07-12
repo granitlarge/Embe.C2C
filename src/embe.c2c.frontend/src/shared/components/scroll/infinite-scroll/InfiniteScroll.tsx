@@ -44,6 +44,41 @@ export function InfiniteScroll({ className, children, callback, direction = "dow
 
     useEffect(() => {
 
+        if (!surface.current || !window.visualViewport) {
+            return;
+        }
+
+        const viewport = window.visualViewport;
+
+        const handler = () => {
+            if (positionRef.current === "end") {
+                requestAnimationFrame(() => {
+                    if (positionRef.current === "start") {
+                        surface.current?.scrollTo({
+                            top: direction === "up" ? surface.current.scrollHeight : 0,
+                        })
+
+                    } else if (positionRef.current === "end") {
+                        surface.current?.scrollTo({
+                            top: direction === "down" ? surface.current.scrollHeight : 0,
+                        })
+                    }
+                })
+            }
+        };
+
+        viewport.addEventListener("resize", handler);
+        viewport.addEventListener("scroll", handler);
+
+        return () => {
+            viewport.removeEventListener("resize", handler);
+            viewport.removeEventListener("scroll", handler);
+        }
+
+    }, []);
+
+    useEffect(() => {
+
         const cleanupScrollPositionListener = setupScrollPositionListener();
 
         return () => {
