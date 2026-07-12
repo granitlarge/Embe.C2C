@@ -21,7 +21,16 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb"
     }
   },
-  allowedDevOrigins: ['192.168.8.7']
+  allowedDevOrigins: ['192.168.8.7'],
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/protected/search",
+        permanent: false
+      }
+    ]
+  }
 };
 
 export default nextConfig;
