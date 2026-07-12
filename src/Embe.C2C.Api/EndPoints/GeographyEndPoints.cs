@@ -9,7 +9,7 @@ public static class GeographyEndpoints
 {
     public static void MapGeographyEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/geography").RequireAuthorization();
+        var group = app.MapGroup("/api/geography");
         group.MapGet("", SearchAdminAreas);
         group.MapGet("/{id}", GetAdminAreaById);
         group.MapGet("/country", GetCountryAdminAreas);

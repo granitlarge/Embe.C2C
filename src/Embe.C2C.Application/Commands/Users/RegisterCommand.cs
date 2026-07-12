@@ -14,8 +14,10 @@ public record CreateImageDto
 public sealed record RegisterCommand
 (
     string Email,
-    string Alias,
     string Password,
+    string Alias,
+    Gender Gender,
+    LocationWriteDto Location,
     DateOnly BirthDate
 );
 

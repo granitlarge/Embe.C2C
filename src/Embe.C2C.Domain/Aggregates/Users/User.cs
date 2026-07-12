@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Candidates;
-using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users.Events;
@@ -19,8 +18,8 @@ public class User : Aggregate
         Email email,
         Alias alias,
         BirthDate birthDate,
-        Gender? gender,
-        ValueObjects.Location? location,
+        Gender gender,
+        ValueObjects.Location location,
         ImmutableHashSet<ImageDetails>? files,
         string? bio,
         string identityUserId
@@ -42,7 +41,7 @@ public class User : Aggregate
         Alias = alias;
         BirthDate = birthDate;
         Gender = gender;
-        Coordinates = location != null ? new Point(location.Longitude, location.Latitude) { SRID = 4326 } : null;
+        Coordinates = new Point(location.Longitude, location.Latitude) { SRID = 4326 };
         Bio = bio;
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
@@ -72,9 +71,9 @@ public class User : Aggregate
     public Alias Alias { get; private set; }
     public BirthDate BirthDate { get; private set; }
     public Age Age => new(BirthDate);
-    public Gender? Gender { get; private set; }
-    public Point? Coordinates { get; private set; }
-    public ValueObjects.Location? Location => Coordinates != null ? new ValueObjects.Location(Coordinates.Y, Coordinates.X) : null;
+    public Gender Gender { get; private set; }
+    public Point Coordinates { get; private set; }
+    public ValueObjects.Location Location => new(Coordinates.Y, Coordinates.X);
 
     private readonly List<Entities.Image> _images;
     [NotMapped]
@@ -127,17 +126,17 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void UpdateGender(Guid actorId, Gender? newGender)
+    public void UpdateGender(Guid actorId, Gender newGender)
     {
         EnsureActorIsOwner(actorId);
         Gender = newGender;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void UpdateLocation(Guid actorId, ValueObjects.Location? newLocation)
+    public void UpdateLocation(Guid actorId, ValueObjects.Location newLocation)
     {
         EnsureActorIsOwner(actorId);
-        Coordinates = newLocation != null ? new Point(newLocation.Longitude, newLocation.Latitude) { SRID = 4326 } : null;
+        Coordinates = new Point(newLocation.Longitude, newLocation.Latitude) { SRID = 4326 };
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
@@ -200,8 +199,8 @@ public class User : Aggregate
         Email email,
         Alias alias,
         BirthDate birthDate,
-        Gender? gender,
-        ValueObjects.Location? location,
+        Gender gender,
+        ValueObjects.Location location,
         ImmutableHashSet<ImageDetails>? images,
         string? bio,
         string identityUserId

@@ -67,7 +67,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
             var alias = Alias.Create(command.Alias);
             var birthDate = new BirthDate(command.BirthDate);
             var gender = command.Gender;
-            var location = command.Location != null ? new Location(command.Location.Latitude, command.Location.Longitude) : null;
+            var location = new Location(command.Location.Latitude, command.Location.Longitude);
             var bio = string.IsNullOrWhiteSpace(command.Bio) ? null : command.Bio;
 
             var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);

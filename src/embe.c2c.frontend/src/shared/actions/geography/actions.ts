@@ -7,7 +7,7 @@ import { AdminArea } from "./types";
 export async function getAdminAreaById(id: string): Promise<ApiResponse<AdminArea, FailureReason>> {
     const response = await Read<AdminArea, FailureReason>(`${process.env.API_URL}/api/geography/${id}`, {
         method: "GET"
-    });
+    }, false);
     return response;
 }
 
@@ -15,7 +15,7 @@ export async function getCountryAdminAreas(): Promise<ApiResponse<AdminArea[], F
 
     const response = await Read<AdminArea[], FailureReason>(`${process.env.API_URL}/api/geography/country`, {
         method: "GET"
-    });
+    }, false);
 
     return response;
 
@@ -39,7 +39,8 @@ export async function searchAdminAreas(
         `${process.env.API_URL}/api/geography?${queryParams}`,
         {
             method: "GET"
-        }
+        },
+        false
     );
     return response;
 }
@@ -53,7 +54,8 @@ export async function reverseGeocode(longitude: number, latitude: number): Promi
             headers: {
                 "Content-Type": "application/json"
             }
-        }
+        },
+        false
     );
     return response;
 }

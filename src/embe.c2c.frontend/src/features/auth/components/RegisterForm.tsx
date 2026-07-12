@@ -161,9 +161,18 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
         alias: z.string({ message: "alias is required" }).min(1, { message: "alias is required" }),
         birthDate: z.string({ message: "birth date is required" }).min(1),
         location: z.object({
-
-        }).required(),
-        gender: z.enum(Gender)
+            longitude: z.number(),
+            latitude: z.number()
+        }, {
+            error: (issue) => {
+                return issue.input === undefined ? "location is required" : "invalid location";
+            }
+        }),
+        gender: z.enum(Gender, {
+            error: (issue) => {
+                return issue.input === undefined ? "gender is required" : "invalid gender";
+            }
+        })
     });
 
     const { lower, upper } = getValidBirthdateRange(18, 120);
@@ -186,7 +195,7 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
                 alias: properties?.alias?.errors?.[0],
                 birthDate: properties?.birthDate?.errors?.[0],
                 location: properties?.location?.errors?.[0],
-                gender: properties?.location?.errors?.[0]
+                gender: properties?.gender?.errors?.[0]
             });
             return;
         }
