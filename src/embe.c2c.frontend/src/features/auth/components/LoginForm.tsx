@@ -4,11 +4,11 @@ import Button from "@/src/shared/components/buttons/Button";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { useState } from "react";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
 import { signIn } from "../actions/sign-in/actions";
 import { SignInError } from "../actions/sign-in/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import Link from "@/src/shared/components/Links/Link";
+import { useRouter } from "nextjs-toploader/app";
 
 export type LoginFormProps = {
     className?: string;
