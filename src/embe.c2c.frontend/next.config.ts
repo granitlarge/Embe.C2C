@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         port: "10000",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "relationshipfindersa.blob.core.windows.net",
+        pathname: "/files/**", 
+      }
     ],
   },
   experimental: {
