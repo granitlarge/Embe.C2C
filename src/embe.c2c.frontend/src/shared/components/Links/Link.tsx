@@ -1,6 +1,8 @@
-import * as NextLink from "next/link"
+import { default as NextLink } from "next/link"
+import type { LinkProps as NextLinkProps } from "next/link"
 
-export type LinkProps = {
+type ExcludedProps = "href" | "children" | "className" | "title";
+export type LinkProps = Omit<NextLinkProps, ExcludedProps> & {
     className?: string;
     children?: React.ReactNode;
     href: string;
@@ -13,9 +15,9 @@ export default function Link({ title, href, className, children, ...props }: Lin
     ].filter(Boolean).join(" ");
 
     return (
-        <NextLink.default href={href} className={`${classNames} active:scale-95`} title={title} {...props}>
+        <NextLink href={href} className={`${classNames} active:scale-95`} title={title} {...props}>
             {children}
-        </NextLink.default>
+        </NextLink>
     )
 
 }

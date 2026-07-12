@@ -1,29 +1,22 @@
+import Link from "@/src/shared/components/Links/Link";
 import Surface, { SurfaceProps } from "@/src/shared/components/surfaces/Surface";
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
-import { User as UserIcon,  } from "@deemlol/next-icons";
-import Image from "next/image";
-import Link from "next/link";
-
-function shorten(str: string, maxLength: number) {
-    if (str.length <= maxLength) {
-        return str;
-    }
-    return str.slice(0, maxLength - 3) + "...";
-}
+import { User as UserIcon, } from "@deemlol/next-icons";
+import Image from "@/src/shared/components/images/Image";
 
 export type UserCompactProps = Omit<SurfaceProps<typeof Link>, "as" | "href" | "children"> & {
     className?: string;
     dto?: ReadDto<User, UserPermission>;
 }
-export function UserCompact({ className, dto, style, ...props }: UserCompactProps) {
+export function UserCompact({ className, dto, ...props }: UserCompactProps) {
     const classNames = [className].filter(Boolean).join(" ");
     const user = dto?.data;
     return (
         <>
             {
                 user?.id &&
-                <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={`/protected/user/${user?.id}`} style={style} {...props} variant="inherit">
+                <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={`/protected/user/${user?.id}`} {...props} variant="inherit">
                     {user?.alias && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs) font-bold">{user?.alias}</span>}
                     {
                         user?.profilePicture?.imageDetails?.url &&

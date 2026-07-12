@@ -1,7 +1,6 @@
 "use client";
 
 import Surface from "@/src/shared/components/surfaces/Surface"
-import Image from "next/image";
 import { useState } from "react";
 import Modal from "@/src/shared/components/modal/Modal";
 import ImageGalleryInput from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
@@ -10,6 +9,7 @@ import { Location } from "@/src/shared/types/domain/value-objects";
 import BasicProfileForm from "../../auth/components/BasicProfileForm";
 import { getValidBirthdateRange } from "@/src/shared/time";
 import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAreaInput";
+import Image from "@/src/shared/components/images/Image";
 
 export type ImageData = {
     id?: string,

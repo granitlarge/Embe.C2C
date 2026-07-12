@@ -1,6 +1,6 @@
 import React from "react";
-import Image from "next/image";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
+import Image from "@/src/shared/components/images/Image";
 import Surface from "../../../surfaces/Surface";
 import { X } from "@deemlol/next-icons";
 

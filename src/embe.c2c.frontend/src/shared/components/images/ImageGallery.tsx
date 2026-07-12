@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "@/src/shared/components/images/Image";
 import styles from "./ImageGallery.module.css";
 
 type PaginationDotsProps = {
@@ -36,9 +36,7 @@ function ImageGalleryImage({ src, alt, className }: ImageGalleryImageProps) {
         <Image
             src={src}
             alt={alt}
-            className={`${classNames} 
-            ${styles.image}
-            rounded-md`}
+            className={`${classNames} ${styles.image} rounded-md`}
             width={0}
             height={0}
             unoptimized={process.env.NODE_ENV === "development"}

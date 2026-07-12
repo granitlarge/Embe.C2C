@@ -3,8 +3,8 @@ import { formatTimeAgo } from "@/src/shared/time";
 import { MatchingCreatedNotification, MatchingRemovedNotification, NotificationType, Notification as NotificationTypeDef } from "@/src/shared/types/domain/aggregates";
 import { MailOpen, Mail } from "lucide-react";
 import { Trash2 } from "@deemlol/next-icons";
-import Image from "next/image";
 import Link from "@/src/shared/components/Links/Link";
+import Image from "@/src/shared/components/images/Image";
 
 type NotificationContent = {
     title: string;
