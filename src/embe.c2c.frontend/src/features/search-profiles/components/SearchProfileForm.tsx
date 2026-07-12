@@ -48,7 +48,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
 
         ageRange: (searchProfile?.ageRangeMin ? [searchProfile.ageRangeMin, searchProfile.ageRangeMax ?? maxAge] : [minAge, maxAge]) as [number, number | undefined],
         maximumDistanceKm: (searchProfile?.maximumDistanceKm ?? maxDistanceKm) as number | undefined,
-        genders: searchProfile?.genders ?? enums.enumerate(Gender).map(({ value }) => value),
+        genders: searchProfile?.genders ?? [] as Gender[],
         active: searchProfile?.active ?? true,
         createdAt: searchProfile?.createdAt,
         updatedAt: searchProfile?.updatedAt
