@@ -214,7 +214,7 @@ public class C2CContext
         )
         and (
             exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id" and spg."Gender" = u."Gender") or
-            not exists (select * from "SearchProfileGender" spg where spg."SearchProfileID" = csp."Id")
+            not exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id")
         )
         and extract(year from age(CURRENT_DATE, u."BirthDate")) between coalesce(csp."AgeRangeMin", 18) and coalesce(csp."AgeRangeMax", 120)
         and extract(year from age(CURRENT_DATE, c."BirthDate")) between coalesce(usp."AgeRangeMin", 18) and coalesce(usp."AgeRangeMax", 120)
