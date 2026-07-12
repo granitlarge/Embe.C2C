@@ -71,7 +71,7 @@ export default function LoginForm({ className }: LoginFormProps) {
     }
     const passwordLabel = <>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></>;
     return (
-        <Surface className={`form w-[600px] max-w-full ${classNames}`} variant="secondary">
+        <Surface className={`form w-[600px] max-w-full ${classNames} relative`} variant="secondary">
             <TextInput
                 label="email"
                 type="email"
@@ -89,6 +89,7 @@ export default function LoginForm({ className }: LoginFormProps) {
                 }} />
             {error && <span className="error-message">{error}</span>}
             <Button onClick={login}>login</Button>
+            <Link className="absolute right-2 top-2" href={"/public/register"}>register</Link>
         </Surface>
     )
 

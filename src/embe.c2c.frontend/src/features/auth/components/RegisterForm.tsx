@@ -330,7 +330,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     return (
         <Surface className={`form flex flex-col gap-5 p-0 ${classNames} w-600px max-w-full`} variant="secondary">
             {step !== "account exists" && <ProgressBar steps={steps} progress={steps.indexOf(step) + 1} onClick={(index) => { navigate(steps[index]) }} />}
-            {step === "account exists" && <span className="mx-auto">{step}</span>}
+            {step === "account exists" && <span className="mx-auto label">{step}</span>}
             <EmailStep
                 hidden={step !== "email"}
                 finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}
