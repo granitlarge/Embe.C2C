@@ -39,25 +39,13 @@ export default function Modal({ children, className, closed, hidden, header, ...
                 ${classNames}
                 flex flex-col items-center gap-0
                 ${styles.modal}
-                flex 
-                flex-col 
                 m-auto 
                 rounded-lg 
                 scrollbar-gutter-stable
                 `}
             onClick={(e) => {
-                const dialog = e.currentTarget;
-                const rect = dialog.getBoundingClientRect();
-
-                const isInDialog =
-                    e.clientX >= rect.left &&
-                    e.clientX <= rect.right &&
-                    e.clientY >= rect.top &&
-                    e.clientY <= rect.bottom;
-
-                if (!isInDialog) {
-                    close();
-                    dialog.close();
+                if (e.target === e.currentTarget) {
+                    dialog.current?.close();
                 }
             }}
             {...props}

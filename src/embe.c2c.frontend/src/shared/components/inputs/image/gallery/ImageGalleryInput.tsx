@@ -20,7 +20,7 @@ function MyImage({ id, src, onRemove }: MyImageProps) {
     return (
         <div ref={droppableRef}>
             <div ref={draggableRef} className="relative">
-                <Image src={src} alt={"An Image"} className={`w-30 h-40 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
+                <Image src={src} alt={"An Image"} className={`w-20 h-30 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
                 <button onClick={onRemove} className="button bg-gray-300 absolute top-0 right-0 -m-3 rounded-full max-w-max max-h-max flex items-center justify-center">
                     <X className="text-(--primary-fc) w-[12px] h-[12px]" />
                 </button>
@@ -31,9 +31,10 @@ function MyImage({ id, src, onRemove }: MyImageProps) {
 
 type ImageSelectorProps = {
     onImageSelected?: (image: { url: string, mimeType: string }[]) => void;
+    className?: string;
 }
 
-function ImageSelector({ onImageSelected }: ImageSelectorProps) {
+function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
 
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -56,7 +57,6 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
                 reader.readAsDataURL(file);
             });
         }
-
     }
 
     function onClick() {
@@ -66,7 +66,7 @@ function ImageSelector({ onImageSelected }: ImageSelectorProps) {
 
     return (
         <Surface
-            className="relative w-30 h-40 flex items-center justify-center cursor-pointer relative rounded-lg" onClick={onClick}
+            className={`relative w-20 h-30 flex items-center justify-center cursor-pointer relative rounded-lg ${className}`} onClick={onClick}
             variant="tertiary">
             <input ref={inputRef} type="file" multiple className="hidden" accept="image/*" onChange={onChange} />
             <span className="text-3xl text-(--secondary-fc)">+</span>

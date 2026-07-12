@@ -23,7 +23,7 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
     return (
         <>
             {
-                isLoading && 
+                isLoading &&
                 <div className="w-full h-[150px] flex items-center justify-center">
                     <Loader className="animate-spin w-(--primary-fs) h-(--primary-fs) mx-auto my-auto" />
                 </div>

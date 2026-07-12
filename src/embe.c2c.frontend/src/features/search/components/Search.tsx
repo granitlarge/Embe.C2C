@@ -90,7 +90,7 @@ export default function Search({ candidates: initialCandidates, className, hasSe
                 !hasSearchProfiles &&
                 <div className="grow-1 flex flex-col justify-center items-center">
                     <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">find people that match your vibe by</span>
-                    <Link className="text-(length:--primary-fs) font-bold" href="/protected/search-profile">creating a search profile</Link>
+                    <Link className="text-(length:--primary-fs) font-bold" href="/protected/search-profile/new">creating a search profile</Link>
                 </div>
             }
             <MainNav className="grow-0" />

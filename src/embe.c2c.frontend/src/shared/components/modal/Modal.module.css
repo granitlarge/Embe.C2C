@@ -1,7 +1,5 @@
 .modal {
-    min-width: 768px;
-    min-height:70%;
-    position: relative;
+
 }
 
 .modal::backdrop {
@@ -10,8 +8,7 @@
 
 @media (max-width: 832px) {
     .modal {
-        min-width: 0px;
-        height: 100dvh;
-        width: 100dvw;
+        height: 80%;
+        width: 85%;
     }
 }
