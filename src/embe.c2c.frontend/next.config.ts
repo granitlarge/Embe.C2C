@@ -15,11 +15,8 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb"
     }
-  }
+  },
+  allowedDevOrigins: ['192.168.8.7']
 };
-
-module.exports = {
-  allowedDevOrigins: ['192.168.8.7'],
-}
 
 export default nextConfig;
