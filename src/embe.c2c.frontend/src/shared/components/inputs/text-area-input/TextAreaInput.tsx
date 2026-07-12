@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./TextAreaInput.module.css";
+import ErrorMessage from "../ErrorMessage";
 
 export type TextAreaInputSize = "sm" | "md" | "lg";
 export type TextAreaInputProps = Omit<React.PropsWithoutRef<React.TextareaHTMLAttributes<HTMLTextAreaElement>>, 'onBlur'> & {
@@ -45,7 +46,7 @@ export default function TextAreaInput({ initialValue, onBlur, label, className, 
                 {...props}
             >
             </textarea>
-            {errorMessage && <span className="mx-auto text-(length:--primary-fs) text-(--error-fc)">{errorMessage}</span>}
+            <ErrorMessage message={errorMessage} />
         </div>
     )
 }

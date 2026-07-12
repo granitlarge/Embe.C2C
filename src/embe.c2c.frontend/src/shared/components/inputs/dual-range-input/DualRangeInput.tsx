@@ -1,5 +1,6 @@
 import * as Slider from '@radix-ui/react-slider';
 import Surface from '../../surfaces/Surface';
+import ErrorMessage from '../ErrorMessage';
 
 export type DualRangeInputProps = {
     label: string;
@@ -10,9 +11,10 @@ export type DualRangeInputProps = {
     value?: [number, number];
     minStepsBetweenThumbs?: number;
     onChange: (value: [number, number]) => void;
+    errorMessage?: string;
 }
 
-export default function DualRangeInput({ label, className, min, max, step, value, minStepsBetweenThumbs, onChange }: DualRangeInputProps) {
+export default function DualRangeInput({ errorMessage, label, className, min, max, step, value, minStepsBetweenThumbs, onChange }: DualRangeInputProps) {
 
     const classNames = [
         className
@@ -42,6 +44,7 @@ export default function DualRangeInput({ label, className, min, max, step, value
                     <span className="absolute -bottom-6 right-0 text-(--primary-fc)">{value ? value[1] : max}{value && value[1] == max ? "+" : ""}</span>
                 </Slider.Thumb>
             </Slider.Root>
+            <ErrorMessage message={errorMessage} />
         </Surface>
     )
 

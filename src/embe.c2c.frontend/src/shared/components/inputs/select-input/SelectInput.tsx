@@ -1,5 +1,6 @@
 import Surface from "../../surfaces/Surface";
 import CheckboxInput from "../checkbox-input/CheckBoxInput";
+import ErrorMessage from "../ErrorMessage";
 import { InputProps } from "../text-input/TextInput";
 
 export type Option = {
@@ -59,7 +60,7 @@ export default function SelectInput({ options, value, onChange, label, className
                         />)
                 }
             </div>
-            {errorMessage && <span className="max-auto text-(--error-fc)">{errorMessage}</span>}
+            <ErrorMessage message={errorMessage} />
         </Surface>
     )
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Surface from "../../surfaces/Surface";
+import ErrorMessage from "../ErrorMessage";
 
 export type DateInputProps = {
     minDate?: string;
@@ -37,7 +38,7 @@ export default function DateInput({ label, initialValue, onBlur, minDate, maxDat
                 min={minDate}
                 max={maxDate}
                 required={required} />
-            {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
+            <ErrorMessage message={errorMessage} />
         </Surface>
     )
 

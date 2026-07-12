@@ -3,6 +3,7 @@ import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
 import Image from "@/src/shared/components/images/Image";
 import Surface from "../../../surfaces/Surface";
 import { X } from "@deemlol/next-icons";
+import ErrorMessage from "../../ErrorMessage";
 
 type MyImageProps = {
     id: string;
@@ -121,7 +122,7 @@ export default function ImageGalleryInput<T extends Image = Image>({ data, error
                 }
                 <ImageSelector onImageSelected={(image) => onChange?.([...images.map(({ __id, ...image }) => image), ...image])} />
             </div>
-            {error?.images && <span className="text-(--error-fc)">{error.images}</span>}
+            <ErrorMessage message={error?.images} />
         </DragDropProvider>
     )
 

@@ -1,3 +1,5 @@
+import ErrorMessage from "../ErrorMessage";
+
 export type Option = {
     label: string;
     value: string;
@@ -33,7 +35,7 @@ export default function DropDownInput({ className, label, options, value, onChan
                     ))
                 }
             </select>
-            {errorMessage && <span className="mx-auto text-(length:--primary-fs) text-(--error-fc)">{errorMessage}</span>}
+            <ErrorMessage message={errorMessage} />
         </div>
     )
 }

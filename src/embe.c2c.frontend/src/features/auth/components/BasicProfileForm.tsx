@@ -67,6 +67,7 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
             {
                 config.birthDate &&
                 <DateInput
+                    errorMessage={error?.birthDate}
                     label={"date of birth"}
                     minDate={data.birthDateRange.lower}
                     maxDate={data.birthDateRange.upper}
@@ -77,6 +78,7 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
             {
                 config.gender &&
                 <SelectInput
+                    errorMessage={error?.gender}               
                     optionClassName="lowercase"
                     multiple={false}
                     options={genderOptions}
@@ -88,6 +90,7 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
             {
                 config.location &&
                 <LocationInput
+                    errorMessage={error?.location}
                     value={data.location}
                     onChange={(location) => { onChange({ ...data, location }) }}
                 />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Surface from "../../surfaces/Surface";
+import ErrorMessage from "../ErrorMessage";
 
 export type InputProps = {
     errorMessage?: string;
@@ -42,7 +43,7 @@ export default function TextInput({
                 onChange={(e) => { setValue(e.target.value); }}
                 onBlur={(e) => { onBlur?.(value) }}
             />
-            {errorMessage && <span className="mx-auto text-(length:--primary-fs) text-(--error-fc)">{errorMessage}</span>}
+            <ErrorMessage message={errorMessage} />
             {children}
         </Surface>
     )

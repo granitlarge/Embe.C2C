@@ -158,7 +158,12 @@ type BasicProfileStepProps = {
 function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
 
     const validationSchema = z.object({
-        alias: z.string({ message: "alias is required" }).min(1, { message: "alias is required" })
+        alias: z.string({ message: "alias is required" }).min(1, { message: "alias is required" }),
+        birthDate: z.string({ message: "birth date is required" }).min(1),
+        location: z.object({
+
+        }).required(),
+        gender: z.enum(Gender)
     });
 
     const { lower, upper } = getValidBirthdateRange(18, 120);
@@ -166,7 +171,9 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
     const [profileData, setProfileData] = useState<BasicProfileFormData>({
         birthDateRange: { lower, upper },
         birthDate: upper,
-        alias: ""
+        alias: "",
+        location: undefined,
+        gender: undefined
     });
 
     const [profileError, setProfileError] = useState<BasicProfileFormError | undefined>(undefined);
@@ -175,7 +182,12 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
         const result = validationSchema.safeParse(profileData);
         if (!result.success) {
             const properties = z.treeifyError(result.error).properties;
-            setProfileError({ alias: properties?.alias?.errors?.[0] });
+            setProfileError({
+                alias: properties?.alias?.errors?.[0],
+                birthDate: properties?.birthDate?.errors?.[0],
+                location: properties?.location?.errors?.[0],
+                gender: properties?.location?.errors?.[0]
+            });
             return;
         }
         setProfileError(undefined);
@@ -188,6 +200,12 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
             data={profileData}
             onChange={setProfileData}
             error={profileError}
+            config={{
+                alias: true,
+                birthDate: true,
+                gender: true,
+                location: true
+            }}
         >
             <Button onClick={onNext}>finish</Button>
         </BasicProfileForm>

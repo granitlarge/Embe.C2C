@@ -9,6 +9,7 @@ import { AdminArea } from "@/src/shared/actions/geography/types";
 import { getAdminAreaById, getCountryAdminAreas, reverseGeocode, searchAdminAreas } from "@/src/shared/actions/geography/actions";
 import { Loader } from "@deemlol/next-icons";
 import Surface from "../../surfaces/Surface";
+import ErrorMessage from "../ErrorMessage";
 
 type LocationInputExactProps = {
     value?: Location;
@@ -425,6 +426,7 @@ export default function LocationInput({ errorMessage, value, onChange, className
                     <LocationInputApproximate value={value} onChange={onChange} className={classNames} />
                 </Tabs.Content>
             </Tabs.Root>
+            <ErrorMessage message={errorMessage} />
         </div>
 
     )

@@ -1,4 +1,5 @@
 import Surface from "../../surfaces/Surface";
+import ErrorMessage from "../ErrorMessage";
 
 export type EmailInputProps = {
     className?: string;
@@ -30,7 +31,7 @@ export function EmailInput({
                 value={value ?? ""}
                 onChange={(e) => onChange?.(e.target.value)}
             />
-            {errorMessage && <span className="mx-auto text-(--error-fc)">{errorMessage}</span>}
+            <ErrorMessage message={errorMessage} />
         </Surface>
     )
 }
