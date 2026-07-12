@@ -22,5 +22,4 @@ module.exports = {
   allowedDevOrigins: ['192.168.8.7'],
 }
 
-
 export default nextConfig;
