@@ -79,7 +79,7 @@ public class UpdateSearchProfileHandler
                 command.Engagement.EndDate
             );
 
-            var genders = command.Genders.Count > 0 ? command.Genders : [.. Enum.GetValues<Gender>()];
+            var genders = command.Genders.Count == Enum.GetValues<Gender>().Length ? [] : command.Genders;
             var ageRangeMin = command.AgeRangeMin is not null ? new Age(command.AgeRangeMin.Value) : null;
             var ageRangeMax = command.AgeRangeMax is not null ? new Age(command.AgeRangeMax.Value) : null;
             var distance = command.MaximumDistanceKm is not null ? new Distance(command.MaximumDistanceKm.Value, LengthUnit.Kilometers) : null;
