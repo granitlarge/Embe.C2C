@@ -1,4 +1,4 @@
-import { generateCandidates } from "@/src/features/search/actions/action";
+import { generateCandidates, getAllSearchProfiles } from "@/src/features/search/actions/action";
 import Search from "@/src/features/search/components/Search";
 import { getHasSearchProfile } from "@/src/shared/actions/user/action";
 
@@ -8,7 +8,8 @@ export type SearchPageProps = {
 export default async function SearchPage({ }: SearchPageProps) {
 
     const getCandidatesResponse = await generateCandidates();
-    if (!getCandidatesResponse.success) {
+    const getAllSearchProfilesResponse = await getAllSearchProfiles(1, 10_000);
+    if (!getCandidatesResponse.success || !getAllSearchProfilesResponse.success) {
         throw new Error("not implemented");
     }
 
@@ -23,6 +24,7 @@ export default async function SearchPage({ }: SearchPageProps) {
 
     return (
         <Search
+            searchProfiles={getAllSearchProfilesResponse.value ?? []}
             className="grow-1 overflow-y-scroll scrollbar-none"
             candidates={getCandidatesResponse.value || []}
             hasSearchProfiles={hasSearchProfiles} 

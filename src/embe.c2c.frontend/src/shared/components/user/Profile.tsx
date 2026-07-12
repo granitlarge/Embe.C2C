@@ -43,7 +43,7 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
         className
     ].filter(Boolean).join(" ")
     return (
-        <Surface className={`w-full flex flex-col gap-2 ${classNames}`} padding="md" variant="secondary">
+        <Surface className={`w-full flex flex-col gap-0 ${classNames}`} padding="md" variant="secondary">
             {
                 userSearchProfile?.name &&
                 <Surface className="mx-auto w-full flex flex-col" variant="tertiary" padding="sm">
@@ -53,22 +53,22 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
                 </Surface>
             }
             <ImageGallery className="h-[300px]" imageUrls={candidate.images?.sort((a, b) => a.imageDetails.order - b.imageDetails.order).map(i => i.imageDetails.url) ?? []} />
-            <ProfileShortInfo className="bottom-2 left-2" user={candidate} searchProfile={candidateSearchProfile!} />
-            {
-                candidate.bio &&
-                <div className="flex flex-col gap-1">
-                    <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold mx-auto">bio</span>
-                    <Surface className="flex flex-col gap-1" padding="sm" variant="tertiary">
-                        <p className="wrap-anywhere whitespace-pre-wrap text-(--primary-fc) text-(length:--primary-fs)">{candidate.bio}</p>
-                    </Surface>
-                </div>
-            }
+            <ProfileShortInfo user={candidate} searchProfile={candidateSearchProfile!} />
             {
                 candidateSearchProfile &&
                 <div className="flex flex-col gap-1">
                     <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold mx-auto">looking for</span>
                     <Surface className="flex flex-col gap-1" padding="sm" variant="tertiary">
                         <p className="wrap-anywhere whitespace-pre-wrap text-(--primary-fc) text-(length:--primary-fs)">{candidateSearchProfile.description}</p>
+                    </Surface>
+                </div>
+            }
+            {
+                candidate.bio &&
+                <div className="flex flex-col gap-1">
+                    <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold mx-auto">bio</span>
+                    <Surface className="flex flex-col gap-1" padding="sm" variant="tertiary">
+                        <p className="wrap-anywhere whitespace-pre-wrap text-(--primary-fc) text-(length:--primary-fs)">{candidate.bio}</p>
                     </Surface>
                 </div>
             }

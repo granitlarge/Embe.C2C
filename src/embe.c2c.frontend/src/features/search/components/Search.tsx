@@ -9,6 +9,8 @@ import { SlidersHorizontal } from "lucide-react";
 import { GeneratedCandidate } from "../actions/type";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
+import { ReadDto } from "@/src/shared/types/dtos/types";
+import { SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;
@@ -34,11 +36,12 @@ function Header({ hasSearchProfiles }: HeaderProps) {
 }
 
 export type SearchProps = {
+    searchProfiles: ReadDto<SearchProfile, SearchProfilePermission>[];
     hasSearchProfiles: boolean;
     candidates: GeneratedCandidate[];
     className?: string;
 }
-export default function Search({ candidates: initialCandidates, className, hasSearchProfiles }: SearchProps) {
+export default function Search({ searchProfiles, candidates: initialCandidates, className, hasSearchProfiles }: SearchProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
 
@@ -76,7 +79,7 @@ export default function Search({ candidates: initialCandidates, className, hasSe
                     {
                         candidates[0] &&
                         <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
-                            <Profile className="grow-1" candidate={candidates[0].candidate.data} candidateSearchProfile={candidates[0].candidateSearchProfile.data} />
+                            <Profile className="grow-1" userSearchProfile={searchProfiles.find(sp => sp.data.id === candidates[0].userSearchProfileId)?.data} candidate={candidates[0].candidate.data} candidateSearchProfile={candidates[0].candidateSearchProfile.data} />
                         </JudgeOverlay>
                     } {
                         !candidates[0] &&
