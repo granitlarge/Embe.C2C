@@ -7,8 +7,8 @@ import Profile from "@/src/shared/components/user/Profile";
 import MainNav from "@/src/shared/components/nav/MainNav";
 import { SlidersHorizontal } from "lucide-react";
 import { GeneratedCandidate } from "../actions/type";
-import { useRouter } from "next/navigation";
 import Link from "@/src/shared/components/Links/Link";
+import { useRouter } from "nextjs-toploader/app";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;

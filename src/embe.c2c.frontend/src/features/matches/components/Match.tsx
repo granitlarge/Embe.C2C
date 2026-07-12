@@ -16,8 +16,8 @@ import { MessageCrafter } from "./MessageCrafter";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { Ellipsis } from "lucide-react";
 import Button from "@/src/shared/components/buttons/Button";
-import { useRouter } from "next/navigation";
 import Link from "@/src/shared/components/Links/Link";
+import { useRouter } from "nextjs-toploader/app";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());

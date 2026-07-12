@@ -15,9 +15,9 @@ import { EngagementBoundedness, EngagementFrequency, EngagementMedium, Gender, R
 import { useState } from "react";
 import * as z from "zod";
 import { createSearchProfile as createSearchProfile, deleteSearchProfile, updateSearchProfile } from "../actions";
-import { useRouter } from "next/navigation";
 import { SearchProfile } from "@/src/shared/types/domain/aggregates";
 import CheckboxInput from "@/src/shared/components/inputs/checkbox-input/CheckBoxInput";
+import { useRouter } from "nextjs-toploader/app";
 
 export type SearchProfileFormProps = {
     className?: string;

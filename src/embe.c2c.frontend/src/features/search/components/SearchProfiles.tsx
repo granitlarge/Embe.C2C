@@ -9,7 +9,7 @@ import { getAllSearchProfiles } from "../actions/action";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import Button from "@/src/shared/components/buttons/Button";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 export type SearchProfilesProps = {
     className?: string;

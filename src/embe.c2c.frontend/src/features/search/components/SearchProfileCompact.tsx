@@ -6,7 +6,6 @@ import { ReadDto } from "@/src/shared/types/dtos/types";
 import * as enums from "@/src/shared/enums";
 import { EngagementBoundedness, EngagementMedium, Gender, RelationshipType } from "@/src/shared/types/domain/value-objects";
 import { ArrowRight, Calendar, Clock, Globe, Handshake, Heart, Mars, Radius, Transgender, Users, Venus } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 function Chip({ children }: { children: React.ReactNode }) {
     return (

@@ -7,7 +7,6 @@ import ProgressBar from "@/src/shared/components/progress-bar/ProgressBar";
 import ImageGalleryInput from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
 import * as z from "zod";
 import { accountExists as accountExists } from "../actions/account-exists/actions";
-import { useRouter } from "next/navigation";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { register } from "@/src/features/auth/actions/register/actions";
 import { Gender } from "@/src/shared/types/domain/value-objects";
