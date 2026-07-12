@@ -24,7 +24,7 @@ export default function Button({ onClick, intent = "default", ...props }: Button
     ].filter(Boolean).join(" ");
 
     return (
-        <button {...props} className={classNames} onClick={async () => {
+        <button {...props} className={`${classNames} active:scale-95`} onClick={async () => {
             setLoading(true);
             const result = onClick?.();
             if (result instanceof Promise) {

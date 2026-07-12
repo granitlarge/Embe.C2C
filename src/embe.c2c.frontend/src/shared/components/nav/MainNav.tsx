@@ -1,8 +1,8 @@
 "use client";
 
 import { Users, Heart, MessageCircle, User } from "lucide-react";
-import Link from "next/link";
 import Surface from "../surfaces/Surface";
+import Link from "../Links/Link";
 
 export type MainNavProps = {
     className?: string;

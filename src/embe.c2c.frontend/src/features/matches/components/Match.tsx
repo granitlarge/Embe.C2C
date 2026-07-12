@@ -13,11 +13,11 @@ import Surface from "@/src/shared/components/surfaces/Surface";
 import { getOrCreateConnection } from "@/src/shared/signal-r";
 import { HubConnection } from "@microsoft/signalr";
 import { MessageCrafter } from "./MessageCrafter";
-import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { Ellipsis } from "lucide-react";
 import Button from "@/src/shared/components/buttons/Button";
 import { useRouter } from "next/navigation";
+import Link from "@/src/shared/components/Links/Link";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());

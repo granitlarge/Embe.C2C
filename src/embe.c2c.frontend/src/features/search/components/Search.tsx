@@ -5,14 +5,10 @@ import JudgeOverlay from "./JudgeOverlay";
 import * as api from "../actions/action";
 import Profile from "@/src/shared/components/user/Profile";
 import MainNav from "@/src/shared/components/nav/MainNav";
-import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
-import Modal from "@/src/shared/components/modal/Modal";
-import SearchProfiles from "./SearchProfiles";
 import { GeneratedCandidate } from "../actions/type";
-import Button from "@/src/shared/components/buttons/Button";
-import { Plus } from "@deemlol/next-icons";
 import { useRouter } from "next/navigation";
+import Link from "@/src/shared/components/Links/Link";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;

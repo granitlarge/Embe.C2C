@@ -4,7 +4,7 @@ import { MatchingCreatedNotification, MatchingRemovedNotification, NotificationT
 import { MailOpen, Mail } from "lucide-react";
 import { Trash2 } from "@deemlol/next-icons";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/src/shared/components/Links/Link";
 
 type NotificationContent = {
     title: string;
