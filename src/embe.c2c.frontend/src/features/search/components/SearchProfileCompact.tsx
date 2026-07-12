@@ -116,17 +116,20 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
                             <span className="text-(--primary-fc) text-(length:--primary-fs)">{distance}</span>
                         </Chip>
                     }
-                    <Chip>
-                        {
-                            genders.some(gender => gender === Gender.Male) && <Mars className="w-5 h-5" />
-                        }
-                        {
-                            genders.some(gender => gender === Gender.Female) && <Venus className="w-5 h-5" />
-                        }
-                        {
-                            genders.some(gender => gender === Gender.TransFemale || gender === Gender.TransMale) && <Transgender className="w-5 h-5" />
-                        }
-                    </Chip>
+                    {
+                        genders.length > 0 &&
+                        <Chip>
+                            {
+                                genders.some(gender => gender === Gender.Male) && <Mars className="w-5 h-5" />
+                            }
+                            {
+                                genders.some(gender => gender === Gender.Female) && <Venus className="w-5 h-5" />
+                            }
+                            {
+                                genders.some(gender => gender === Gender.TransFemale || gender === Gender.TransMale) && <Transgender className="w-5 h-5" />
+                            }
+                        </Chip>
+                    }
                 </div>
             </>
         </Surface>
