@@ -56,7 +56,7 @@ export default function LoginForm({ className }: LoginFormProps) {
 
             } else {
 
-                router.push("/protected/search");
+                router.replace("/protected/search");
 
             }
 
