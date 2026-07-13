@@ -50,9 +50,7 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
                     active !== undefined && !active &&
                     <span className={`absolute right-3 top-3 w-2 h-2 rounded-full bg-(--inactive-color) mb-auto`} />
                 }
-                <div className="flex flex-col items-center">
-                    <h3>{searchProfile.name}</h3>
-                </div>
+                <h3 className="mx-auto">{searchProfile.name}</h3>
                 <div className="flex flex-row gap-2 flex-wrap justify-start items-center">
                     {
                         relationshipType !== undefined &&
