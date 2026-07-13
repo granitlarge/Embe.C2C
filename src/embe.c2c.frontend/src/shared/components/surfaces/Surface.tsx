@@ -1,7 +1,7 @@
 import React from "react";
 
 export type Padding = "none" | "xs" | "sm" | "md" | "lg";
-export type Variant = "primary" | "secondary" | "tertiary" | "inherit" | "none";
+export type Variant = "primary" | "secondary" | "tertiary" | "quaternary" | "inherit" | "none";
 
 export type SurfaceProps<T extends React.ElementType = "div"> = {
     className?: string;

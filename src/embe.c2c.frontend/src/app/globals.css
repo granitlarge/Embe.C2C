@@ -39,6 +39,13 @@
     --tertiary-border-color: var(--tertiary-fc-primary);
     --tertiary-error-fc: rgb(255, 0, 0);
 
+    --quaternary-bg: rgb(218, 220, 242);
+    --tertiary-fc-primary: black;
+    --tertiary-fc-secondary: rgb(49, 49, 49);
+    --tertiary-fc-tertiary: rgb(85, 85, 85);
+    --tertiary-border-color: var(--tertiary-fc-primary);
+    --tertiary-error-fc: rgb(255, 0, 0);
+
     --message-bg: rgb(191, 188, 255);
     --message-fc-primary: black;
     --message-fc-secondary: black;
@@ -181,6 +188,17 @@
     --tertiary-fc: var(--tertiary-fc-tertiary);
     --error-fc: var(--tertiary-error-fc);
     --border-color: var(--tertiary-border-color);
+  }
+
+  .surface-quaternary {
+    background-color: var(--quaternary-bg);
+    color: var(--quaternary-fc-primary);
+    --primary-fc: var(--quaternary-fc-primary);
+    --secondary-fc: var(--quaternary-fc-secondary);
+    --tertiary-fc: var(--quaternary-fc-quaternary);
+    --error-fc: var(--quaternary-error-fc);
+    --border-color: var(--quaternary-border-color);
+
   }
 
   .surface-message {

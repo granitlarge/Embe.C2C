@@ -10,7 +10,7 @@ import { useRouter } from "nextjs-toploader/app";
 
 function Chip({ children }: { children: React.ReactNode }) {
     return (
-        <Surface className="flex gap-1 items-center p-1" variant="primary" padding="none">
+        <Surface className="flex gap-1 items-center p-1" variant="tertiary" padding="none">
             {children}
         </Surface>
     )
