@@ -8,7 +8,7 @@ export type InfoWindowProps = {
     text: string;
     show?: boolean
 }
-export default function InfoWindow({ text, show = false}: InfoWindowProps) {
+export default function InfoWindow({ text, show = false }: InfoWindowProps) {
 
     const [isOpen, setIsOpen] = useState(show)
     return (
