@@ -10,8 +10,10 @@ using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Exceptions;
+using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
+using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 
@@ -24,7 +26,8 @@ public class CreateSearchProfileHandler
     IntegrationEventHandler integrationEventHandler,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
     SearchProfileDtoMapper searchProfileDtoMapper,
-    SearchProfileAuthorizationFactStore searchProfileAuthorizationFactStore
+    SearchProfileAuthorizationFactStore searchProfileAuthorizationFactStore,
+    SearchProfileService searchProfileService
 
 ) : TransactionalCommandHandler<CreateSearchProfileCommand, Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
 (
@@ -38,6 +41,7 @@ public class CreateSearchProfileHandler
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
     private readonly SearchProfileAuthorizationFactStore _searchProfileAuthorizationFactStore = searchProfileAuthorizationFactStore;
+    private readonly SearchProfileService _searchProfileService = searchProfileService;
 
     protected async override Task<TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
     (
@@ -48,6 +52,21 @@ public class CreateSearchProfileHandler
     {
         try
         {
+            var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User must be authenticated");
+            var user = await context.DomainUsersQuery.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: cancellationToken);
+            if (user is null)
+            {
+                return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+                (
+                    false,
+                    Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
+                    (
+                        FailureReason.Forbidden,
+                        "user does not exist"
+                    )
+                );
+            }
+
             var engagement = new Engagement
             (
                 command.Engagement.Medium,
@@ -60,10 +79,11 @@ public class CreateSearchProfileHandler
             var genders = command.Genders.Count == 0 ? [.. Enum.GetValues<Gender>()] : command.Genders;
             var ageRangeMin = command.AgeRangeMin is not null ? new Age(command.AgeRangeMin.Value) : null;
             var ageRangeMax = command.AgeRangeMax is not null ? new Age(command.AgeRangeMax.Value) : null;
+            var maximumDistanceKm = command.MaximumDistanceKm != null ? new Distance(command.MaximumDistanceKm.Value, LengthUnit.Kilometers) : null;
 
-            var searchProfile = SearchProfile.Create
+            var searchProfile = _searchProfileService.Create
             (
-                _authenticatedUserService.UserId ?? throw new InvalidOperationException("User must be authenticated"),
+                user,
                 command.Name,
                 command.Description,
                 command.RelationshipType,
@@ -71,7 +91,7 @@ public class CreateSearchProfileHandler
                 genders,
                 ageRangeMin,
                 ageRangeMax,
-                command.MaximumDistanceKm is not null ? new Distance(command.MaximumDistanceKm.Value, LengthUnit.Kilometers) : null
+                maximumDistanceKm
             );
 
             context.SearchProfiles.Add(searchProfile);

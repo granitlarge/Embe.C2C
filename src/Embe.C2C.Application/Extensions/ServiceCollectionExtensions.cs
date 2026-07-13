@@ -95,6 +95,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UserService>();
         services.AddScoped<MatchingService>();
         services.AddScoped<JudgementService>();
+        services.AddScoped<SearchProfileService>();
 
         services.AddScoped<UserDtoMapper>();
         services.AddScoped<ImageDtoMapper>();

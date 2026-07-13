@@ -77,7 +77,7 @@ public class SearchProfile : Aggregate
     public ICollection<Matching>? MatchingsUserId2 { get; private set; }
     #endregion
 
-    public void AddGender(Gender gender)
+    internal void AddGender(Gender gender)
     {
         if (_genders.Any(g => g.Gender == gender))
         {
@@ -88,7 +88,7 @@ public class SearchProfile : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void RemoveGender(Gender gender)
+    internal void RemoveGender(Gender gender)
     {
         if (!_genders.Any(g => g.Gender == gender))
         {
@@ -104,26 +104,26 @@ public class SearchProfile : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void ToggleActive()
+    internal void ToggleActive()
     {
         Active = !Active;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void ChangeEngagement(Engagement engagement)
+    internal void ChangeEngagement(Engagement engagement)
     {
         Engagement = engagement;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void ChangeName(string name)
+    internal void ChangeName(string name)
     {
         ValidateName(name);
         Name = name;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void ChangeDescription(string description)
+    internal void ChangeDescription(string description)
     {
         ValidateDescription(description);
         Description = description;
@@ -162,7 +162,7 @@ public class SearchProfile : Aggregate
         }
     }
 
-    public static SearchProfile Create
+    internal static SearchProfile Create
     (
         Guid userId,
         string name,
@@ -189,12 +189,12 @@ public class SearchProfile : Aggregate
         );
     }
 
-    public void ChangeRelationshipType(RelationshipType relationshipType)
+    internal void ChangeRelationshipType(RelationshipType relationshipType)
     {
         RelationshipType = relationshipType;
     }
 
-    public void ChangeGenders(ImmutableHashSet<Gender> genders)
+    internal void ChangeGenders(ImmutableHashSet<Gender> genders)
     {
         ValidateGenders(genders);
 
@@ -211,7 +211,7 @@ public class SearchProfile : Aggregate
         }
     }
 
-    public void ChangeAgeRange(Age? ageRangeMin, Age? ageRangeMax)
+    internal void ChangeAgeRange(Age? ageRangeMin, Age? ageRangeMax)
     {
         ValidateAgeRange(ageRangeMin, ageRangeMax);
 
@@ -219,7 +219,7 @@ public class SearchProfile : Aggregate
         AgeRangeMax = ageRangeMax;
     }
 
-    public void ChangeMaximumDistance(Distance? distance)
+    internal void ChangeMaximumDistance(Distance? distance)
     {
         MaximumDistance = distance;
     }
@@ -237,5 +237,6 @@ public enum SearchProfileDomainError
     FrequencyAndBoundednessCombinationInvalid,
     FixedTermRequiresStartAndEndDate,
     InvalidGenders,
-    InvalidAgeRange
+    InvalidAgeRange,
+    OwnerLocationNotSet
 }

@@ -1,5 +1,6 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
+using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
@@ -7,6 +8,7 @@ using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
+using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +22,9 @@ public class UpdateSearchProfileHandler
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
-    SearchProfileDtoMapper searchProfileDtoMapper
+    SearchProfileDtoMapper searchProfileDtoMapper,
+    SearchProfileService searchProfileService,
+    IAuthenticatedUserService authenticatedUserService
 
 ) : TransactionalCommandHandler<UpdateSearchProfileCommand, Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
 (
@@ -32,6 +36,8 @@ public class UpdateSearchProfileHandler
 {
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
+    private readonly SearchProfileService _searchProfileService = searchProfileService;
+    private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
 
     protected async override Task<TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
     (
@@ -42,6 +48,21 @@ public class UpdateSearchProfileHandler
     {
         try
         {
+            var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated");
+            var user = await context.DomainUsersQuery.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: cancellationToken);
+            if (user is null)
+            {
+                return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+                (
+                    false,
+                    Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
+                    (
+                        FailureReason.Forbidden,
+                        "user does not exist"
+                    )
+                );
+            }
+
             var searchProfile = await context.SearchProfilesQuery.FirstOrDefaultAsync(sp => sp.Id == command.Id, cancellationToken: cancellationToken);
             if (searchProfile is null)
             {
@@ -85,17 +106,20 @@ public class UpdateSearchProfileHandler
             var distance = command.MaximumDistanceKm is not null ? new Distance(command.MaximumDistanceKm.Value, LengthUnit.Kilometers) : null;
             var active = command.Active;
 
-            searchProfile.ChangeName(command.Name);
-            searchProfile.ChangeDescription(command.Description);
-            searchProfile.ChangeRelationshipType(command.RelationshipType);
-            searchProfile.ChangeEngagement(engagement);
-            searchProfile.ChangeGenders(genders);
-            searchProfile.ChangeAgeRange(ageRangeMin, ageRangeMax);
-            searchProfile.ChangeMaximumDistance(distance);
-            if (searchProfile.Active != active)
-            {
-                searchProfile.ToggleActive();
-            }
+            _searchProfileService.Update
+            (
+                user,
+                searchProfile,
+                command.Name,
+                command.Description,
+                command.RelationshipType,
+                engagement,
+                genders,
+                ageRangeMin,
+                ageRangeMax,
+                distance,
+                active
+            );
 
             await context.SaveChangesAsync(cancellationToken);
 

@@ -4,6 +4,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
+using Embe.C2C.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
@@ -58,9 +59,9 @@ public class DeleteSearchProfileHandler
             );
         }
 
+        searchProfile.Remove();
         context.SearchProfiles.Remove(searchProfile);
 
-        searchProfile.Remove();
         return new TransactionalCommandResult<Result>
         (
             CommitChanges: true,

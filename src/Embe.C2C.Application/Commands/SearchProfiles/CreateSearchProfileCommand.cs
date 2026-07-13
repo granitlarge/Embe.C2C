@@ -13,7 +13,7 @@ public record CreateSearchProfileCommand
     ImmutableHashSet<Gender> Genders,
     int? AgeRangeMin,
     int? AgeRangeMax,
-    int? MaximumDistanceKm
+    double? MaximumDistanceKm
 );
 
 public record EngagementWriteDto
