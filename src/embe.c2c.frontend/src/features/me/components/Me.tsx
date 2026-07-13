@@ -12,7 +12,7 @@ import { Gender } from "@/src/shared/types/domain/value-objects";
 import Modal from "@/src/shared/components/modal/Modal";
 import Profile from "@/src/shared/components/user/Profile";
 import { calculateAge } from "@/src/shared/time";
-import AlertDialog from "@/src/shared/components/infos/Warning";
+import AlertDialog from "@/src/shared/components/infos/AlertDialog";
 
 export type MeProps = {
     className?: string,
