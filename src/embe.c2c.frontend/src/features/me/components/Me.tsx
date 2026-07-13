@@ -136,7 +136,7 @@ export default function Me({ className, user }: MeProps) {
                     (serverSideBasicFormData.location !== undefined) && (clientSideBasicFormData.location === undefined) &&
                     <AlertDialog
                         title="are you sure?"
-                        description='clearing your location will disable the maximum distance filter on all of your search profiles.'
+                        description='clearing your location will disable the maximum distance filter on all of your search profiles'
                         onCancel={() => {
                             setClientSideBasicFormData(prev => ({
                                 ...prev,
