@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
@@ -11,6 +12,7 @@ using Embe.C2C.Application.Extensions;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
+using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +25,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
     private readonly IFileService _fileService;
     private readonly IWorkItemService _workItemService;
     private readonly UserDtoMapper _userDtoMapper;
+    private readonly SearchProfileService _searchProfileService;
 
     public UpdateHandler
     (
@@ -34,7 +37,8 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
         IntegrationEventHandler integrationEventHandler,
         IWorkItemService workItemService,
         DomainEventStore domainEventStore,
-        UserDtoMapper userDtoMapper
+        UserDtoMapper userDtoMapper,
+        SearchProfileService searchProfileService
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _user = user;
@@ -42,6 +46,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
         _fileService = fileService;
         _workItemService = workItemService;
         _userDtoMapper = userDtoMapper;
+        _searchProfileService = searchProfileService;
     }
 
     protected override async Task<TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
@@ -76,11 +81,39 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
                 return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found."));
             }
 
+            var isClearingLocation = command.Location == null && user.Location != null;
+
             user.UpdateAlias(actorId, alias);
             user.UpdateBirthDate(actorId, birthDate);
             user.UpdateGender(actorId, gender);
             user.UpdateLocation(actorId, location);
             user.UpdateBio(actorId, bio);
+
+            // If the user clears his location, disable the maximum distance filter on all of his search profiles.
+            if (isClearingLocation)
+            {
+                var searchProfilesWithDistanceFilter = await context.SearchProfilesQuery
+                    .Where(spq => spq.UserId == user.Id && spq.MaximumDistance != null)
+                    .ToListAsync(cancellationToken);
+
+                foreach (var sp in searchProfilesWithDistanceFilter)
+                {
+                    _searchProfileService.Update
+                    (
+                        user,
+                        sp,
+                        sp.Name,
+                        sp.Description,
+                        sp.RelationshipType,
+                        sp.Engagement,
+                        sp.Genders.Select(g => g.Gender).ToImmutableHashSet(),
+                        sp.AgeRangeMin,
+                        sp.AgeRangeMax,
+                        null,
+                        sp.Active
+                    );
+                }
+            }
 
             var imagesToRemove = user.Images.Where(f => !command.ImagesToKeep?.Any(itk => itk.Id == f.Id) ?? true).ToList();
             foreach (var image in imagesToRemove)
