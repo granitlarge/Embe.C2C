@@ -208,14 +208,8 @@ public class C2CContext
         and usp."Active" = true
         and csp."Active" = true
         and usp."RelationshipType" = csp."RelationshipType"
-        and (
-            exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id" and spg."Gender" = c."Gender") or 
-            not exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id")
-        )
-        and (
-            exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id" and spg."Gender" = u."Gender") or
-            not exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id")
-        )
+        and exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = usp."Id" and spg."Gender" = c."Gender")
+        and exists (select * from "SearchProfileGender" spg where spg."SearchProfileId" = csp."Id" and spg."Gender" = u."Gender")
         and extract(year from age(CURRENT_DATE, u."BirthDate")) between coalesce(csp."AgeRangeMin", 18) and coalesce(csp."AgeRangeMax", 120)
         and extract(year from age(CURRENT_DATE, c."BirthDate")) between coalesce(usp."AgeRangeMin", 18) and coalesce(usp."AgeRangeMax", 120)
         and (

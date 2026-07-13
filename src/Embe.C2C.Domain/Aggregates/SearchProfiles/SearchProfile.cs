@@ -148,7 +148,10 @@ public class SearchProfile : Aggregate
 
     private static void ValidateGenders(ImmutableHashSet<Gender> genders)
     {
-
+        if (genders.Count == 0)
+        {
+            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidGenders));
+        }
     }
 
     private static void ValidateAgeRange(Age? ageRangeMin, Age? ageRangeMax)
