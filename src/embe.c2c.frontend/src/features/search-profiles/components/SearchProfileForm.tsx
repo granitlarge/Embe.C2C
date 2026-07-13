@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/src/shared/components/buttons/Button";
-import InfoWindow from "@/src/shared/components/infos/InfoWindow";
+import InfoText from "@/src/shared/components/infos/InfoWindow";
 import DateInput from "@/src/shared/components/inputs/date-input/DateInput";
 import DropDownInput from "@/src/shared/components/inputs/dropdown-input/DropDownInput";
 import DualRangeInput from "@/src/shared/components/inputs/dual-range-input/DualRangeInput";
@@ -15,15 +15,19 @@ import { EngagementBoundedness, EngagementFrequency, EngagementMedium, Gender, R
 import { useState } from "react";
 import * as z from "zod";
 import { createSearchProfile as createSearchProfile, deleteSearchProfile, updateSearchProfile } from "../actions";
-import { SearchProfile } from "@/src/shared/types/domain/aggregates";
+import { SearchProfile, User } from "@/src/shared/types/domain/aggregates";
 import CheckboxInput from "@/src/shared/components/inputs/checkbox-input/CheckBoxInput";
 import { useRouter } from "nextjs-toploader/app";
+import LocationInput from "@/src/shared/components/inputs/location-input/LocationInput";
+import { Location } from "@/src/shared/types/domain/value-objects"
+import { updateProfile } from "../../me/actions/action";
 
 export type SearchProfileFormProps = {
     className?: string;
-    searchProfile?: SearchProfile,
+    searchProfile?: SearchProfile;
+    user: User;
 }
-export default function SearchProfileForm({ className, searchProfile }: SearchProfileFormProps) {
+export default function SearchProfileForm({ className, searchProfile, user : initialUser}: SearchProfileFormProps) {
 
     const maxDistanceKm = 160;
     const minDistance = 1;
@@ -53,6 +57,8 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
         createdAt: searchProfile?.createdAt,
         updatedAt: searchProfile?.updatedAt
     }
+
+    const [user, setUser] = useState(initialUser);
 
     const [serverSideState, setServerSideState] = useState(initialState);
     const [clientSideState, setClientSideState] = useState(initialState);
@@ -95,14 +101,15 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
 
             medium: z.enum(EngagementMedium, "medium is required"),
 
-            duration: z.enum(EngagementBoundedness, "duration is required")
+            duration: z.enum(EngagementBoundedness, "duration is required"),
 
         })
 
-
         const validationResult = validationSchema.safeParse(clientSideState);
         if (!validationResult.success) {
+
             const errors = z.treeifyError(validationResult.error);
+            console.log(errors);
             setNameError(errors.properties?.name?.errors?.[0]);
             setDescriptionError(errors.properties?.description?.errors?.[0]);
             setRelationshipError(errors.properties?.relationship?.errors?.[0]);
@@ -111,6 +118,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
             setFrequencyError(errors.properties?.frequency?.errors?.[0]);
             setDateRangeError(errors.properties?.dateRange?.errors?.[0]);
             return;
+
         } else {
 
             setNameError(undefined);
@@ -199,12 +207,49 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
         setClientSideState(serverSideState);
     }
 
+    async function onSaveNewLocation() {
+
+        const updateProfileResponse = await updateProfile
+        (
+            user.id,
+            user.alias!,
+            user.birthDate!,
+            user.gender,
+            newUserLocation,
+            user.images?.map((image, index) => ({ id: image.id, order: index })),
+            [],
+            user.bio
+        );
+
+        if (!updateProfileResponse.success || !updateProfileResponse.value?.data) {
+            throw new Error("not implemented");
+        }
+
+        setUser(updateProfileResponse.value.data);
+
+    }
+
+    const [newUserLocation, setNewUserLocation] = useState(undefined as Location | undefined);
+    const distanceLocationNotSetAlertChildren = (
+        <Surface className="flex flex-col p-3 gap-3" variant="secondary">
+            <InfoText show={true} >
+                <p className="text-(--primary-fc) text-(length:--primary-fs)">In order to use the distance filter, you must specify your location.</p>
+            </InfoText>
+            <LocationInput
+                value={newUserLocation}
+                onChange={(location) => setNewUserLocation(location)}
+            />
+            <Button intent="save" onClick={() => onSaveNewLocation()}>save</Button>
+        </Surface>
+    );
     const classNames = [className].filter(Boolean).join(" ");
     return (
         <Surface className={`${classNames} flex flex-col gap-2`} variant="none" padding="none">
 
             <Surface className="flex flex-col gap-2 grow-1 overflow-y-scroll scrollbar-none" variant="secondary" padding="sm">
-                <InfoWindow text={"A search-profile is a set of criteria that define the type of relationship you're looking for."} show={true}/>
+                <InfoText show={true} >
+                    <p>A search-profile is a set of criteria that define the type of relationship you're looking for.</p>
+                </InfoText>
                 <DropDownInput
                     optionClassName="lowercase"
                     errorMessage={relationshipError}
@@ -246,7 +291,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                     clientSideState.duration === EngagementBoundedness.FixedTerm &&
                     <>
                         <DateInput
-                            initialValue={clientSideState.dateRange?.startDate}   
+                            initialValue={clientSideState.dateRange?.startDate}
                             onBlur={(value) => setClientSideState(prev => ({ ...prev, dateRange: { ...prev.dateRange, startDate: value } }))}
                             minDate={new Date().toISOString().split("T")[0]}
                             maxDate="2099-01-01"
@@ -298,16 +343,16 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
                     onChange={(ageRange) => setClientSideState(prev => ({ ...prev, ageRange }))}
                 />
 
-                {
-                    <SingleRangeInput
-                        value={clientSideState.maximumDistanceKm}
-                        label={"max distance (km)"}
-                        min={minDistance}
-                        max={maxDistanceKm}
-                        step={1}
-                        onChange={(maximumDistanceKm) => setClientSideState(prev => ({ ...prev, maximumDistanceKm }))}
-                    />
-                }
+                <SingleRangeInput
+                    disabledAlertChildren={distanceLocationNotSetAlertChildren}
+                    disabled={user.location === undefined}
+                    value={clientSideState.maximumDistanceKm}
+                    label={"max distance (km)"}
+                    min={minDistance}
+                    max={maxDistanceKm}
+                    step={1}
+                    onChange={(maximumDistanceKm) => setClientSideState(prev => ({ ...prev, maximumDistanceKm }))}
+                />
 
                 <TextAreaInput
                     errorMessage={descriptionError}

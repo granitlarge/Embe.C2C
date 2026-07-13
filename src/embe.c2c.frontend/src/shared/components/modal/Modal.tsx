@@ -37,7 +37,7 @@ export default function Modal({ children, className, closed, hidden, header, ...
     return (
         <dialog ref={dialog} className={`
                 ${classNames}
-                flex flex-col items-center gap-0
+                flex flex-col
                 ${styles.modal}
                 m-auto 
                 rounded-lg 

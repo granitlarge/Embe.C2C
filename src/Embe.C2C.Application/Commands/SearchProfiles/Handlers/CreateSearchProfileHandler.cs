@@ -26,7 +26,6 @@ public class CreateSearchProfileHandler
     IntegrationEventHandler integrationEventHandler,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
     SearchProfileDtoMapper searchProfileDtoMapper,
-    SearchProfileAuthorizationFactStore searchProfileAuthorizationFactStore,
     SearchProfileService searchProfileService
 
 ) : TransactionalCommandHandler<CreateSearchProfileCommand, Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
@@ -40,7 +39,6 @@ public class CreateSearchProfileHandler
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
-    private readonly SearchProfileAuthorizationFactStore _searchProfileAuthorizationFactStore = searchProfileAuthorizationFactStore;
     private readonly SearchProfileService _searchProfileService = searchProfileService;
 
     protected async override Task<TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync

@@ -68,7 +68,7 @@ function LocationInputExact({ value, onChange, className }: LocationInputExactPr
     return (
         <Surface className={`input-wrapper ${classNames}`} variant="inherit" padding="sm">
             <div className="flex flex-row items-center">
-                <input className="input overflow-x-scroll" type="text" disabled value={locationName ? locationName : value ? `${value.latitude}, ${value.longitude}` : "location not set"} />
+                <input className="input overflow-x-scroll" type="text" disabled value={value ? (locationName ?? `${value.longitude}, ${value.latitude}`) : "location not set"} />
                 <button className="max-w-max bg-transparent button" onClick={updateLocation}>
                     <RefreshCcw className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc) ${loading ? "animate-[spin_1s_linear_infinite_reverse]" : ""}`} />
                 </button>
@@ -389,8 +389,9 @@ export type LocationInputProps = {
     value?: Location;
     onChange?: (value?: Location) => void;
     className?: string;
+    label?: string;
 }
-export default function LocationInput({ errorMessage, value, onChange, className }: LocationInputProps) {
+export default function LocationInput({ errorMessage, value, onChange, className, label}: LocationInputProps) {
 
     const [tab, setTab] = useState<"exact" | "approximate">("exact");
 
@@ -409,7 +410,7 @@ export default function LocationInput({ errorMessage, value, onChange, className
     return (
 
         <div className="flex flex-col gap-2 w-full">
-            <span className="mx-auto label">location</span>
+            {label && <span className="mx-auto label">{label}</span>}
             <Tabs.Root value={tab} onValueChange={(value) => setTab(value as "exact" | "approximate")} className={`${classNames} w-full flex flex-col gap-3`}>
                 <Tabs.List className="flex flex-row gap-0 w-full">
                     <Tabs.Trigger value="exact" className={`w-full rounded-none rounded-l-md ${exactTabButtonClassNames} button button-default`} >

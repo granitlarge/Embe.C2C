@@ -1,10 +1,10 @@
-import { getCurrentUser } from "@/src/features/auth/actions/action";
+import { getMe } from "@/src/features/auth/actions/action";
 import Me from "@/src/features/me/components/Me";
 import MainNav from "@/src/shared/components/nav/MainNav";
 
 export default async function MePage() {
 
-    const getCurrentUserResponse = await getCurrentUser();
+    const getCurrentUserResponse = await getMe();
     if (!getCurrentUserResponse.success) {
         throw new Error("not implemented");
     }

@@ -4,21 +4,23 @@ import { Info } from "@deemlol/next-icons"
 import Surface from "../surfaces/Surface"
 import { useState } from "react"
 
-export type InfoWindowProps = {
-    text: string;
+export type InfoTextProps = {
     show?: boolean
+    children: React.ReactNode;
+    className?: string;
 }
-export default function InfoWindow({ text, show = false }: InfoWindowProps) {
+export default function InfoText({ className, children, show = false }: InfoTextProps) {
 
     const [isOpen, setIsOpen] = useState(show)
+    const classNames = [className].filter(Boolean).join(" ");
     return (
 
-        <Surface className="flex flex-row gap-2 max-w-max items-start" variant="tertiary" padding="sm">
+        <Surface className={`flex flex-row gap-2 items-start ${classNames}`} variant="tertiary" padding="sm">
             <button onClick={() => setIsOpen(prev => !prev)}>
                 <Info />
             </button>
             {
-                isOpen && <p className="text-(--primary-fc) text-(length:--secondary-fs)">{text}</p>
+                isOpen && children
             }
         </Surface>
 

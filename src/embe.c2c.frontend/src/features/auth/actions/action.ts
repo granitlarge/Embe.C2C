@@ -5,7 +5,7 @@ import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { getAuthenticatedUser } from "@/src/shared/user";
 
-export async function getCurrentUser(): Promise<ApiResponse<ReadDto<User, UserPermission>, FailureReason>> {
+export async function getMe(): Promise<ApiResponse<ReadDto<User, UserPermission>, FailureReason>> {
 
     const currentUser = await getAuthenticatedUser();
     const response = await Read<ReadDto<User, UserPermission>, FailureReason>(`${process.env.API_URL}/api/user/me`, {

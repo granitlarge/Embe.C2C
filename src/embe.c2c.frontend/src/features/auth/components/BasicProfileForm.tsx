@@ -90,6 +90,7 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
             {
                 config.location &&
                 <LocationInput
+                    label="location"
                     errorMessage={error?.location}
                     value={data.location}
                     onChange={(location) => { onChange({ ...data, location }) }}
