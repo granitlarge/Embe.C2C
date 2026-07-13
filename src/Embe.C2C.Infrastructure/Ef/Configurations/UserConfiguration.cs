@@ -43,7 +43,7 @@ public class UserConfiguration : AggregateConfiguration<User>
         builder.HasOne<MyIdentityUser>()
             .WithOne()
             .HasForeignKey<User>(u => u.IdentityUserId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .OwnsMany<Domain.Entities.Image>("_images", image =>

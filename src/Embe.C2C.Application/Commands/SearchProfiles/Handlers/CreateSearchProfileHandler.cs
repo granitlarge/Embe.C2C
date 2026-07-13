@@ -57,7 +57,7 @@ public class CreateSearchProfileHandler
                 command.Engagement.EndDate
             );
 
-            var genders = command.Genders.Count == Enum.GetValues<Gender>().Length ? [] : command.Genders;
+            var genders = command.Genders.Count == 0 ? [.. Enum.GetValues<Gender>()] : command.Genders;
             var ageRangeMin = command.AgeRangeMin is not null ? new Age(command.AgeRangeMin.Value) : null;
             var ageRangeMax = command.AgeRangeMax is not null ? new Age(command.AgeRangeMax.Value) : null;
 

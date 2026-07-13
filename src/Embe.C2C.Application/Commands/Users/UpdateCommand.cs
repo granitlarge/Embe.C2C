@@ -9,8 +9,8 @@ public record UpdateCommand
     Guid UserId,
     string Alias,
     DateOnly BirthDate,
-    Gender Gender,
-    LocationWriteDto Location,
+    Gender? Gender,
+    LocationWriteDto? Location,
     ImmutableHashSet<UpdateImageDto>? ImagesToKeep,
     ImmutableHashSet<CreateImageDto>? ImagesToAdd,
     string? Bio

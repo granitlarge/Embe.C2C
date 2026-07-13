@@ -262,7 +262,7 @@
 
   input::placeholder,
   .input::placeholder {
-    color: var(--secondary-fc);
+    color: var(--tertiary-fc);
     font-size: var(--primary-fs);
   }
 

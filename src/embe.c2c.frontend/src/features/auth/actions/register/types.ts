@@ -1,10 +1,12 @@
-import { Gender, DatingPreferences, ImageDetails } from "@/src/shared/types/domain/value-objects";
+import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 
 export type RegisterRequest = {
     email: string,
     alias?: string;
     password: string,
     birthDate: string,
+    location: Location;
+    gender: Gender;
 }
 
 export enum RegisterUserFailureReason {

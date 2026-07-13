@@ -17,7 +17,7 @@ export async function updateProfile
         bio?: string
     ): Promise<ApiResponse<ReadDto<User, UserPermission>, FailureReason>> {
 
-    const body = JSON.stringify({ userId, alias, birthDate, gender, location, imagesToKeep, imagesToAdd, bio});
+    const body = JSON.stringify({ userId, alias, birthDate, gender, location, imagesToKeep, imagesToAdd, bio });
     const response = Mutate<ReadDto<User, UserPermission>, FailureReason>(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
         {

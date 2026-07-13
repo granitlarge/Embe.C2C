@@ -102,7 +102,9 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
                 <BasicProfileForm
                     error={{
                         alias: error?.alias,
-                        birthDate: error?.birthDate
+                        birthDate: error?.birthDate,
+                        location: error?.location,
+                        gender: error?.gender
                     }}
                     config={{
                         alias: true,

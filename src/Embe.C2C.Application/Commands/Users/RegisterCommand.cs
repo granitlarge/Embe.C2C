@@ -16,8 +16,6 @@ public sealed record RegisterCommand
     string Email,
     string Password,
     string Alias,
-    Gender Gender,
-    LocationWriteDto Location,
     DateOnly BirthDate
 );
 

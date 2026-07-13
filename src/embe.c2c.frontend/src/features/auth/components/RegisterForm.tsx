@@ -9,7 +9,7 @@ import * as z from "zod";
 import { accountExists as accountExists } from "../actions/account-exists/actions";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { register } from "@/src/features/auth/actions/register/actions";
-import { Gender } from "@/src/shared/types/domain/value-objects";
+import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import SearchProfileBuilderForm, { SearchProfileBuilderFormData, SearchProfileBuilderFormError } from "./SearchProfileBuilderForm";
 import { ImagesFormData, ImagesFormError } from "./ImagesForm";
 import { Range } from "@/src/shared/types/range";
@@ -152,27 +152,14 @@ function PasswordStep({
 }
 
 type BasicProfileStepProps = {
-    finish: (birthDate: string, alias: string) => void;
+    finish: (birthDate: string, alias: string, location: Location, gender: Gender) => void;
     hidden?: boolean;
 }
 function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
 
     const validationSchema = z.object({
         alias: z.string({ message: "alias is required" }).min(1, { message: "alias is required" }),
-        birthDate: z.string({ message: "birth date is required" }).min(1),
-        location: z.object({
-            longitude: z.number(),
-            latitude: z.number()
-        }, {
-            error: (issue) => {
-                return issue.input === undefined ? "location is required" : "invalid location";
-            }
-        }),
-        gender: z.enum(Gender, {
-            error: (issue) => {
-                return issue.input === undefined ? "gender is required" : "invalid gender";
-            }
-        })
+        birthDate: z.string({ message: "birth date is required" }).min(1)
     });
 
     const { lower, upper } = getValidBirthdateRange(18, 120);
@@ -181,8 +168,6 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
         birthDateRange: { lower, upper },
         birthDate: upper,
         alias: "",
-        location: undefined,
-        gender: undefined
     });
 
     const [profileError, setProfileError] = useState<BasicProfileFormError | undefined>(undefined);
@@ -193,14 +178,12 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
             const properties = z.treeifyError(result.error).properties;
             setProfileError({
                 alias: properties?.alias?.errors?.[0],
-                birthDate: properties?.birthDate?.errors?.[0],
-                location: properties?.location?.errors?.[0],
-                gender: properties?.gender?.errors?.[0]
+                birthDate: properties?.birthDate?.errors?.[0]
             });
             return;
         }
         setProfileError(undefined);
-        finish(profileData.birthDate!, profileData.alias!);
+        finish(profileData.birthDate!, profileData.alias!, profileData.location!, profileData.gender!);
     }
 
     return (
@@ -212,8 +195,8 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
             config={{
                 alias: true,
                 birthDate: true,
-                gender: true,
-                location: true
+                gender: false,
+                location: false
             }}
         >
             <Button onClick={onNext}>finish</Button>
@@ -337,13 +320,15 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         setStep(step);
     }
 
-    async function finish(birthDate: string, alias: string) {
+    async function finish(birthDate: string, alias: string, location: Location, gender: Gender) {
 
         const response = await register({
             email: data.email!,
             alias: alias!,
             password: data.password!,
             birthDate: birthDate!,
+            gender: gender,
+            location: location
         });
 
         if (response.success) {
