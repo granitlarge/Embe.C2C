@@ -68,7 +68,7 @@ function LocationInputExact({ value, onChange, className }: LocationInputExactPr
     return (
         <Surface className={`input-wrapper ${classNames}`} variant="inherit" padding="sm">
             <div className="flex flex-row items-center">
-                <input className="input overflow-x-scroll" type="text" disabled value={value ? (locationName ?? `${value.longitude}, ${value.latitude}`) : "location not set"} />
+                <input className="input overflow-x-scroll" type="text" disabled value={value ? (locationName ?? `${value.latitude}, ${value.longitude}`) : "location not set"} />
                 <button className="max-w-max bg-transparent button" onClick={updateLocation}>
                     <RefreshCcw className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc) ${loading ? "animate-[spin_1s_linear_infinite_reverse]" : ""}`} />
                 </button>
