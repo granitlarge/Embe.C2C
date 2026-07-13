@@ -204,7 +204,7 @@ export default function SearchProfileForm({ className, searchProfile }: SearchPr
         <Surface className={`${classNames} flex flex-col gap-2`} variant="none" padding="none">
 
             <Surface className="flex flex-col gap-2 grow-1 overflow-y-scroll scrollbar-none" variant="secondary" padding="sm">
-                <InfoWindow text={"A search-profile is a set of criteria that define the type of relationship you're looking for."} />
+                <InfoWindow text={"A search-profile is a set of criteria that define the type of relationship you're looking for."} show={true}/>
                 <DropDownInput
                     optionClassName="lowercase"
                     errorMessage={relationshipError}

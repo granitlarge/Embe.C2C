@@ -7,10 +7,9 @@ import { formatDistance } from "../../distance";
 
 export type ProfileShortInfoProps = {
     user: User,
-    searchProfile?: SearchProfile,
     className?: string
 }
-export function ProfileShortInfo({ user, searchProfile, className }: ProfileShortInfoProps) {
+export function ProfileShortInfo({ user, className }: ProfileShortInfoProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
     return (
@@ -53,7 +52,7 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
                 </Surface>
             }
             <ImageGallery className="h-[300px]" imageUrls={candidate.images?.sort((a, b) => a.imageDetails.order - b.imageDetails.order).map(i => i.imageDetails.url) ?? []} />
-            <ProfileShortInfo user={candidate} searchProfile={candidateSearchProfile!} />
+            <ProfileShortInfo user={candidate} />
             {
                 candidateSearchProfile &&
                 <div className="flex flex-col gap-1">

@@ -1,22 +1,16 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
-using Embe.C2C.Application.Authorizations;
-using Embe.C2C.Application.Dtos.Read;
-using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>>
+public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, ResultBase<RegisterUserFailureReason>>
 {
     private readonly IAuthService _authService;
-    private readonly UserAuthorizationService _userAuthorizationService;
-    private readonly UserDtoMapper _userDtoMapper;
 
     public RegisterHandler
     (
@@ -24,24 +18,22 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IAuthService authService,
-        DomainEventStore domainEventStore,
-        UserAuthorizationService userAuthorizationService,
-        UserDtoMapper userDtoMapper
+        DomainEventStore domainEventStore
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authService = authService;
-        _userAuthorizationService = userAuthorizationService;
-        _userDtoMapper = userDtoMapper;
     }
 
-    protected override async Task<TransactionalCommandResult<TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>>> HandleAsync(ISparseRepository context, RegisterCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>> HandleAsync(ISparseRepository context, RegisterCommand command, CancellationToken cancellationToken = default)
     {
+
         try
         {
+
             var registerUserResult = await _authService.RegisterUserAsync(command.Email, command.Password, cancellationToken);
             if (!registerUserResult.IsSuccess)
             {
-                return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>>(false, TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>.Failure(registerUserResult.Reason, registerUserResult.Message!));
+                return new TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(registerUserResult.Reason, registerUserResult.Message!));
             }
 
             var email = Email.Create(command.Email);
@@ -53,20 +45,17 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Type
             var user = User.Register(email, alias, birthDate, gender: null, location: null, images: null, bio: null, identityUserId);
 
             context.DomainUsers.Add(user);
-            await context.SaveChangesAsync(cancellationToken);
 
-            var dto = await user.Enrich(null).ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken);
+            return new TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>(true, ResultBase<RegisterUserFailureReason>.Success());
 
-            if (dto == null)
-                return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>>(false, TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>.Failure(RegisterUserFailureReason.UnknownError, "The user does not have access to their own data."));
-
-            return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>>(true, TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>.Success(dto));
         }
         catch (DomainException ex)
         {
-            return new TransactionalCommandResult<TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>>(false, TypedResult<RegisterUserFailureReason, ReadDto<UserDto, UserPermission>>.Failure(RegisterUserFailureReason.DomainError, ex.Message));
+            return new TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(RegisterUserFailureReason.DomainError, ex.Message));
         }
+
     }
+
 }
 
 public enum RegisterUserFailureReason
