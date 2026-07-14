@@ -27,7 +27,7 @@ export type SearchProfileFormProps = {
     searchProfile?: SearchProfile;
     user: User;
 }
-export default function SearchProfileForm({ className, searchProfile, user : initialUser}: SearchProfileFormProps) {
+export default function SearchProfileForm({ className, searchProfile, user: initialUser }: SearchProfileFormProps) {
 
     const maxDistanceKm = 300;
     const minDistance = 1;
@@ -214,16 +214,16 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
     async function onSaveNewLocation() {
 
         const updateProfileResponse = await updateProfile
-        (
-            user.id,
-            user.alias!,
-            user.birthDate!,
-            user.gender,
-            newUserLocation,
-            user.images?.map((image, index) => ({ id: image.id, order: index })),
-            [],
-            user.bio
-        );
+            (
+                user.id,
+                user.alias!,
+                user.birthDate!,
+                user.gender,
+                newUserLocation,
+                user.images?.map((image, index) => ({ id: image.id, order: index })),
+                [],
+                user.bio
+            );
 
         if (!updateProfileResponse.success || !updateProfileResponse.value?.data) {
             throw new Error("not implemented");

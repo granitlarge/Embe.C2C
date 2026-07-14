@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Embe_c2c_Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7147",
+      "launchBrowser": false
+    }
+  }
+}

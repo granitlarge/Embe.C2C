@@ -2,6 +2,7 @@
   <Project Path="Embe.C2C.Api/Embe.C2C.Api.csproj" />
   <Project Path="Embe.C2C.Application/Embe.C2C.Application.csproj" />
   <Project Path="Embe.C2C.Domain/Embe.C2C.Domain.csproj" />
+  <Project Path="Embe.C2C.Functions/Embe.C2C.Functions.csproj" />
   <Project Path="Embe.C2C.Infrastructure/Embe.C2C.Infrastructure.csproj" />
   <Project Path="Embe.C2C.Test/Embe.C2C.Test.csproj" />
 </Solution>
