@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
-public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCommand, Result>
+public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
 {
     private readonly MessageAuthorizationService _messageAuthorizationPolicy;
     private readonly IAuthenticatedUserService _authenticatedUser;
@@ -33,7 +33,7 @@ public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCom
         _matchingService = matchingService;
     }
 
-    protected async override Task<TransactionalCommandResult<Result>> HandleAsync
+    protected async override Task<CommandResult<Result>> HandleAsync
     (
         ISparseRepository context,
         DeleteMessageCommand command,
@@ -43,22 +43,22 @@ public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCom
         var permissions = await _messageAuthorizationPolicy.GetPermissionsAsync(command.MessageId, cancellationToken);
         if (!permissions.Contains(MessagePermission.Delete))
         {
-            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You don't have permission to delete this message."));
+            return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You don't have permission to delete this message."));
         }
 
         try
         {
             var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == _authenticatedUser.UserId, cancellationToken);
             if (user is null)
-                return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "Authenticated user not found."));
+                return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 
             var message = await context.MessagesQuery.SingleOrDefaultAsync(m => m.Id == command.MessageId, cancellationToken);
             if (message is null)
-                return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Message not found."));
+                return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Message not found."));
 
             var matching = await context.MatchingsQuery.SingleOrDefaultAsync(m => m.Conversation.Messages!.Any(msg => msg.Id == message.Id), cancellationToken);
             if (matching is null)
-                return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found for the message."));
+                return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found for the message."));
 
             var newLastMessage = await context.MessagesQuery
                 .Where(m => m.ConversationId == matching.Conversation.Id && m.Id != message.Id)
@@ -73,12 +73,12 @@ public class DeleteMessageHandler : TransactionalCommandHandler<DeleteMessageCom
             context.Messages.Remove(message);
 
             var result = Result.Success();
-            return new TransactionalCommandResult<Result>(true, result);
+            return new CommandResult<Result>(true, result);
         }
         catch (DomainException ex)
         {
             var result = Result.Failure(FailureReason.DomainError, ex.Message);
-            var transactionalResult = new TransactionalCommandResult<Result>(false, result);
+            var transactionalResult = new CommandResult<Result>(false, result);
             return transactionalResult;
         }
     }

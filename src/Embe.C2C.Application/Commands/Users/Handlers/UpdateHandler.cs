@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<ReadDto<UserDto, UserPermission>?>>
+public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDto, UserPermission>?>>
 {
     private readonly IAuthenticatedUserService _user;
     private readonly UserAuthorizationService _authorizationPolicy;
@@ -49,7 +49,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
         _searchProfileService = searchProfileService;
     }
 
-    protected override async Task<TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
+    protected override async Task<CommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
     (
         ISparseRepository context,
         UpdateCommand command,
@@ -59,7 +59,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
         var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Update))
         {
-            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to update this profile."));
+            return new CommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to update this profile."));
         }
 
         var actorId = _user.UserId ?? throw new InvalidOperationException("User is not authenticated.");
@@ -78,7 +78,7 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
             var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
             if (user == null)
             {
-                return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found."));
+                return new CommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found."));
             }
 
             var isClearingLocation = command.Location == null && user.Location != null;
@@ -141,11 +141,11 @@ public class UpdateHandler : TransactionalCommandHandler<UpdateCommand, Result<R
 
             success = true;
 
-            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(true, Result<ReadDto<UserDto, UserPermission>?>.Success(readDto));
+            return new CommandResult<Result<ReadDto<UserDto, UserPermission>?>>(true, Result<ReadDto<UserDto, UserPermission>?>.Success(readDto));
         }
         catch (DomainException)
         {
-            return new TransactionalCommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.DomainError, "Invalid input data."));
+            return new CommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.DomainError, "Invalid input data."));
         }
         finally
         {

@@ -4,16 +4,16 @@ using Embe.C2C.Domain;
 
 namespace Embe.C2C.Application.Commands;
 
-public record TransactionalCommandResult<T>(bool CommitChanges, T Value);
+public record CommandResult<T>(bool CommitChanges, T Value);
 
-public abstract class TransactionalCommandHandler<T_Command, T_Result>
+public abstract class CommandHandler<T_Command, T_Result>
 {
     private readonly DomainEventStore _domainEventStore;
     private readonly IRepository _context;
     private readonly DomainEventHandler _domainEventHandler;
     private readonly IntegrationEventHandler _integrationEventHandler;
 
-    public TransactionalCommandHandler
+    public CommandHandler
     (
         DomainEventStore domainEventStore,
         IRepository context,
@@ -56,5 +56,5 @@ public abstract class TransactionalCommandHandler<T_Command, T_Result>
         return result.Value;
     }
 
-    protected abstract Task<TransactionalCommandResult<T_Result>> HandleAsync(ISparseRepository context, T_Command command, CancellationToken cancellationToken = default);
+    protected abstract Task<CommandResult<T_Result>> HandleAsync(ISparseRepository context, T_Command command, CancellationToken cancellationToken = default);
 }

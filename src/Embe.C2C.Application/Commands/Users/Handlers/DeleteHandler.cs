@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
+public class DeleteHandler : CommandHandler<DeleteCommand, Result>
 {
     private readonly UserAuthorizationService _authorizationPolicy;
     private readonly UserService _userService;
@@ -32,24 +32,24 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
         _authService = authService;
     }
 
-    protected override async Task<TransactionalCommandResult<Result>> HandleAsync(ISparseRepository context, DeleteCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<CommandResult<Result>> HandleAsync(ISparseRepository context, DeleteCommand command, CancellationToken cancellationToken = default)
     {
         var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Delete))
         {
-            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You are not authorized to delete this user."));
+            return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You are not authorized to delete this user."));
         }
 
         var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
         if (user is null)
         {
-            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "User not found."));
+            return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "User not found."));
         }
 
         var deleteIdentityUserResult = await _authService.DeleteUserAsync(user.IdentityUserId, cancellationToken);
         if (!deleteIdentityUserResult.IsSuccess)
         {
-            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!));
+            return new CommandResult<Result>(false, Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!));
         }
 
         var accounts = await context.AccountsQuery.Where(a => a.UserId == command.UserId).ToListAsync(cancellationToken);
@@ -62,6 +62,6 @@ public class DeleteHandler : TransactionalCommandHandler<DeleteCommand, Result>
             context.Accounts.Remove(account);
         }
 
-        return new TransactionalCommandResult<Result>(true, Result.Success());
+        return new CommandResult<Result>(true, Result.Success());
     }
 }

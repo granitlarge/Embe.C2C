@@ -6,7 +6,7 @@ using Embe.C2C.Domain;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 
-public class RefreshHandler : TransactionalCommandHandler<RefreshCommand, TypedResult<RefreshFailureReason, Credentials>>
+public class RefreshHandler : CommandHandler<RefreshCommand, TypedResult<RefreshFailureReason, Credentials>>
 {
     private readonly IAuthService _authService;
 
@@ -22,7 +22,7 @@ public class RefreshHandler : TransactionalCommandHandler<RefreshCommand, TypedR
         _authService = authService;
     }
 
-    protected override async Task<TransactionalCommandResult<TypedResult<RefreshFailureReason, Credentials>>> HandleAsync
+    protected override async Task<CommandResult<TypedResult<RefreshFailureReason, Credentials>>> HandleAsync
     (
         ISparseRepository context,
         RefreshCommand command,
@@ -30,6 +30,6 @@ public class RefreshHandler : TransactionalCommandHandler<RefreshCommand, TypedR
     )
     {
         var result = await _authService.RefreshAsync(command.RefreshToken, cancellationToken);
-        return new TransactionalCommandResult<TypedResult<RefreshFailureReason, Credentials>>(result.IsSuccess, result);
+        return new CommandResult<TypedResult<RefreshFailureReason, Credentials>>(result.IsSuccess, result);
     }
 }

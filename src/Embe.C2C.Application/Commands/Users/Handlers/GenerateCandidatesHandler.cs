@@ -26,7 +26,7 @@ public class GenerateCandidatesHandler
     SearchProfileAuthorizationFactStore searchProfileAuthorizationFactStore,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
     SearchProfileDtoMapper searchProfileDtoMapper
-) : TransactionalCommandHandler<GenerateCandidatesCommand, Result<List<GeneratedCandidate>>>
+) : CommandHandler<GenerateCandidatesCommand, Result<List<GeneratedCandidate>>>
 (
     domainEventStore,
     context,
@@ -42,7 +42,7 @@ public class GenerateCandidatesHandler
     private readonly SearchProfileAuthorizationFactStore _searchProfileAuthorizationFactStore = searchProfileAuthorizationFactStore;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
 
-    protected override async Task<TransactionalCommandResult<Result<List<GeneratedCandidate>>>> HandleAsync
+    protected override async Task<CommandResult<Result<List<GeneratedCandidate>>>> HandleAsync
     (
         ISparseRepository context,
         GenerateCandidatesCommand command,
@@ -54,7 +54,7 @@ public class GenerateCandidatesHandler
         var userHasCandidates = await context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         if (!userHasCandidates)
         {
-            return new TransactionalCommandResult<Result<List<GeneratedCandidate>>>(true, Result<List<GeneratedCandidate>>.Success([]));
+            return new CommandResult<Result<List<GeneratedCandidate>>>(true, Result<List<GeneratedCandidate>>.Success([]));
         }
 
         var candidates = await context.CandidatesQuery
@@ -85,7 +85,7 @@ public class GenerateCandidatesHandler
         }
 
         var result = Result<List<GeneratedCandidate>>.Success(dtos);
-        return new TransactionalCommandResult<Result<List<GeneratedCandidate>>>(true, result);
+        return new CommandResult<Result<List<GeneratedCandidate>>>(true, result);
     }
 }
 

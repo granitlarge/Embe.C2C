@@ -14,13 +14,13 @@ public class SignInHandler
     DomainEventHandler domainEventHandler, 
     IntegrationEventHandler integrationEventHandler,
     DomainEventStore domainEventStore
-) : TransactionalCommandHandler<SignInCommand, TypedResult<SignInFailureReason, Credentials>>(domainEventStore, context, domainEventHandler, integrationEventHandler)
+) : CommandHandler<SignInCommand, TypedResult<SignInFailureReason, Credentials>>(domainEventStore, context, domainEventHandler, integrationEventHandler)
 {
     private readonly IAuthService _authService = authService;
 
-    protected override async Task<TransactionalCommandResult<TypedResult<SignInFailureReason, Credentials>>> HandleAsync(ISparseRepository context, SignInCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<CommandResult<TypedResult<SignInFailureReason, Credentials>>> HandleAsync(ISparseRepository context, SignInCommand command, CancellationToken cancellationToken = default)
     {
         var result = await _authService.SignInAsync(command.Email, command.Password, cancellationToken);
-        return new TransactionalCommandResult<TypedResult<SignInFailureReason, Credentials>>(result.IsSuccess, result);
+        return new CommandResult<TypedResult<SignInFailureReason, Credentials>>(result.IsSuccess, result);
     }
 }

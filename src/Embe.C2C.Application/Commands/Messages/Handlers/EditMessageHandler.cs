@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
-public class EditMessageHandler : TransactionalCommandHandler<EditMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
+public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
 {
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUser;
@@ -39,7 +39,7 @@ public class EditMessageHandler : TransactionalCommandHandler<EditMessageCommand
         _messageDtoMapper = messageDtoMapper;
     }
 
-    protected async override Task<TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
+    protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
     (
         ISparseRepository context,
         EditMessageCommand command,
@@ -50,36 +50,36 @@ public class EditMessageHandler : TransactionalCommandHandler<EditMessageCommand
         if (!permissions.Contains(MessagePermission.Edit))
         {
             var result = Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "You don't have permission to edit this message.");
-            return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, result);
+            return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, result);
         }
 
         try
         {
             var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == _authenticatedUser.UserId, cancellationToken);
             if (user is null)
-                return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
+                return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 
             var message = await context.MessagesQuery
                 .Include(m => m.ReplyToMessage)
                 .SingleOrDefaultAsync(m => m.Id == command.MessageId, cancellationToken);
 
             if (message is null)
-                return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Message not found."));
+                return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Message not found."));
 
             _matchingService.EditMessage(user, message, MessageContent.Create(command.NewContent));
 
             var readDto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
             if (readDto == null)
             {
-                return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "You don't have permission to view this message."));
+                return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "You don't have permission to view this message."));
             }
 
-            return new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(true, Result<ReadDto<MessageDto, MessagePermission>>.Success(readDto));
+            return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(true, Result<ReadDto<MessageDto, MessagePermission>>.Success(readDto));
         }
         catch (DomainException ex)
         {
             var result = Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.DomainError, ex.Message);
-            var transactionalResult = new TransactionalCommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, result);
+            var transactionalResult = new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, result);
             return transactionalResult;
         }
     }

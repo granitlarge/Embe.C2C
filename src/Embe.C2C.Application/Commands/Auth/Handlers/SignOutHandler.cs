@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 
-public class SignOutHandler : TransactionalCommandHandler<SignOutCommand, TypedResult<SignOutFailureReason, bool>>
+public class SignOutHandler : CommandHandler<SignOutCommand, TypedResult<SignOutFailureReason, bool>>
 {
     private readonly IAuthService _authService;
 
@@ -23,7 +23,7 @@ public class SignOutHandler : TransactionalCommandHandler<SignOutCommand, TypedR
         _authService = authService;
     }
 
-    protected override async Task<TransactionalCommandResult<TypedResult<SignOutFailureReason, bool>>> HandleAsync
+    protected override async Task<CommandResult<TypedResult<SignOutFailureReason, bool>>> HandleAsync
     (
         ISparseRepository context,
         SignOutCommand command,
@@ -31,6 +31,6 @@ public class SignOutHandler : TransactionalCommandHandler<SignOutCommand, TypedR
     )
     {
         var result = await _authService.SignOutAsync(command.RefreshToken, cancellationToken);
-        return new TransactionalCommandResult<TypedResult<SignOutFailureReason, bool>>(result.IsSuccess, result);
+        return new CommandResult<TypedResult<SignOutFailureReason, bool>>(result.IsSuccess, result);
     }
 }

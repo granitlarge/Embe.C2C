@@ -26,7 +26,7 @@ public class UpdateSearchProfileHandler
     SearchProfileService searchProfileService,
     IAuthenticatedUserService authenticatedUserService
 
-) : TransactionalCommandHandler<UpdateSearchProfileCommand, Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+) : CommandHandler<UpdateSearchProfileCommand, Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
 (
     domainEventStore,
     context,
@@ -39,7 +39,7 @@ public class UpdateSearchProfileHandler
     private readonly SearchProfileService _searchProfileService = searchProfileService;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
 
-    protected async override Task<TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
+    protected async override Task<CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
     (
         ISparseRepository context,
         UpdateSearchProfileCommand command,
@@ -52,7 +52,7 @@ public class UpdateSearchProfileHandler
             var user = await context.DomainUsersQuery.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: cancellationToken);
             if (user is null)
             {
-                return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+                return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
                     false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
@@ -66,7 +66,7 @@ public class UpdateSearchProfileHandler
             var searchProfile = await context.SearchProfilesQuery.FirstOrDefaultAsync(sp => sp.Id == command.Id, cancellationToken: cancellationToken);
             if (searchProfile is null)
             {
-                return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+                return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
                     CommitChanges: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
@@ -80,7 +80,7 @@ public class UpdateSearchProfileHandler
             var (permissions, variant) = await _searchProfileAuthorizationService.GetAsync(command.Id, cancellationToken);
             if (!permissions.Contains(SearchProfilePermission.Modify))
             {
-                return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+                return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
                     CommitChanges: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
@@ -126,7 +126,7 @@ public class UpdateSearchProfileHandler
             var dto = await searchProfile.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
             if (dto is null)
             {
-                return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+                return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
                     CommitChanges: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
@@ -138,7 +138,7 @@ public class UpdateSearchProfileHandler
             }
 
             var result = Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto);
-            return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
                 CommitChanges: true,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto)
@@ -146,7 +146,7 @@ public class UpdateSearchProfileHandler
         }
         catch (DomainException de)
         {
-            return new TransactionalCommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
                 CommitChanges: false,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure

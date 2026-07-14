@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Matching.Handlers;
 
-public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result>
+public class UnmatchHandler : CommandHandler<UnmatchCommand, Result>
 {
     private readonly MatchingAuthorizationService _authorizationPolicy;
     private readonly IAuthenticatedUserService _userService;
@@ -28,7 +28,7 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
         _userService = userService;
     }
 
-    protected override async Task<TransactionalCommandResult<Result>> HandleAsync
+    protected override async Task<CommandResult<Result>> HandleAsync
     (
         ISparseRepository context,
         UnmatchCommand command,
@@ -38,19 +38,19 @@ public class UnmatchHandler : TransactionalCommandHandler<UnmatchCommand, Result
         var permissions = await _authorizationPolicy.GetPermissionsAsync(command.MatchingId, cancellationToken);
         if (!permissions.Contains(MatchingPermission.Unmatch))
         {
-            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You do not have permission to unmatch this matching."));
+            return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You do not have permission to unmatch this matching."));
         }
 
         var actorId = _userService.UserId ?? throw new InvalidOperationException("Unauthorized"); ;
         var matching = await context.MatchingsQuery.SingleOrDefaultAsync(m => m.Id == command.MatchingId, cancellationToken);
         if (matching == null)
         {
-            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found."));
+            return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found."));
         }
 
         matching.Remove(actorId);
         context.Matchings.Remove(matching);
 
-        return new TransactionalCommandResult<Result>(true, Result.Success());
+        return new CommandResult<Result>(true, Result.Success());
     }
 }

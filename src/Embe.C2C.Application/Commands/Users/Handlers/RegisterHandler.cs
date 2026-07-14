@@ -8,7 +8,7 @@ using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, ResultBase<RegisterUserFailureReason>>
+public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<RegisterUserFailureReason>>
 {
     private readonly IAuthService _authService;
 
@@ -24,7 +24,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Resu
         _authService = authService;
     }
 
-    protected override async Task<TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>> HandleAsync(ISparseRepository context, RegisterCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<CommandResult<ResultBase<RegisterUserFailureReason>>> HandleAsync(ISparseRepository context, RegisterCommand command, CancellationToken cancellationToken = default)
     {
 
         try
@@ -33,7 +33,7 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Resu
             var registerUserResult = await _authService.RegisterUserAsync(command.Email, command.Password, cancellationToken);
             if (!registerUserResult.IsSuccess)
             {
-                return new TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(registerUserResult.Reason, registerUserResult.Message!));
+                return new CommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(registerUserResult.Reason, registerUserResult.Message!));
             }
 
             var email = Email.Create(command.Email);
@@ -46,12 +46,12 @@ public class RegisterHandler : TransactionalCommandHandler<RegisterCommand, Resu
 
             context.DomainUsers.Add(user);
 
-            return new TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>(true, ResultBase<RegisterUserFailureReason>.Success());
+            return new CommandResult<ResultBase<RegisterUserFailureReason>>(true, ResultBase<RegisterUserFailureReason>.Success());
 
         }
         catch (DomainException ex)
         {
-            return new TransactionalCommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(RegisterUserFailureReason.DomainError, ex.Message));
+            return new CommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(RegisterUserFailureReason.DomainError, ex.Message));
         }
 
     }

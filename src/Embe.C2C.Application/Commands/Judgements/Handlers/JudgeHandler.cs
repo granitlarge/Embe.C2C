@@ -16,7 +16,7 @@ using Embe.C2C.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 namespace Embe.C2C.Application.Commands.Judgements.Handlers;
 
-public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
+public class JudgeHandler : CommandHandler<JudgeCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
 {
     private readonly UserAuthorizationService _userAuthorizationService;
     private readonly JudgementService _judgementService;
@@ -65,7 +65,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         _searchProfileDtoMapper = searchProfileDtoMapper;
     }
 
-    protected override async Task<TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
+    protected override async Task<CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
     (
         ISparseRepository context,
         JudgeCommand command,
@@ -76,7 +76,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         var candidate = await context.CandidatesQuery.SingleOrDefaultAsync(c => c.Id == command.CandidateId && c.UserId == userId, cancellationToken);
         if (candidate == null)
         {
-            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>
+            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>
             (
                 CommitChanges: false,
                 Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure
@@ -92,19 +92,19 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         var (candidatePermissions, candidateVariant) = await _userAuthorizationService.GetAsync(candidate.CandidateUserId, cancellationToken);
         if (!candidatePermissions.Contains(UserPermission.Judge))
         {
-            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to judge."));
+            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "User is not authorized to judge."));
         }
 
         var judge = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         if (judge == null)
         {
-            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "User not found."));
+            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "User not found."));
         }
 
         var judgee = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == candidate.CandidateUserId, cancellationToken);
         if (judgee == null)
         {
-            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Judgee not found."));
+            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Judgee not found."));
         }
 
         var existingJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.CandidateId == candidate.Id, cancellationToken);
@@ -144,7 +144,7 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
         }
 
         if (matching == null)
-            return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(null));
+            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(null));
 
         var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         var readDto = await matching.ToDtoAsync
@@ -164,6 +164,6 @@ public class JudgeHandler : TransactionalCommandHandler<JudgeCommand, Result<Rea
             cancellationToken
         );
 
-        return new TransactionalCommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(readDto));
+        return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(readDto));
     }
 }

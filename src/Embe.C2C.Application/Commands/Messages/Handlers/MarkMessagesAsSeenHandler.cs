@@ -15,11 +15,11 @@ public class MarkMessagesAsSeenHandler
     IntegrationEventHandler integrationEventHandler,
     MessageAuthorizationService messageAuthoriztionPolicy,
     DomainEventStore domainEventStore
-) : TransactionalCommandHandler<MarkMessagesAsSeenCommand, Result>(domainEventStore, context, domainEventHandler, integrationEventHandler)
+) : CommandHandler<MarkMessagesAsSeenCommand, Result>(domainEventStore, context, domainEventHandler, integrationEventHandler)
 {
     private readonly MessageAuthorizationService _messageAuthorizationPolicy = messageAuthoriztionPolicy;
 
-    protected async override Task<TransactionalCommandResult<Result>> HandleAsync
+    protected async override Task<CommandResult<Result>> HandleAsync
     (
         ISparseRepository context,
         MarkMessagesAsSeenCommand command,
@@ -29,7 +29,7 @@ public class MarkMessagesAsSeenHandler
         var messages = await context.MessagesQuery.Where(m => command.MessageIds.Contains(m.Id)).ToListAsync(cancellationToken: cancellationToken);
         if (messages.Count != command.MessageIds.Length)
         {
-            return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "One or more messages were not found."));
+            return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "One or more messages were not found."));
         }
 
         foreach (var message in messages)
@@ -37,11 +37,11 @@ public class MarkMessagesAsSeenHandler
             var permissions = await _messageAuthorizationPolicy.GetPermissionsAsync(message.Id, cancellationToken);
             if (!permissions.Contains(MessagePermission.MarkAsSeen))
             {
-                return new TransactionalCommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You do not have permission to mark this message as seen."));
+                return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You do not have permission to mark this message as seen."));
             }
 
             message.MarkAsSeen(seen: true);
         }
-        return new TransactionalCommandResult<Result>(true, Result.Success());
+        return new CommandResult<Result>(true, Result.Success());
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Notifications.Handlers;
 
-public class MarkAsReadHandler : TransactionalCommandHandler<MarkAsReadCommand, Result>
+public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, Result>
 {
     public MarkAsReadHandler
     (
@@ -21,16 +21,16 @@ public class MarkAsReadHandler : TransactionalCommandHandler<MarkAsReadCommand, 
 
     }
 
-    protected async override Task<TransactionalCommandResult<Result>> HandleAsync(ISparseRepository context, MarkAsReadCommand command, CancellationToken cancellationToken = default)
+    protected async override Task<CommandResult<Result>> HandleAsync(ISparseRepository context, MarkAsReadCommand command, CancellationToken cancellationToken = default)
     {
         var notification = await context.NotificationsQuery.FirstOrDefaultAsync(n => n.Id == command.NotificationId, cancellationToken);
         if (notification is null)
         {
-            return new TransactionalCommandResult<Result>(CommitChanges: false, Result.Failure(FailureReason.NotFound, "Notification not found."));
+            return new CommandResult<Result>(CommitChanges: false, Result.Failure(FailureReason.NotFound, "Notification not found."));
         }
 
         notification.MarkAsRead(command.IsRead);
 
-        return new TransactionalCommandResult<Result>(CommitChanges: true, Result.Success());
+        return new CommandResult<Result>(CommitChanges: true, Result.Success());
     }
 }

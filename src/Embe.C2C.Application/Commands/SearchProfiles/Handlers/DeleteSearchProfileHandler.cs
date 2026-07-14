@@ -17,7 +17,7 @@ public class DeleteSearchProfileHandler
     IntegrationEventHandler integrationEventHandler,
     IAuthenticatedUserService authenticatedUserService,
     SearchProfileAuthorizationService searchProfileAuthorizationService
-) : TransactionalCommandHandler<DeleteSearchProfileCommand, Result>
+) : CommandHandler<DeleteSearchProfileCommand, Result>
     (
         domainEventStore,
         context,
@@ -28,13 +28,13 @@ public class DeleteSearchProfileHandler
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
 
-    protected async override Task<TransactionalCommandResult<Result>> HandleAsync(ISparseRepository context, DeleteSearchProfileCommand command, CancellationToken cancellationToken = default)
+    protected async override Task<CommandResult<Result>> HandleAsync(ISparseRepository context, DeleteSearchProfileCommand command, CancellationToken cancellationToken = default)
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("Authenticated user ID is null.");
         var (permissions, variant) = await _searchProfileAuthorizationService.GetAsync(command.Id, cancellationToken);
         if (!permissions.Contains(SearchProfilePermission.Delete))
         {
-            return new TransactionalCommandResult<Result>
+            return new CommandResult<Result>
             (
                 CommitChanges: false,
                 Result.Failure
@@ -48,7 +48,7 @@ public class DeleteSearchProfileHandler
         var searchProfile = await context.SearchProfilesQuery.FirstOrDefaultAsync(sp => sp.Id == command.Id, cancellationToken: cancellationToken);
         if (searchProfile is null)
         {
-            return new TransactionalCommandResult<Result>
+            return new CommandResult<Result>
             (
                 CommitChanges: false,
                 Result.Failure
@@ -62,7 +62,7 @@ public class DeleteSearchProfileHandler
         searchProfile.Remove();
         context.SearchProfiles.Remove(searchProfile);
 
-        return new TransactionalCommandResult<Result>
+        return new CommandResult<Result>
         (
             CommitChanges: true,
             Result.Success()
