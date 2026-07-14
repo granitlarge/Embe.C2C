@@ -36,7 +36,14 @@ export type BasicProfileFormProps = {
     config?: BasicProfileFormConfig;
 }
 
-export default function BasicProfileForm({ className, data, error, onChange, children, config }: BasicProfileFormProps & { className?: string }) {
+export default function BasicProfileForm({ 
+    className, 
+    data, 
+    error, 
+    onChange, 
+    children, 
+    config 
+}: BasicProfileFormProps & { className?: string }) {
 
     config = config || {
         birthDate: true,
@@ -78,6 +85,9 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
             {
                 config.gender &&
                 <SelectInput
+                    info={data.gender === undefined ? "specify your gender to receive more matches" : undefined}
+                    infoTitle="gender"
+                    infoType="important"
                     errorMessage={error?.gender}               
                     optionClassName="lowercase"
                     multiple={false}
@@ -90,6 +100,8 @@ export default function BasicProfileForm({ className, data, error, onChange, chi
             {
                 config.location &&
                 <LocationInput
+                    info={data.location === undefined ? "specify your location to receive more matches" : undefined}
+                    infoType="important"
                     label="location"
                     errorMessage={error?.location}
                     value={data.location}

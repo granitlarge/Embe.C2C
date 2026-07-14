@@ -1,5 +1,5 @@
 import { AlertTriangle } from "lucide-react";
-import Modal from "../modal/Modal";
+import LargeModal from "../modal/LargeModal";
 import { useState } from "react";
 
 export type AlertProps = {
@@ -12,16 +12,16 @@ export default function Alert({ children }: AlertProps) {
     return (
         <span>
             <button className="max-w-max max-h-max flex justify-center items-center" onClick={() => setOpen(prev => !prev)}>
-                <AlertTriangle className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" />
+                <AlertTriangle className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc) text-(--warning-fc)" />
             </button>
             {
                 open === true &&
-                <Modal
+                <LargeModal
                     closed={() => setOpen(false)}
                     hidden={false}
                 >
                     {children}
-                </Modal>
+                </LargeModal>
             }
         </span>
     )

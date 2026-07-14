@@ -2,7 +2,7 @@
 
 import Surface from "@/src/shared/components/surfaces/Surface"
 import { useState } from "react";
-import Modal from "@/src/shared/components/modal/Modal";
+import LargeModal from "@/src/shared/components/modal/LargeModal";
 import ImageGalleryInput from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
 import { Gender } from "@/src/shared/types/domain/value-objects";
 import { Location } from "@/src/shared/types/domain/value-objects";
@@ -50,7 +50,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                 }
             </button>
 
-            <Modal closed={() => setModalOpen(false)} hidden={!modalOpen} header="images">
+            <LargeModal closed={() => setModalOpen(false)} hidden={!modalOpen} header="images">
                 <ImageGalleryInput<ImageData>
                     data={{ images: initialImages }}
                     onChange={
@@ -59,7 +59,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                         }
                     }
                 />
-            </Modal>
+            </LargeModal>
         </div>
     )
 }

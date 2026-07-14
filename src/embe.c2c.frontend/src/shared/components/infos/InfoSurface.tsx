@@ -4,12 +4,12 @@ import { Info } from "@deemlol/next-icons"
 import Surface from "../surfaces/Surface"
 import { useState } from "react"
 
-export type InfoTextProps = {
+export type InfoSurfaceProps = {
     show?: boolean
     children: React.ReactNode;
     className?: string;
 }
-export default function InfoText({ className, children, show = false }: InfoTextProps) {
+export default function InfoSurface({ className, children, show = false }: InfoSurfaceProps) {
 
     const [isOpen, setIsOpen] = useState(show)
     const classNames = [className].filter(Boolean).join(" ");

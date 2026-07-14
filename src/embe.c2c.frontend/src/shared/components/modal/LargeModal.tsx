@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import styles from "./Modal.module.css";
+import styles from "./LargeModal.module.css";
 
-export type ModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>, "children" | "className" | "ref" | "closedby" | "hidden" | "onClick"> & {
+export type LargeModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>, "children" | "className" | "ref" | "closedby" | "hidden" | "onClick"> & {
     className?: string;
     children: React.ReactNode;
     closed: () => void;
@@ -9,7 +9,7 @@ export type ModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttributes
     header?: string;
 };
 
-export default function Modal({ children, className, closed, hidden, header, ...props }: ModalProps) {
+export default function LargeModal({ children, className, closed, hidden, header, ...props }: LargeModalProps) {
 
     const classNames = [
         className,

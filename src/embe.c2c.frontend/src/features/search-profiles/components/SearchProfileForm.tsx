@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/src/shared/components/buttons/Button";
-import InfoText from "@/src/shared/components/infos/InfoWindow";
+import InfoSurface from "@/src/shared/components/infos/InfoSurface";
 import DateInput from "@/src/shared/components/inputs/date-input/DateInput";
 import DropDownInput from "@/src/shared/components/inputs/dropdown-input/DropDownInput";
 import DualRangeInput from "@/src/shared/components/inputs/dual-range-input/DualRangeInput";
@@ -29,7 +29,7 @@ export type SearchProfileFormProps = {
 }
 export default function SearchProfileForm({ className, searchProfile, user : initialUser}: SearchProfileFormProps) {
 
-    const maxDistanceKm = 160;
+    const maxDistanceKm = 300;
     const minDistance = 1;
     const maxAge = 120;
     const minAge = 18;
@@ -232,10 +232,11 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
     const [newUserLocation, setNewUserLocation] = useState(undefined as Location | undefined);
     const distanceLocationNotSetAlertChildren = (
         <Surface className="flex flex-col p-3 gap-3" variant="secondary">
-            <InfoText show={true} >
+            <InfoSurface show={true} >
                 <p className="text-(--primary-fc) text-(length:--primary-fs)">In order to use the distance filter, you must specify your location.</p>
-            </InfoText>
+            </InfoSurface>
             <LocationInput
+                label="location"
                 value={newUserLocation}
                 onChange={(location) => setNewUserLocation(location)}
             />
@@ -247,9 +248,9 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
         <Surface className={`${classNames} flex flex-col gap-2`} variant="none" padding="none">
 
             <Surface className="flex flex-col gap-2 grow-1 overflow-y-scroll scrollbar-none" variant="secondary" padding="sm">
-                <InfoText show={true} >
+                <InfoSurface show={true} >
                     <p>A search-profile is a set of criteria that define the type of relationship you're looking for.</p>
-                </InfoText>
+                </InfoSurface>
                 <DropDownInput
                     optionClassName="lowercase"
                     errorMessage={relationshipError}

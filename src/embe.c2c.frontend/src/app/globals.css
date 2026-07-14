@@ -24,6 +24,8 @@
     --primary-fc-tertiary: rgb(85, 85, 85);
     --primary-border-color: var(--primary-fc-primary);
     --primary-error-fc: rgb(255, 0, 0);
+    --primary-warning-fc: rgb(255, 153, 0);
+    --primary-important-fc: red;
 
     --secondary-bg: rgb(255, 255, 255);
     --secondary-fc-primary: black;
@@ -31,6 +33,8 @@
     --secondary-fc-tertiary: rgb(85, 85, 85);
     --secondary-border-color: rgb(184, 183, 183);
     --secondary-error-fc: rgb(255, 0, 0);
+    --secondary-warning-fc: rgb(255, 153, 0);
+    --secondary-important-fc: red;
 
     --tertiary-bg: rgb(240, 240, 240);
     --tertiary-fc-primary: black;
@@ -38,6 +42,8 @@
     --tertiary-fc-tertiary: rgb(85, 85, 85);
     --tertiary-border-color: var(--tertiary-fc-primary);
     --tertiary-error-fc: rgb(255, 0, 0);
+    --tertiary-warning-fc: rgb(255, 153, 0);
+    --tertiary-important-fc: red;
 
     --quaternary-bg: rgb(218, 220, 242);
     --tertiary-fc-primary: black;
@@ -45,6 +51,8 @@
     --tertiary-fc-tertiary: rgb(85, 85, 85);
     --tertiary-border-color: var(--tertiary-fc-primary);
     --tertiary-error-fc: rgb(255, 0, 0);
+    --quaternary-warning-fc: rgb(255, 153, 0);
+    --quaternary-important-fc: red;
 
     --message-bg: rgb(191, 188, 255);
     --message-fc-primary: black;
@@ -82,7 +90,8 @@
     --border-color: none;
     --link-fc: var(--universal-primary-bg);
     --active-color: var(--universal-primary-bg);
-    --inactive-color: red; 
+    --inactive-color: red;
+    --warning-fc: none;
 
     --button-default-bg: lightgray;
     --button-default-fc: black;
@@ -168,6 +177,8 @@
     --tertiary-fc: var(--primary-fc-tertiary);
     --error-fc: var(--primary-error-fc);
     --border-color: var(--primary-border-color);
+    --warning-fc: var(--primary-warning-fc);
+    --important-fc: var(--primary-important-fc);
   }
 
   .surface-secondary {
@@ -178,6 +189,8 @@
     --tertiary-fc: var(--secondary-fc-tertiary);
     --error-fc: var(--secondary-error-fc);
     --border-color: var(--secondary-border-color);
+    --warning-fc: var(--secondary-warning-fc);
+    --important-fc: var(--secondary-important-fc);
   }
 
   .surface-tertiary {
@@ -188,6 +201,8 @@
     --tertiary-fc: var(--tertiary-fc-tertiary);
     --error-fc: var(--tertiary-error-fc);
     --border-color: var(--tertiary-border-color);
+    --warning-fc: var(--tertiary-warning-fc);
+    --important-fc: var(--tertiary-important-fc);
   }
 
   .surface-quaternary {
@@ -198,7 +213,8 @@
     --tertiary-fc: var(--quaternary-fc-quaternary);
     --error-fc: var(--quaternary-error-fc);
     --border-color: var(--quaternary-border-color);
-
+    --warning-fc: var(--quaternary-warning-fc);
+    --important-fc: var(--quaternary-important-fc);
   }
 
   .surface-message {
@@ -345,5 +361,11 @@
 
   .button:hover {
     cursor: pointer;
+  }
+
+  a:active,
+  button:active,
+  .button:active {
+    scale: 95%
   }
 }

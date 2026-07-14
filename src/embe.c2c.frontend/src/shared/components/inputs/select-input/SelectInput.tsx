@@ -1,3 +1,4 @@
+import InfoModal, { InfoType } from "../../infos/InfoModal";
 import Surface from "../../surfaces/Surface";
 import CheckboxInput from "../checkbox-input/CheckBoxInput";
 import ErrorMessage from "../ErrorMessage";
@@ -17,9 +18,24 @@ export type SelectInputProps = InputProps & {
     multiple?: boolean;
     required?: boolean
     optionClassName?: string;
+    info?: string;
+    infoTitle?: string;
+    infoType: InfoType
 }
 
-export default function SelectInput({ options, value, onChange, label, className, multiple = false, required = false, errorMessage, optionClassName }: SelectInputProps) {
+export default function SelectInput({ 
+    options, 
+    value, 
+    onChange, 
+    label, 
+    className, 
+    multiple = false, 
+    required = false, 
+    errorMessage, 
+    optionClassName ,
+    info,
+    infoType
+}: SelectInputProps) {
 
     const classNames = [
         className
@@ -31,7 +47,13 @@ export default function SelectInput({ options, value, onChange, label, className
 
     return (
         <Surface className={`input-wrapper ${classNames}`} variant="inherit" padding="none">
-            <span className="label">{label}</span>
+            <div className="flex items-center justify-center w-full gap-1">
+                <span className="label m-0">{label}</span>
+                {
+                    info && infoType &&
+                    <InfoModal info={info} type={infoType} />
+                }
+            </div>
             <div className="flex flex-col items-start gap-2 w-full">
                 {
                     options.map((option) =>

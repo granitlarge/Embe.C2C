@@ -1,4 +1,4 @@
-import Modal from "@/src/shared/components/modal/Modal";
+import LargeModal from "@/src/shared/components/modal/LargeModal";
 import { useEffect, useState } from "react";
 import useNotificationStore from "../../stores";
 import Notification from "../notification/Notification";
@@ -60,7 +60,7 @@ export default function NotificationsModal({ hidden, closed }: NotificationsModa
     }
 
     return (
-        <Modal hidden={hidden} closed={closed} header={"notifications"}>
+        <LargeModal hidden={hidden} closed={closed} header={"notifications"}>
             {
                 error ? <span className="text-(length:--fs-6) error-message">{error}</span> :
                     notifications.length === 0 ? <span className="text-(length:--fs-6)">no notifications</span> :
@@ -74,6 +74,6 @@ export default function NotificationsModal({ hidden, closed }: NotificationsModa
                             />
                         ))
             }
-        </Modal>
+        </LargeModal>
     )
 }

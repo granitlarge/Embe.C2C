@@ -9,7 +9,7 @@ import Button from "@/src/shared/components/buttons/Button";
 import { updateProfile } from "../actions/action";
 import * as z from "zod";
 import { Gender } from "@/src/shared/types/domain/value-objects";
-import Modal from "@/src/shared/components/modal/Modal";
+import LargeModal from "@/src/shared/components/modal/LargeModal";
 import Profile from "@/src/shared/components/user/Profile";
 import { calculateAge } from "@/src/shared/time";
 import AlertDialog from "@/src/shared/components/infos/AlertDialog";
@@ -85,7 +85,8 @@ export default function Me({ className, user }: MeProps) {
         const imagesToKeep = imageAndIndex.filter(({ image }) => image.id !== undefined).map(({ image, index }) => ({ id: image.id!, order: index }));
         const imagesToAdd = imageAndIndex.filter(({ image }) => image.id === undefined);
 
-        const response = await updateProfile(
+        const updateProfileResponse = await updateProfile
+        (
             user.data?.id!,
             clientSideBasicFormData.alias!,
             clientSideBasicFormData.birthDate!,
@@ -96,11 +97,11 @@ export default function Me({ className, user }: MeProps) {
             clientSideBasicFormData.bio
         );
 
-        if (!response.success) {
+        if (!updateProfileResponse.success) {
             throw new Error("not implemented");
         }
 
-        const responseReadDto = response.value!;
+        const responseReadDto = updateProfileResponse.value!;
         const newServerSideBasicFormData = {
             images: responseReadDto.data.images
                 ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order }))
@@ -136,7 +137,7 @@ export default function Me({ className, user }: MeProps) {
                     (serverSideBasicFormData.location !== undefined) && (clientSideBasicFormData.location === undefined) &&
                     <AlertDialog
                         title="are you sure?"
-                        description='clearing your location will disable the maximum distance filter on all of your search profiles'
+                        description='clearing your location will disable the distance filter on all of your search profiles'
                         onCancel={() => {
                             setClientSideBasicFormData(prev => ({
                                 ...prev,
@@ -152,7 +153,7 @@ export default function Me({ className, user }: MeProps) {
                 <Button onClick={onCancel} intent="cancel">cancel</Button>
             </div>
             {
-                showPreview && <Modal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">
+                showPreview && <LargeModal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">
                     <Profile
                         candidate={{
                             id: user.data?.id!,
@@ -196,7 +197,7 @@ export default function Me({ className, user }: MeProps) {
                             })) ?? []
                         }}
                     />
-                </Modal>
+                </LargeModal>
             }
         </Surface>
 

@@ -11,6 +11,7 @@ export type DateInputProps = {
     className?: string;
     required?: boolean
     errorMessage?: string;
+    info?: string;
 }
 
 export default function DateInput({ label, initialValue, onBlur, minDate, maxDate, className, required = true, errorMessage }: DateInputProps) {

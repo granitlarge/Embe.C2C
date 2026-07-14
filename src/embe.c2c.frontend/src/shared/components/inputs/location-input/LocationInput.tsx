@@ -10,6 +10,7 @@ import { getAdminAreaById, getCountryAdminAreas, reverseGeocode, searchAdminArea
 import { Loader } from "@deemlol/next-icons";
 import Surface from "../../surfaces/Surface";
 import ErrorMessage from "../ErrorMessage";
+import InfoModal, { InfoType } from "../../infos/InfoModal";
 
 type LocationInputExactProps = {
     value?: Location;
@@ -389,9 +390,11 @@ export type LocationInputProps = {
     value?: Location;
     onChange?: (value?: Location) => void;
     className?: string;
-    label?: string;
+    label: string;
+    info?: string;
+    infoType?: InfoType;
 }
-export default function LocationInput({ errorMessage, value, onChange, className, label}: LocationInputProps) {
+export default function LocationInput({ info, infoType, errorMessage, value, onChange, className, label }: LocationInputProps) {
 
     const [tab, setTab] = useState<"exact" | "approximate">("exact");
 
@@ -410,7 +413,13 @@ export default function LocationInput({ errorMessage, value, onChange, className
     return (
 
         <div className="flex flex-col gap-2 w-full">
-            {label && <span className="mx-auto label">{label}</span>}
+            <div className="flex justify-center items-center gap-1">
+                <span className="mx-0 label">{label}</span>
+                {
+                    info && infoType &&
+                    <InfoModal info={info} type={infoType} />
+                }
+            </div>
             <Tabs.Root value={tab} onValueChange={(value) => setTab(value as "exact" | "approximate")} className={`${classNames} w-full flex flex-col gap-3`}>
                 <Tabs.List className="flex flex-row gap-0 w-full">
                     <Tabs.Trigger value="exact" className={`w-full rounded-none rounded-l-md ${exactTabButtonClassNames} button button-default`} >
