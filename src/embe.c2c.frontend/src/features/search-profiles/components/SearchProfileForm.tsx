@@ -149,6 +149,7 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
             };
 
             if (clientSideState.id) {
+
                 const updateSearchProfileResponse = await updateSearchProfile(payload);
 
                 if (!updateSearchProfileResponse.success || !updateSearchProfileResponse.value?.data) {
@@ -176,6 +177,7 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
                     updatedAt: updatedSearchProfile.updatedAt
                 }
 
+                router.refresh();
                 setServerSideState(newState);
                 setClientSideState(newState);
 
@@ -187,6 +189,7 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
                     throw new Error("not implemented");
                 }
 
+                router.refresh();
                 router.replace("/protected/search-profile/" + createSearchProfileResponse.value?.data.id);
 
             }

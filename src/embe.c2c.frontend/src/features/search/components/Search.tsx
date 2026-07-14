@@ -43,6 +43,7 @@ export type SearchProps = {
 }
 export default function Search({ searchProfiles, candidates: initialCandidates, className, hasSearchProfiles }: SearchProps) {
 
+    const router = useRouter();
     const classNames = [className].filter(Boolean).join(" ");
 
     const [candidates, setCandidates] = useState(initialCandidates);
@@ -62,6 +63,7 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
         if (!response.success) {
             throw new Error("Not implemented");
         } else {
+            router.refresh();
             if (candidates.length === 0) {
                 await loadCandidates();
             } else {

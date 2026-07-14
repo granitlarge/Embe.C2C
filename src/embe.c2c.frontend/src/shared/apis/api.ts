@@ -3,6 +3,7 @@ import type { ApiResponse, FailureReason, ReadRequest, MutationRequest } from ".
 import { redirect } from "next/navigation";
 import { ApiError } from "../api-errors";
 import { getAccessToken } from "../security/functions";
+import { Tag } from "../cache";
 
 async function parseResponse<T>(response: Response): Promise<T | undefined> {
 
@@ -63,11 +64,20 @@ async function SendUnauthenticatedRequest<T>(request: Request): Promise<T> {
 export async function Read<T>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T, FailureReason>>;
 export async function Read<T_Value, T_Error>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T_Value, T_Error>>;
 export async function Read<T_Value, T_Error = FailureReason>(input: URL | RequestInfo, init: ReadRequest, authenticate = true): Promise<ApiResponse<T_Value, T_Error>> {
+
+    init.next = {
+        ...init.next,
+        tags: init.next?.tags?.map(tag => tag.toLowerCase() as Tag)
+    };
+
     const request = new Request(input, init);
+
     if (authenticate) {
         return await SendAuthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
     }
+
     return await SendUnauthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
+
 }
 
 export async function Mutate<T_Value>

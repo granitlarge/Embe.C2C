@@ -35,6 +35,7 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
         if (!response) {
             throw new Error("not implemented");
         }
+        router.refresh();
         router.push("/protected/matches");
     }
 
@@ -85,6 +86,7 @@ export type MatchProps = {
 }
 export default function Match({ match, user, className }: MatchProps) {
 
+    const router = useRouter();
     const matchRef = useRef(match);
     const partner = match.data.userId1 === user.userId ? match.data.user2?.data : match.data.user1?.data;
     const connection = useRef<HubConnection | null>(null);
@@ -136,6 +138,8 @@ export default function Match({ match, user, className }: MatchProps) {
             return prev;
         });
 
+        router.refresh();
+
     }
 
     function onMessagesSeen(...messageIds: Guid[]) {
@@ -155,6 +159,8 @@ export default function Match({ match, user, className }: MatchProps) {
                     }
                 })
             ));
+
+        router.refresh();
     }
 
     function onMessagesUnseen(...messageIds: Guid[]) {
@@ -174,6 +180,7 @@ export default function Match({ match, user, className }: MatchProps) {
                     }
                 })
             ));
+        router.refresh();
     }
 
     useEffect(() => {
@@ -201,6 +208,8 @@ export default function Match({ match, user, className }: MatchProps) {
                 return sortMessages([...otherMessages, newMessage]);
             });
 
+            router.refresh();
+
         };
 
         const onMessageEditedHandler = async (messageId: Guid, conversationId: Guid) => {
@@ -220,6 +229,8 @@ export default function Match({ match, user, className }: MatchProps) {
                 const otherMessages = prev.filter(m => m.data.id !== editedMessage.data.id);
                 return sortMessages([...otherMessages, editedMessage]);
             });
+
+            router.refresh();
 
         };
 
@@ -340,6 +351,8 @@ export default function Match({ match, user, className }: MatchProps) {
                 });
                 setMessageCrafterConfig(defaultMessageCrafterConfig);
 
+                router.refresh();
+
             } else {
 
                 throw new Error("Not Implemented");
@@ -359,6 +372,7 @@ export default function Match({ match, user, className }: MatchProps) {
             if (response.success) {
                 setMessages(prev => sortMessages([...prev, response.value!]));
                 setMessageCrafterConfig(defaultMessageCrafterConfig);
+                router.refresh();
             } else {
                 throw new Error("Not Implemented");
             }

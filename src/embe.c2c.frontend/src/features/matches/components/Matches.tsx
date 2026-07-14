@@ -7,6 +7,7 @@ import { useState } from "react";
 import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
 import { getMatchings } from "../actions/action";
 import { ReadDto } from "@/src/shared/types/dtos/types";
+import { useRouter } from "nextjs-toploader/app";
 
 export type MatchesProps = {
     user: AuthenticatedUser

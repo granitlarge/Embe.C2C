@@ -7,7 +7,6 @@ using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Entities;
-using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
@@ -122,6 +121,7 @@ public class JudgeHandler : CommandHandler<JudgeCommand, Result<ReadDto<Matching
         {
             oppositeJudgement = await context.JudgementsQuery.SingleOrDefaultAsync(j => j.CandidateId == oppositeCandidate.Id, cancellationToken);
         }
+
 
         var (matching, judgement) = _judgementService.Judge(judge, candidate, command.IsPositive, existingJudgement, oppositeJudgement);
         if (matching != null)

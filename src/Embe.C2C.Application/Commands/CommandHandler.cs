@@ -11,25 +11,17 @@ public record CommandResult<T>
 );
 
 public abstract class CommandHandler<T_Command, T_Result>
+(
+    DomainEventStore domainEventStore,
+    IRepository context,
+    DomainEventHandler domainEventHandler,
+    IntegrationEventHandler integrationEventHandler
+)
 {
-    private readonly DomainEventStore _domainEventStore;
-    private readonly IRepository _context;
-    private readonly DomainEventHandler _domainEventHandler;
-    private readonly IntegrationEventHandler _integrationEventHandler;
-
-    public CommandHandler
-    (
-        DomainEventStore domainEventStore,
-        IRepository context,
-        DomainEventHandler domainEventHandler,
-        IntegrationEventHandler integrationEventHandler
-    )
-    {
-        _domainEventStore = domainEventStore;
-        _context = context;
-        _domainEventHandler = domainEventHandler;
-        _integrationEventHandler = integrationEventHandler;
-    }
+    private readonly DomainEventStore _domainEventStore = domainEventStore;
+    private readonly IRepository _context = context;
+    private readonly DomainEventHandler _domainEventHandler = domainEventHandler;
+    private readonly IntegrationEventHandler _integrationEventHandler = integrationEventHandler;
 
     public async Task<T_Result> HandleAsync
     (

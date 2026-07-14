@@ -332,6 +332,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         });
 
         if (response.success) {
+            router.refresh();
             router.push("/public/login");
         } else {
             throw new Error("not implemented");

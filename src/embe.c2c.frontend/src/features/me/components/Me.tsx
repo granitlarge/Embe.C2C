@@ -13,6 +13,7 @@ import LargeModal from "@/src/shared/components/modal/LargeModal";
 import Profile from "@/src/shared/components/user/Profile";
 import { calculateAge } from "@/src/shared/time";
 import AlertDialog from "@/src/shared/components/infos/AlertDialog";
+import { useRouter } from "nextjs-toploader/app";
 
 export type MeProps = {
     className?: string,
@@ -21,6 +22,7 @@ export type MeProps = {
 
 export default function Me({ className, user }: MeProps) {
 
+    const router = useRouter();
     const classNames = [
         className
     ].filter(Boolean).join(" ")
@@ -115,6 +117,7 @@ export default function Me({ className, user }: MeProps) {
 
         setServerSideBasicFormData(newServerSideBasicFormData);
         setClientSideBasicFormData(newServerSideBasicFormData);
+        router.refresh();
     }
 
     return (

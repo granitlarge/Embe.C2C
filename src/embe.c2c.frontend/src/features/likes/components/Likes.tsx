@@ -7,6 +7,7 @@ import { useState } from "react";
 import { UserCompact } from "../../matches/components/UserCompact";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { getPositiveJudgements } from "../actions";
+import { useRouter } from "nextjs-toploader/app";
 
 export type LikesProps = {
     initialLikes: ReadDto<Judgement, JudgementPermission>[];
@@ -14,6 +15,7 @@ export type LikesProps = {
 }
 export default function Likes({ initialLikes, className }: LikesProps) {
 
+    const router = useRouter();
     const [likes, setLikes] = useState(initialLikes);
     const classNames = [className].filter(Boolean).join(" ");
 
