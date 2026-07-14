@@ -21,7 +21,8 @@ public static class SignalREndPoints
         var hubContext = await hubContextPool.GetHubContextAsync(cancellationToken);
         var response = await hubContext.NegotiateAsync(new Microsoft.Azure.SignalR.Management.NegotiationOptions
         {
-            HttpContext = httpContext
+            HttpContext = httpContext,
+            CloseOnAuthenticationExpiration = true
         }, cancellationToken);
         return Results.Ok(response);
 
