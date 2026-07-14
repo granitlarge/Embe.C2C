@@ -19,8 +19,7 @@ export type SelectInputProps = InputProps & {
     required?: boolean
     optionClassName?: string;
     info?: string;
-    infoTitle?: string;
-    infoType: InfoType
+    infoType?: InfoType
 }
 
 export default function SelectInput({ 
