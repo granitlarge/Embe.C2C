@@ -100,7 +100,7 @@ public class CreateSearchProfileHandler
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
-                    CommitChanges: false,
+                    Commit: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                     (
                         FailureReason.Forbidden,
@@ -112,7 +112,7 @@ public class CreateSearchProfileHandler
             var result = Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto);
             return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                CommitChanges: true,
+                Commit: true,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto)
             );
         }
@@ -120,7 +120,7 @@ public class CreateSearchProfileHandler
         {
             return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                CommitChanges: false,
+                Commit: false,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                 (
                     FailureReason.DomainError,

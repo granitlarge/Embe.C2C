@@ -26,11 +26,11 @@ public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, Result>
         var notification = await context.NotificationsQuery.FirstOrDefaultAsync(n => n.Id == command.NotificationId, cancellationToken);
         if (notification is null)
         {
-            return new CommandResult<Result>(CommitChanges: false, Result.Failure(FailureReason.NotFound, "Notification not found."));
+            return new CommandResult<Result>(Commit: false, Result.Failure(FailureReason.NotFound, "Notification not found."));
         }
 
         notification.MarkAsRead(command.IsRead);
 
-        return new CommandResult<Result>(CommitChanges: true, Result.Success());
+        return new CommandResult<Result>(Commit: true, Result.Success());
     }
 }

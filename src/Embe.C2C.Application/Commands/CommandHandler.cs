@@ -4,7 +4,11 @@ using Embe.C2C.Domain;
 
 namespace Embe.C2C.Application.Commands;
 
-public record CommandResult<T>(bool CommitChanges, T Value);
+public record CommandResult<T>
+(
+    bool Commit,
+    T Value
+);
 
 public abstract class CommandHandler<T_Command, T_Result>
 {
@@ -29,7 +33,7 @@ public abstract class CommandHandler<T_Command, T_Result>
 
     public async Task<T_Result> HandleAsync
     (
-        T_Command command, 
+        T_Command command,
         CancellationToken cancellationToken = default
     )
     {
@@ -41,7 +45,7 @@ public abstract class CommandHandler<T_Command, T_Result>
             await _domainEventHandler.HandleAsync(domainEvent, cancellationToken);
         }
 
-        if (result.CommitChanges)
+        if (result.Commit)
         {
             await _context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
