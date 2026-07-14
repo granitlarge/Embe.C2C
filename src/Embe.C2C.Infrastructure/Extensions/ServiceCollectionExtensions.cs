@@ -45,11 +45,19 @@ public static class ServiceCollectionExtensions
             options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), x => x.UseNetTopologySuite())
         );
 
-        services.AddScoped<IFileService, BlobStorageFileService>();
+        services.AddScoped<IImageService, BlobStorageImageService>();
         services.AddScoped<INotificationService, SignalRNotificationService>();
         services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
         services.AddScoped<IWorkItemService, ServiceBusWorkItemService>();
         services.AddScoped<IAuthService, AuthService>();
+        if (environment.IsDevelopment())
+        {
+            services.AddScoped<IContentSafetyService, NullContentSafetyService>();
+        }
+        else
+        {
+            services.AddScoped<IContentSafetyService, AzureAIContentSafetyService>();
+        }
 
         services.AddSingleton((serviceProvider) =>
         {

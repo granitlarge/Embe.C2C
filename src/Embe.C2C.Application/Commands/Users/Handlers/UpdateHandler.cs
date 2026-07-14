@@ -22,7 +22,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
 {
     private readonly IAuthenticatedUserService _user;
     private readonly UserAuthorizationService _authorizationPolicy;
-    private readonly IFileService _fileService;
+    private readonly IImageService _fileService;
     private readonly IWorkItemService _workItemService;
     private readonly UserDtoMapper _userDtoMapper;
     private readonly SearchProfileService _searchProfileService;
@@ -32,7 +32,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
         IAuthenticatedUserService user,
         IRepository context,
         UserAuthorizationService authorizationPolicy,
-        IFileService fileService,
+        IImageService fileService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IWorkItemService workItemService,
@@ -119,19 +119,12 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
             foreach (var image in imagesToRemove)
             {
                 user.RemoveImage(actorId, image.Id);
-                await _fileService.DeleteFileByNameAsync(image.ImageDetails.Name, cancellationToken);
+                await _fileService.DeleteImageAsync(image.ImageDetails.Name, image.ImageDetails.Status, cancellationToken);
             }
 
             foreach (var image in command.ImagesToKeep ?? [])
             {
                 user.ChangeImageOrder(actorId, image.Id, image.Order);
-            }
-
-            foreach (var image in command.ImagesToAdd ?? [])
-            {
-                var uploadImageResult = await _fileService.UploadFileAsync(image.Url.DataUrlToBytes(), image.MimeType, cancellationToken);
-                user.AddImage(actorId, new ImageDetails(uploadImageResult.Name, image.MimeType, image.Order));
-                uploadedFileUrls.Add(uploadImageResult.Url);
             }
 
             var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == actorId, cancellationToken);
@@ -153,7 +146,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
             {
                 try
                 {
-                    await Task.WhenAll(uploadedFileUrls.Select(url => _fileService.DeleteFileByUrlAsync(url, cancellationToken)));
+                    await Task.WhenAll(uploadedFileUrls.Select(url => _fileService.DeleteImageByUrlAsync(url, cancellationToken)));
                 }
                 catch (Exception)
                 {

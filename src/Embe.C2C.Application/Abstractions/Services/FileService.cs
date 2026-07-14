@@ -1,15 +1,32 @@
+using Embe.C2C.Domain.ValueObjects;
+
 namespace Embe.C2C.Application.Abstractions.Services;
 
-public interface IUploadFileResult
+public interface IUploadImageResult
 {
     string Url { get; }
     string Name { get; }
 }
 
-public interface IFileService
+public interface IImageService
 {
-    Task<IUploadFileResult> UploadFileAsync(byte[] content, string mimeType, CancellationToken cancellationToken = default);
-    Task<string> GenerateFileSasUrlAsync(string fileName, TimeSpan lifetime, CancellationToken cancellationToken = default);
-    Task DeleteFileByNameAsync(string name, CancellationToken cancellationToken = default);
-    Task DeleteFileByUrlAsync(string url, CancellationToken cancellationToken = default);
+    Task<IUploadImageResult> UploadImageAsync(byte[] content, string mimeType, CancellationToken cancellationToken = default);
+    Task<string?> GenerateImageSasUrlAsync
+    (
+        string name,
+        ImageStatus status,
+        FilePermissions permissions,
+        TimeSpan lifetime,
+        CancellationToken cancellationToken = default
+    );
+    Task DeleteImageAsync(string name, ImageStatus status, CancellationToken cancellationToken = default);
+    Task DeleteImageByUrlAsync(string url, CancellationToken cancellationToken = default);
+    Task MoveImageAsync(string name, ImageStatus oldStatus, ImageStatus newStatus, CancellationToken cancellationToken = default);
+}
+
+[Flags]
+public enum FilePermissions
+{
+    Read = 1,
+    Write = 2,
 }

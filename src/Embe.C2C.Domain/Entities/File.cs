@@ -52,4 +52,8 @@ public class Image : Entity
         return new Image(ownerUserId, imageDetails);
     }
 
+    internal void ChangeStatus(ImageStatus newStatus)
+    {
+        ImageDetails = ImageDetails with { Status = newStatus };
+    }
 }

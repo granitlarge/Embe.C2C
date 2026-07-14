@@ -56,6 +56,7 @@ public class UserConfiguration : AggregateConfiguration<User>
                     fd.Property(d => d.Name);
                     fd.Property(d => d.MimeType);
                     fd.Property(d => d.Order);
+                    fd.HasIndex(d => d.Name).IsUnique();
                 });
                 image.Property(image => image.RowVersion).IsRowVersion();
             });

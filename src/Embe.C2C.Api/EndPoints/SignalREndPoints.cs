@@ -1,4 +1,3 @@
-using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Infrastructure.SignalR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +7,7 @@ public static class SignalREndPoints
 {
     public static void MapSignalREndPoints(this WebApplication webApplication)
     {
+#warning should we require authorization here?
         webApplication.MapPost("/hubs/main/negotiate", Negotiate);
     }
 
@@ -25,6 +25,5 @@ public static class SignalREndPoints
             CloseOnAuthenticationExpiration = true
         }, cancellationToken);
         return Results.Ok(response);
-
     }
 }

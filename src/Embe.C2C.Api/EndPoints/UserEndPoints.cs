@@ -22,6 +22,7 @@ public static class UserEndPoints
         group.MapGet("/me", GetMe).RequireAuthorization();
         group.MapGet("/{id:guid}", GetById).RequireAuthorization();
         group.MapGet("/has-search-profile", HasSearchProfile).RequireAuthorization();
+        group.MapPost("/upload-image", AddImage).RequireAuthorization();
     }
 
     private static async Task<IResult> Register([FromBody] RegisterCommand command, [FromServices] RegisterHandler handler, CancellationToken cancellationToken = default)
@@ -63,6 +64,12 @@ public static class UserEndPoints
     private static async Task<IResult> HasSearchProfile([FromServices] GetHasSearchProfileHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(GetHasSearchProfileQuery.Instance, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> AddImage([FromBody] AddImageCommand command, [FromServices] AddImageHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();
     }
 }

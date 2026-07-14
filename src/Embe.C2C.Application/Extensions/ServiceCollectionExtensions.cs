@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Users.Handlers.DeleteHandler>();
         services.AddScoped<Commands.Users.Handlers.UpdateHandler>();
         services.AddScoped<Commands.Users.Handlers.GenerateCandidatesHandler>();
+        services.AddScoped<Commands.Users.Handlers.AddImageHandler>();
 
         services.AddScoped<Commands.Matching.Handlers.UnmatchHandler>();
         services.AddScoped<Commands.Judgements.Handlers.JudgeHandler>();
@@ -39,6 +40,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Messages.Handlers.MarkMessagesAsSeenHandler>();
 
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
+
+        services.AddScoped<Commands.Images.Handlers.ProcessUploadedImageHandler>();
 
         services.AddScoped<Commands.SearchProfiles.Handlers.CreateSearchProfileHandler>();
         services.AddScoped<Commands.SearchProfiles.Handlers.UpdateSearchProfileHandler>();
@@ -107,7 +110,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IFileUrlGenerator, FileUrlGenerator>((services) =>
         {
-            var service = services.GetRequiredService<IFileService>();
+            var service = services.GetRequiredService<IImageService>();
             var sasDuration = TimeSpan.FromMinutes(30);
             return new FileUrlGenerator(service, sasDuration);
         });

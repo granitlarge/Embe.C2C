@@ -13,7 +13,7 @@ import Image from "@/src/shared/components/images/Image";
 
 export type ImageData = {
     id?: string,
-    url: string,
+    url?: string,
     mimeType: string,
     order: number
 }

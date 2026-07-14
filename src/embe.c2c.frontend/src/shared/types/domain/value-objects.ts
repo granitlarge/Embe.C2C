@@ -16,10 +16,11 @@ export type DatingPreferences = {
 }
 
 export type ImageDetails = {
-    url: string;
+    url?: string;
     name: string;
     mimeType: string;
     order: number;
+    status: ImageStatus
 }
 
 export type Currency = {
@@ -92,4 +93,9 @@ export type Engagement = {
     frequency: EngagementFrequency;
     startDate: string;
     endDate: string;
+}
+export enum ImageStatus {
+    Pending = 1,
+    Rejected = 2,
+    Accepted = 3
 }

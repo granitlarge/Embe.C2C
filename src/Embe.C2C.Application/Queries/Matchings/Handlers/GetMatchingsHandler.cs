@@ -20,7 +20,7 @@ namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 public class GetMatchingsHandler
 (
     IRepository repository,
-    IFileService fileService,
+    IImageService fileService,
     MatchingAuthorizationService matchingAuthorizationService,
     MatchingDtoMapper matchingDtoMapper,
     UserAuthorizationService userAuthorizationService,
@@ -33,7 +33,7 @@ public class GetMatchingsHandler
     SearchProfileDtoMapper searchProfileDtoMapper
 ) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
-    private readonly IFileService _fileService = fileService;
+    private readonly IImageService _fileService = fileService;
     private readonly MatchingAuthorizationService _matchingAuthorizationService = matchingAuthorizationService;
     private readonly MatchingDtoMapper _matchingDtoMapper = matchingDtoMapper;
     private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;

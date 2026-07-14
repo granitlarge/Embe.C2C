@@ -4,7 +4,7 @@ namespace Embe.C2C.Domain.ValueObjects;
 
 public record ImageDetails
 {
-    public ImageDetails(string name, string mimeType, int order)
+    public ImageDetails(string name, string mimeType, int order, ImageStatus status)
     {
         if (order < 0)
         {
@@ -24,11 +24,13 @@ public record ImageDetails
         Name = name;
         MimeType = mimeType;
         Order = order;
+        Status = status;
     }
 
     public string Name { get; }
     public string MimeType { get; }
     public int Order { get; init; }
+    public ImageStatus Status { get; init; }
 }
 
 public enum ImageDetailsError
@@ -36,4 +38,11 @@ public enum ImageDetailsError
     InvalidOrder,
     InvalidName,
     InvalidMimeType
+}
+
+public enum ImageStatus
+{
+    Pending = 1,
+    Rejected = 2,
+    Accepted = 3
 }

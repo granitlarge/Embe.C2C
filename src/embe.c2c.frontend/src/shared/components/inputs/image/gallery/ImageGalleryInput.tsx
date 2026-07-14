@@ -7,7 +7,7 @@ import ErrorMessage from "../../ErrorMessage";
 
 type MyImageProps = {
     id: string;
-    src: string;
+    src?: string;
     onRemove?: () => void;
 }
 
@@ -19,6 +19,7 @@ function MyImage({ id, src, onRemove }: MyImageProps) {
         id
     });
     return (
+        src &&
         <div ref={droppableRef}>
             <div ref={draggableRef} className="relative">
                 <Image src={src} alt={"An Image"} className={`w-20 h-30 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
@@ -42,8 +43,11 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
     function onChange(event: React.ChangeEvent<HTMLInputElement>) {
         const target = event.target as HTMLInputElement;
         if (target.files && target.files.length > 0) {
-            const countFiles = target.files.length;
-            let images = [];
+            //const countFiles = target.files.length;
+            let images = Array.from(target.files).map(f => ({ url: URL.createObjectURL(f), mimeType: f.type }));
+            onImageSelected?.(images);
+
+            /*
             const files = Array.from(target.files);
             files.forEach((file) => {
                 const reader = new FileReader();
@@ -57,6 +61,7 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
                 };
                 reader.readAsDataURL(file);
             });
+            */
         }
     }
 
@@ -77,7 +82,7 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
 }
 
 export type Image = {
-    url: string;
+    url?: string;
     mimeType: string;
 }
 

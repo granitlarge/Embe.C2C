@@ -8,12 +8,15 @@ import { useState } from "react"
 import Button from "@/src/shared/components/buttons/Button";
 import { updateProfile } from "../actions/action";
 import * as z from "zod";
-import { Gender } from "@/src/shared/types/domain/value-objects";
+import { Gender, ImageStatus } from "@/src/shared/types/domain/value-objects";
 import LargeModal from "@/src/shared/components/modal/LargeModal";
 import Profile from "@/src/shared/components/user/Profile";
 import { calculateAge } from "@/src/shared/time";
 import AlertDialog from "@/src/shared/components/infos/AlertDialog";
 import { useRouter } from "nextjs-toploader/app";
+import { Mutate } from "@/src/shared/apis/api";
+import { FailureReason } from "@/src/shared/apis/type";
+import { AddImageResult } from "../actions/type";
 
 export type MeProps = {
     className?: string,
@@ -30,6 +33,7 @@ export default function Me({ className, user }: MeProps) {
     const [showPreview, setShowPreview] = useState(false);
     const initialBasicFormData = {
         images: user.data?.images
+            ?.filter(image => image.imageDetails.status === ImageStatus.Accepted)
             ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order }))
             .sort((a, b) => a.order - b.order) ?? [],
         alias: user.data?.alias!,
@@ -69,6 +73,42 @@ export default function Me({ className, user }: MeProps) {
         setShowPreview(true);
     }
 
+    async function addImage(blob: Blob, mimeType: string, order: number) : Promise<AddImageResult> {
+
+        const body = JSON.stringify({ mimeType, order })
+        const getSasResponse = await Mutate<AddImageResult, FailureReason>(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/user/upload-image`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body
+            },
+        );
+
+        if (!getSasResponse.success || !getSasResponse.value?.uploadUrl) {
+            throw new Error("not implemented");
+        }
+
+        const uploadUrl = getSasResponse.value;
+        const response = await fetch(uploadUrl.uploadUrl!, {
+            method: "PUT",
+            headers: {
+                "x-ms-blob-type": "BlockBlob",
+                "Content-Type": mimeType
+            },
+            body: blob
+        })
+
+        if (!response.ok) {
+            throw new Error("not implemented");
+        }
+
+        return getSasResponse.value;
+
+    }
+
     async function onSave() {
 
         const validationResult = validationScheme.safeParse(clientSideBasicFormData);
@@ -87,6 +127,11 @@ export default function Me({ className, user }: MeProps) {
         const imagesToKeep = imageAndIndex.filter(({ image }) => image.id !== undefined).map(({ image, index }) => ({ id: image.id!, order: index }));
         const imagesToAdd = imageAndIndex.filter(({ image }) => image.id === undefined);
 
+        const addImageResults = await Promise.all(imagesToAdd.filter(i => i.image.url !== undefined).map(async i => {
+            const blob = await (await fetch(i.image.url!)).blob();
+            return await addImage(blob, i.image.mimeType, i.image.order)
+        }));
+
         const updateProfileResponse = await updateProfile
         (
             user.data?.id!,
@@ -94,8 +139,7 @@ export default function Me({ className, user }: MeProps) {
             clientSideBasicFormData.birthDate!,
             clientSideBasicFormData.gender,
             clientSideBasicFormData.location,
-            imagesToKeep,
-            imagesToAdd.map(({ image, index }) => ({ url: image.url, mimeType: image.mimeType, order: index })),
+            imagesToKeep.concat(addImageResults.map(i => ({ id: i.image.id, order: i.image.imageDetails.order }))),
             clientSideBasicFormData.bio
         );
 
@@ -106,6 +150,7 @@ export default function Me({ className, user }: MeProps) {
         const responseReadDto = updateProfileResponse.value!;
         const newServerSideBasicFormData = {
             images: responseReadDto.data.images
+                ?.filter(image => image.imageDetails.status === ImageStatus.Accepted)
                 ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order }))
                 .sort((a, b) => a.order - b.order) ?? [],
             alias: responseReadDto.data.alias!,
@@ -179,6 +224,7 @@ export default function Me({ className, user }: MeProps) {
                                     mimeType: clientSideBasicFormData.images?.[0]?.mimeType ?? "",
                                     order: 0,
                                     name: "",
+                                    status: ImageStatus.Accepted
                                 },
                                 markedForDeletionAt: null,
                                 deletedAt: null,
@@ -194,6 +240,7 @@ export default function Me({ className, user }: MeProps) {
                                     mimeType: image.mimeType,
                                     order: index,
                                     name: "",
+                                    status: ImageStatus.Accepted
                                 },
                                 markedForDeletionAt: null,
                                 deletedAt: null
