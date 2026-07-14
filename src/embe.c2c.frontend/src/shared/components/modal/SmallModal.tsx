@@ -11,10 +11,7 @@ export type SmallModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttri
 
 export default function SmallModal({ children, className, closed, hidden, ...props }: SmallModalProps) {
 
-    const classNames = [
-        className,
-        hidden ? "hidden" : ""
-    ].filter(Boolean).join(" ");
+
 
     const dialog = useRef<HTMLDialogElement | null>(null);
 
@@ -34,6 +31,10 @@ export default function SmallModal({ children, className, closed, hidden, ...pro
         }
     }, [closed, hidden]);
 
+    const classNames = [
+        className,
+        hidden ? "hidden" : ""
+    ].filter(Boolean).join(" ");
     return (
         <dialog ref={dialog} className={`
                 ${classNames}

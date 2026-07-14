@@ -24,11 +24,12 @@ export default function InfoModal({ info, type }: InfoModalProps) {
             {
                 isOpen &&
                 <SmallModal
+                    className="w-full"
                     hidden={false}
                     closed={() => setIsOpen(false)}
                 >
-                    <Surface className="w-full h-full flex items-center justify-center">
-                        <div className="flex justify-center items-center text-center">{info}</div>
+                    <Surface className="w-full flex items-center justify-center" padding="lg">
+                        <span className="text-center text-(length:--primary-fs) text-(--primary-fc)">{info}</span>
                     </Surface>
                 </SmallModal>
             }

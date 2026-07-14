@@ -87,7 +87,7 @@ export default function BasicProfileForm({
                 <SelectInput
                     info={data.gender === undefined ? "specify your gender to receive more matches" : undefined}
                     infoType="important"
-                    errorMessage={error?.gender}               
+                    errorMessage={error?.gender}
                     optionClassName="lowercase"
                     multiple={false}
                     options={genderOptions}
