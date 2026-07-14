@@ -20,7 +20,18 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSignalR();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSignalR();
+}
+else if (builder.Environment.IsProduction())
+{
+    builder.Services.AddSignalR().AddAzureSignalR(configure =>
+    {
+        configure.ConnectionString = builder.Configuration.GetConnectionString("AzureSignalR");
+    });
+}
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthorization();

@@ -8,6 +8,7 @@ using Embe.C2C.Infrastructure.Extensions;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddApplication();
 
