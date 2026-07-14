@@ -3,7 +3,6 @@ using Embe.C2C.Api.OpenApi;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Infrastructure;
 using Embe.C2C.Infrastructure.Extensions;
-using Embe.C2C.Infrastructure.SignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = new Settings(builder.Configuration);
@@ -19,18 +18,6 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddSignalR();
-}
-else if (builder.Environment.IsProduction())
-{
-    builder.Services.AddSignalR().AddAzureSignalR(configure =>
-    {
-        configure.ConnectionString = builder.Configuration.GetConnectionString("AzureSignalR");
-    });
-}
 
 builder.Services.AddHttpContextAccessor();
 
@@ -117,10 +104,6 @@ app.MapMessageEndPoints();
 app.MapGeographyEndpoints();
 app.MapSearchProfileEndPoints();
 app.MapOpenApiEndpoints();
-
-app.MapHub<MainHub>("/hubs/main", options =>
-{
-    options.CloseOnAuthenticationExpiration = true;
-});
+app.MapSignalREndPoints();
 
 app.Run();

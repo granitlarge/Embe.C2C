@@ -8,6 +8,7 @@ using Embe.C2C.Infrastructure.Ef.Contexts;
 using Embe.C2C.Infrastructure.Identity;
 using Embe.C2C.Infrastructure.SignalR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Azure.SignalR.Management;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,18 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
         services.AddScoped<IWorkItemService, ServiceBusWorkItemService>();
         services.AddScoped<IAuthService, AuthService>();
+
+        services.AddSingleton((serviceProvider) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var serviceManager = new ServiceManagerBuilder()
+                .WithOptions(option =>
+            {
+                option.ConnectionString = configuration.GetConnectionString("AzureSignalR");
+            }).BuildServiceManager();
+            var pool = new SignalRServiceHubContextPool(serviceManager);
+            return pool;
+        });
 
         return services;
 
