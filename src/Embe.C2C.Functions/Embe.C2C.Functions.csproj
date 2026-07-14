@@ -18,4 +18,9 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Embe.C2C.Application\Embe.C2C.Application.csproj" />
+    <ProjectReference Include="..\Embe.C2C.Infrastructure\Embe.C2C.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
