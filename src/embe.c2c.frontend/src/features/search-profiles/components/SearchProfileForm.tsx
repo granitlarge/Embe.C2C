@@ -153,6 +153,7 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
                 const updateSearchProfileResponse = await updateSearchProfile(payload);
 
                 if (!updateSearchProfileResponse.success || !updateSearchProfileResponse.value?.data) {
+                    console.log(updateSearchProfileResponse);
                     throw new Error("not implemented");
                 }
 
@@ -287,6 +288,12 @@ export default function SearchProfileForm({ className, searchProfile, user : ini
                         setClientSideState(prev => ({ ...prev, duration: enums.parse(EngagementBoundedness, duration) }))
                         if (enums.parse(EngagementBoundedness, duration) === EngagementBoundedness.OneTime) {
                             setClientSideState(prev => ({ ...prev, frequency: EngagementFrequency.Once }));
+                        } else {
+                            setClientSideState(prev => ({ ...prev, frequency: prev.frequency === EngagementFrequency.Once ? undefined : prev.frequency }))
+                        }
+
+                        if (enums.parse(EngagementBoundedness, duration) !== EngagementBoundedness.FixedTerm) {
+                            setClientSideState(prev => ({ ...prev, dateRange: undefined }));
                         }
                     }}
                 />
