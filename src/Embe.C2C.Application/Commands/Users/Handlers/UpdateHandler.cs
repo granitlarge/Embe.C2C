@@ -2,13 +2,10 @@ using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
-using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
-using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
-using Embe.C2C.Application.Extensions;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
@@ -22,8 +19,6 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
 {
     private readonly IAuthenticatedUserService _user;
     private readonly UserAuthorizationService _authorizationPolicy;
-    private readonly IImageService _fileService;
-    private readonly IWorkItemService _workItemService;
     private readonly UserDtoMapper _userDtoMapper;
     private readonly SearchProfileService _searchProfileService;
 
@@ -32,10 +27,8 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
         IAuthenticatedUserService user,
         IRepository context,
         UserAuthorizationService authorizationPolicy,
-        IImageService fileService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
-        IWorkItemService workItemService,
         DomainEventStore domainEventStore,
         UserDtoMapper userDtoMapper,
         SearchProfileService searchProfileService
@@ -43,8 +36,6 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
     {
         _user = user;
         _authorizationPolicy = authorizationPolicy;
-        _fileService = fileService;
-        _workItemService = workItemService;
         _userDtoMapper = userDtoMapper;
         _searchProfileService = searchProfileService;
     }
@@ -63,9 +54,6 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
         }
 
         var actorId = _user.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-
-        var success = false;
-        HashSet<string> uploadedFileUrls = [];
 
         try
         {
@@ -119,7 +107,6 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
             foreach (var image in imagesToRemove)
             {
                 user.RemoveImage(actorId, image.Id);
-                await _fileService.DeleteImageAsync(image.ImageDetails.Name, image.ImageDetails.Status, cancellationToken);
             }
 
             foreach (var image in command.ImagesToKeep ?? [])
@@ -132,27 +119,11 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
             var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
             var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
 
-            success = true;
-
             return new CommandResult<Result<ReadDto<UserDto, UserPermission>?>>(true, Result<ReadDto<UserDto, UserPermission>?>.Success(readDto));
         }
         catch (DomainException)
         {
             return new CommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.DomainError, "Invalid input data."));
-        }
-        finally
-        {
-            if (!success)
-            {
-                try
-                {
-                    await Task.WhenAll(uploadedFileUrls.Select(url => _fileService.DeleteImageByUrlAsync(url, cancellationToken)));
-                }
-                catch (Exception)
-                {
-                    await Task.WhenAll(uploadedFileUrls.Select(url => _workItemService.PerformAsync(new DeleteFile(url))));
-                }
-            }
         }
 
     }

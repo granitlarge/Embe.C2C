@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 using Embe.C2C.Application.Abstractions.Services;
@@ -28,7 +29,6 @@ public class BlobStorageImageService : IImageService
         };
         return $"{pathElement}/{imageName}";
     }
-    
 
     public async Task DeleteImageAsync(string name, ImageStatus status, CancellationToken cancellationToken = default)
     {
@@ -40,8 +40,11 @@ public class BlobStorageImageService : IImageService
 
     public async Task DeleteImageByUrlAsync(string url, CancellationToken cancellationToken = default)
     {
-        var blobClient = new BlobClient(new Uri(url));
-        await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+        var blobName = GetBlobNameFromBlobUrl(url);
+        var blobContainerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+        await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        var bc = blobContainerClient.GetBlobClient(blobName);
+        await bc.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<string?> GenerateImageSasUrlAsync
@@ -64,6 +67,15 @@ public class BlobStorageImageService : IImageService
         return sasUri.ToString();
     }
 
+    public async Task<string> GetImageUrlAsync(string name, ImageStatus status, CancellationToken cancellationToken)
+    {
+        var path = GetImagePath(name, status);
+        var blobContainerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+        await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        var bc = blobContainerClient.GetBlobClient(path);
+        return bc.Uri.ToString();
+    }
+
     public async Task MoveImageAsync(string name, ImageStatus oldStatus, ImageStatus newStatus, CancellationToken cancellationToken = default)
     {
         var bcc = _blobServiceClient.GetBlobContainerClient(_containerName);
@@ -73,6 +85,45 @@ public class BlobStorageImageService : IImageService
         var content = await bc.DownloadContentAsync(cancellationToken);
         var newBlobClient = bcc.GetBlobClient(GetImagePath(name, newStatus));
         await newBlobClient.UploadAsync(content.Value.Content, cancellationToken);
+    }
+
+    private static string GetBlobNameFromBlobUrl(string blobUrl)
+    {
+        var pathDirectorySeparatorChars = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+        if (blobUrl.StartsWith(pathDirectorySeparatorChars))
+        {
+            blobUrl = blobUrl[1..];
+        }
+
+        if (blobUrl.EndsWith(pathDirectorySeparatorChars))
+        {
+            blobUrl = blobUrl[^1..];
+        }
+
+        var blobNameParts = new Uri(blobUrl).AbsolutePath.Split(pathDirectorySeparatorChars).Skip(3);
+        var blobName = string.Join("/", blobNameParts);
+        return blobName;
+    }
+
+    public async Task MoveImageAsync(string fromUrl, string toUrl, CancellationToken cancellationToken = default)
+    {
+        var fromBlobName = GetBlobNameFromBlobUrl(fromUrl);
+        var toBlobName = GetBlobNameFromBlobUrl(toUrl);
+
+        var blobContainerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+        await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+
+        var fromBc = blobContainerClient.GetBlobClient(fromBlobName);
+        var toBc = blobContainerClient.GetBlobClient(toBlobName);
+
+        Console.WriteLine("FromBlobName: " + fromBlobName);
+        Console.WriteLine("ToBlobName: " + toBlobName);
+        Console.WriteLine("FromBlob Exists: " + await fromBc.ExistsAsync(cancellationToken));
+        Console.WriteLine("ToBlob Exists: " + await toBc.ExistsAsync(cancellationToken));
+        using var fromStream = await fromBc.OpenReadAsync(cancellationToken: cancellationToken);
+        using var toStream = await toBc.OpenWriteAsync(overwrite: true, cancellationToken: cancellationToken);
+
+        await fromStream.CopyToAsync(toStream, cancellationToken);
     }
 
     public async Task<IUploadImageResult> UploadImageAsync(byte[] content, string mimeType, CancellationToken cancellationToken = default)

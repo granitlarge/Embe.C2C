@@ -4,6 +4,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Entities;
+using Embe.C2C.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Images.Handlers;
@@ -14,8 +15,7 @@ public class ProcessUploadedImageHandler
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
-    IContentSafetyService contentSafetyService,
-    IImageService imageService
+    IContentSafetyService contentSafetyService
 ) : CommandHandler<ProcessUploadedImageCommand, Result>
 (
     domainEventStore,
@@ -25,7 +25,6 @@ public class ProcessUploadedImageHandler
 )
 {
     private readonly IContentSafetyService _contentSafetyService = contentSafetyService;
-    private readonly IImageService _imageService = imageService;
 
     protected override async Task<CommandResult<Result>> HandleAsync
     (
@@ -44,9 +43,15 @@ public class ProcessUploadedImageHandler
         }
 
         var targetImage = user.Images.Single(i => i.ImageDetails.Name == command.ImageId.ToString());
-        var newStatus = isSafe ? Domain.ValueObjects.ImageStatus.Accepted : Domain.ValueObjects.ImageStatus.Rejected;
-        user.ChangeImageStatus(user.Id, targetImage.Id, newStatus);
-        await _imageService.MoveImageAsync(targetImage.ImageDetails.Name, Domain.ValueObjects.ImageStatus.Pending, newStatus, cancellationToken);
+        var newStatus = isSafe ? ImageStatus.Accepted : ImageStatus.Rejected;
+        if (newStatus == ImageStatus.Accepted)
+        {
+            user.ChangeImageStatus(user.Id, targetImage.Id, newStatus);
+        }
+        else if (newStatus == ImageStatus.Rejected)
+        {
+            user.RemoveImage(user.Id, targetImage.Id);
+        }
         return new CommandResult<Result>(Commit: true, Result.Success());
     }
 }

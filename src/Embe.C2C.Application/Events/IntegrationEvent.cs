@@ -10,7 +10,10 @@ public enum IntegrationEventType
     MessageEdited,
     MessageDeleted,
     MessageSeen,
-    MessageUnseen
+    MessageUnseen,
+
+    ImageRemoved,
+    ImageMoved
 }
 
 public record IntegrationEvent(IntegrationEventType Type)

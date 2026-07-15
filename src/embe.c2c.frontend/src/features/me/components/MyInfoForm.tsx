@@ -84,7 +84,6 @@ export type MyInfoFormProps = {
 }
 export default function MyInfoForm({ className, data, error, onChange }: MyInfoFormProps) {
 
-    console.log("MyInfoForm images", data.images);
     const classNames = [
         className
     ].filter(Boolean).join(" ")

@@ -20,7 +20,7 @@ var azureStorage = builder
 var azureStorageBlobs = azureStorage.AddBlobs("AzureStorageBlobs");
 var azureStorageQueues = azureStorage.AddQueues("AzureStorageQueues");
 
-var azureServiceBus = builder.AddAzureServiceBus("AzureServiceBus").RunAsEmulator();
+var azureServiceBus = builder.AddAzureServiceBus("AzureServiceBus2").RunAsEmulator().AddServiceBusQueue("AzureServiceBus", "work-items");
 
 var api = builder
     .AddProject("Api", "../Embe.C2C.Api/Embe.C2C.Api.csproj")
@@ -33,7 +33,8 @@ var api = builder
     .WithReference(azureServiceBus)
     .WithReference(azureStorageBlobs)
     .WaitFor(azureStorage)
-    .WaitFor(azureSignalR);
+    .WaitFor(azureSignalR)
+    .WaitFor(azureServiceBus);
 
 var functions = builder
     .AddAzureFunctionsProject("functions", "../Embe.C2C.Functions/Embe.C2C.Functions.csproj")
@@ -41,9 +42,11 @@ var functions = builder
     .WithHostStorage(azureStorage)
     .WithReference(azureStorageBlobs)
     .WithReference(defaultConnection)
+    .WithReference(azureServiceBus)
     .WaitFor(azureStorageBlobs)
     .WaitFor(azureSignalR)
-    .WaitFor(defaultConnection);
+    .WaitFor(defaultConnection)
+    .WaitFor(azureServiceBus);
 
 #pragma warning disable ASPIREJAVASCRIPT001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 var frontend = builder.AddNextJsApp("frontend", "../embe.c2c.frontend/")

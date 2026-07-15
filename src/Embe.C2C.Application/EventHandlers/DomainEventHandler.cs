@@ -1,5 +1,9 @@
 using Embe.C2C.Application.Abstractions.Repos;
+using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
+using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Events;
+using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
 using Embe.C2C.Application.Extensions;
@@ -14,16 +18,22 @@ using NotificationUpdatedEvent = Embe.C2C.Domain.Aggregates.Notifications.Events
 
 namespace Embe.C2C.Application.EventHandlers;
 
-public class DomainEventHandler(IRepository context) : IntegrationEventCollector
+public class DomainEventHandler
+(
+    IRepository context,
+    IImageService imageService,
+    IWorkItemService workItemService
+) : IntegrationEventCollector
 {
     private readonly IRepository _context = context;
+    private readonly IImageService _imageService = imageService;
+    private readonly IWorkItemService _workItemService = workItemService;
 
     public async Task HandleAsync(DomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
 
         switch (domainEvent)
         {
-
             case UserCreatedEvent userCreatedEvent:
                 await HandleUserCreatedEventAsync(userCreatedEvent, cancellationToken);
                 break;
@@ -54,6 +64,13 @@ public class DomainEventHandler(IRepository context) : IntegrationEventCollector
                 break;
             case MessageUnseenEvent messageUnseenEvent:
                 await HandleMessageUnseenEventAsync(messageUnseenEvent, cancellationToken);
+                break;
+
+            case UserImageStatusChangedEvent userImageStatusChangedEvent:
+                await HandleUserImageStatusChangedEventAsync(userImageStatusChangedEvent, cancellationToken);
+                break;
+            case UserImageRemovedEvent userImageRemovedEvent:
+                await HandleUserImageRemovedEventAsync(userImageRemovedEvent, cancellationToken);
                 break;
 
             default:
@@ -226,5 +243,31 @@ public class DomainEventHandler(IRepository context) : IntegrationEventCollector
         var messageId = messageUnseenEvent.Message.Id;
         var messageUnseen = new MessageUnseen(conversationId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageUnseen);
+    }
+
+    private async Task HandleUserImageStatusChangedEventAsync
+    (
+        UserImageStatusChangedEvent userImageStatusChangedEvent,
+        CancellationToken cancellationToken
+    )
+    {
+        var image = userImageStatusChangedEvent.Image;
+        var fromUrlTask = _imageService.GetImageUrlAsync(image.ImageDetails.Name, userImageStatusChangedEvent.OldStatus, cancellationToken);
+        var toUrlTask = _imageService.GetImageUrlAsync(image.ImageDetails.Name, image.ImageDetails.Status, cancellationToken);
+        await Task.WhenAll(fromUrlTask, toUrlTask);
+        var fromUrl = await fromUrlTask;
+        var toUrl = await toUrlTask;
+        AddIntegrationEvent(new ImageMovedEvent(fromUrl, toUrl));
+    }
+
+    private async Task HandleUserImageRemovedEventAsync
+    (
+        UserImageRemovedEvent userImageRemovedEvent,
+        CancellationToken cancellationToken
+    )
+    {
+        var image = userImageRemovedEvent.Image;
+        var url = await _imageService.GetImageUrlAsync(image.ImageDetails.Name, image.ImageDetails.Status, cancellationToken);
+        AddIntegrationEvent(new ImageRemovedEvent(url));
     }
 }

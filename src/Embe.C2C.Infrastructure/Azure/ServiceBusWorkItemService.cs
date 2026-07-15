@@ -10,14 +10,16 @@ public class ServiceBusWorkItemService : IWorkItemService
 
     public ServiceBusWorkItemService(IConfiguration configuration)
     {
-        _serviceBusClient = new ServiceBusClient(configuration.GetConnectionString("AzureServiceBus"));
+        var connectionString = configuration.GetConnectionString("AzureServiceBus") ?? configuration.GetValue<string>("AzureServiceBus");
+        _serviceBusClient = new ServiceBusClient(connectionString);
     }
 
     public async Task PerformAsync<T>(T task, CancellationToken cancellationToken = default)
         where T : IWorkItem
     {
+        const string queueName = "work-items";
         await _serviceBusClient
-            .CreateSender("work-items")
+            .CreateSender(queueName)
             .SendMessageAsync(new ServiceBusMessage(System.Text.Json.JsonSerializer.Serialize(task)), cancellationToken);
     }
 }

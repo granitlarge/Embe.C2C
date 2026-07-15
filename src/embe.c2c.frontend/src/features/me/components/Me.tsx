@@ -22,9 +22,9 @@ export type MeProps = {
     className?: string,
     user: ReadDto<User, UserPermission>
 }
-
 export default function Me({ className, user }: MeProps) {
 
+    console.log(user);
     const router = useRouter();
     const classNames = [
         className

@@ -19,9 +19,18 @@ public interface IImageService
         TimeSpan lifetime,
         CancellationToken cancellationToken = default
     );
+
+    Task<string> GetImageUrlAsync
+    (
+        string name,
+        ImageStatus status,
+        CancellationToken cancellationToken
+    );
+
     Task DeleteImageAsync(string name, ImageStatus status, CancellationToken cancellationToken = default);
     Task DeleteImageByUrlAsync(string url, CancellationToken cancellationToken = default);
     Task MoveImageAsync(string name, ImageStatus oldStatus, ImageStatus newStatus, CancellationToken cancellationToken = default);
+    Task MoveImageAsync(string fromUrl, string toUrl, CancellationToken cancellationToken = default);
 }
 
 [Flags]

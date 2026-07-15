@@ -109,7 +109,6 @@ export default function SearchProfileForm({ className, searchProfile, user: init
         if (!validationResult.success) {
 
             const errors = z.treeifyError(validationResult.error);
-            console.log(errors);
             setNameError(errors.properties?.name?.errors?.[0]);
             setDescriptionError(errors.properties?.description?.errors?.[0]);
             setRelationshipError(errors.properties?.relationship?.errors?.[0]);
@@ -153,7 +152,6 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 const updateSearchProfileResponse = await updateSearchProfile(payload);
 
                 if (!updateSearchProfileResponse.success || !updateSearchProfileResponse.value?.data) {
-                    console.log(updateSearchProfileResponse);
                     throw new Error("not implemented");
                 }
 
