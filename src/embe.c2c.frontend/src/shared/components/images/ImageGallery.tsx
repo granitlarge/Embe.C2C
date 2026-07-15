@@ -45,7 +45,7 @@ function ImageGalleryImage({ src, alt, className }: ImageGalleryImageProps) {
 }
 
 export type ImageGalleryProps = {
-    imageUrls: string[];
+    imageUrls: (string | undefined)[];
     className?: string;
 }
 export default function ImageGallery({ className, imageUrls }: ImageGalleryProps) {

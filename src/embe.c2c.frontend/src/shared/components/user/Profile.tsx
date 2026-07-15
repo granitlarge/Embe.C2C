@@ -1,6 +1,6 @@
 import { Mars, Transgender, Venus } from "lucide-react";
 import { SearchProfile, User } from "../../types/domain/aggregates"
-import { Gender } from "../../types/domain/value-objects";
+import { Gender, ImageStatus } from "../../types/domain/value-objects";
 import ImageGallery from "../images/ImageGallery"
 import Surface from "../surfaces/Surface";
 import { formatDistance } from "../../distance";
@@ -51,7 +51,12 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
                     </span>
                 </Surface>
             }
-            <ImageGallery className="h-[300px]" imageUrls={candidate.images?.sort((a, b) => a.imageDetails.order - b.imageDetails.order).map(i => i.imageDetails.url) ?? []} />
+            <ImageGallery className="h-[300px]" imageUrls={
+                candidate.images
+                    ?.filter(image => image.imageDetails.status === ImageStatus.Accepted)
+                    .sort((a, b) => a.imageDetails.order - b.imageDetails.order)
+                    .map(i => i.imageDetails.url) ?? []
+                } />
             <ProfileShortInfo user={candidate} />
             {
                 candidateSearchProfile &&

@@ -4,7 +4,7 @@ import Surface from "@/src/shared/components/surfaces/Surface"
 import { useState } from "react";
 import LargeModal from "@/src/shared/components/modal/LargeModal";
 import ImageGalleryInput from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
-import { Gender } from "@/src/shared/types/domain/value-objects";
+import { Gender, ImageStatus } from "@/src/shared/types/domain/value-objects";
 import { Location } from "@/src/shared/types/domain/value-objects";
 import BasicProfileForm from "../../auth/components/BasicProfileForm";
 import { getValidBirthdateRange } from "@/src/shared/time";
@@ -15,7 +15,8 @@ export type ImageData = {
     id?: string,
     url?: string,
     mimeType: string,
-    order: number
+    order: number;
+    status?: ImageStatus;
 }
 type MyImagesFormProps = {
     initialImages: ImageData[]
@@ -55,7 +56,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                     data={{ images: initialImages }}
                     onChange={
                         (newImages) => {
-                            onChange?.(newImages.map((image, index) => ({ id: (image as ImageData)?.id, url: image.url, mimeType: image.mimeType, order: index })));
+                            onChange?.(newImages.map((image, index) => ({ id: (image as ImageData)?.id, url: image.url, mimeType: image.mimeType, order: index, status: image.status })));
                         }
                     }
                 />
@@ -83,6 +84,7 @@ export type MyInfoFormProps = {
 }
 export default function MyInfoForm({ className, data, error, onChange }: MyInfoFormProps) {
 
+    console.log("MyInfoForm images", data.images);
     const classNames = [
         className
     ].filter(Boolean).join(" ")

@@ -1,10 +1,11 @@
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Dtos
 {
     public interface IFileUrlGenerator
     {
-        Task<string?> GenerateUrlAsync(string fileName, FilePermissions filePermissions, CancellationToken cancellationToken = default);
+        Task<string?> GenerateUrlAsync(string fileName, ImageStatus imageStatus, FilePermissions filePermissions, CancellationToken cancellationToken = default);
     }
 
     public class FileUrlGenerator : IFileUrlGenerator
@@ -22,9 +23,9 @@ namespace Embe.C2C.Application.Dtos
             _sasDuration = sasDuration;
         }
 
-        public Task<string?> GenerateUrlAsync(string fileName, FilePermissions filePermissions, CancellationToken cancellationToken = default)
+        public Task<string?> GenerateUrlAsync(string fileName, ImageStatus imageStatus, FilePermissions filePermissions, CancellationToken cancellationToken = default)
         {
-            return _fileService.GenerateImageSasUrlAsync(fileName, Domain.ValueObjects.ImageStatus.Accepted, filePermissions, _sasDuration, cancellationToken);
+            return _fileService.GenerateImageSasUrlAsync(fileName, imageStatus, filePermissions, _sasDuration, cancellationToken);
 
         }
     }

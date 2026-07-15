@@ -168,6 +168,14 @@ public class User : Aggregate
         var image = _images.Single(i => i.Id == imageId);
         image.ChangeStatus(newStatus);
         UpdatedAt = DateTimeOffset.UtcNow;
+        if (newStatus == ImageStatus.Accepted)
+        {
+            AddDomainEvent(new UserImageAcceptedEvent(image));
+        }
+        else if (newStatus == ImageStatus.Rejected)
+        {
+            AddDomainEvent(new UserImageRejectedEvent(image));
+        }
     }
 
     public void RemoveImage(Guid actorId, Guid imageId)

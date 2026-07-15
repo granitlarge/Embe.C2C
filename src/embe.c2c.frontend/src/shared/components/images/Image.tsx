@@ -16,8 +16,7 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
     const [isLoading, setIsLoading] = useState(true);
     const classNames = [
         className,
-        isLoading ? "opacity-0" : "opacity-100",
-        "hello"
+        isLoading ? "opacity-0" : "opacity-100"
     ].filter(Boolean).join(" ");
 
     return (

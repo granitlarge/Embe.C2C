@@ -33,8 +33,7 @@ export default function Me({ className, user }: MeProps) {
     const [showPreview, setShowPreview] = useState(false);
     const initialBasicFormData = {
         images: user.data?.images
-            ?.filter(image => image.imageDetails.status === ImageStatus.Accepted)
-            ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order }))
+            ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status as (ImageStatus | undefined) }))
             .sort((a, b) => a.order - b.order) ?? [],
         alias: user.data?.alias!,
         birthDate: user.data?.birthDate!,
@@ -46,7 +45,7 @@ export default function Me({ className, user }: MeProps) {
     const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(initialBasicFormData);
     const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(initialBasicFormData);
     const [basicFormError, setBasicFormError] = useState<MyInfoFormError>({});
-
+    
     const validationScheme = z.object({
         images: z.array(z.object({
             id: z.string().optional(),
@@ -150,8 +149,7 @@ export default function Me({ className, user }: MeProps) {
         const responseReadDto = updateProfileResponse.value!;
         const newServerSideBasicFormData = {
             images: responseReadDto.data.images
-                ?.filter(image => image.imageDetails.status === ImageStatus.Accepted)
-                ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order }))
+                ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status }))
                 .sort((a, b) => a.order - b.order) ?? [],
             alias: responseReadDto.data.alias!,
             birthDate: responseReadDto.data.birthDate!,
@@ -220,11 +218,11 @@ export default function Me({ className, user }: MeProps) {
                                 id: "",
                                 ownerUserId: "",
                                 imageDetails: {
-                                    url: clientSideBasicFormData.images?.[0]?.url ?? "",
+                                    url: clientSideBasicFormData.images?.[0]?.url,
                                     mimeType: clientSideBasicFormData.images?.[0]?.mimeType ?? "",
                                     order: 0,
                                     name: "",
-                                    status: ImageStatus.Accepted
+                                    status: clientSideBasicFormData.images?.[0]?.status ?? ImageStatus.Pending
                                 },
                                 markedForDeletionAt: null,
                                 deletedAt: null,
@@ -240,7 +238,7 @@ export default function Me({ className, user }: MeProps) {
                                     mimeType: image.mimeType,
                                     order: index,
                                     name: "",
-                                    status: ImageStatus.Accepted
+                                    status: image.status ?? ImageStatus.Pending
                                 },
                                 markedForDeletionAt: null,
                                 deletedAt: null

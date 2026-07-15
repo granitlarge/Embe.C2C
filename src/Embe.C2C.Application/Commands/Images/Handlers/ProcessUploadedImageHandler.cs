@@ -39,12 +39,14 @@ public class ProcessUploadedImageHandler
         var user = await context.DomainUsersQuery.FirstOrDefaultAsync(du => EF.Property<List<Image>>(du, "_images").Any(i => i.ImageDetails.Name == command.ImageId.ToString()), cancellationToken);
         var isSafe = Math.Abs(safetyScore) < 0.001m;
         if (user is null)
+        {
             return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "user does not exist"));
+        }
 
         var targetImage = user.Images.Single(i => i.ImageDetails.Name == command.ImageId.ToString());
         var newStatus = isSafe ? Domain.ValueObjects.ImageStatus.Accepted : Domain.ValueObjects.ImageStatus.Rejected;
         user.ChangeImageStatus(user.Id, targetImage.Id, newStatus);
-        await _imageService.MoveImageAsync(targetImage.ImageDetails.Name, Domain.ValueObjects.ImageStatus.Pending, newStatus);
+        await _imageService.MoveImageAsync(targetImage.ImageDetails.Name, Domain.ValueObjects.ImageStatus.Pending, newStatus, cancellationToken);
         return new CommandResult<Result>(Commit: true, Result.Success());
     }
 }

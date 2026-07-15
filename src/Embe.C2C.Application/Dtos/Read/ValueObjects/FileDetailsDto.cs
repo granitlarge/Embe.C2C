@@ -15,7 +15,7 @@ public static class ImageDetailsDtoExtensions
 {
     public static async Task<ImageDetailsDto> ToDtoAsync(this ImageDetails fileDetails, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken = default)
     {
-        var url = await fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, Abstractions.Services.FilePermissions.Read, cancellationToken);
+        var url = await fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, fileDetails.Status, Abstractions.Services.FilePermissions.Read, cancellationToken);
         return new ImageDetailsDto(url, fileDetails.Name, fileDetails.MimeType, fileDetails.Order, fileDetails.Status);
     }
 }
