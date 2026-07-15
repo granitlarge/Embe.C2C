@@ -299,14 +299,14 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                     clientSideState.duration === EngagementBoundedness.FixedTerm &&
                     <>
                         <DateInput
-                            initialValue={clientSideState.dateRange?.startDate}
+                            value={clientSideState.dateRange?.startDate}
                             onBlur={(value) => setClientSideState(prev => ({ ...prev, dateRange: { ...prev.dateRange, startDate: value } }))}
                             minDate={new Date().toISOString().split("T")[0]}
                             maxDate="2099-01-01"
                             label={"start date"}
                         />
                         <DateInput
-                            initialValue={clientSideState.dateRange?.endDate}
+                            value={clientSideState.dateRange?.endDate}
                             onBlur={(value) => setClientSideState(prev => ({ ...prev, dateRange: { ...prev.dateRange, endDate: value } }))}
                             minDate={new Date().toISOString().split("T")[0]}
                             maxDate="2099-01-01"
@@ -364,7 +364,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
 
                 <TextAreaInput
                     errorMessage={descriptionError}
-                    initialValue={clientSideState.description}
+                    value={clientSideState.description}
                     label="description"
                     placeholder="describe what you're looking for..."
                     size="lg"
@@ -373,7 +373,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
 
                 <TextInput
                     errorMessage={nameError}
-                    initialValue={clientSideState.name}
+                    value={clientSideState.name}
                     label="name"
                     placeholder="name your search profile..."
                     onBlur={(name) => setClientSideState(prev => ({ ...prev, name }))}

@@ -1,10 +1,11 @@
+import { Guid } from "../../cache";
 import { ReadDto } from "../dtos/types";
 import { Message, MessagePermission } from "./aggregates";
 import { ImageDetails as ImageDetails } from "./value-objects";
 
 export type Image = {
-    id: string;
-    ownerUserId: string;
+    id: Guid;
+    ownerUserId: Guid;
     imageDetails: ImageDetails;
     markedForDeletionAt: string | null;
     deletedAt: string | null;
@@ -12,11 +13,11 @@ export type Image = {
 }
 
 export type Conversation = {
-    id: string;
-    matchingId: string;
-    userId1: string;
-    userId2: string;
-    lastMessageId: string | null;
+    id: Guid;
+    matchingId: Guid;
+    userId1: Guid;
+    userId2: Guid;
+    lastMessageId: Guid | null;
     messageCount: number;
     updatedAt: string;
     createdAt: string;

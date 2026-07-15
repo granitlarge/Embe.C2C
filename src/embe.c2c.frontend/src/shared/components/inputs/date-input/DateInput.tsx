@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Surface from "../../surfaces/Surface";
 import ErrorMessage from "../ErrorMessage";
 
@@ -6,7 +6,7 @@ export type DateInputProps = {
     minDate?: string;
     maxDate?: string;
     label: string;
-    initialValue?: string;
+    value?: string;
     onBlur?: (value: string) => void;
     className?: string;
     required?: boolean
@@ -14,17 +14,21 @@ export type DateInputProps = {
     info?: string;
 }
 
-export default function DateInput({ label, initialValue, onBlur, minDate, maxDate, className, required = true, errorMessage }: DateInputProps) {
+export default function DateInput({ label, value, onBlur, minDate, maxDate, className, required = true, errorMessage }: DateInputProps) {
 
-    const [value, setValue] = useState(initialValue ?? "");
+    const [actualValue, setActualValue] = useState(value ?? "");
 
     const shellClassNames = [
         className
     ].filter(Boolean).join(" ");
 
+    useEffect(() => {
+        setActualValue(value ?? "")
+    }, [value])
+
     const inputClassNames = [
         "input",
-        (value && ((minDate && value < minDate) || (maxDate && value > maxDate))) ? "input-invalid" : ""
+        (actualValue && ((minDate && actualValue < minDate) || (maxDate && actualValue > maxDate))) ? "input-invalid" : ""
     ].filter(Boolean).join(" ");
 
     return (
@@ -33,9 +37,9 @@ export default function DateInput({ label, initialValue, onBlur, minDate, maxDat
             <input
                 className={inputClassNames}
                 type="date"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onBlur={() => onBlur?.(value)}
+                value={actualValue}
+                onChange={(e) => setActualValue(e.target.value)}
+                onBlur={() => onBlur?.(actualValue)}
                 min={minDate}
                 max={maxDate}
                 required={required} />

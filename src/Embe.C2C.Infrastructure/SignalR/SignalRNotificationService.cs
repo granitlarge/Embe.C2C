@@ -1,4 +1,5 @@
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Messages;
 using Microsoft.AspNetCore.SignalR;
 
@@ -17,6 +18,8 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
             MessageDeleted messageDeleted => SendMessageDeletedNotificationAsync(messageDeleted, cancellationToken),
             MessageSeen messageSeen => SendMessageSeenNotificationAsync(messageSeen, cancellationToken),
             MessageUnseen messageUnseen => SendMessageUnseenNotificationAsync(messageUnseen, cancellationToken),
+
+            ImageStatusChangedEvent imageStatusChangedEvent => SendImageStatusChangedNotificationAsync(imageStatusChangedEvent, cancellationToken),
             _ => Task.CompletedTask
         };
     }
@@ -54,7 +57,20 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
     {
         var hubContext = await _pool.GetHubContextAsync(cancellationToken);
         await hubContext.Clients.User(messageUnseen.AuthorUserId.ToString())
-        .SendAsync("MessagesUnseen", new[] { messageUnseen.MessageId }, messageUnseen.ConversationId, cancellationToken);
+            .SendAsync("MessagesUnseen", new[] { messageUnseen.MessageId }, messageUnseen.ConversationId, cancellationToken);
+    }
+
+    private async Task SendImageStatusChangedNotificationAsync(ImageStatusChangedEvent imageStatusChanged, CancellationToken cancellationToken)
+    {
+        var hubContext = await _pool.GetHubContextAsync(cancellationToken);
+        await hubContext.Clients.User(imageStatusChanged.UserId.ToString())
+        .SendAsync
+        (
+            "ImageStatusChanged",
+            imageStatusChanged.ImageId,
+            imageStatusChanged.NewStatus,
+            cancellationToken
+        );
     }
 
     #endregion

@@ -10,9 +10,10 @@ import BasicProfileForm from "../../auth/components/BasicProfileForm";
 import { getValidBirthdateRange } from "@/src/shared/time";
 import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAreaInput";
 import Image from "@/src/shared/components/images/Image";
+import { Guid } from "@/src/shared/cache";
 
 export type ImageData = {
-    id?: string,
+    id?: Guid,
     url?: string,
     mimeType: string,
     order: number;
@@ -139,7 +140,7 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
                     size="lg"
                     placeholder="tell the world about yourself..."
                     label="bio"
-                    initialValue={data.bio}
+                    value={data.bio}
                     onBlur={(value) => onChange({ ...data, bio: value })}
                     errorMessage={error?.bio}
                 />

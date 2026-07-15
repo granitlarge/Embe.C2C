@@ -132,14 +132,14 @@ function PasswordStep({
             <TextInput
                 label="password"
                 type="password"
-                initialValue={password}
+                value={password}
                 onBlur={(pw) => { setPasswordState(pw); clearErrors(); }}
                 errorMessage={undefined}
             />
             <TextInput
                 label="confirm password"
                 type="password"
-                initialValue={confirmPassword}
+                value={confirmPassword}
                 onBlur={(pw) => { setConfirmPasswordState(pw); clearErrors(); }}
                 errorMessage={error}
             />

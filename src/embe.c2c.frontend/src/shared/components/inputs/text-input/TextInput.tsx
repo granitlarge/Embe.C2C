@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Surface from "../../surfaces/Surface";
 import ErrorMessage from "../ErrorMessage";
 
@@ -9,7 +9,7 @@ export type InputProps = {
 export type TextInputProps = InputProps & {
     className?: string;
     onBlur?: (value: string) => void;
-    initialValue?: string;
+    value?: string;
     label?: React.ReactNode;
     type?: string;
     placeholder?: string;
@@ -20,14 +20,17 @@ export default function TextInput({
     className,
     onBlur,
     type = "text",
-    initialValue,
+    value,
     errorMessage,
     placeholder,
     children
 }: TextInputProps) {
 
-    const [value, setValue] = useState(initialValue ?? "");
+    const [actualValue, setActualValue] = useState(value ?? "");
 
+    useEffect(() => {
+        setActualValue(value || "");
+    }, [value])
     const shellClassNames = [
         className
     ].filter(Boolean).join(" ");
@@ -39,9 +42,9 @@ export default function TextInput({
                 className="input"
                 placeholder={placeholder ?? ""}
                 type={type}
-                value={value}
-                onChange={(e) => { setValue(e.target.value); }}
-                onBlur={(e) => { onBlur?.(value) }}
+                value={actualValue}
+                onChange={(e) => { setActualValue(e.target.value); }}
+                onBlur={(e) => { onBlur?.(actualValue) }}
             />
             <ErrorMessage message={errorMessage} />
             {children}

@@ -31,7 +31,7 @@ export function MessageCrafter({
                 mode === "reply" && <Message className="surface-secondary absolute bottom-full mb-1" dto={replyToMessage!} isOwn={false} />
             }
             <TextAreaInput
-                initialValue={content}
+                value={content}
                 onBlur={onChange}
                 placeholder="write a message.."
                 className="surface-secondary w-full p-3 rounded-l-lg grow-1"

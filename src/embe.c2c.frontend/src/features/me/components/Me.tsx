@@ -4,7 +4,7 @@ import Surface from "@/src/shared/components/surfaces/Surface"
 import MyInfoForm, { MyInfoFormData, MyInfoFormError } from "./MyInfoForm"
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates"
 import { ReadDto } from "@/src/shared/types/dtos/types"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Button from "@/src/shared/components/buttons/Button";
 import { updateProfile } from "../actions/action";
 import * as z from "zod";
@@ -17,35 +17,68 @@ import { useRouter } from "nextjs-toploader/app";
 import { Mutate } from "@/src/shared/apis/api";
 import { FailureReason } from "@/src/shared/apis/type";
 import { AddImageResult } from "../actions/type";
+import useCurrentUserStore from "@/src/shared/stores/current-user";
+import { getOrCreateConnection } from "@/src/shared/signal-r";
+import { Guid, NullGuid } from "@/src/shared/cache";
 
 export type MeProps = {
     className?: string,
     user: ReadDto<User, UserPermission>
 }
-export default function Me({ className, user }: MeProps) {
+export default function Me({ className, user: initialUser }: MeProps) {
 
-    console.log(user);
     const router = useRouter();
-    const classNames = [
-        className
-    ].filter(Boolean).join(" ")
+    
+    const currentUser = useCurrentUserStore(store => store.currentUser);
+    const setCurrentUser = useCurrentUserStore(store => store.setCurrentUser);
+    useEffect(() => {
+        setCurrentUser(initialUser);
+    }, [initialUser, setCurrentUser])
+
+    useEffect(() => {
+
+        const connection = getOrCreateConnection();
+        if (connection.state === "Disconnected") {
+            connection.start().catch(err => {
+                console.error("failed to start connection: ", err);
+            })
+        }
+
+        return () => {
+
+        }
+
+    }, [])
 
     const [showPreview, setShowPreview] = useState(false);
-    const initialBasicFormData = {
-        images: user.data?.images
-            ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status as (ImageStatus | undefined) }))
-            .sort((a, b) => a.order - b.order) ?? [],
-        alias: user.data?.alias!,
-        birthDate: user.data?.birthDate!,
-        gender: user.data?.gender,
-        location: user.data?.location,
-        bio: user.data?.bio
-    };
+    function getBasicFormDataFromCurrentUser(user: ReadDto<User, UserPermission> | undefined) {
+        const basicFormData = {
+            images: user?.data?.images
+                ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status as (ImageStatus | undefined) }))
+                .sort((a, b) => a.order - b.order) ?? [],
+            alias: user?.data?.alias!,
+            birthDate: user?.data?.birthDate!,
+            gender: user?.data?.gender,
+            location: user?.data?.location,
+            bio: user?.data?.bio
+        };
 
-    const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(initialBasicFormData);
-    const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(initialBasicFormData);
+        return basicFormData;
+    }
+
+    const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(currentUser));
+    const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(currentUser));
+
+    useEffect(() => {
+
+        setServerSideBasicFormData(getBasicFormDataFromCurrentUser(currentUser));
+        // THIS IS PROBLEMATIC! We need to merge changes here.
+        setClientSideBasicFormData(getBasicFormDataFromCurrentUser(currentUser));
+
+    }, [currentUser]);
+
     const [basicFormError, setBasicFormError] = useState<MyInfoFormError>({});
-    
+
     const validationScheme = z.object({
         images: z.array(z.object({
             id: z.string().optional(),
@@ -72,7 +105,7 @@ export default function Me({ className, user }: MeProps) {
         setShowPreview(true);
     }
 
-    async function addImage(blob: Blob, mimeType: string, order: number) : Promise<AddImageResult> {
+    async function addImage(blob: Blob, mimeType: string, order: number): Promise<AddImageResult> {
 
         const body = JSON.stringify({ mimeType, order })
         const getSasResponse = await Mutate<AddImageResult, FailureReason>(
@@ -132,37 +165,28 @@ export default function Me({ className, user }: MeProps) {
         }));
 
         const updateProfileResponse = await updateProfile
-        (
-            user.data?.id!,
-            clientSideBasicFormData.alias!,
-            clientSideBasicFormData.birthDate!,
-            clientSideBasicFormData.gender,
-            clientSideBasicFormData.location,
-            imagesToKeep.concat(addImageResults.map(i => ({ id: i.image.id, order: i.image.imageDetails.order }))),
-            clientSideBasicFormData.bio
-        );
+            (
+                currentUser?.data?.id!,
+                clientSideBasicFormData.alias!,
+                clientSideBasicFormData.birthDate!,
+                clientSideBasicFormData.gender,
+                clientSideBasicFormData.location,
+                imagesToKeep.concat(addImageResults.map(i => ({ id: i.image.id, order: i.image.imageDetails.order }))),
+                clientSideBasicFormData.bio
+            );
 
         if (!updateProfileResponse.success) {
             throw new Error("not implemented");
         }
 
         const responseReadDto = updateProfileResponse.value!;
-        const newServerSideBasicFormData = {
-            images: responseReadDto.data.images
-                ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status }))
-                .sort((a, b) => a.order - b.order) ?? [],
-            alias: responseReadDto.data.alias!,
-            birthDate: responseReadDto.data.birthDate!,
-            gender: responseReadDto.data.gender,
-            location: responseReadDto.data.location,
-            bio: responseReadDto.data.bio
-        };
-
-        setServerSideBasicFormData(newServerSideBasicFormData);
-        setClientSideBasicFormData(newServerSideBasicFormData);
+        setCurrentUser(responseReadDto);
         router.refresh();
     }
 
+    const classNames = [
+        className
+    ].filter(Boolean).join(" ")
     return (
 
         <Surface className={`${classNames} flex flex-col gap-2`} padding="none">
@@ -202,21 +226,21 @@ export default function Me({ className, user }: MeProps) {
                 showPreview && <LargeModal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">
                     <Profile
                         candidate={{
-                            id: user.data?.id!,
+                            id: currentUser?.data?.id!,
                             bio: clientSideBasicFormData.bio,
                             alias: clientSideBasicFormData.alias,
                             birthDate: clientSideBasicFormData.birthDate,
                             gender: clientSideBasicFormData.gender,
-                            datingPreferences: user.data?.datingPreferences,
+                            datingPreferences: currentUser?.data?.datingPreferences,
                             location: clientSideBasicFormData.location,
-                            distanceKmToQueryingUser: user.data?.distanceKmToQueryingUser || 0,
+                            distanceKmToQueryingUser: currentUser?.data?.distanceKmToQueryingUser || 0,
                             age: clientSideBasicFormData.birthDate ? calculateAge(clientSideBasicFormData.birthDate) : undefined,
-                            createdAt: user.data?.createdAt,
-                            updatedAt: user.data?.updatedAt,
-                            email: user.data?.email,
+                            createdAt: currentUser?.data?.createdAt,
+                            updatedAt: currentUser?.data?.updatedAt,
+                            email: currentUser?.data?.email,
                             profilePicture: {
-                                id: "",
-                                ownerUserId: "",
+                                id: NullGuid ,
+                                ownerUserId: NullGuid,
                                 imageDetails: {
                                     url: clientSideBasicFormData.images?.[0]?.url,
                                     mimeType: clientSideBasicFormData.images?.[0]?.mimeType ?? "",
@@ -229,9 +253,9 @@ export default function Me({ className, user }: MeProps) {
                                 createdAt: ""
                             },
                             images: clientSideBasicFormData.images?.map((image, index) => ({
-                                id: image.id ?? "",
-                                ownerUserId: "",
-                                createdAt: user.data?.createdAt ?? "",
+                                id: image.id ?? NullGuid,
+                                ownerUserId: NullGuid,
+                                createdAt: "",
                                 updatedAt: new Date().toISOString(),
                                 imageDetails: {
                                     url: image.url,
@@ -241,7 +265,7 @@ export default function Me({ className, user }: MeProps) {
                                     status: image.status ?? ImageStatus.Pending
                                 },
                                 markedForDeletionAt: null,
-                                deletedAt: null
+                                deletedAt: null,
                             })) ?? []
                         }}
                     />

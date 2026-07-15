@@ -5,19 +5,19 @@ import ErrorMessage from "../ErrorMessage";
 export type TextAreaInputSize = "sm" | "md" | "lg";
 export type TextAreaInputProps = Omit<React.PropsWithoutRef<React.TextareaHTMLAttributes<HTMLTextAreaElement>>, 'onBlur'> & {
     onBlur?: (value: string) => void;
-    initialValue?: string;
+    value?: string;
     label?: string;
     errorMessage?: string;
     className?: string;
     size?: TextAreaInputSize;
 }
 
-export default function TextAreaInput({ initialValue, onBlur, label, className, errorMessage, size, ...props }: TextAreaInputProps) {
-    const [value, setValue] = useState(initialValue ?? "");
+export default function TextAreaInput({ value, onBlur, label, className, errorMessage, size, ...props }: TextAreaInputProps) {
+    const [actualValue, setActualValue] = useState(value ?? "");
 
     useEffect(() => {
-        setValue(initialValue ?? "");
-    }, [initialValue]);
+        setActualValue(value ?? "");
+    }, [value]);
 
     const classNames = [
         className
@@ -35,12 +35,12 @@ export default function TextAreaInput({ initialValue, onBlur, label, className, 
             {label && <label className="label">{label}</label>}
             <textarea
                 placeholder={props.placeholder}
-                value={value}
+                value={actualValue}
                 onChange={(e) => {
-                    setValue(e.target.value);
+                    setActualValue(e.target.value);
                 }}
                 onBlur={(e) => {
-                    onBlur?.(value);
+                    onBlur?.(actualValue);
                 }}
                 className={`input ${styles.textArea} ${textAreaClasses}`}
                 {...props}

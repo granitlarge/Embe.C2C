@@ -66,7 +66,7 @@ export default function BasicProfileForm({
                 config.alias &&
                 <TextInput
                     label={"alias"}
-                    initialValue={data?.alias}
+                    value={data?.alias}
                     onBlur={(alias) => onChange({ ...data, alias })}
                     errorMessage={error?.alias}
                 />
@@ -78,7 +78,7 @@ export default function BasicProfileForm({
                     label={"date of birth"}
                     minDate={data.birthDateRange.lower}
                     maxDate={data.birthDateRange.upper}
-                    initialValue={data?.birthDate}
+                    value={data?.birthDate}
                     onBlur={(birthDate) => onChange({ ...data, birthDate })}
                 />
             }

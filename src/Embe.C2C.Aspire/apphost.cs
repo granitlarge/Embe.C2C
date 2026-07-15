@@ -29,6 +29,7 @@ var api = builder
     .WithEnvironment("Jwt:Audience", "Embe.C2C.Api")
     .WithEnvironment("Jwt__Secrets__AccessToken", "AccessTokenYourSuperSecretKeyForJwtTokenGeneration")
     .WithEnvironment("Jwt__Secrets__RefreshToken", "AccessTokenYourSuperSecretKeyForJwtTokenGeneration")
+    .WithEnvironment("Cors__AllowedOrigins", "http://frontend-embe.c2c.aspire.dev.localhost:51649")
     .WithReference(defaultConnection)
     .WithReference(azureServiceBus)
     .WithReference(azureStorageBlobs)
