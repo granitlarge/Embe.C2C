@@ -41,4 +41,3 @@ jobs:
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D875B4587F0049C4878F37A040C13585 }}
-          scm-do-build-during-deployment: false
