@@ -1,7 +1,7 @@
 "use client";
 
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
-import { createContext, ReactNode, useEffect, useState } from "react"
+import { createContext, ReactNode, RefObject, useEffect, useRef, useState } from "react"
 import { getAccessToken, refreshAccessToken } from "../security/functions";
 import { useApplicationStore } from "../stores/provider";
 import { Guid } from "../cache";
@@ -21,7 +21,18 @@ export const SignalRProvider = ({
     const user = useApplicationStore(s => s.user);
     const setUser = useApplicationStore(s => s.setUser);
 
+    const userRef = useRef(user);
+    const setUserRef = useRef(setUser);
+
     const [connection, setConnection] = useState<HubConnection | undefined>(undefined);
+
+    useEffect(() => {
+        userRef.current = user;
+    }, [user])
+
+    useEffect(() => {
+        setUserRef.current = setUser;
+    }, [setUser]);
 
     useEffect(() => {
         const connection = createConnection();
@@ -33,11 +44,11 @@ export const SignalRProvider = ({
     }, []);
 
     useEffect(() => {
-        const removeUserHandlers = addUserHandlers(connection, user, setUser);
+        const removeUserHandlers = addUserHandlers(connection, userRef, setUserRef);
         return () => {
             removeUserHandlers();
         };
-    }, [connection, user, setUser])
+    }, [connection])
 
     return (
         <SignalRContext.Provider value={connection}>
@@ -70,13 +81,16 @@ function createConnection(): HubConnection {
 
 function addUserHandlers(
     connection: HubConnection | undefined,
-    user: ReadDto<User, UserPermission> | undefined,
-    setUser: (newUser: ReadDto<User, UserPermission> | undefined) => void
+    userRef: RefObject<ReadDto<User, UserPermission> | undefined>,
+    setUserRef: RefObject<(newUser: ReadDto<User, UserPermission> | undefined) => void>
 ): () => void {
 
     const onImageStatusChanged = (imageId: Guid, newStatus: ImageStatus) => {
 
         console.log("SignalR.ImageStatusChanged");
+
+        const user = userRef.current;
+        const setUser = setUserRef.current;
         if (!user) {
             return;
         }
