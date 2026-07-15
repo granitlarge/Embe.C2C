@@ -17,40 +17,18 @@ import { useRouter } from "nextjs-toploader/app";
 import { Mutate } from "@/src/shared/apis/api";
 import { FailureReason } from "@/src/shared/apis/type";
 import { AddImageResult } from "../actions/type";
-import useCurrentUserStore from "@/src/shared/stores/current-user";
-import { getOrCreateConnection } from "@/src/shared/signal-r";
 import { NullGuid } from "@/src/shared/cache";
-import { HubConnectionState } from "@microsoft/signalr";
+import { useApplicationStore } from "@/src/shared/stores/provider";
 
 export type MeProps = {
-    className?: string,
-    user: ReadDto<User, UserPermission>
+    className?: string;
 }
-export default function Me({ className, user: initialUser }: MeProps) {
+export default function Me({ className }: MeProps) {
 
     const router = useRouter();
 
-    const currentUser = useCurrentUserStore(store => store.currentUser);
-    const setCurrentUser = useCurrentUserStore(store => store.setCurrentUser);
-
-    useEffect(() => {
-        setCurrentUser(initialUser);
-    }, [initialUser, setCurrentUser])
-
-    useEffect(() => {
-
-        const connection = getOrCreateConnection();
-        if (connection.state === HubConnectionState.Disconnected) {
-            connection.start().catch(err => {
-                console.error("failed to start connection: ", err);
-            })
-        }
-
-        return () => {
-
-        }
-
-    }, [])
+    const user = useApplicationStore(s => s.user);
+    const setUser = useApplicationStore(s => s.setUser);
 
     const [showPreview, setShowPreview] = useState(false);
     function getBasicFormDataFromCurrentUser(user: ReadDto<User, UserPermission> | undefined) {
@@ -69,16 +47,20 @@ export default function Me({ className, user: initialUser }: MeProps) {
         return basicFormData;
     }
 
-    const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(currentUser));
-    const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(currentUser));
+    const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(user));
+    const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(user));
 
     useEffect(() => {
 
-        setServerSideBasicFormData(getBasicFormDataFromCurrentUser(currentUser));
-        // THIS IS PROBLEMATIC! We need to merge changes here.
-        setClientSideBasicFormData(getBasicFormDataFromCurrentUser(currentUser));
+        const updatedBasicFormData = getBasicFormDataFromCurrentUser(user)
+        setServerSideBasicFormData(updatedBasicFormData);
+        // Warning! We need to merge the previous and current changes to avoid clearing all the user's modification.
+        setClientSideBasicFormData(prev => ({
+            ...prev,
+            images: updatedBasicFormData.images
+        }));
 
-    }, [currentUser]);
+    }, [user]);
 
     const [basicFormError, setBasicFormError] = useState<MyInfoFormError>({});
 
@@ -169,7 +151,7 @@ export default function Me({ className, user: initialUser }: MeProps) {
 
         const updateProfileResponse = await updateProfile
             (
-                currentUser?.data?.id!,
+                user?.data?.id!,
                 clientSideBasicFormData.alias!,
                 clientSideBasicFormData.birthDate!,
                 clientSideBasicFormData.gender,
@@ -183,7 +165,7 @@ export default function Me({ className, user: initialUser }: MeProps) {
         }
 
         const responseReadDto = updateProfileResponse.value!;
-        setCurrentUser(responseReadDto);
+        setUser(responseReadDto);
         router.refresh();
     }
 
@@ -229,18 +211,18 @@ export default function Me({ className, user: initialUser }: MeProps) {
                 showPreview && <LargeModal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">
                     <Profile
                         candidate={{
-                            id: currentUser?.data?.id!,
+                            id: user?.data?.id!,
                             bio: clientSideBasicFormData.bio,
                             alias: clientSideBasicFormData.alias,
                             birthDate: clientSideBasicFormData.birthDate,
                             gender: clientSideBasicFormData.gender,
-                            datingPreferences: currentUser?.data?.datingPreferences,
+                            datingPreferences: user?.data?.datingPreferences,
                             location: clientSideBasicFormData.location,
-                            distanceKmToQueryingUser: currentUser?.data?.distanceKmToQueryingUser || 0,
+                            distanceKmToQueryingUser: user?.data?.distanceKmToQueryingUser || 0,
                             age: clientSideBasicFormData.birthDate ? calculateAge(clientSideBasicFormData.birthDate) : undefined,
-                            createdAt: currentUser?.data?.createdAt,
-                            updatedAt: currentUser?.data?.updatedAt,
-                            email: currentUser?.data?.email,
+                            createdAt: user?.data?.createdAt,
+                            updatedAt: user?.data?.updatedAt,
+                            email: user?.data?.email,
                             acceptedImages: clientSideBasicFormData.images
                                 ?.map((image, index) => ({ image, index }))
                                 .filter(({ image }) => image.status === ImageStatus.Accepted || image.status === undefined)

@@ -10,7 +10,7 @@ import { Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates"
 import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
 import { Guid } from "@/src/shared/cache";
 import Surface from "@/src/shared/components/surfaces/Surface";
-import { getOrCreateConnection, getOrCreateConnectionOld } from "@/src/shared/signal-r";
+import { getOrCreateConnectionOld } from "@/src/shared/signal-r";
 import { HubConnection } from "@microsoft/signalr";
 import { MessageCrafter } from "./MessageCrafter";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
