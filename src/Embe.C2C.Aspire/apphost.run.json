@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://embe.c2c.aspire.dev.localhost:17084;http://embe.c2c.aspire.dev.localhost:15040",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_ENVIRONMENT": "Development",
+        "ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL": "https://embe.c2c.aspire.dev.localhost:21271",
+        "ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL": "https://embe.c2c.aspire.dev.localhost:22284"
+      }
+    },
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "http://embe.c2c.aspire.dev.localhost:15040",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_ENVIRONMENT": "Development",
+        "ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL": "http://embe.c2c.aspire.dev.localhost:19268",
+        "ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL": "http://embe.c2c.aspire.dev.localhost:20255",
+        "ASPIRE_ALLOW_UNSECURED_TRANSPORT": "true"
+      }
+    }
+  }
+}

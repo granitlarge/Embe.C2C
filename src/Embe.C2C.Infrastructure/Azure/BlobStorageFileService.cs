@@ -13,7 +13,7 @@ public class BlobStorageImageService : IImageService
 
     public BlobStorageImageService(IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("AzureBlobStorage");
+        var connectionString = configuration.GetConnectionString("AzureStorageBlobs") ?? configuration.GetValue<string>("AzureStorageBlobs");
         _blobServiceClient = new BlobServiceClient(connectionString, new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05));
     }
 

@@ -7,7 +7,7 @@ export function getOrCreateConnection() {
 
     if (!connection) {
         connection = new signalR.HubConnectionBuilder()
-            .withUrl(process.env.NEXT_PUBLIC_SIGNALR_HUB_URL!, {
+            .withUrl(`${process.env.NEXT_PUBLIC_API_URL!}/hubs/main`, {
                 accessTokenFactory: async () => {
                     let accessToken = await getAccessToken();
                     if (!accessToken) {

@@ -1,8 +1,12 @@
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Embe.C2C.Api.EndPoints;
 using Embe.C2C.Api.OpenApi;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Infrastructure;
+using Embe.C2C.Infrastructure.Ef.Contexts;
 using Embe.C2C.Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = new Settings(builder.Configuration);
@@ -12,7 +16,8 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://embec2cfrontend.bakovicmiro.workers.dev")
+        policy
+            .WithOrigins("http://frontend-embe.c2c.aspire.dev.localhost:51649", "http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -105,5 +110,29 @@ app.MapGeographyEndpoints();
 app.MapSearchProfileEndPoints();
 app.MapOpenApiEndpoints();
 app.MapSignalREndPoints();
+
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<C2CContext>();
+    await context.Database.MigrateAsync();
+
+    #region setup cors on azurite
+    var blobServiceClient = new BlobServiceClient(app.Configuration.GetConnectionString("AzureStorageBlobs"));
+    var props = await blobServiceClient.GetPropertiesAsync();
+
+    props.Value.Cors.Clear();
+    props.Value.Cors.Add(new BlobCorsRule
+    {
+        AllowedOrigins = "http://frontend-embe.c2c.aspire.dev.localhost:51649",
+        AllowedMethods = "GET,PUT,HEAD,OPTIONS,DELETE",
+        AllowedHeaders = "*",
+        ExposedHeaders = "*",
+        MaxAgeInSeconds = 3600
+    });
+
+    await blobServiceClient.SetPropertiesAsync(props.Value);
+    #endregion
+}
 
 app.Run();

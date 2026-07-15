@@ -171,6 +171,7 @@ public class C2CContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.HasPostgresExtension("postgis");
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
 
