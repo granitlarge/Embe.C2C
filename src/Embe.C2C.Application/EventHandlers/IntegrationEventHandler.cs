@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
@@ -39,7 +38,7 @@ public class IntegrationEventHandler
             case ImageRemovedEvent imageRemovedEvent:
                 await HandleImageRemovedEventAsync(imageRemovedEvent, cancellationToken);
                 break;
-            case ImageMovedEvent imageMovedEvent:
+            case ImageStatusChangedEvent imageMovedEvent:
                 await HandleImageMovedEventAsync(imageMovedEvent, cancellationToken);
                 break;
             default:
@@ -100,30 +99,30 @@ public class IntegrationEventHandler
     {
         try
         {
-            await _imageService.DeleteImageByUrlAsync(imageRemovedEvent.Url, cancellationToken);
+            await _imageService.DeleteImageAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, cancellationToken);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Console.WriteLine("Exception while attempting to delete an image with url {0}: {1}", imageRemovedEvent.Url, e);
-            await _workItemService.PerformAsync(new DeleteImage(imageRemovedEvent.Url), cancellationToken);
+            var url = await _imageService.GetImageUrlAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, cancellationToken);
+            await _workItemService.PerformAsync(new DeleteImage(url), cancellationToken);
         }
     }
 
     private async Task HandleImageMovedEventAsync
     (
-        ImageMovedEvent imageMovedEvent,
+        ImageStatusChangedEvent imageMovedEvent,
         CancellationToken cancellationToken
     )
     {
-        var fromUrl = imageMovedEvent.FromUrl;
-        var toUrl = imageMovedEvent.ToUrl;
+        var fromUrl = await _imageService.GetImageUrlAsync(imageMovedEvent.ImageName, imageMovedEvent.OldStatus, cancellationToken);
+        var toUrl = await _imageService.GetImageUrlAsync(imageMovedEvent.ImageName, imageMovedEvent.NewStatus, cancellationToken);
         try
         {
+
             await _imageService.MoveImageAsync(fromUrl, toUrl, cancellationToken);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Console.WriteLine("Exception while attempting to move an image from {0} to {1}: {2}", imageMovedEvent.FromUrl, imageMovedEvent.ToUrl, e);
             await _workItemService.PerformAsync(new MoveFile(fromUrl, toUrl), cancellationToken);
         }
     }

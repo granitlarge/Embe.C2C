@@ -1,7 +1,4 @@
 using Embe.C2C.Application.Abstractions.Repos;
-using Embe.C2C.Application.Abstractions.Services;
-using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
-using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Messages;
@@ -20,14 +17,10 @@ namespace Embe.C2C.Application.EventHandlers;
 
 public class DomainEventHandler
 (
-    IRepository context,
-    IImageService imageService,
-    IWorkItemService workItemService
+    IRepository context
 ) : IntegrationEventCollector
 {
     private readonly IRepository _context = context;
-    private readonly IImageService _imageService = imageService;
-    private readonly IWorkItemService _workItemService = workItemService;
 
     public async Task HandleAsync(DomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
@@ -251,13 +244,9 @@ public class DomainEventHandler
         CancellationToken cancellationToken
     )
     {
+        var oldStatus = userImageStatusChangedEvent.OldStatus;
         var image = userImageStatusChangedEvent.Image;
-        var fromUrlTask = _imageService.GetImageUrlAsync(image.ImageDetails.Name, userImageStatusChangedEvent.OldStatus, cancellationToken);
-        var toUrlTask = _imageService.GetImageUrlAsync(image.ImageDetails.Name, image.ImageDetails.Status, cancellationToken);
-        await Task.WhenAll(fromUrlTask, toUrlTask);
-        var fromUrl = await fromUrlTask;
-        var toUrl = await toUrlTask;
-        AddIntegrationEvent(new ImageMovedEvent(fromUrl, toUrl));
+        AddIntegrationEvent(new ImageStatusChangedEvent(image.OwnerUserId, image.Id, image.ImageDetails.Name, oldStatus, image.ImageDetails.Status)); ;
     }
 
     private async Task HandleUserImageRemovedEventAsync
@@ -267,7 +256,6 @@ public class DomainEventHandler
     )
     {
         var image = userImageRemovedEvent.Image;
-        var url = await _imageService.GetImageUrlAsync(image.ImageDetails.Name, image.ImageDetails.Status, cancellationToken);
-        AddIntegrationEvent(new ImageRemovedEvent(url));
+        AddIntegrationEvent(new ImageRemovedEvent(image.OwnerUserId, image.Id, image.ImageDetails.Name, image.ImageDetails.Status));
     }
 }
