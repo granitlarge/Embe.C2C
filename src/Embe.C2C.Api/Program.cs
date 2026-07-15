@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy
-            .WithOrigins("http://frontend-embe.c2c.aspire.dev.localhost:51649", "http://localhost:3000")
+            .WithOrigins(builder.Configuration.GetValue<string>("Cors:AllowedOrigins")?.Split(",") ?? [])
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
