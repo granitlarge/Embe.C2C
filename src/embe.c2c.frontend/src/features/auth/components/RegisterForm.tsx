@@ -4,16 +4,13 @@ import Button from "@/src/shared/components/buttons/Button";
 import { EmailInput } from "@/src/shared/components/inputs/email-input/EmailInput";
 import { useState } from "react";
 import ProgressBar from "@/src/shared/components/progress-bar/ProgressBar";
-import ImageGalleryInput from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
 import * as z from "zod";
 import { accountExists as accountExists } from "../actions/account-exists/actions";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { register } from "@/src/features/auth/actions/register/actions";
 import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import SearchProfileBuilderForm, { SearchProfileBuilderFormData, SearchProfileBuilderFormError } from "./SearchProfileBuilderForm";
-import { ImagesFormData, ImagesFormError } from "./ImagesForm";
 import { Range } from "@/src/shared/types/range";
-import { CreateFile } from "@/src/shared/types/dtos/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import BasicProfileForm, { BasicProfileFormData, BasicProfileFormError } from "./BasicProfileForm";
 import { getValidBirthdateRange } from "@/src/shared/time";
@@ -256,44 +253,6 @@ function SearchProfileStep({ onGendersChange, onAgeRangeChange, onDistanceChange
     )
 }
 
-type ImagesStepProps = {
-    finish?: (images: CreateFile[]) => void;
-    images?: CreateFile[]
-    hidden?: boolean;
-}
-function ImagesStep({ finish: finish, hidden, }: ImagesStepProps) {
-
-    const validationSchema = z.array(z.object({
-        url: z.url(),
-        mimeType: z.string(),
-    })).min(2, { message: "please add at least two images" })
-        .max(10, { message: "you can add up to 10 images" });
-
-    const [imagesData, setImagesData] = useState<ImagesFormData | undefined>(undefined);
-    const [imagesError, setImagesError] = useState<ImagesFormError | undefined>(undefined);
-
-    function onNext() {
-        const result = validationSchema.safeParse(imagesData?.images);
-        if (!result.success) {
-            setImagesError({ images: result.error.issues[0].message });
-            return;
-        } else {
-            finish?.(imagesData!.images);
-        }
-    }
-
-    return (
-        <div className={`${hidden ? "hidden" : ""} flex flex-col gap-3 w-full items-center pt-3`}>
-            <ImageGalleryInput
-                data={imagesData}
-                error={imagesError}
-                onChange={(newImages) => setImagesData(prev => ({ ...prev, images: newImages.map((image, index) => ({ ...image, order: index })) }))}
-            />
-            <Button className="max-w-xs" onClick={onNext}>finish</Button>
-        </div>
-    )
-
-}
 export type RegisterFormProps = {
     className?: string;
 }
