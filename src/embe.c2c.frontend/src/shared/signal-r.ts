@@ -5,6 +5,7 @@ import { ReadDto } from "./types/dtos/types";
 import { User, UserPermission } from "./types/domain/aggregates";
 import useCurrentUserStore from "./stores/current-user";
 import { Guid } from "./cache";
+import { Images } from "lucide-react";
 
 let connection: signalR.HubConnection | null = null;
 
@@ -100,25 +101,39 @@ function setupImageHandlers(
         if (!currentUser)
             return;
 
-        setCurrentUser
-            ({
+        if (newStatus === ImageStatus.Accepted) {
+
+            setCurrentUser
+                ({
+                    ...currentUser,
+                    data: {
+                        ...currentUser.data,
+                        images: currentUser.data.images?.map(image => {
+                            if (image.id !== imageId) {
+                                return image;
+                            }
+                            return {
+                                ...image,
+                                imageDetails: {
+                                    ...image.imageDetails,
+                                    status: newStatus
+                                }
+                            }
+                        })
+                    }
+                });
+
+        } else if (newStatus === ImageStatus.Rejected) {
+
+            setCurrentUser({
                 ...currentUser,
                 data: {
                     ...currentUser.data,
-                    images: currentUser.data.images?.map(image => {
-                        if (image.id !== imageId) {
-                            return image;
-                        }
-                        return {
-                            ...image,
-                            imageDetails: {
-                                ...image.imageDetails,
-                                status: newStatus
-                            }
-                        }
-                    })
+                    images: currentUser.data.images?.filter(image => image.id !== imageId)
                 }
             });
+
+        }
 
     }
 

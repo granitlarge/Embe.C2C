@@ -19,7 +19,7 @@ import { FailureReason } from "@/src/shared/apis/type";
 import { AddImageResult } from "../actions/type";
 import useCurrentUserStore from "@/src/shared/stores/current-user";
 import { getOrCreateConnection } from "@/src/shared/signal-r";
-import { Guid, NullGuid } from "@/src/shared/cache";
+import { NullGuid } from "@/src/shared/cache";
 
 export type MeProps = {
     className?: string,
@@ -28,7 +28,7 @@ export type MeProps = {
 export default function Me({ className, user: initialUser }: MeProps) {
 
     const router = useRouter();
-    
+
     const currentUser = useCurrentUserStore(store => store.currentUser);
     const setCurrentUser = useCurrentUserStore(store => store.setCurrentUser);
     useEffect(() => {
