@@ -1,5 +1,3 @@
-using Embe.C2C.Application.Dtos.Read.Variants.ValueObjects;
-
 namespace Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 
 public record UserVariant
@@ -12,12 +10,12 @@ public record UserVariant
         includeAge: false,
         includeGender: false,
         includeLocation: false,
-        includeProfilePicture: false,
-        includeFiles: false,
         includeCreatedAt: false,
         includeUpdatedAt: false,
         includeDistance: false,
-        includeBio: false
+        includeBio: false,
+        includePendingImages: false,
+        includeAcceptedImages: false
     );
 
     public static readonly UserVariant Blocked = new
@@ -28,12 +26,12 @@ public record UserVariant
         includeAge: false,
         includeGender: false,
         includeLocation: false,
-        includeProfilePicture: false,
-        includeFiles: false,
         includeCreatedAt: false,
         includeUpdatedAt: false,
         includeDistance: false,
-        includeBio: false
+        includeBio: false,
+        includePendingImages: false,
+        includeAcceptedImages: false
     );
 
     public static readonly UserVariant Matched = new
@@ -44,12 +42,12 @@ public record UserVariant
         includeAge: true,
         includeGender: true,
         includeLocation: false,
-        includeProfilePicture: true,
-        includeFiles: true,
         includeCreatedAt: false,
         includeUpdatedAt: false,
         includeDistance: true,
-        includeBio: true
+        includeBio: true,
+        includePendingImages: false,
+        includeAcceptedImages: true
     );
 
     public static readonly UserVariant Candidate = new
@@ -60,12 +58,12 @@ public record UserVariant
         includeAge: true,
         includeGender: true,
         includeLocation: false,
-        includeProfilePicture: true,
-        includeFiles: true,
         includeCreatedAt: false,
         includeUpdatedAt: false,
         includeDistance: true,
-        includeBio: true
+        includeBio: true,
+        includePendingImages: false,
+        includeAcceptedImages: true
     );
 
     public static readonly UserVariant PositivelyJudged = new
@@ -76,12 +74,12 @@ public record UserVariant
         includeAge: true,
         includeGender: true,
         includeLocation: false,
-        includeProfilePicture: true,
-        includeFiles: true,
         includeCreatedAt: false,
         includeUpdatedAt: false,
         includeDistance: true,
-        includeBio: true
+        includeBio: true,
+        includePendingImages: false,
+        includeAcceptedImages: true
     );
 
     public static readonly UserVariant Full = new
@@ -92,12 +90,12 @@ public record UserVariant
         includeAge: true,
         includeGender: true,
         includeLocation: true,
-        includeProfilePicture: true,
-        includeFiles: true,
         includeCreatedAt: true,
         includeUpdatedAt: true,
         includeDistance: true,
-        includeBio: true
+        includeBio: true,
+        includePendingImages: true,
+        includeAcceptedImages: true
     );
 
     public UserVariant
@@ -108,12 +106,12 @@ public record UserVariant
         bool includeAge,
         bool includeGender,
         bool includeLocation,
-        bool includeProfilePicture,
-        bool includeFiles,
         bool includeCreatedAt,
         bool includeUpdatedAt,
         bool includeDistance,
-        bool includeBio
+        bool includeBio,
+        bool includePendingImages,
+        bool includeAcceptedImages
     )
     {
         IncludeEmail = includeEmail;
@@ -122,12 +120,12 @@ public record UserVariant
         IncludeAge = includeAge;
         IncludeGender = includeGender;
         IncludeLocation = includeLocation;
-        IncludeProfilePicture = includeProfilePicture;
-        IncludeImages = includeFiles;
         IncludeCreatedAt = includeCreatedAt;
         IncludeUpdatedAt = includeUpdatedAt;
         IncludeDistanceToQueryingUser = includeDistance;
         IncludeBio = includeBio;
+        IncludePendingImages = includePendingImages;
+        IncludeAcceptedImages = includeAcceptedImages;
     }
 
     public bool IncludeEmail { get; }
@@ -136,10 +134,10 @@ public record UserVariant
     public bool IncludeAge { get; }
     public bool IncludeGender { get; }
     public bool IncludeLocation { get; }
-    public bool IncludeProfilePicture { get; }
-    public bool IncludeImages { get; }
     public bool IncludeCreatedAt { get; }
     public bool IncludeUpdatedAt { get; }
     public bool IncludeDistanceToQueryingUser { get; }
     public bool IncludeBio { get; }
+    public bool IncludePendingImages { get; }
+    public bool IncludeAcceptedImages { get; }
 }

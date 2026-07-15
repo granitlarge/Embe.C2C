@@ -1,11 +1,8 @@
 import * as signalR from "@microsoft/signalr";
 import { getAccessToken, refreshAccessToken } from "./security/functions";
 import { ImageStatus } from "./types/domain/value-objects";
-import { ReadDto } from "./types/dtos/types";
-import { User, UserPermission } from "./types/domain/aggregates";
 import useCurrentUserStore from "./stores/current-user";
 import { Guid } from "./cache";
-import { Images } from "lucide-react";
 
 let connection: signalR.HubConnection | null = null;
 
@@ -101,6 +98,11 @@ function setupImageHandlers(
         if (!currentUser)
             return;
 
+        const targetImage = [...(currentUser.data.acceptedImages ?? []), ...(currentUser.data.pendingImages ?? [])].find(image => image.id === imageId);
+        if (targetImage === undefined) {
+            return;
+        }
+
         if (newStatus === ImageStatus.Accepted) {
 
             setCurrentUser
@@ -108,18 +110,14 @@ function setupImageHandlers(
                     ...currentUser,
                     data: {
                         ...currentUser.data,
-                        images: currentUser.data.images?.map(image => {
-                            if (image.id !== imageId) {
-                                return image;
+                        acceptedImages: (currentUser.data.acceptedImages ?? []).concat([{
+                            ...targetImage,
+                            imageDetails: {
+                                ...targetImage.imageDetails,
+                                status: newStatus
                             }
-                            return {
-                                ...image,
-                                imageDetails: {
-                                    ...image.imageDetails,
-                                    status: newStatus
-                                }
-                            }
-                        })
+                        }]),
+                        pendingImages: (currentUser.data.pendingImages ?? []).filter(image => image.id !== imageId)
                     }
                 });
 
@@ -129,7 +127,8 @@ function setupImageHandlers(
                 ...currentUser,
                 data: {
                     ...currentUser.data,
-                    images: currentUser.data.images?.filter(image => image.id !== imageId)
+                    pendingImages: (currentUser.data.pendingImages ?? []).filter(image => image.id !== imageId),
+                    acceptedImages: (currentUser.data.acceptedImages ?? []).filter(image => image.id !== imageId)
                 }
             });
 

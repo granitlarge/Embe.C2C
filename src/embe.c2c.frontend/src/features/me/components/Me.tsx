@@ -20,6 +20,7 @@ import { AddImageResult } from "../actions/type";
 import useCurrentUserStore from "@/src/shared/stores/current-user";
 import { getOrCreateConnection } from "@/src/shared/signal-r";
 import { NullGuid } from "@/src/shared/cache";
+import { HubConnectionState } from "@microsoft/signalr";
 
 export type MeProps = {
     className?: string,
@@ -31,6 +32,7 @@ export default function Me({ className, user: initialUser }: MeProps) {
 
     const currentUser = useCurrentUserStore(store => store.currentUser);
     const setCurrentUser = useCurrentUserStore(store => store.setCurrentUser);
+
     useEffect(() => {
         setCurrentUser(initialUser);
     }, [initialUser, setCurrentUser])
@@ -38,7 +40,7 @@ export default function Me({ className, user: initialUser }: MeProps) {
     useEffect(() => {
 
         const connection = getOrCreateConnection();
-        if (connection.state === "Disconnected") {
+        if (connection.state === HubConnectionState.Disconnected) {
             connection.start().catch(err => {
                 console.error("failed to start connection: ", err);
             })
@@ -52,9 +54,10 @@ export default function Me({ className, user: initialUser }: MeProps) {
 
     const [showPreview, setShowPreview] = useState(false);
     function getBasicFormDataFromCurrentUser(user: ReadDto<User, UserPermission> | undefined) {
+        const images = [...(user?.data.pendingImages ?? []), ...(user?.data.acceptedImages ?? [])];
         const basicFormData = {
-            images: user?.data?.images
-                ?.map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status as (ImageStatus | undefined) }))
+            images: images
+                .map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status as (ImageStatus | undefined) }))
                 .sort((a, b) => a.order - b.order) ?? [],
             alias: user?.data?.alias!,
             birthDate: user?.data?.birthDate!,
@@ -238,35 +241,46 @@ export default function Me({ className, user: initialUser }: MeProps) {
                             createdAt: currentUser?.data?.createdAt,
                             updatedAt: currentUser?.data?.updatedAt,
                             email: currentUser?.data?.email,
-                            profilePicture: {
-                                id: NullGuid ,
-                                ownerUserId: NullGuid,
-                                imageDetails: {
-                                    url: clientSideBasicFormData.images?.[0]?.url,
-                                    mimeType: clientSideBasicFormData.images?.[0]?.mimeType ?? "",
-                                    order: 0,
-                                    name: "",
-                                    status: clientSideBasicFormData.images?.[0]?.status ?? ImageStatus.Pending
-                                },
-                                markedForDeletionAt: null,
-                                deletedAt: null,
-                                createdAt: ""
-                            },
-                            images: clientSideBasicFormData.images?.map((image, index) => ({
-                                id: image.id ?? NullGuid,
-                                ownerUserId: NullGuid,
-                                createdAt: "",
-                                updatedAt: new Date().toISOString(),
-                                imageDetails: {
-                                    url: image.url,
-                                    mimeType: image.mimeType,
-                                    order: index,
-                                    name: "",
-                                    status: image.status ?? ImageStatus.Pending
-                                },
-                                markedForDeletionAt: null,
-                                deletedAt: null,
-                            })) ?? []
+                            acceptedImages: clientSideBasicFormData.images
+                                ?.map((image, index) => ({ image, index }))
+                                .filter(({ image }) => image.status === ImageStatus.Accepted || image.status === undefined)
+                                .map(({ image, index }) => {
+                                    return {
+                                        id: image.id ?? NullGuid,
+                                        ownerUserId: NullGuid,
+                                        createdAt: "",
+                                        updatedAt: new Date().toISOString(),
+                                        imageDetails: {
+                                            url: image.url,
+                                            mimeType: image.mimeType,
+                                            order: index,
+                                            name: "",
+                                            status: image.status ?? ImageStatus.Pending
+                                        },
+                                        markedForDeletionAt: null,
+                                        deletedAt: null,
+                                    }
+                                }) ?? [],
+                            pendingImages: clientSideBasicFormData.images
+                                ?.map((image, index) => ({ image, index }))
+                                .filter(({ image }) => image.status === ImageStatus.Pending)
+                                .map(({ image, index }) => {
+                                    return {
+                                        id: image.id ?? NullGuid,
+                                        ownerUserId: NullGuid,
+                                        createdAt: "",
+                                        updatedAt: new Date().toISOString(),
+                                        imageDetails: {
+                                            url: image.url,
+                                            mimeType: image.mimeType,
+                                            order: index,
+                                            name: "",
+                                            status: image.status ?? ImageStatus.Pending
+                                        },
+                                        markedForDeletionAt: null,
+                                        deletedAt: null,
+                                    }
+                                }) ?? [],
                         }}
                     />
                 </LargeModal>

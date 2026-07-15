@@ -41,6 +41,8 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
     const classNames = [
         className
     ].filter(Boolean).join(" ")
+
+    const images = [...(candidate.pendingImages ?? []), ...(candidate.acceptedImages ?? [])];
     return (
         <Surface className={`w-full flex flex-col gap-3 ${classNames}`} padding="md" variant="secondary">
             {
@@ -52,8 +54,8 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
                 </Surface>
             }
             <ImageGallery className="h-[300px]" imageUrls={
-                candidate.images
-                    ?.filter(image => image.imageDetails.status === ImageStatus.Accepted)
+                images
+                    .filter(image => image.imageDetails.status === ImageStatus.Accepted)
                     .sort((a, b) => a.imageDetails.order - b.imageDetails.order)
                     .map(i => i.imageDetails.url) ?? []
                 } />

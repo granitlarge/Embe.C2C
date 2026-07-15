@@ -1,0 +1,534 @@
+"filename", "language", "JSON", "JSON with Comments", "YAML", "TypeScript", "MS SQL", "Python", "Markdown", "JavaScript", "TypeScript JSX", "C#", "XML", "PostCSS", "Skill", "comment", "blank", "total"
+"c:\Users\Miro\source\repos\Embe.C2C\.github\workflows\main_relationshipfinder-api.yml", "YAML", 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12, 59
+"c:\Users\Miro\source\repos\Embe.C2C\.github\workflows\main_relationshipfinder.yml", "YAML", 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 44
+"c:\Users\Miro\source\repos\Embe.C2C\data\ADM.json", "JSON", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\Miro\source\repos\Embe.C2C\data\scripts\LoadADMFileToDb.sql", "MS SQL", 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 27
+"c:\Users\Miro\source\repos\Embe.C2C\data\scripts\gadm_add_centroid.py", "Python", 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 53, 11, 91
+"c:\Users\Miro\source\repos\Embe.C2C\package-lock.json", "JSON", 756, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 757
+"c:\Users\Miro\source\repos\Embe.C2C\package.json", "JSON", 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"c:\Users\Miro\source\repos\Embe.C2C\settings.json", "JSON with Comments", 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\Embe.C2C.Api.csproj", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 5, 25
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\AuthEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 7, 52
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\GeographyEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 7, 56
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\JudgementEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 7, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\MatchingEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 6, 41
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\MessageEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 0, 8, 93
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\NotificationEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 8, 61
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\SearchProfileEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 8, 81
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\SignalREndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 3, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\EndPoints\UserEndPoints.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 11, 75
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\Extensions\FailureReasonExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 8, 87
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\Extensions\ResultExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 4, 49
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\OpenApi\OpenApiConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\OpenApi\OpenApiDocumentTransformer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 6, 21
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\OpenApi\OpenApiEndpointExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 1, 12
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\Program.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 19, 139
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\Properties\launchSettings.json", "JSON", 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\appsettings.Development.json", "JSON", 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Api\appsettings.json", "JSON", 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Entities\IAdminArea.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 1, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Repos\Repository.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 111, 0, 0, 0, 0, 14, 125
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Result.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 14, 72
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\AuthServices\AuthService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 10, 59
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\AuthServices\Credentials.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1, 5
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\AuthenticatedUserService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\ContentSafetyService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 6, 1, 12
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\FileService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 6, 41
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\NotificationService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\WorkItemServices\IWorkItemService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 3, 12
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\WorkItemServices\WorkItems\DeleteFile.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Abstractions\Services\WorkItemServices\WorkItems\MoveImage.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactGenerators\AuthorizationFactGenerator.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 2, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactGenerators\JudgementAuthorizationFactGenerator.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 4, 39
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactGenerators\MatchingFactGenerator.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 5, 32
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactGenerators\MessageFactGenerator.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 91, 0, 0, 0, 0, 13, 104
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactGenerators\SearchProfileFactGenerator.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 6, 42
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactGenerators\UserFactGenerator.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 8, 81
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\AuthorizationFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\AuthorizationFactStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 5, 32
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Conversations\ConversationAuthorizationFactStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 4, 39
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Conversations\Facts\IsParticipantConversationFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Judgements\Facts\IsJudgementJudge.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Judgements\Facts\IsJudgementJudgee.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Judgements\Facts\IsPositivelyJudgedJudgee.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Judgements\JudgementAuthorizationFactStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 10, 66
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Matches\Facts\IsParticipantMatchFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Matches\MatchingAuthorizationFactStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 4, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Messages\Facts\AuthorMessageFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Messages\Facts\RecipientMessageFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Messages\MessageAuthorizationFactStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 7, 71
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\SearchProfiles\Facts\IsCandidateForUserFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 2, 5
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\SearchProfiles\Facts\IsMatchedFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\SearchProfiles\Facts\IsOwnerFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\SearchProfiles\SearchProfileAuthorizationFactStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 12, 71
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Users\Facts\BlockedByUserFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Users\Facts\BlockingUserFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Users\Facts\CandidateUserFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Users\Facts\IsPositivelyJudgedByUser.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Users\Facts\MatchedUserFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Users\Facts\SameUserFact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\FactStores\Users\UserAuthorizationFactStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 19, 99
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\JudgementAuthorizationService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 21, 11, 97
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\MatchingAuthorizationService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 41, 10, 124
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\MessageAuthorizationService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 18, 9, 108
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\SearchProfileAuthorizationService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 16, 97
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Authorizations\UserAuthorizationService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 0, 0, 0, 21, 19, 148
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Auth\Handlers\RefreshHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 4, 35
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Auth\Handlers\SignInHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 3, 25
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Auth\Handlers\SignOutHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 4, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Auth\RefreshCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Auth\SignInCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Auth\SignOutCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\CommandHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 8, 56
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Images\Handlers\ProcessUploadedImageHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 6, 56
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Images\ProcessUploadedImageCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Judgements\Handlers\JudgeHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 0, 0, 0, 0, 14, 169
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Judgements\JudgeCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Matching\Handlers\UnmatchHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 7, 56
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Matching\UnmatchCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\CreateMessageCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\DeleteMessageCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\EditMessageCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\Handlers\CreateMessageHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, 0, 13, 100
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\Handlers\DeleteMessageHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 11, 85
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\Handlers\EditMessageHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 10, 86
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\Handlers\MarkMessagesAsSeenHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 5, 47
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Messages\MarkMessagesAsSeenCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Notifications\DeleteCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Notifications\Handlers\DeleteHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Notifications\Handlers\MarkAsReadHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 6, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Notifications\MarkAsReadCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\SearchProfiles\CreateSearchProfileCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 3, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\SearchProfiles\DeleteSearchProfileCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\SearchProfiles\Handlers\CreateSearchProfileHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 122, 0, 0, 0, 0, 10, 132
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\SearchProfiles\Handlers\DeleteSearchProfileHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 6, 71
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\SearchProfiles\Handlers\UpdateSearchProfileHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 148, 0, 0, 0, 0, 12, 160
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\SearchProfiles\UpdateSearchProfileCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 2, 18
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\AddImageCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\DeleteCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\GenerateCandidatesCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\Handlers\AddImageHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 6, 65
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\Handlers\DeleteHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 0, 0, 0, 0, 10, 67
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\Handlers\GenerateCandidatesHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, 0, 11, 98
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\Handlers\RegisterHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 13, 68
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\Handlers\UpdateHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 113, 0, 0, 0, 1, 16, 130
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\RegisterCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 4, 32
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Commands\Users\UpdateCommand.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 3, 22
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Account.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 4, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Blocking.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 4, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Contact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 4, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\ContactRequest.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 4, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Judgement.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 7, 46
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Matching.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 7, 56
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Message.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 0, 0, 0, 0, 6, 52
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Notification.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 6, 53
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\SearchProfile.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 6, 54
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\Transaction.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 4, 37
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Aggregates\User.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 8, 77
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\DtoProperty.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Entities\ConversationDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 7, 55
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Entities\ImageDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 5, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\ReadDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\ValueObjects\CurrencyDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 3, 17
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\ValueObjects\Distance.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 3, 17
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\ValueObjects\FileDetailsDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 3, 21
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\ValueObjects\LocationDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 2, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\ValueObjects\MoneyDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 4, 18
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Variants\Aggregates\JudgementVariant.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 6, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Variants\Aggregates\MatchingVariant.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 12, 105
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Variants\Aggregates\SearchProfileVariant.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 91, 0, 0, 0, 0, 6, 97
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Variants\Aggregates\UserVariant.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 135, 0, 0, 0, 0, 8, 143
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Read\Variants\ValueObjects\DatingPreferencesVariant.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 5, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\UrlGenerator.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 5, 32
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\AccountWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 2, 11
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\BlockingWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\ContactRequestWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 11
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\ContactWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\JudgementWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 11
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\MatchingWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\MessageWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 1, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\TransactionWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 3, 17
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Aggregates\UserWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 2, 20
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Entities\ConversationWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 2, 17
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\Entities\FileWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\ValueObjects\CurrencyWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\ValueObjects\DistanceWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\ValueObjects\EngagementWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 2, 12
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\ValueObjects\FileDetailsWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\ValueObjects\LocationWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 2, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Dtos\Write\ValueObjects\MoneyWriteDto.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Embe.C2C.Application.csproj", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 5, 19
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Enrichment\Aggregates\UserEnriched.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\EventHandlers\DomainEventHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 237, 0, 0, 0, 0, 24, 261
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\EventHandlers\IntegrationEventHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 110, 0, 0, 0, 1, 18, 129
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Images\ImageRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Images\ImageStatusChangedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 5
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\IntegrationEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 4, 23
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\IntegrationEventCollector.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 3, 17
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Messages\MessageCreated.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Messages\MessageDeleted.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Messages\MessageEdited.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Messages\MessageSeen.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Messages\MessageUnseen.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Notifications\NotificationCreatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Notifications\NotificationDeletedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Events\Notifications\NotificationUpdatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\Domain\Aggregates\JudgementExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 2, 34
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\Domain\Aggregates\MatchingExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 7, 76
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\Domain\Aggregates\MessageExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 2, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\Domain\Aggregates\SearchProfileExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 2, 24
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\Domain\Aggregates\UserExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 5, 43
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\NotificationDtoExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 3, 19
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\ServiceCollectionExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 24, 120
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Extensions\StringExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 2, 32
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Auth\AccountExistsQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Auth\Handlers\AccountExistsHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 4, 20
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Geography\GetAdminAreaByIdQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Geography\GetAdminAreaQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Geography\Handlers\GetAdminAreaByIdHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 6, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Geography\Handlers\GetAdminAreaHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 4, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Geography\Handlers\GetCountryAdminAreaHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 4, 24
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Geography\Handlers\ReverseGeocodeHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 4, 21
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Geography\ReverseGeocodeQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Judgements\GetPositiveJudgementsQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Judgements\Handlers\GetPositiveJudgementsHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 8, 68
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Matchings\GetMatchingByIdQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Matchings\GetMatchingsQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Matchings\Handlers\GetMatchingByIdHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 95, 0, 0, 0, 0, 8, 103
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Matchings\Handlers\GetMatchingsHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, 6, 7, 100
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Messages\GetMessageByIdQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Messages\GetMessagesByMatchingIdQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Messages\Handlers\GetMessageByIdHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 6, 46
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Messages\Handlers\GetMessagesByMatchingIdHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 6, 50
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Notifications\Handlers\GetNotificationsHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 4, 33
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Notifications\Handlers\HasUnreadHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 4, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\PagedQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 4, 20
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\SearchProfiles\GetAllSearchProfilesQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\SearchProfiles\GetSearchProfileQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\SearchProfiles\Handlers\GetAllSearchProfilesQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 6, 57
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\SearchProfiles\Handlers\GetSearchProfileHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 7, 71
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\TransactionalQueryHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 5, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Users\GetHasSearchProfileQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Users\GetMeQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Users\GetUserByIdQuery.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Users\Handlers\GetHasSearchProfileHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 5, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Users\Handlers\GetMeHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 4, 41
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Application\Queries\Users\Handlers\GetUserByIdHandler.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 5, 48
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 169, 0, 54, 223
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\aws.md", "Markdown", 0, 0, 0, 0, 0, 0, 119, 0, 0, 0, 0, 0, 0, 0, 58, 177
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\azure.md", "Markdown", 0, 0, 0, 0, 0, 0, 225, 0, 0, 0, 0, 0, 0, 0, 92, 317
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\cicd.md", "Markdown", 0, 0, 0, 0, 0, 0, 259, 0, 0, 0, 0, 0, 0, 0, 84, 343
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\docker-compose.md", "Markdown", 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 0, 55, 156
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\github-actions-azure-csharp.yml", "YAML", 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8, 54
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\github-actions-azure-typescript.yml", "YAML", 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9, 54
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\javascript.md", "Markdown", 0, 0, 0, 0, 0, 0, 95, 0, 0, 0, 0, 0, 0, 0, 32, 127
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\kubernetes.md", "Markdown", 0, 0, 0, 0, 0, 0, 158, 0, 0, 0, 0, 0, 0, 0, 79, 237
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-deployment\references\preflight.md", "Markdown", 0, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 63, 190
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-init\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 0, 29, 147
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-init\references\init-workflow.md", "Markdown", 0, 0, 0, 0, 0, 0, 95, 0, 0, 0, 0, 0, 0, 0, 29, 124
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-init\references\templates.md", "Markdown", 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 24, 93
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-monitoring\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 146, 0, 52, 198
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-monitoring\references\diagnostics-bridge.md", "Markdown", 0, 0, 0, 0, 0, 0, 156, 0, 0, 0, 0, 0, 0, 0, 54, 210
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-monitoring\references\monitoring.md", "Markdown", 0, 0, 0, 0, 0, 0, 111, 0, 0, 0, 0, 0, 0, 0, 51, 162
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-monitoring\references\playwright-handoff.md", "Markdown", 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 7, 22
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-orchestration\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 167, 0, 38, 205
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-orchestration\references\agent-workflows.md", "Markdown", 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 37, 120
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-orchestration\references\app-commands.md", "Markdown", 0, 0, 0, 0, 0, 0, 95, 0, 0, 0, 0, 0, 0, 0, 29, 124
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-orchestration\references\detection.md", "Markdown", 0, 0, 0, 0, 0, 0, 111, 0, 0, 0, 0, 0, 0, 1, 49, 161
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-orchestration\references\resource-management.md", "Markdown", 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 10, 39
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire-orchestration\references\safety-guardrails.md", "Markdown", 0, 0, 0, 0, 0, 0, 189, 0, 0, 0, 0, 0, 0, 0, 84, 273
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 133, 0, 27, 160
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\.agents\skills\aspire\references\aspire-13-3-breaking-changes.md", "Markdown", 0, 0, 0, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 23, 111
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\apphost.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 10, 62
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\apphost.run.json", "JSON", 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 31
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Aspire\aspire.config.json", "JSON", 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Accounts\Account.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 131, 0, 0, 0, 0, 24, 155
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Accounts\Events\AccountClosedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Accounts\Events\AccountOpenedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Accounts\Events\AccountRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Accounts\Events\DepositEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 3, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Accounts\Events\WithdrawalEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 4, 16
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Aggregate.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Blockings\Blocking.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 8, 47
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Blockings\Events\BlockingCreatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Blockings\Events\BlockingRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Candidates\Candidate.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 8, 55
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\ContactRequests\ContactRequest.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 13, 79
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\ContactRequests\Events\ContactRequestAcceptedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\ContactRequests\Events\ContactRequestRejectedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\ContactRequests\Events\ContactRequestRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\ContactRequests\Events\ContactRequestedCreatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Contacts\Contact.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 9, 49
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Contacts\Events\ContactRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Judgements\Events\JudgementCreatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Judgements\Events\JudgementEditedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Judgements\Events\LikeEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Judgements\Judgement.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 11, 62
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Matchings\Events\MatchingCreatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Matchings\Events\MatchingRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Matchings\Matching.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 10, 84
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Messages\Events\MessageCreatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Messages\Events\MessageEditedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Messages\Events\MessageRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Messages\Events\MessageSeenEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Messages\Events\MessageUnseenEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Messages\Message.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 15, 96
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Notifications\Events\NotificationRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Notifications\Events\NotificationUpdatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Notifications\Matchings\MatchingCreated.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 3, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Notifications\Matchings\MatchingNotification.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 4, 31
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Notifications\Matchings\MatchingRemoved.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 4, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Notifications\Notification.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 8, 44
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\SearchProfiles\SearchProfile.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 207, 0, 0, 0, 0, 35, 242
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Transactions\Transaction.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 0, 0, 0, 1, 10, 74
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Users\Events\UserCreatedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Users\Events\UserDeletedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Users\Events\UserImageRemovedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Users\Events\UserImageStatusChangedEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Aggregates\Users\User.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 206, 0, 0, 0, 2, 31, 239
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\DomainError.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\DomainEvent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\DomainEventCollector.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 4, 21
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\DomainEventStore.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 4, 18
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\DomainService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 2, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Embe.C2C.Domain.csproj", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 4, 14
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Entities\Conversation.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 15, 87
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Entities\Entity.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Entities\File.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 10, 59
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Entities\SearchProfiles\SearchProfileGender.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 6, 31
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Exceptions\DomainException.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Policies\CommunicationPolicy.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 5, 35
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Services\BlockingService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 4, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Services\ContactService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 8, 58
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Services\JudgementService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 7, 54
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Services\MatchingService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 13, 88
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Services\SearchProfileService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 9, 85
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\Services\UserService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 5, 33
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Actor.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 1, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Age.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 8, 47
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\BirthDate.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 4, 22
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Currency.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Distance.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 8, 51
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Email.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 6, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Engagements\Engagement.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 9, 63
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Engagements\Enums\EngagementBoundedness.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Engagements\Enums\EngagementFrequency.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 11
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Engagements\Enums\EngagementMedium.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Engagements\Enums\FixedTermEngagementDomainError.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\FileDetails.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 8, 48
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Gender.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 1, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Location.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 14, 65
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\MessageContent.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 4, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\Money.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 10, 48
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\RelationshipType.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\TransactionReason.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 1, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\TransactionType.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Domain\ValueObjects\UserName.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 5, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Functions\Embe.C2C.Functions.csproj", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 5, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Functions\ImageProcessor.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 3, 23
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Functions\Program.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 5, 22
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Functions\Properties\launchSettings.json", "JSON", 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Functions\host.json", "JSON", 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\ApiConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 4, 23
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\AspNetCore\AuthenticatedUserService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 4, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Azure\AzureAIContentSafetyService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 5, 34
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Azure\BlobStorageFileService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 121, 0, 0, 0, 0, 20, 141
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Azure\ServiceBusWorkItemService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 4, 25
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\AbstractionConfigurations\AggregateConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 2, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\AbstractionConfigurations\EntityConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\AccountConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 6, 38
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\AdminAreaConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 3, 24
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\BlockingConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 5, 25
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\CandidateConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 6, 35
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\ConversationConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 4, 25
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\JudgementConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 4, 21
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\MatchingConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 7, 35
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\MessageConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 6, 40
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\Notifications\Matchings\MatchingCreatedConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\Notifications\Matchings\MatchingNotificationConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 4, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\Notifications\Matchings\MatchingRemovedConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\Notifications\NotificationConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 5, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\RefreshTokenEntityConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 2, 18
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\SearchProfileConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 10, 55
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\TransactionConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 4, 32
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Configurations\UserConfiguration.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 11, 66
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Contexts\C2CContext.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 285, 0, 0, 0, 0, 42, 327
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Entities\AdminArea.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 10, 34
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Ef\Entities\RefreshToken.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 5, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Embe.C2C.Infrastructure.csproj", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 5, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Extensions\ServiceCollectionExtensions.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 8, 77
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Identity\AuthService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 291, 0, 0, 0, 0, 44, 335
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Identity\MyIdentityUser.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 3, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260709230440_InitialCreate.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 844, 0, 0, 0, 2, 303, 1149
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260709230440_InitialCreate.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 752, 0, 0, 0, 3, 87, 842
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710023305_DomainCandidate.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 915, 0, 0, 0, 2, 331, 1248
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710023305_DomainCandidate.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 256, 0, 0, 0, 3, 55, 314
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710023646_SearchProfilesFix.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 892, 0, 0, 0, 2, 324, 1218
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710023646_SearchProfilesFix.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 3, 5, 52
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710095944_SearchProfileRelationshipType.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 894, 0, 0, 0, 2, 325, 1221
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710095944_SearchProfileRelationshipType.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 3, 4, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710230332_SearchProfileActive.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 900, 0, 0, 0, 2, 328, 1230
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260710230332_SearchProfileActive.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 3, 8, 53
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260711014915_SearchProfileGenderKeyNeverGenerated.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 899, 0, 0, 0, 2, 328, 1229
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260711014915_SearchProfileGenderKeyNeverGenerated.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 3, 6, 23
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260711030456_MatchingSetNullOnSearchProfileDeleted.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 899, 0, 0, 0, 2, 328, 1229
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260711030456_MatchingSetNullOnSearchProfileDeleted.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 3, 10, 67
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260712110904_RequireGenderAndLocation.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 900, 0, 0, 0, 2, 328, 1230
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260712110904_RequireGenderAndLocation.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 0, 0, 0, 3, 6, 55
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260712112405_AspNetUserDomainUserCascadeDelete.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 900, 0, 0, 0, 2, 328, 1230
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260712112405_AspNetUserDomainUserCascadeDelete.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 3, 6, 42
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260713072714_MakeGenderAndLocationOptional.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 899, 0, 0, 0, 2, 328, 1229
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260713072714_MakeGenderAndLocationOptional.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 0, 0, 0, 3, 6, 55
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260714125326_ImageStatus.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 901, 0, 0, 0, 2, 329, 1232
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260714125326_ImageStatus.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 3, 4, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260714142326_ImageNameUniqueIndex.Designer.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 903, 0, 0, 0, 2, 330, 1235
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\20260714142326_ImageNameUniqueIndex.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 3, 4, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\Migrations\C2CContextModelSnapshot.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 901, 0, 0, 0, 1, 330, 1232
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\SignalR\Hubs\MainHub.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 3, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\SignalR\SignalRNotificationService.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 11, 77
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Infrastructure\SignalR\SignalRServiceHubContextPool.cs", "C#", 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 4, 23
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.Test\Embe.C2C.Test.csproj", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 6, 34
+"c:\Users\Miro\source\repos\Embe.C2C\src\Embe.C2C.slnx", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 9
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\AGENTS.md", "Markdown", 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 2, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\CLAUDE.md", "Markdown", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 14, 37
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\eslint.config.mjs", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 2, 3, 19
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\fonts\index.ts", "TypeScript", 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 37
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\next.config.ts", "TypeScript", 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 36
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\package-lock.json", "JSON", 9077, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9078
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\package.json", "JSON", 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 43
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\postcss.config.mjs", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 2, 8
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\public\file.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\public\globe.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\public\next.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\public\vercel.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\public\window.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\discover\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 2, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\likes\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 11, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\matches\[matchId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 6, 41
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\matches\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 5, 25
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\me\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 3, 19
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\search-profile\[searchProfileId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 1, 34
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\search-profile\new\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 3, 20
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\search-profile\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 3, 17
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\search\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 5, 33
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\settings\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 4, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\protected\user\[userId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 4, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\public\(auth)\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 4, 19
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\public\(auth)\login\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 4, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\public\(auth)\register\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 4, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\(pages)\public\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\globals.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 300, 0, 12, 59, 371
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 12, 43
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\app\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\account-exists\actions.ts", "TypeScript", 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 22
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\action.ts", "TypeScript", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 20
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\register\actions.ts", "TypeScript", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 24
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\register\types.ts", "TypeScript", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 18
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\sign-in\actions.ts", "TypeScript", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\sign-in\types.ts", "TypeScript", 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\sign-out\actions.ts", "TypeScript", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 19
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\actions\sign-out\types.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\components\BasicProfileForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 105, 0, 0, 0, 0, 0, 11, 116
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\components\LoginForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 77, 0, 0, 0, 0, 0, 20, 97
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\components\RegisterForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 285, 0, 0, 0, 0, 0, 42, 327
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\auth\components\SearchProfileBuilderForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 13, 113
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\likes\actions.ts", "TypeScript", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\likes\components\Likes.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 16, 70
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\likes\types.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\actions\action.ts", "TypeScript", 0, 0, 0, 125, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 135
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\ConversationCompact.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 7, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\Match.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 419, 0, 0, 0, 0, 1, 97, 517
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\MatchCompact.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 5, 42
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\Matches.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 8, 51
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\Message.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 8, 74
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\MessageBrief.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 8, 50
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\MessageCrafter.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 1, 5, 58
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\matches\components\UserCompact.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 2, 37
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\me\actions\action.ts", "TypeScript", 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 37
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\me\actions\type.ts", "TypeScript", 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\me\components\Me.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 252, 0, 0, 0, 0, 1, 39, 292
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\me\components\MyInfoForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 134, 0, 0, 0, 0, 0, 19, 153
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\notifications\actions\action.ts", "TypeScript", 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 58
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\notifications\actions\type.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\notifications\components\notification\Notification.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 13, 95
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\notifications\components\notifications-menu\NotificationsMenu.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\notifications\components\notifications-menu\NotificationsMenu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 9, 50
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\notifications\components\notifications-modal\NotificationsModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 11, 79
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\notifications\stores.ts", "TypeScript", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search-profiles\actions.ts", "TypeScript", 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 61
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search-profiles\components\SearchProfileForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 342, 0, 0, 0, 0, 0, 57, 399
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search-profiles\types.ts", "TypeScript", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 20
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search\actions\action.ts", "TypeScript", 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 53
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search\actions\type.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search\components\FindUserDating.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 4, 30
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search\components\JudgeOverlay.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 6, 62
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search\components\Search.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 12, 105
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search\components\SearchProfileCompact.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 8, 136
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\features\search\components\SearchProfiles.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 7, 59
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\middleware.ts", "TypeScript", 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 63
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\actions\action.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\actions\geography\actions.ts", "TypeScript", 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 61
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\actions\geography\types.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\actions\user\action.ts", "TypeScript", 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 35
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\actions\user\type.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\api-errors.ts", "TypeScript", 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\apis\api.ts", "TypeScript", 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 111
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\apis\type.ts", "TypeScript", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 27
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\cache.ts", "TypeScript", 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 25
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\Links\Link.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 4, 23
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\buttons\Button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 7, 47
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\footer\Footer.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\footer\Footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 5, 21
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\header\Header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 4, 14
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\icons\HorizontalEllipsis.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\icons\Trash.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 2, 17
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\images\Image.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 4, 40
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\images\ImageGallery.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 5
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\images\ImageGallery.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 9, 80
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\infos\Alert.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 3, 28
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\infos\AlertDialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 39
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\infos\InfoModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 5, 39
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\infos\InfoSurface.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 6, 29
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\ErrorMessage.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 13
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\checkbox-input\CheckBoxInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 5, 31
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\date-input\DateInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 8, 50
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\dropdown-input\DropDownInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 2, 41
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\dual-range-input\DualRangeInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 46, 0, 0, 0, 0, 0, 5, 51
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\email-input\EmailInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 4, 37
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\image\gallery\ImageGalleryInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 119, 0, 0, 0, 0, 0, 15, 134
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\location-input\LocationInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 366, 0, 0, 0, 0, 7, 71, 444
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\select-input\SelectInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 6, 87
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\single-range-input\SingleRangeInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 7, 71
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\text-area-input\TextAreaInput.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\text-area-input\TextAreaInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 46, 0, 0, 0, 0, 0, 6, 52
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\inputs\text-input\TextInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 5, 53
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\modal\LargeModal.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 3, 14
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\modal\LargeModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 8, 58
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\modal\SmallModal.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 2, 7
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\modal\SmallModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 9, 58
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\nav\MainNav.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\nav\MainNav.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 7, 71
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\nav\SecondaryNav.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 3, 16
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\progress-bar\ProgressBar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 3, 52
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\scroll\infinite-scroll\InfiniteScroll.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 138, 0, 0, 0, 0, 0, 42, 180
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\surfaces\Surface.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 5, 45
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\components\user\Profile.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 0, 4, 83
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\distance.ts", "TypeScript", 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\enums.ts", "TypeScript", 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 91
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\route.ts", "TypeScript", 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\security\constants.ts", "TypeScript", 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\security\functions.ts", "TypeScript", 0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 84
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\security\types.ts", "TypeScript", 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 12
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\signal-r.ts", "TypeScript", 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 145
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\stores\current-user.ts", "TypeScript", 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 14
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\time.ts", "TypeScript", 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 40
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\types\application\types.ts", "TypeScript", 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\types\domain\aggregates.ts", "TypeScript", 0, 0, 0, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 172
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\types\domain\entities.ts", "TypeScript", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 26
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\types\domain\value-objects.ts", "TypeScript", 0, 0, 0, 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 101
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\types\dtos\types.ts", "TypeScript", 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 15
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\types\range.ts", "TypeScript", 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\src\shared\user.ts", "TypeScript", 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 20
+"c:\Users\Miro\source\repos\Embe.C2C\src\embe.c2c.frontend\tsconfig.json", "JSON with Comments", 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 35
+"Total", "-", 9993, 46, 163, 1516, 26, 27, 2151, 20, 4684, 23075, 140, 329, 733, 273, 8322, 51498

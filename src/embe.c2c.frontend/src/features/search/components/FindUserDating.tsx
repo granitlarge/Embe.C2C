@@ -14,11 +14,12 @@ export default function FindUserDating({ dto, className }: FindUserDatingProps) 
     const permissions = dto.permissions;
 
     const classNames = [className].filter(Boolean).join(" ");
+    const images = [...(user.pendingImages ?? []), ...(user.acceptedImages ?? [])];
     return (
         <Surface variant="inherit" className={`flex flex-col ${classNames}`}>
             {
-                user.images && user.images.length > 0 &&
-                <ImageGallery imageUrls={user.images.map(file => file.imageDetails.url)} />
+                images.length > 0 &&
+                <ImageGallery imageUrls={images.map(file => file.imageDetails.url)} />
             }
             {user.alias && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.alias}</span>}
             {user.age && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">{user.age}</span>}

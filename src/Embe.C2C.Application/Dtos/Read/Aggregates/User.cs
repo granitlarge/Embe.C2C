@@ -17,8 +17,8 @@ public record UserDto
     int? Age,
     Gender? Gender,
     LocationDto? Location,
-    ImageDto? ProfilePicture,
-    ImmutableHashSet<ImageDto>? Images,
+    ImmutableHashSet<ImageDto>? AcceptedImages,
+    ImmutableHashSet<ImageDto>? PendingImages,
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt,
     double? DistanceKmToQueryingUser,
@@ -47,8 +47,15 @@ public class UserDtoMapper
         }
 
         var user = userEnriched.User;
-        var images = user.Images != null && variant.IncludeImages ? await Task.WhenAll(user.Images.Select(f => _imageDtoMapper.ToDtoAsync(f, cancellationToken))) : null;
-        var profilePicture = user.ProfilePicture != null && variant.IncludeProfilePicture ? await _imageDtoMapper.ToDtoAsync(user.ProfilePicture, cancellationToken) : null;
+        var acceptedImages = await Task.WhenAll(user.Images
+            .Where(i => variant.IncludeAcceptedImages && i.ImageDetails.Status == ImageStatus.Accepted)
+            .Select(image => _imageDtoMapper.ToDtoAsync(image, cancellationToken)));
+
+        var pendingImages = await Task.WhenAll(
+            user.Images
+                .Where(i => variant.IncludePendingImages && i.ImageDetails.Status == ImageStatus.Pending)
+                .Select(image => _imageDtoMapper.ToDtoAsync(image, cancellationToken))
+        );
 
         return new UserDto
         (
@@ -59,8 +66,8 @@ public class UserDtoMapper
             variant.IncludeAge ? user.Age.Value : null,
             variant.IncludeGender ? user.Gender : null,
             variant.IncludeLocation ? user.Location?.ToDto() : null,
-            variant.IncludeProfilePicture ? profilePicture : null,
-            variant.IncludeImages ? images?.ToImmutableHashSet() : null,
+            variant.IncludeAcceptedImages ? [.. acceptedImages] : null,
+            variant.IncludePendingImages ? [.. pendingImages] : null,
             variant.IncludeCreatedAt ? user.CreatedAt : null,
             variant.IncludeUpdatedAt ? user.UpdatedAt : null,
             variant.IncludeDistanceToQueryingUser ? userEnriched.DistanceKmToQueryingUser : null,

@@ -12,6 +12,10 @@ export type UserCompactProps = Omit<SurfaceProps<typeof Link>, "as" | "href" | "
 export function UserCompact({ className, dto, ...props }: UserCompactProps) {
     const classNames = [className].filter(Boolean).join(" ");
     const user = dto?.data;
+    const profilePicture = [...(dto?.data?.acceptedImages ?? []), ...(dto?.data?.pendingImages ?? [])]
+        .sort((a, b) => a.imageDetails.order - b.imageDetails.order)
+        .at(0);
+
     return (
         <>
             {
@@ -19,11 +23,11 @@ export function UserCompact({ className, dto, ...props }: UserCompactProps) {
                 <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={`/protected/user/${user?.id}`} {...props} variant="inherit">
                     {user?.alias && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs) font-bold">{user?.alias}</span>}
                     {
-                        user?.profilePicture?.imageDetails?.url &&
-                        <Image src={user?.profilePicture?.imageDetails?.url} alt="Profile picture" width={0} height={0} className="w-20 h-20 rounded-full object-cover" unoptimized={process.env.NODE_ENV === "development"} />
+                        profilePicture?.imageDetails?.url &&
+                        <Image src={profilePicture?.imageDetails?.url} alt="Profile picture" width={0} height={0} className="w-20 h-20 rounded-full object-cover" unoptimized={process.env.NODE_ENV === "development"} />
                     }
                     {
-                        !user?.profilePicture?.imageDetails?.url &&
+                        !profilePicture?.imageDetails?.url &&
                         <UserIcon className="w-20 h-20 rounded-full bg-transparent flex items-center justify-center text-(--primary-fc) text-(length:--primary-fs)" />
                     }
                 </Surface>
