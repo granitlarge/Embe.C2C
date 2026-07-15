@@ -28,6 +28,7 @@ public class BlobStorageImageService : IImageService
         };
         return $"{pathElement}/{imageName}";
     }
+    
 
     public async Task DeleteImageAsync(string name, ImageStatus status, CancellationToken cancellationToken = default)
     {
