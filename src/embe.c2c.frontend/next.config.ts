@@ -12,7 +12,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "relationshipfindersa.blob.core.windows.net",
-        pathname: "/files/**", 
+        pathname: "/images/pending/**",
+      },
+      {
+        protocol: "https",
+        hostname: "relationshipfindersa.blob.core.windows.net",
+        pathname: "/images/accepted/**",
       }
     ],
   },
