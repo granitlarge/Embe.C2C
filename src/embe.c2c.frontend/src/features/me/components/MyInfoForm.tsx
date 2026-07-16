@@ -28,6 +28,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
 
     const [modalOpen, setModalOpen] = useState(false);
     const isEmpty = initialImages.length === 0;
+    const profilePictureUrl = !isEmpty ? initialImages.sort((a, b) => a.order - b.order)[0].url : undefined;
     const classNames = [
         className
     ].filter(Boolean).join(" ")
@@ -36,9 +37,9 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
         <div className={`max-w-max ${classNames}`}>
             <button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent text-(length:--fs-1)">
                 {
-                    !isEmpty && <Image
+                    !isEmpty && profilePictureUrl && <Image
                         className={`rounded-full w-[150px] h-[150px] object-cover shadow-(color:--border-color) shadow-md`}
-                        src={initialImages.find(image => image.order === 0)?.url ?? ""}
+                        src={profilePictureUrl}
                         alt="User Image"
                         width={150}
                         height={150}
@@ -46,7 +47,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                     />
                 }
                 {
-                    isEmpty &&
+                    (isEmpty || !profilePictureUrl) &&
                     <div className={`rounded-full w-[150px] h-[150px] flex flex-col items-center justify-center bg-gray-300`}>
                     </div>
                 }
