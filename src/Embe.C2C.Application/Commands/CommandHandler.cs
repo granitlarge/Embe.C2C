@@ -32,7 +32,7 @@ public abstract class CommandHandler<T_Command, T_Result>
         using var transaction = await _context.BeginTransactionAsync(cancellationToken);
         var result = await HandleAsync(new SparseRepository(_context), command, cancellationToken);
 
-        foreach (var domainEvent in _context.DomainEvents.Union(_domainEventStore.DomainEvents))
+        foreach (var domainEvent in _context.DomainEvents.Union(_domainEventStore.DomainEvents).OrderBy(de => de.Timestamp))
         {
             await _domainEventHandler.HandleAsync(domainEvent, cancellationToken);
         }

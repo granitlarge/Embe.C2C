@@ -22,7 +22,10 @@ public class IntegrationEventHandler
     public async Task HandleAsync(IntegrationEventCollector eventCollector, CancellationToken cancellationToken = default)
     {
         var events = eventCollector.CollectedEvents;
-        await Task.WhenAll(events.Select(e => HandleAsync(e, cancellationToken)));
+        foreach (var @event in events.OrderBy(e => e.Timestamp))
+        {
+            await HandleAsync(@event, cancellationToken);
+        }
     }
 
     private async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken = default)

@@ -107,10 +107,8 @@ public class BlobStorageImageService : IImageService
             absolutePath = absolutePath[..^1];
         }
 
-        Console.WriteLine($"BlobPath for Blob with URI '{blobUrl}' is '{absolutePath}'.");
         var blobNameParts = absolutePath.Split(pathDirectorySeparatorChars).Skip(2);
         var blobName = string.Join("/", blobNameParts);
-        Console.WriteLine($"BlobName for Blob with URI '{blobUrl}' is '{blobName}'.");
         return blobName;
     }
 
@@ -125,14 +123,13 @@ public class BlobStorageImageService : IImageService
         var fromBc = blobContainerClient.GetBlobClient(fromBlobName);
         var toBc = blobContainerClient.GetBlobClient(toBlobName);
 
-        Console.WriteLine("FromBlobName: " + fromBlobName);
-        Console.WriteLine("ToBlobName: " + toBlobName);
-        Console.WriteLine("FromBlob Exists: " + await fromBc.ExistsAsync(cancellationToken));
-        Console.WriteLine("ToBlob Exists: " + await toBc.ExistsAsync(cancellationToken));
-        using var fromStream = await fromBc.OpenReadAsync(cancellationToken: cancellationToken);
-        using var toStream = await toBc.OpenWriteAsync(overwrite: true, cancellationToken: cancellationToken);
+        using (var fromStream = await fromBc.OpenReadAsync(cancellationToken: cancellationToken))
+        {
+            using var toStream = await toBc.OpenWriteAsync(overwrite: true, cancellationToken: cancellationToken);
+            await fromStream.CopyToAsync(toStream, cancellationToken);
+        }
 
-        await fromStream.CopyToAsync(toStream, cancellationToken);
+        await fromBc.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<IUploadImageResult> UploadImageAsync(byte[] content, string mimeType, CancellationToken cancellationToken = default)
