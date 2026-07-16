@@ -104,8 +104,9 @@ public class IntegrationEventHandler
         {
             await _imageService.DeleteImageAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Console.WriteLine("Failed to delete image, sending to work-item service {0}.", e);
             var url = await _imageService.GetImageUrlAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, cancellationToken);
             await _workItemService.PerformAsync(new DeleteImage(url), cancellationToken);
         }
@@ -124,8 +125,9 @@ public class IntegrationEventHandler
 
             await _imageService.MoveImageAsync(fromUrl, toUrl, cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Console.WriteLine("Failed to move image, sending to work-item service. {0}", e);
             await _workItemService.PerformAsync(new MoveFile(fromUrl, toUrl), cancellationToken);
         }
     }
