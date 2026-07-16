@@ -54,7 +54,9 @@ export default function Me({ className }: MeProps) {
 
         const updatedBasicFormData = getBasicFormDataFromCurrentUser(user)
         setServerSideBasicFormData(updatedBasicFormData);
-        // Warning! We need to merge the previous and current changes to avoid clearing all the user's modification.
+        // Warning! If the user adds images after issuing a save, we'll reach this point and we'll clear his added images.
+        // This is not something we can solve. There is no way to correlate a locally added image with a server-side image, because the local
+        // image's id is undefined.
         setClientSideBasicFormData(prev => ({
             ...prev,
             images: updatedBasicFormData.images
