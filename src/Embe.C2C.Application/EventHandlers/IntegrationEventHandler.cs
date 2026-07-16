@@ -100,6 +100,7 @@ public class IntegrationEventHandler
         CancellationToken cancellationToken
     )
     {
+        Console.WriteLine($"Deleting image '{imageRemovedEvent.ImageId}'.");
         try
         {
             await _imageService.DeleteImageAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, cancellationToken);
@@ -118,6 +119,7 @@ public class IntegrationEventHandler
         CancellationToken cancellationToken
     )
     {
+        Console.WriteLine($"Moving image '{imageMovedEvent.ImageId}'.");
         var fromUrl = await _imageService.GetImageUrlAsync(imageMovedEvent.ImageName, imageMovedEvent.OldStatus, cancellationToken);
         var toUrl = await _imageService.GetImageUrlAsync(imageMovedEvent.ImageName, imageMovedEvent.NewStatus, cancellationToken);
         try
