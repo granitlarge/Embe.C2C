@@ -88,28 +88,8 @@ public class BlobStorageImageService : IImageService
 
     private static string GetBlobNameFromBlobUrl(string blobUrl)
     {
-        var pathDirectorySeparatorChars = new[] 
-        { 
-            Path.DirectorySeparatorChar, 
-            Path.AltDirectorySeparatorChar, 
-            '/', 
-            '\\' 
-        }.Distinct().ToArray();
-
-        var absolutePath = new Uri(blobUrl).AbsolutePath;
-        if (absolutePath.Length > 0 && pathDirectorySeparatorChars.Any(pdsc => pdsc == absolutePath[0]))
-        {
-            absolutePath = absolutePath[1..];
-        }
-
-        if (absolutePath.Length > 0 && pathDirectorySeparatorChars.Any(pdsc => pdsc == absolutePath[^1]))
-        {
-            absolutePath = absolutePath[..^1];
-        }
-
-        var blobNameParts = absolutePath.Split(pathDirectorySeparatorChars).Skip(2);
-        var blobName = string.Join("/", blobNameParts);
-        return blobName;
+        var blobUri = new BlobUriBuilder(new Uri(blobUrl));
+        return blobUri.BlobName;
     }
 
     public async Task MoveImageAsync(string fromUrl, string toUrl, CancellationToken cancellationToken = default)
