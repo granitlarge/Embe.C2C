@@ -45,7 +45,6 @@ public class ProcessUploadedImageHandler
         var targetImage = user.Images.Single(i => i.ImageDetails.Name == command.ImageId.ToString());
         var newStatus = isSafe ? ImageStatus.Accepted : ImageStatus.Rejected;
 
-
         user.ChangeImageStatus(user.Id, targetImage.Id, newStatus);
         if (newStatus == ImageStatus.Rejected)
         {
