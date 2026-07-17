@@ -108,7 +108,7 @@ public class BlobStorageImageService : IImageService
             using var toStream = await toBc.OpenWriteAsync(overwrite: true, cancellationToken: cancellationToken);
             await fromStream.CopyToAsync(toStream, cancellationToken);
         }
-
+#warning we're not copying the properties (such as Content-Type) from the original blob to the new blob, we should do that
         await fromBc.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
