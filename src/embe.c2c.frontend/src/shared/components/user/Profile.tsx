@@ -55,7 +55,6 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
             }
             <ImageGallery className="h-[300px]" imageUrls={
                 images
-                    .filter(image => image.imageDetails.status === ImageStatus.Accepted)
                     .sort((a, b) => a.imageDetails.order - b.imageDetails.order)
                     .map(i => i.imageDetails.url) ?? []
                 } />
