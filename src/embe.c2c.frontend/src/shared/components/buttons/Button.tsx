@@ -85,7 +85,11 @@ export default function Button({ onClick, intent = "none", ...props }: ButtonPro
                     <div className="flex justify-center items-center"
                         style={{
                             width: buttonDimensionsRef.current.width,
-                            height: buttonDimensionsRef.current.height
+                            height: buttonDimensionsRef.current.height,
+                            paddingLeft: buttonDimensionsRef.current.padding.left,
+                            paddingRight: buttonDimensionsRef.current.padding.right,
+                            paddingTop: buttonDimensionsRef.current.padding.top,
+                            paddingBottom: buttonDimensionsRef.current.padding.bottom
                         }}
                     >
                         <Loader
