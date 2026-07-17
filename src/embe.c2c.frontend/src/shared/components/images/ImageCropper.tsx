@@ -1,7 +1,12 @@
 "use client";
 
+import { kMaxLength } from "buffer";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+type Point = {
+    x: number,
+    y: number
+}
 export type ImageCropperProps = {
     src: string;
     width: number;
@@ -9,14 +14,17 @@ export type ImageCropperProps = {
 }
 export default function ImageCropper({ src, width, height }: ImageCropperProps) {
 
+    const scrollSpeed = .05;
+    const pointersHistoryRef = useRef(new Map());
+    const pointersRef = useRef(new Map());
+
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const cropperRef = useRef<HTMLDivElement>(null);
     const grabbingCropperRef = useRef<boolean>(false);
     const grabbingContainerRef = useRef<boolean>(false);
-    const cropperOffsetRef = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
-    const containerPinchRef = useRef(false);
-    const containerLastPinchMove = useRef<React.TouchList | null>(null);
+    const cropperOffsetRef = useRef<Point>({ x: 0, y: 0 });
+    const pinchingContainerRef = useRef(false);
 
     const [image, setImage] = useState<HTMLImageElement | null>(null);
     const [cropperWidth, setCropperWidth] = useState(0);
@@ -95,8 +103,6 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
     useEffect(() => {
 
-        // At this point, we have have scaled down the image to fit the full width of the parent.
-        // We need to scalea the cropper as well.
         if (imageWidth === 0 || imageHeight === 0)
             return;
 
@@ -117,34 +123,64 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
     }, [width, height, imageWidth, imageHeight, containerWidth])
 
-    function onWheel(clientX: number, clientY: number, deltaY: number, deltaX: number, deltaZ: number, speed: number) {
+    function onWheel(clientX: number, clientY: number, deltaY: number, deltaX: number, deltaZ: number) {
 
         const direction = deltaY < 0 ? "in" : deltaY > 0 ? "out" : "none";
         let newWidth;
         let newHeight;
         if (direction === "in") {
-            newWidth = Math.max(viewport.width * (1 - speed), imageWidth * speed);
-            newHeight = Math.max(viewport.height * (1 - speed), imageHeight * speed);
+            newWidth = Math.max(viewport.width * (1 - scrollSpeed), imageWidth / imageHeight);
+            newHeight = Math.max(viewport.height * (1 - scrollSpeed), 1);
         } else if (direction === "out") {
-            newWidth = Math.min(viewport.width * (1 + speed), imageWidth);
-            newHeight = Math.min(viewport.height * (1.0 + speed), imageHeight);
+            newWidth = Math.min(viewport.width * (1 + scrollSpeed), imageWidth);
+            newHeight = Math.min(viewport.height * (1 + scrollSpeed), imageHeight);
         } else {
             newWidth = width;
             newHeight = height;
         }
 
-        updateViewport(clientX, clientY, newWidth, newHeight);
+        if (!containerRef.current)
+            return;
+
+        const centerX = containerRef.current.getBoundingClientRect().left + containerRef.current.getBoundingClientRect().width / 2;
+        const centerY = containerRef.current.getBoundingClientRect().top + containerRef.current.getBoundingClientRect().height / 2;
+
+        const dx = (centerX - clientX) * newWidth / viewport.width;
+        const dy = (centerY - clientY) * newHeight / viewport.height;
+
+        updateViewport(clientX + dx, clientY + dy, newWidth, newHeight);
     }
 
-    function onMove(clientX: number, clientY: number) {
+    function onMove(e: React.PointerEvent) {
 
-        updateZoomPosition();
+        updatePosition();
         updateCropperPosition();
 
-        function updateZoomPosition() {
+        function updatePosition() {
+
+            if (!containerRef.current)
+                return;
             if (grabbingContainerRef.current !== true)
                 return;
-            updateViewport(clientX, clientY, viewport.width, viewport.height);
+            if (pointersRef.current.size !== 1)
+                return;
+            if (!pointersHistoryRef.current.has(e.pointerId)) {
+                pointersHistoryRef.current.set(e.pointerId, e);
+                return;
+            }
+
+            const history = pointersHistoryRef.current.get(e.pointerId) as React.PointerEvent;
+            const current = e;
+
+            const dx = current.clientX - history.clientX;
+            const dy = current.clientY - history.clientY;
+
+            // We need to find the new center.
+            const cx = containerRef.current.getBoundingClientRect().left + containerRef.current.getBoundingClientRect().width / 2;
+            const cy = containerRef.current.getBoundingClientRect().top + containerRef.current.getBoundingClientRect().height / 2;
+
+            updateViewport(cx - dx, cy - dy, viewport.width, viewport.height);
+            pointersHistoryRef.current.set(e.pointerId, e);
         }
 
         function updateCropperPosition() {
@@ -155,8 +191,8 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
             const containerBoundingClientRect = containerRef.current.getBoundingClientRect();
 
-            const newCropperX = Math.max(Math.min(clientX - containerBoundingClientRect.left - (cropperOffsetRef.current.x), containerWidth - cropperWidth), 0);
-            const newCropperY = Math.max(Math.min(clientY - containerBoundingClientRect.top - (cropperOffsetRef.current.y), containerHeight - cropperHeight), 0);
+            const newCropperX = Math.max(Math.min(e.clientX - containerBoundingClientRect.left - (cropperOffsetRef.current.x), containerWidth - cropperWidth), 0);
+            const newCropperY = Math.max(Math.min(e.clientY - containerBoundingClientRect.top - (cropperOffsetRef.current.y), containerHeight - cropperHeight), 0);
 
             setCropperX(newCropperX);
             setCropperY(newCropperY);
@@ -184,8 +220,8 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         const sourceOffsetX = Math.max(Math.min(sourceImageX - destinationImageX, imageWidth - newWidth), 0);
         const sourceOffsetY = Math.max(Math.min(sourceImageY - destinationImageY, imageHeight - newHeight), 0);
 
-
         setViewport({ x: sourceOffsetX, y: sourceOffsetY, width: newWidth, height: newHeight });
+
     }
 
     function onCropperPointerDown(clientX: number, clientY: number) {
@@ -209,44 +245,69 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
     }
 
-    function onWindowPointerUp() {
+    function onWindowPointerUp(e: PointerEvent) {
 
         grabbingCropperRef.current = false;
-        cropperOffsetRef.current = { x: 0, y: 0 };
         grabbingContainerRef.current = false;
+
+        cropperOffsetRef.current = { x: 0, y: 0 };
+
+        pointersRef.current.delete(e.pointerId);
+        pointersHistoryRef.current.delete(e.pointerId);
 
     }
 
-    function onContainerPinchMove(e: React.TouchEvent<HTMLDivElement>) {
+    function distance(p1: {x:number, y:number}, p2: {x:number,y:number}) {
+        const distance = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        return distance;
+    }
 
-        if (containerPinchRef.current !== true) {
+    function onPinch(e: React.PointerEvent) {
+
+        if (!pinchingContainerRef.current) {
             return;
         }
 
-        if (!containerLastPinchMove.current) {
-            containerLastPinchMove.current = e.touches;
+        if (pointersRef.current.size !== 2)
+            return;
+
+        if (!containerRef.current)
+            return;
+
+        const t1 = Array.from(pointersRef.current.values())[0] as React.PointerEvent;
+        const t2 = Array.from(pointersRef.current.values())[1] as React.PointerEvent;
+
+        const h1 = pointersHistoryRef.current.get(t1.pointerId) as React.PointerEvent | null | undefined;
+        const h2 = pointersHistoryRef.current.get(t2.pointerId) as React.PointerEvent | null | undefined;
+
+        if (!h1 || !h2) {
+            if (!pointersHistoryRef.current.get(e.pointerId)) {
+                pointersHistoryRef.current.set(e.pointerId, e);
+            }
             return;
         }
 
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
+        const currentDistance = distance({ x: t1.clientX, y: t1.clientY }, { x: t2.clientX, y: t2.clientY });
+        const historyDistance = distance({ x: h1.clientX, y: h1.clientY }, { x: h2.clientX, y: h2.clientY });
 
-        const p1 = containerLastPinchMove.current[0].identifier === t1.identifier ? containerLastPinchMove.current[0] : containerLastPinchMove.current[0];
-        const p2 = containerLastPinchMove.current[0].identifier !== p1.identifier ? containerLastPinchMove.current[0] : containerLastPinchMove.current[1];
+        const direction = currentDistance > historyDistance ? "out" : "in";
+        const scrollAmount = distance({ x: h1.clientX, y: h1.clientY }, { x: t1.clientX, y: t1.clientY });
 
-        // We need to determine whether the distance between the pinches has increased or decreased (this gives us the direction of the zoom)
-        // we then determine by how much it has increased, and whether the center of the pinch has changed (which determines where we zoom)
+        if (!containerRef.current)
+            return;
 
-        const prevDistance = Math.sqrt(Math.pow(p1.clientX - p2.clientX, 2) + Math.pow(p1.clientY - p2.clientY, 2));
-        const distance = Math.sqrt(Math.pow(t1.clientX - t2.clientX, 2) + Math.pow(t1.clientY - t2.clientY, 2));
+        const centerX = containerRef.current.getBoundingClientRect().left + containerRef.current.getBoundingClientRect().width / 2;
+        const centerY = containerRef.current.getBoundingClientRect().top + containerRef.current.getBoundingClientRect().height / 2;
 
-        const direction = distance > prevDistance ? "in" : "out";
-
-        const newCenterX = t1.clientX + Math.abs(t1.clientX - t2.clientX) / 2;
-        const newCenterY = t1.clientY + Math.abs(t1.clientY - t2.clientY) / 2;
-
-        onWheel(newCenterX, newCenterY, direction === "in" ? -1 : 1, 0, 0, 0.01);
-        containerLastPinchMove.current = e.touches;
+        onWheel
+            (
+                centerX,
+                centerY,
+                direction === "in" ? -1 : 1,
+                0,
+                0
+            );
+        pointersHistoryRef.current.set(e.pointerId, e);
 
     }
 
@@ -255,28 +316,20 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             <div
                 ref={containerRef}
                 className="relative w-full"
-                onMouseMove={(e) => { onMove(e.clientX, e.clientY); }}
-                onTouchMove={(e) => {
-                    if (e.touches.length === 1) {
-
-                        onMove(e.touches[0].clientX, e.touches[0].clientY);
-
-                    } else if (e.touches.length === 2) {
-
-                        onContainerPinchMove(e);
-
+                onPointerMove={(e) => {
+                    if (pinchingContainerRef.current === true) {
+                        onPinch(e);
                     }
+                    onMove(e);
                 }}
-                onTouchStart={(e) => {
-                    if (e.touches.length === 2) {
-                        containerPinchRef.current = true;
-                    }
-                }}
-                onTouchEnd={(e) => {
-                    containerPinchRef.current = false;
-                }}
-                onPointerDown={() => {
+                onPointerDown={(e) => {
+                    pointersRef.current.set(e.pointerId, e)
                     grabbingContainerRef.current = true;
+                    if (pointersRef.current.size === 2) {
+                        pinchingContainerRef.current = true;
+                    } else {
+                        pinchingContainerRef.current = false;
+                    }
                 }}
             >
                 <canvas
@@ -286,22 +339,20 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
                     width={containerWidth}
                     height={containerHeight}
                     onWheel={(e) => {
-                        onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ, 0.05);
+                        onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ);
                     }}
                 >
 
                 </canvas>
                 {
-                    false &&
                     <div
                         ref={cropperRef}
                         style={{ width: cropperWidth ?? 0, height: cropperHeight ?? 0, top: cropperY, left: cropperX }}
                         className="absolute bg-black opacity-50"
                         onWheel={(e) => {
-                            onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ, 0.05);
+                            onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ);
                         }}
                         onPointerDown={(e) => { console.log("cropper pointer down"); e.stopPropagation(); onCropperPointerDown(e.clientX, e.clientY); }}
-                        onTouchStart={(e) => e.touches.length === 1 && onCropperPointerDown(e.touches[0].clientX, e.touches[0].clientY)}
                         onMouseMove={(e) => { e.stopPropagation(); }}
                     >
 

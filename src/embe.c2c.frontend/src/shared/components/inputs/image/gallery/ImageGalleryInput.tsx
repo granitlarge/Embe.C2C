@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
 import Image from "@/src/shared/components/images/Image";
 import Surface from "../../../surfaces/Surface";
@@ -6,6 +6,9 @@ import { X } from "@deemlol/next-icons";
 import ErrorMessage from "../../ErrorMessage";
 import { ImageStatus } from "@/src/shared/types/domain/value-objects";
 import Button from "../../../buttons/Button";
+import LargeModal from "../../../modal/LargeModal";
+import ImageCropper from "../../../images/ImageCropper";
+import ImageCrop from "../crop/ImageCrop";
 
 type MyImageProps = {
     id: string;
@@ -57,12 +60,15 @@ type ImageSelectorProps = {
 function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
 
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const [showCropper, setShowCropper] = useState(false);
+    const [images, setImages] = useState([] as string[]);
 
     function onChange(event: React.ChangeEvent<HTMLInputElement>) {
         const target = event.target as HTMLInputElement;
         if (target.files && target.files.length > 0) {
             let images = Array.from(target.files).map(f => ({ url: URL.createObjectURL(f), mimeType: f.type }));
-            onImageSelected?.(images);
+            setImages(images.map(i => i.url));
+            setShowCropper(true);
         }
     }
 
@@ -77,6 +83,18 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
             variant="tertiary">
             <input ref={inputRef} type="file" multiple className="hidden" accept="image/*"  onChange={onChange} />
             <span className="text-3xl text-(--secondary-fc)">+</span>
+            {
+                showCropper &&
+                <LargeModal
+                    hidden={false}
+                    closed={() => setShowCropper(false)}
+                >
+                    <ImageCrop
+                        images={images} 
+
+                    />
+                </LargeModal>
+            }
         </Surface>
 
     )
