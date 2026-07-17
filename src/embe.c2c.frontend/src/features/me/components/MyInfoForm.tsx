@@ -11,6 +11,7 @@ import { getValidBirthdateRange } from "@/src/shared/time";
 import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAreaInput";
 import Image from "@/src/shared/components/images/Image";
 import { Guid } from "@/src/shared/cache";
+import Button from "@/src/shared/components/buttons/Button";
 
 export type ImageData = {
     id?: Guid,
@@ -35,7 +36,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
 
     return (
         <div className={`max-w-max ${classNames}`}>
-            <button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent text-(length:--fs-1)">
+            <Button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent text-(length:--fs-1)">
                 {
                     !isEmpty && profilePictureUrl && <Image
                         className={`rounded-full w-[150px] h-[150px] object-cover shadow-(color:--border-color) shadow-md`}
@@ -51,7 +52,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                     <div className={`rounded-full w-[150px] h-[150px] flex flex-col items-center justify-center bg-gray-300`}>
                     </div>
                 }
-            </button>
+            </Button>
 
             <LargeModal closed={() => setModalOpen(false)} hidden={!modalOpen} header="images">
                 <ImageGalleryInput<ImageData>

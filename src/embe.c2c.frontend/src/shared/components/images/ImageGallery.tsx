@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "@/src/shared/components/images/Image";
 import styles from "./ImageGallery.module.css";
+import Button from "../buttons/Button";
 
 type PaginationDotsProps = {
     total: number,
@@ -69,8 +70,8 @@ export default function ImageGallery({ className, imageUrls }: ImageGalleryProps
             {
                 imageUrls.length > 1 &&
                 <>
-                    <button onClick={() => setCurrentImageUrlIndex(prev => (prev - 1 + imageUrls.length) % imageUrls.length)} className="rounded-full absolute -left-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronLeft className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></button>
-                    <button onClick={() => setCurrentImageUrlIndex(prev => (prev + 1) % imageUrls.length)} className="rounded-full absolute -right-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronRight className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></button>
+                    <Button onClick={() => setCurrentImageUrlIndex(prev => (prev - 1 + imageUrls.length) % imageUrls.length)} className="rounded-full absolute -left-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronLeft className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></Button>
+                    <Button onClick={() => setCurrentImageUrlIndex(prev => (prev + 1) % imageUrls.length)} className="rounded-full absolute -right-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronRight className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></Button>
                     <PaginationDots total={imageUrls.length} current={currentImageUrlIndex} className="absolute top-2 left-1/2 transform -translate-x-1/2" />
                 </>
             }

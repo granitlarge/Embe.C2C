@@ -1,3 +1,4 @@
+import Button from "@/src/shared/components/buttons/Button";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { formatTimeAgo } from "@/src/shared/time";
 import { MessagePermission, Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
@@ -51,10 +52,10 @@ export default function Message({ className, dto, onEdit, onDelete, onReport, on
                 <div className="flex gap-2 justify-between items-center">
                     <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{isOwn ? "you" : "they"}</span>
                     <div className="flex gap-1 items-center">
-                        {!isOwn && canReply && onReply && <button className="p-0 bg-transparent" onClick={onReply}><Reply className={actionIconClassNames} /></button>}
-                        {canEdit && onEdit && <button className="p-0 bg-transparent" onClick={onEdit}><Edit className={actionIconClassNames} /></button>}
-                        {canDelete && onDelete && <button className="p-0 bg-transparent" onClick={onDelete}><Trash2 className={actionIconClassNames} /></button>}
-                        {canReport && onReport && <button className="p-0 bg-transparent" onClick={onReport}><Flag className={actionIconClassNames} /></button>}
+                        {!isOwn && canReply && onReply && <Button className="p-0 bg-transparent" onClick={onReply}><Reply className={actionIconClassNames} /></Button>}
+                        {canEdit && onEdit && <Button className="p-0 bg-transparent" onClick={onEdit}><Edit className={actionIconClassNames} /></Button>}
+                        {canDelete && onDelete && <Button className="p-0 bg-transparent" onClick={onDelete}><Trash2 className={actionIconClassNames} /></Button>}
+                        {canReport && onReport && <Button className="p-0 bg-transparent" onClick={onReport}><Flag className={actionIconClassNames} /></Button>}
                     </div>
                 </div>
                 {message.content && <MessageContent className={`text-(--primary-fc) text-(length:--primary-fs) ${isOwn ? "ml-auto" : "mr-auto"}`} content={message.content} />}

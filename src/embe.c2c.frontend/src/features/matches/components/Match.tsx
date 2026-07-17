@@ -50,9 +50,9 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
 
             <DropdownMenu.Root modal={false}>
                 <DropdownMenu.Trigger asChild>
-                    <button className="bg-transparent max-w-max ml-auto p-0">
+                    <Button className="bg-transparent max-w-max ml-auto p-0">
                         <Ellipsis />
-                    </button>
+                    </Button>
                 </DropdownMenu.Trigger>
 
                 <DropdownMenu.Portal>

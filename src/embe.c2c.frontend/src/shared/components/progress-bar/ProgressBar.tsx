@@ -1,3 +1,4 @@
+import Button from "../buttons/Button";
 import Surface from "../surfaces/Surface";
 
 export type ProgressBarProps = {
@@ -19,7 +20,7 @@ export default function ProgressBar({ className, steps, progress, onClick }: Pro
                 </div>
                 {
                     steps.map((step, index) => (
-                        <button
+                        <Button
                             key={step}
                             className=
                             {
@@ -43,7 +44,7 @@ export default function ProgressBar({ className, steps, progress, onClick }: Pro
                             }}
                         >
                             <span className="text-(--primary-fc) text-(length:--secondary-fs) absolute left-1/2 -translate-x-1/2 top-full">{step}</span>
-                        </button>
+                        </Button>
                     ))
                 }
             </div>

@@ -3,6 +3,7 @@
 import { Info } from "@deemlol/next-icons"
 import Surface from "../surfaces/Surface"
 import { useState } from "react"
+import Button from "../buttons/Button";
 
 export type InfoSurfaceProps = {
     show?: boolean
@@ -16,9 +17,9 @@ export default function InfoSurface({ className, children, show = false }: InfoS
     return (
 
         <Surface className={`flex flex-row gap-2 items-start ${classNames}`} variant="tertiary" padding="sm">
-            <button onClick={() => setIsOpen(prev => !prev)}>
+            <Button onClick={() => setIsOpen(prev => !prev)}>
                 <Info />
-            </button>
+            </Button>
             {
                 isOpen && children
             }

@@ -4,6 +4,7 @@ import { ReadDto } from "@/src/shared/types/dtos/types";
 import { Send, Save, Ban } from "lucide-react";
 import Message from "./Message";
 import { Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
+import Button from "@/src/shared/components/buttons/Button";
 
 // Caller must guarantee that whenever mode is "reply", replyToMessage is not undefined.
 export type MessageCrafterProps = {
@@ -40,15 +41,15 @@ export function MessageCrafter({
             <div className="surface-secondary rounded-r-lg flex flex-col justify-center pr-3 pt-2 pb-2">
                 {
                     mode === "create" &&
-                    <button className="button button-save max-w-max max-h-max my-auto" onClick={saveMessage}>
+                    <Button className="button button-save max-w-max max-h-max my-auto" onClick={saveMessage}>
                         <Send />
-                    </button>
+                    </Button>
                 }
                 {
                     (mode === "edit" || mode === "reply") &&
                     <div className="flex flex-col gap-2 justify-center">
-                        <button className="button button-save" onClick={saveMessage}>{mode === "edit" ? <Save /> : <Send />}</button>
-                        <button className="button button-cancel" onClick={onCancel}><Ban /></button>
+                        <Button className="button button-save" onClick={saveMessage}>{mode === "edit" ? <Save /> : <Send />}</Button>
+                        <Button className="button button-cancel" onClick={onCancel}><Ban /></Button>
                     </div>
                 }
             </div>

@@ -1,4 +1,5 @@
 import { Check } from "@deemlol/next-icons";
+import Button from "../../buttons/Button";
 
 export type CheckboxInputProps = {
     value?: boolean;
@@ -14,7 +15,7 @@ export default function CheckboxInput({ value = false, label, onChange, classNam
         className
     ].filter(Boolean).join(" ");
     return (
-        <button
+        <Button
             className={`input flex items-center justify-between w-full ${classNames}`}
             onClick={() => onChange?.(!value)}
         >
@@ -26,6 +27,6 @@ export default function CheckboxInput({ value = false, label, onChange, classNam
 
             <Check className={`w-(--primary-fs) h-(--primary-fs) transition-opacity ${value ? "opacity-100" : "opacity-0"}`}
             />
-        </button>
+        </Button>
     )
 }

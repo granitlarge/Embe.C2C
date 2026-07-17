@@ -5,6 +5,7 @@ import Surface from "../../../surfaces/Surface";
 import { X } from "@deemlol/next-icons";
 import ErrorMessage from "../../ErrorMessage";
 import { ImageStatus } from "@/src/shared/types/domain/value-objects";
+import Button from "../../../buttons/Button";
 
 type MyImageProps = {
     id: string;
@@ -40,9 +41,9 @@ function MyImage({ id, src, status, onRemove }: MyImageProps) {
                         <span className="mx-auto text-(--primary-fc) text-(length:--tertiary-fs)">awaiting approval</span>
                     </Surface>
                 }
-                <button onClick={onRemove} className="button bg-gray-300 absolute top-0 right-0 -m-3 rounded-full max-w-max max-h-max flex items-center justify-center">
+                <Button onClick={onRemove} className="button bg-gray-300 absolute top-0 right-0 -m-3 rounded-full max-w-max max-h-max flex items-center justify-center">
                     <X className="text-(--primary-fc) w-[12px] h-[12px]" />
-                </button>
+                </Button>
             </div>
         </div>
     )

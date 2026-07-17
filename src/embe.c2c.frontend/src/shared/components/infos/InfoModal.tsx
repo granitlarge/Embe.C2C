@@ -2,6 +2,7 @@ import { Info, AlertCircle } from "@deemlol/next-icons";
 import { useState } from "react";
 import Surface from "../surfaces/Surface";
 import SmallModal from "../modal/SmallModal";
+import Button from "../buttons/Button";
 
 export type InfoType = "info" | "important";
 
@@ -15,12 +16,12 @@ export default function InfoModal({ info, type }: InfoModalProps) {
 
     return (
         <div>
-            <button className="flex items-center" onClick={() => setIsOpen(prev => !prev)}>
+            <Button className="flex items-center" onClick={() => setIsOpen(prev => !prev)}>
                 {
                     type === "info" && <Info className="w-(--primary-fs) h-(--primary-fs)" /> ||
                     type === "important" && <AlertCircle className="w-(--primary-fs) h-(--primary-fs) text-(--important-fc)" />
                 }
-            </button>
+            </Button>
             {
                 isOpen &&
                 <SmallModal

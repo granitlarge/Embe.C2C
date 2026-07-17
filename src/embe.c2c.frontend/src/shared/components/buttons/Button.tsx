@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Loader } from "@deemlol/next-icons";
+import { useEffect, useRef, useState } from "react";
 
 export type ButtonIntent = "save" | "destructive" | "cancel" | "preview" | "navigate" | "create" | "default" | "none";
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
@@ -8,7 +9,19 @@ export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "o
     intent?: ButtonIntent;
 }
 
-export default function Button({ onClick, intent = "default", ...props }: ButtonProps) {
+export default function Button({ onClick, intent = "none", ...props }: ButtonProps) {
+
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const buttonDimensionsRef = useRef<{
+        width: number,
+        height: number,
+        padding: {
+            top: number,
+            bottom: number,
+            left: number,
+            right: number
+        }
+    }>({ width: 0, height: 0, padding: { top: 0, bottom: 0, left: 0, right: 0 } });
 
     const [loading, setLoading] = useState(false);
     const classNames = [
@@ -23,8 +36,27 @@ export default function Button({ onClick, intent = "default", ...props }: Button
                                 intent === "create" ? "button-create" : ""
     ].filter(Boolean).join(" ");
 
+    useEffect(() => {
+
+        if (!buttonRef.current || !buttonDimensionsRef.current)
+            return;
+
+        const computedStyle = getComputedStyle(buttonRef.current)
+        buttonDimensionsRef.current = {
+            width: parseFloat(computedStyle.width) - parseFloat(computedStyle.paddingRight) - parseFloat(computedStyle.paddingLeft),
+            height: parseFloat(computedStyle.height) - parseFloat(computedStyle.paddingTop) - parseFloat(computedStyle.paddingBottom),
+            padding: {
+                top: parseFloat(computedStyle.paddingTop),
+                bottom: parseFloat(computedStyle.paddingBottom),
+                left: parseFloat(computedStyle.paddingLeft),
+                right: parseFloat(computedStyle.paddingRight)
+            }
+        };
+
+    }, [props.children])
+
     return (
-        <button {...props} className={`${classNames} active:scale-95`} onClick={async () => {
+        <button ref={buttonRef} {...props} className={`${classNames} active:scale-95`} onClick={async () => {
             if (loading) {
                 return;
             }
@@ -42,7 +74,18 @@ export default function Button({ onClick, intent = "default", ...props }: Button
                 setLoading(false);
             }
         }}>
-            {loading ? "loading..." : props.children}
+            {
+                loading ?
+                    <Loader
+                        className="animate-spin"
+                        style={{ 
+                            width: buttonDimensionsRef.current.width, 
+                            height: buttonDimensionsRef.current.height,
+                        }}
+                        width={buttonDimensionsRef.current.width}
+                        height={buttonDimensionsRef.current.height}
+                    /> : props.children
+            }
         </button>
     );
 

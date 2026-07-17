@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import useNotificationStore from "../../stores";
 import NotificationsModal from "../notifications-modal/NotificationsModal";
 import * as api from "../../actions/action";
+import Button from "@/src/shared/components/buttons/Button";
 
 export type NotificationsMenuProps = {
     className?: string;
@@ -33,7 +34,7 @@ export default function NotificationsMenu({ className }: NotificationsMenuProps)
 
     return (
         <div className="flex flex-col ml-auto">
-            <button
+            <Button
                 className={`${classNames} cursor-pointer`}
                 onClick={() => { setHidden(prev => !prev) }}
             >
@@ -42,7 +43,7 @@ export default function NotificationsMenu({ className }: NotificationsMenuProps)
                     <span className="text-(length:--fs-lg)">notifications</span>
                     {hasUnread && <span className="absolute top-0 -right-1 block h-2 w-2 rounded-full bg-(--primary)"></span>}
                 </div>
-            </button>
+            </Button>
             <NotificationsModal hidden={hidden} closed={() => setHidden(true)} />
         </div>
     );

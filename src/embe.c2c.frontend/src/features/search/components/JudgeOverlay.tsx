@@ -1,3 +1,4 @@
+import Button from "@/src/shared/components/buttons/Button";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { useCallback } from "react";
@@ -17,7 +18,7 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
 
         <Surface className={`${classNames} relative`} variant="secondary" padding="none">
             {children}
-            <button
+            <Button
                 onClick={judgeNegative}
                 className="
                     absolute 
@@ -35,8 +36,8 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
                     w-10
                     h-10
                 "/>
-            </button>
-            <button
+            </Button>
+            <Button
                 onClick={judgePositive}
                 className="
                     absolute 
@@ -54,7 +55,7 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
                     w-10
                     h-10
                 "/>
-            </button>
+            </Button>
         </Surface>
 
     )

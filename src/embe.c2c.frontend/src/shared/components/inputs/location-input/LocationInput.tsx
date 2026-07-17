@@ -11,6 +11,7 @@ import { Loader } from "@deemlol/next-icons";
 import Surface from "../../surfaces/Surface";
 import ErrorMessage from "../ErrorMessage";
 import InfoModal, { InfoType } from "../../infos/InfoModal";
+import Button from "../../buttons/Button";
 
 type LocationInputExactProps = {
     value?: Location;
@@ -70,12 +71,12 @@ function LocationInputExact({ value, onChange, className }: LocationInputExactPr
         <Surface className={`input-wrapper ${classNames}`} variant="inherit" padding="sm">
             <div className="flex flex-row items-center">
                 <input className="input overflow-x-scroll" type="text" disabled value={value ? (locationName ?? `${value.latitude}, ${value.longitude}`) : "location not set"} />
-                <button className="max-w-max bg-transparent button" onClick={updateLocation}>
+                <Button className="max-w-max bg-transparent button" onClick={updateLocation}>
                     <RefreshCcw className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc) ${loading ? "animate-[spin_1s_linear_infinite_reverse]" : ""}`} />
-                </button>
-                <button className="max-w-max bg-transparent button" onClick={() => { onChange?.(undefined) }}>
+                </Button>
+                <Button className="max-w-max bg-transparent button" onClick={() => { onChange?.(undefined) }}>
                     <Trash2 className={`w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)`} />
-                </button>
+                </Button>
             </div>
         </Surface>
     )

@@ -11,6 +11,7 @@ import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
+import Button from "@/src/shared/components/buttons/Button";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;
@@ -25,9 +26,9 @@ function Header({ hasSearchProfiles }: HeaderProps) {
                 <h1 className="truncate">search</h1>
                 {
                     hasSearchProfiles &&
-                    <button className="ml-auto" onClick={() => router.push("/protected/search-profile")}>
+                    <Button className="ml-auto max-w-max" onClick={() => router.push("/protected/search-profile")} intent="none">
                         <SlidersHorizontal className="w-6 h-6" />
-                    </button>
+                    </Button>
                 }
             </header>
         </div>

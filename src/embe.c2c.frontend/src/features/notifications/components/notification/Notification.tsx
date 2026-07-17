@@ -5,6 +5,7 @@ import { MailOpen, Mail } from "lucide-react";
 import { Trash2 } from "@deemlol/next-icons";
 import Link from "@/src/shared/components/Links/Link";
 import Image from "@/src/shared/components/images/Image";
+import Button from "@/src/shared/components/buttons/Button";
 
 type NotificationContent = {
     title: string;
@@ -73,19 +74,16 @@ export default function Notification({ markAsRead, remove, markAsUnread, notific
                 <div className="flex flex-row gap-2">
 
                     {notification.isRead &&
-                        <button title="mark as unread" className="cursor-pointer text-(--surface-font-color)" onClick={markAsUnread}>
+                        <Button title="mark as unread" className="cursor-pointer text-(--surface-font-color)" onClick={markAsUnread}>
                             <MailOpen className="w-5 h-5" />
-                        </button>}
+                        </Button>}
                     {!notification.isRead &&
-                        <button title="mark as read" className="cursor-pointer text-(--surface-font-color)" onClick={markAsRead}>
+                        <Button title="mark as read" className="cursor-pointer text-(--surface-font-color)" onClick={markAsRead}>
                             <Mail className="w-5 h-5" />
-                        </button>}
-                    <button>
-
-                    </button>
-                    <button title="remove" className="cursor-pointer text-(--destructive)" onClick={remove}>
+                        </Button>}
+                    <Button title="remove" className="cursor-pointer text-(--destructive)" onClick={remove}>
                         <Trash2 className="w-5 h-5" />
-                    </button>
+                    </Button>
 
                 </div>
                 <div className="ml-auto text-(--surface-font-color-muted) text-(length:--fs-sm)" suppressHydrationWarning>{timeAgo}</div>
