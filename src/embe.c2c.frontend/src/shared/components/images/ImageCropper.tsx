@@ -13,6 +13,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const cropperRef = useRef<HTMLDivElement>(null);
     const grabbingCropperRef = useRef<boolean>(false);
+    const grabbingContainerRef = useRef<boolean>(false);
     const cropperOffsetRef = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
 
     const [image, setImage] = useState<HTMLImageElement | null>(null);
@@ -21,23 +22,24 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
     const [imageWidth, setImageWidth] = useState(0);
     const [imageHeight, setImageHeight] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
-    const [zoomPercentageUnits, setZoomPercentageUnits] = useState(0);
     const containerHeight = imageWidth !== 0 ? containerWidth * imageHeight / imageWidth : 0;
 
     const [cropperX, setCropperX] = useState(0);
     const [cropperY, setCropperY] = useState(0);
 
+    const [viewport, setViewport] = useState({ x: 0, y: 0, width: imageWidth, height: imageHeight })
+
     useEffect(() => {
 
-        window.addEventListener("pointerup", onCropperPointerUp);
+        window.addEventListener("pointerup", onWindowPointerUp);
 
         return () => {
-            window.removeEventListener("pointerup", onCropperPointerUp);
+            window.removeEventListener("pointerup", onWindowPointerUp);
         }
 
     }, [])
 
-    const onMouseMove = useCallback((e: React.MouseEvent) => {
+    const onMouseMoveUpdateCropperPosition = useCallback((clientX: number, clientY: number) => {
 
         if (grabbingCropperRef.current !== true)
             return;
@@ -46,13 +48,16 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
         const containerBoundingClientRect = containerRef.current.getBoundingClientRect();
 
-        const newCropperX = Math.max(Math.min(e.clientX - containerBoundingClientRect.left - (cropperOffsetRef.current.x), containerWidth - cropperWidth), 0);
-        const newCropperY = Math.max(Math.min(e.clientY - containerBoundingClientRect.top - (cropperOffsetRef.current.y), containerHeight - cropperHeight), 0);
+        const newCropperX = Math.max(Math.min(clientX - containerBoundingClientRect.left - (cropperOffsetRef.current.x), containerWidth - cropperWidth), 0);
+        const newCropperY = Math.max(Math.min(clientY - containerBoundingClientRect.top - (cropperOffsetRef.current.y), containerHeight - cropperHeight), 0);
 
         setCropperX(newCropperX);
         setCropperY(newCropperY);
 
     }, [setCropperX, setCropperY, containerWidth, containerHeight, cropperWidth, cropperHeight]);
+
+    const onMousemoveUpdatedZoomPosition = useCallback((clientX: number, clientY: number) => {
+    }, [])
 
     useEffect(() => {
 
@@ -82,10 +87,11 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             setImage(image);
             setImageWidth(image.width);
             setImageHeight(image.height);
+            setViewport({ x: 0, y: 0, width: image.width, height: image.height })
         }
         image.src = src;
 
-    }, [src]);
+    }, [src, setImage, setImageWidth, setImageHeight, setViewport]);
 
     useEffect(() => {
 
@@ -101,9 +107,9 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             return;
 
         context.clearRect(0, 0, containerWidth, containerHeight);
-        context.drawImage(image, 0, 0, imageWidth * ((100 - Math.min(zoomPercentageUnits, 90)) / 100), imageHeight * ((100 - Math.min(zoomPercentageUnits, 90)) / 100), 0, 0, containerWidth, containerHeight);
+        context.drawImage(image, viewport.x, viewport.y, viewport.width, viewport.height, 0, 0, containerWidth, containerHeight);
 
-    }, [image, containerWidth, zoomPercentageUnits]);
+    }, [image, containerWidth, viewport.width, viewport.height]);
 
     useEffect(() => {
 
@@ -127,45 +133,55 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         setCropperHeight(cropperHeight);
         console.log("Setting Cropper Dimensions: ", cropperWidth, cropperHeight);
 
-    }, [width, height, imageWidth, imageHeight, containerWidth, zoomPercentageUnits])
+    }, [width, height, imageWidth, imageHeight, containerWidth])
 
-    function onWheel(deltaY: number, deltaX: number, deltaZ: number) {
+    function onWheel(clientX: number, clientY: number, deltaY: number, deltaX: number, deltaZ: number) {
+
+        if (!containerRef.current)
+            return;
+
         const direction = deltaY < 0 ? "in" : "out";
-        let newZoomPercentage = zoomPercentageUnits;
-        if (direction === "out") {
-            const newZoomPercentageCandidate = Math.max(0, zoomPercentageUnits - 10);
-            if (!exceedsContainer(newZoomPercentageCandidate)) {
-                newZoomPercentage = newZoomPercentageCandidate;
-            }
+        let newWidth;
+        let newHeight;
+        if (direction === "in") {
+            newWidth = Math.max(viewport.width * .90, imageWidth * .10);
+            newHeight = Math.max(viewport.height * .90, imageHeight * 0.10);
         } else {
-            const newZoomPercentageCandidate = zoomPercentageUnits + 10;
-            if (!exceedsContainer(newZoomPercentageCandidate)) {
-                newZoomPercentage = newZoomPercentageCandidate;
-            }
+            newWidth = Math.min(viewport.width * 1.10, imageWidth);
+            newHeight = Math.min(viewport.height * 1.10, imageHeight);
         }
 
-        setZoomPercentageUnits(newZoomPercentage);
+        const offsetX = clientX - containerRef.current.getBoundingClientRect().left;
+        const offsetY = clientY - containerRef.current.getBoundingClientRect().top;
 
-        function exceedsContainer(newPercentage: number) {
-            const exceedsContainerHeight = newPercentage / 100 * cropperHeight >= containerHeight;
-            const exceedsContainerWidth = newPercentage / 100 * cropperWidth >= containerWidth;
-            const exceedsContainer = exceedsContainerHeight || exceedsContainerWidth;
-            return exceedsContainer;
-        }
+        const relativeX = offsetX / containerWidth;
+        const relativeY = offsetY / containerHeight;
+
+        const sourceImageX = viewport.x + viewport.width * relativeX;
+        const sourceImageY = viewport.y + viewport.height * relativeY;
+
+        const destinationImageX = newWidth / 2;
+        const destinationImageY = newHeight / 2;
+
+        const sourceOffsetX = Math.max(Math.min(sourceImageX - destinationImageX, imageWidth - newWidth), 0);
+        const sourceOffsetY = Math.max(Math.min(sourceImageY - destinationImageY, imageHeight - newHeight), 0);
+
+        setViewport({ x: sourceOffsetX, y: sourceOffsetY, width: newWidth, height: newHeight });
+
     }
 
-    function onCropperPointerDown(e: React.MouseEvent<HTMLDivElement>) {
+    function onCropperPointerDown(clientX: number, clientY: number) {
 
         if (!cropperRef.current)
             return;
 
         const cropperBoundingClientRect = cropperRef.current.getBoundingClientRect();
-        const isWithinCropper = cropperBoundingClientRect.x <= e.clientX && cropperBoundingClientRect.x + cropperBoundingClientRect.width >= e.clientX &&
-            cropperBoundingClientRect.y <= e.clientY && cropperBoundingClientRect.y + cropperBoundingClientRect.height >= e.clientY;
+        const isWithinCropper = cropperBoundingClientRect.x <= clientX && cropperBoundingClientRect.x + cropperBoundingClientRect.width >= clientX &&
+            cropperBoundingClientRect.y <= clientY && cropperBoundingClientRect.y + cropperBoundingClientRect.height >= clientY;
 
         if (isWithinCropper) {
-            const offsetX = e.clientX - cropperBoundingClientRect.x;
-            const offsetY = e.clientY - cropperBoundingClientRect.y;
+            const offsetX = clientX - cropperBoundingClientRect.x;
+            const offsetY = clientY - cropperBoundingClientRect.y;
             cropperOffsetRef.current = { x: offsetX, y: offsetY };
         } else {
             cropperOffsetRef.current = { x: 0, y: 0 };
@@ -175,18 +191,28 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
     }
 
-    function onCropperPointerUp() {
+    function onWindowPointerUp() {
 
         grabbingCropperRef.current = false;
         cropperOffsetRef.current = { x: 0, y: 0 };
+        grabbingContainerRef.current = false;
 
     }
 
     return (
         <div
             ref={containerRef}
-            className="relative w-full"
-            onMouseMove={onMouseMove}
+            className="relative w-full touch-none"
+            onMouseMove={(e) => { onMouseMoveUpdateCropperPosition(e.clientX, e.clientY); onMousemoveUpdatedZoomPosition(e.clientX, e.clientY); }}
+            onTouchMove={(e) => {
+                if (e.touches.length === 1) {
+                    onMouseMoveUpdateCropperPosition(e.touches[0].clientX, e.touches[0].clientY);
+                    onMousemoveUpdatedZoomPosition(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }}
+            onPointerDown={() => {
+                grabbingContainerRef.current = true;
+            }}
 
         >
             <canvas
@@ -196,7 +222,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
                 width={containerWidth}
                 height={containerHeight}
                 onWheel={(e) => {
-                    onWheel(e.deltaY, e.deltaX, e.deltaZ);
+                    onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ);
                 }}
             >
 
@@ -206,9 +232,10 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
                 style={{ width: cropperWidth ?? 0, height: cropperHeight ?? 0, top: cropperY, left: cropperX }}
                 className="absolute bg-black opacity-50"
                 onWheel={(e) => {
-                    onWheel(e.deltaY, e.deltaX, e.deltaZ);
+                    onWheel(e.clientX, e.clientY,  e.deltaY, e.deltaX, e.deltaZ);
                 }}
-                onPointerDown={onCropperPointerDown}
+                onPointerDown={(e) => {e.stopPropagation(); onCropperPointerDown(e.clientX, e.clientY);}}
+                onTouchStart={(e) => e.touches.length === 1 && onCropperPointerDown(e.touches[0].clientX, e.touches[0].clientY)}
             >
 
             </div>

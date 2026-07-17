@@ -15,16 +15,19 @@ export default function Button({ onClick, intent = "default", ...props }: Button
         props.className,
         "button",
         intent === "save" ? "button-save" :
-        intent === "destructive" ? "button-destructive" :
-        intent === "cancel" ? "button-cancel" :
-        intent === "preview" ? "button-preview" :
-        intent === "default" ? "button-default" :
-        intent === "navigate" ? "button-navigate" :
-        intent === "create" ? "button-create" : ""
+            intent === "destructive" ? "button-destructive" :
+                intent === "cancel" ? "button-cancel" :
+                    intent === "preview" ? "button-preview" :
+                        intent === "default" ? "button-default" :
+                            intent === "navigate" ? "button-navigate" :
+                                intent === "create" ? "button-create" : ""
     ].filter(Boolean).join(" ");
 
     return (
         <button {...props} className={`${classNames} active:scale-95`} onClick={async () => {
+            if (loading) {
+                return;
+            }
             setLoading(true);
             const result = onClick?.();
             if (result instanceof Promise) {
@@ -38,7 +41,6 @@ export default function Button({ onClick, intent = "default", ...props }: Button
             } else {
                 setLoading(false);
             }
-
         }}>
             {loading ? "loading..." : props.children}
         </button>
