@@ -89,7 +89,7 @@ export default function LoginForm({ className }: LoginFormProps) {
                     clearErrors();
                 }} />
             {error && <span className="error-message">{error}</span>}
-            <Button onClick={login}>login</Button>
+            <Button onClick={login} intent="save">login</Button>
             <Link className="absolute right-2 top-2" href={"/public/register"}>register</Link>
         </Surface>
     )

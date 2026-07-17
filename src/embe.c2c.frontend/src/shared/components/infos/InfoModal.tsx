@@ -16,7 +16,7 @@ export default function InfoModal({ info, type }: InfoModalProps) {
 
     return (
         <div>
-            <Button className="flex items-center" onClick={() => setIsOpen(prev => !prev)}>
+            <Button className="flex items-center max-w-max" onClick={() => setIsOpen(prev => !prev)}>
                 {
                     type === "info" && <Info className="w-(--primary-fs) h-(--primary-fs)" /> ||
                     type === "important" && <AlertCircle className="w-(--primary-fs) h-(--primary-fs) text-(--important-fc)" />

@@ -17,7 +17,7 @@ export default function InfoSurface({ className, children, show = false }: InfoS
     return (
 
         <Surface className={`flex flex-row gap-2 items-start ${classNames}`} variant="tertiary" padding="sm">
-            <Button onClick={() => setIsOpen(prev => !prev)}>
+            <Button className="max-w-max" onClick={() => setIsOpen(prev => !prev)}>
                 <Info />
             </Button>
             {

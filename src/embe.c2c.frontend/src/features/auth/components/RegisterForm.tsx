@@ -64,7 +64,7 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
                 errorMessage={emailError}
             />
             {error && <span className="text-(--error-fc)">{error}</span>}
-            <Button onClick={onNavigate}>next</Button>
+            <Button intent="navigate" onClick={onNavigate}>next</Button>
         </Surface>
     )
 
@@ -76,7 +76,7 @@ function AccountExistsStep({ hidden }: { hidden: boolean }) {
         router.push("/public/login");
     }
     return (
-        <Button className={`${hidden ? "hidden" : ""}`} onClick={onClick}>login</Button>
+        <Button intent="navigate" className={`${hidden ? "hidden" : ""}`} onClick={onClick}>login</Button>
     )
 }
 
@@ -143,7 +143,7 @@ function PasswordStep({
                 onBlur={(pw) => { setConfirmPasswordState(pw); clearErrors(); }}
                 errorMessage={error}
             />
-            <Button onClick={next}>next</Button>
+            <Button intent="navigate" onClick={next}>next</Button>
         </Surface>
     )
 }
@@ -196,7 +196,7 @@ function BasicProfileStep({ finish, hidden }: BasicProfileStepProps) {
                 location: false
             }}
         >
-            <Button onClick={onNext}>finish</Button>
+            <Button intent="save" onClick={onNext}>finish</Button>
         </BasicProfileForm>
     )
 
@@ -248,7 +248,7 @@ function SearchProfileStep({ onGendersChange, onAgeRangeChange, onDistanceChange
 
     return (
         <SearchProfileBuilderForm className={`${hidden ? "hidden" : ""}`} data={datingPreferencesData} onChange={setDatingPreferencesData} error={datingPreferencesError} >
-            <Button className="max-w-xs" onClick={next}>next</Button>
+            <Button intent="navigate" className="max-w-xs" onClick={next}>next</Button>
         </SearchProfileBuilderForm>
     )
 }

@@ -23,6 +23,7 @@ export default function Button({ onClick, intent = "none", ...props }: ButtonPro
         }
     }>({ width: 0, height: 0, padding: { top: 0, bottom: 0, left: 0, right: 0 } });
 
+    const loadingRef = useRef(false);
     const [loading, setLoading] = useState(false);
     const classNames = [
         props.className,
@@ -41,50 +42,56 @@ export default function Button({ onClick, intent = "none", ...props }: ButtonPro
         if (!buttonRef.current || !buttonDimensionsRef.current)
             return;
 
-        const computedStyle = getComputedStyle(buttonRef.current)
-        buttonDimensionsRef.current = {
-            width: parseFloat(computedStyle.width) - parseFloat(computedStyle.paddingRight) - parseFloat(computedStyle.paddingLeft),
-            height: parseFloat(computedStyle.height) - parseFloat(computedStyle.paddingTop) - parseFloat(computedStyle.paddingBottom),
-            padding: {
-                top: parseFloat(computedStyle.paddingTop),
-                bottom: parseFloat(computedStyle.paddingBottom),
-                left: parseFloat(computedStyle.paddingLeft),
-                right: parseFloat(computedStyle.paddingRight)
-            }
-        };
+        const resizeObserver = new ResizeObserver(() => {
+            if (!buttonRef.current)
+                return;
+            const computedStyle = getComputedStyle(buttonRef.current)
+            buttonDimensionsRef.current = {
+                width: parseFloat(computedStyle.width) - parseFloat(computedStyle.paddingRight) - parseFloat(computedStyle.paddingLeft) - parseFloat(computedStyle.borderLeft) - parseFloat(computedStyle.borderRight),
+                height: parseFloat(computedStyle.height) - parseFloat(computedStyle.paddingTop) - parseFloat(computedStyle.paddingBottom) - parseFloat(computedStyle.borderBottom) - parseFloat(computedStyle.borderTop),
+                padding: {
+                    top: parseFloat(computedStyle.paddingTop),
+                    bottom: parseFloat(computedStyle.paddingBottom),
+                    left: parseFloat(computedStyle.paddingLeft),
+                    right: parseFloat(computedStyle.paddingRight)
+                }
+            };
+        });
 
-    }, [props.children])
+        resizeObserver.observe(buttonRef.current);
+        return () => {
+            resizeObserver.disconnect();
+        }
+
+    }, [])
 
     return (
         <button ref={buttonRef} {...props} className={`${classNames} active:scale-95`} onClick={async () => {
-            if (loading) {
+            if (loadingRef.current) {
                 return;
             }
+            loadingRef.current = true;
             setLoading(true);
             const result = onClick?.();
-            if (result instanceof Promise) {
-                try {
-                    await result;
-                    setLoading(false);
-                } catch (e) {
-                    setLoading(false);
-                    throw e;
-                }
-            } else {
+            try {
+                await result;
+            } finally {
                 setLoading(false);
+                loadingRef.current = false;
             }
         }}>
             {
                 loading ?
-                    <Loader
-                        className="animate-spin"
-                        style={{ 
-                            width: buttonDimensionsRef.current.width, 
-                            height: buttonDimensionsRef.current.height,
+                    <div className="flex justify-center items-center"
+                        style={{
+                            width: buttonDimensionsRef.current.width,
+                            height: buttonDimensionsRef.current.height
                         }}
-                        width={buttonDimensionsRef.current.width}
-                        height={buttonDimensionsRef.current.height}
-                    /> : props.children
+                    >
+                        <Loader
+                            className="mx-auto my-auto animate-spin w-(--primary-fs) h-(--primary-fs)"
+                        />
+                    </div> : props.children
             }
         </button>
     );
