@@ -25,7 +25,14 @@ function MyImage({ id, src, status, onRemove }: MyImageProps) {
             <div ref={draggableRef} className="relative">
                 {
                     src && src !== "" &&
-                    <Image src={src} alt={"An Image"} className={`w-20 h-30 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`} width={0} height={0} unoptimized={process.env.NODE_ENV === "development"} />
+                    <Image
+                        src={src}
+                        alt={"An Image"}
+                        className={`w-20 h-30 object-cover rounded-lg ${isDragging ? "shadow-2xl shadow-black" : ""}`}
+                        width={100}
+                        height={100}
+                        unoptimized={process.env.NODE_ENV === "development"}
+                    />
                 }
                 {
                     status === ImageStatus.Pending &&
@@ -67,7 +74,7 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
         <Surface
             className={`relative w-20 h-30 flex items-center justify-center cursor-pointer relative rounded-lg ${className}`} onClick={onClick}
             variant="tertiary">
-            <input ref={inputRef} type="file" multiple className="hidden" accept="image/*" onChange={onChange} />
+            <input ref={inputRef} type="file" multiple className="hidden" accept="image/*"  onChange={onChange} />
             <span className="text-3xl text-(--secondary-fc)">+</span>
         </Surface>
 

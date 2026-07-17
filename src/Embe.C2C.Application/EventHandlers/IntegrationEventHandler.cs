@@ -126,6 +126,7 @@ public class IntegrationEventHandler
         {
 
             await _imageService.MoveImageAsync(fromUrl, toUrl, cancellationToken);
+            Console.WriteLine($"Moved image '{imageMovedEvent.ImageId}'");
         }
         catch (Exception e)
         {
