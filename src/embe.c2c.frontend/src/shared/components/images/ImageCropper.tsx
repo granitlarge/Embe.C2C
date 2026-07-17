@@ -15,6 +15,8 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
     const grabbingCropperRef = useRef<boolean>(false);
     const grabbingContainerRef = useRef<boolean>(false);
     const cropperOffsetRef = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
+    const containerPinchRef = useRef(false);
+    const containerLastPinchMove = useRef<React.TouchList | null>(null);
 
     const [image, setImage] = useState<HTMLImageElement | null>(null);
     const [cropperWidth, setCropperWidth] = useState(0);
@@ -37,26 +39,6 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             window.removeEventListener("pointerup", onWindowPointerUp);
         }
 
-    }, [])
-
-    const onMouseMoveUpdateCropperPosition = useCallback((clientX: number, clientY: number) => {
-
-        if (grabbingCropperRef.current !== true)
-            return;
-        if (!containerRef.current)
-            return;
-
-        const containerBoundingClientRect = containerRef.current.getBoundingClientRect();
-
-        const newCropperX = Math.max(Math.min(clientX - containerBoundingClientRect.left - (cropperOffsetRef.current.x), containerWidth - cropperWidth), 0);
-        const newCropperY = Math.max(Math.min(clientY - containerBoundingClientRect.top - (cropperOffsetRef.current.y), containerHeight - cropperHeight), 0);
-
-        setCropperX(newCropperX);
-        setCropperY(newCropperY);
-
-    }, [setCropperX, setCropperY, containerWidth, containerHeight, cropperWidth, cropperHeight]);
-
-    const onMousemoveUpdatedZoomPosition = useCallback((clientX: number, clientY: number) => {
     }, [])
 
     useEffect(() => {
@@ -109,7 +91,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         context.clearRect(0, 0, containerWidth, containerHeight);
         context.drawImage(image, viewport.x, viewport.y, viewport.width, viewport.height, 0, 0, containerWidth, containerHeight);
 
-    }, [image, containerWidth, viewport.width, viewport.height]);
+    }, [image, containerWidth, viewport]);
 
     useEffect(() => {
 
@@ -135,21 +117,57 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
     }, [width, height, imageWidth, imageHeight, containerWidth])
 
-    function onWheel(clientX: number, clientY: number, deltaY: number, deltaX: number, deltaZ: number) {
+    function onWheel(clientX: number, clientY: number, deltaY: number, deltaX: number, deltaZ: number, speed: number) {
 
-        if (!containerRef.current)
-            return;
-
-        const direction = deltaY < 0 ? "in" : "out";
+        const direction = deltaY < 0 ? "in" : deltaY > 0 ? "out" : "none";
         let newWidth;
         let newHeight;
         if (direction === "in") {
-            newWidth = Math.max(viewport.width * .90, imageWidth * .10);
-            newHeight = Math.max(viewport.height * .90, imageHeight * 0.10);
+            newWidth = Math.max(viewport.width * (1 - speed), imageWidth * speed);
+            newHeight = Math.max(viewport.height * (1 - speed), imageHeight * speed);
+        } else if (direction === "out") {
+            newWidth = Math.min(viewport.width * (1 + speed), imageWidth);
+            newHeight = Math.min(viewport.height * (1.0 + speed), imageHeight);
         } else {
-            newWidth = Math.min(viewport.width * 1.10, imageWidth);
-            newHeight = Math.min(viewport.height * 1.10, imageHeight);
+            newWidth = width;
+            newHeight = height;
         }
+
+        updateViewport(clientX, clientY, newWidth, newHeight);
+    }
+
+    function onMove(clientX: number, clientY: number) {
+
+        updateZoomPosition();
+        updateCropperPosition();
+
+        function updateZoomPosition() {
+            if (grabbingContainerRef.current !== true)
+                return;
+            updateViewport(clientX, clientY, viewport.width, viewport.height);
+        }
+
+        function updateCropperPosition() {
+            if (grabbingCropperRef.current !== true)
+                return;
+            if (!containerRef.current)
+                return;
+
+            const containerBoundingClientRect = containerRef.current.getBoundingClientRect();
+
+            const newCropperX = Math.max(Math.min(clientX - containerBoundingClientRect.left - (cropperOffsetRef.current.x), containerWidth - cropperWidth), 0);
+            const newCropperY = Math.max(Math.min(clientY - containerBoundingClientRect.top - (cropperOffsetRef.current.y), containerHeight - cropperHeight), 0);
+
+            setCropperX(newCropperX);
+            setCropperY(newCropperY);
+        }
+
+    }
+
+    function updateViewport(clientX: number, clientY: number, newWidth: number, newHeight: number) {
+
+        if (!containerRef.current)
+            return;
 
         const offsetX = clientX - containerRef.current.getBoundingClientRect().left;
         const offsetY = clientY - containerRef.current.getBoundingClientRect().top;
@@ -166,8 +184,8 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         const sourceOffsetX = Math.max(Math.min(sourceImageX - destinationImageX, imageWidth - newWidth), 0);
         const sourceOffsetY = Math.max(Math.min(sourceImageY - destinationImageY, imageHeight - newHeight), 0);
 
-        setViewport({ x: sourceOffsetX, y: sourceOffsetY, width: newWidth, height: newHeight });
 
+        setViewport({ x: sourceOffsetX, y: sourceOffsetY, width: newWidth, height: newHeight });
     }
 
     function onCropperPointerDown(clientX: number, clientY: number) {
@@ -199,45 +217,96 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
     }
 
+    function onContainerPinchMove(e: React.TouchEvent<HTMLDivElement>) {
+
+        if (containerPinchRef.current !== true) {
+            return;
+        }
+
+        if (!containerLastPinchMove.current) {
+            containerLastPinchMove.current = e.touches;
+            return;
+        }
+
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+
+        const p1 = containerLastPinchMove.current[0].identifier === t1.identifier ? containerLastPinchMove.current[0] : containerLastPinchMove.current[0];
+        const p2 = containerLastPinchMove.current[0].identifier !== p1.identifier ? containerLastPinchMove.current[0] : containerLastPinchMove.current[1];
+
+        // We need to determine whether the distance between the pinches has increased or decreased (this gives us the direction of the zoom)
+        // we then determine by how much it has increased, and whether the center of the pinch has changed (which determines where we zoom)
+
+        const prevDistance = Math.sqrt(Math.pow(p1.clientX - p2.clientX, 2) + Math.pow(p1.clientY - p2.clientY, 2));
+        const distance = Math.sqrt(Math.pow(t1.clientX - t2.clientX, 2) + Math.pow(t1.clientY - t2.clientY, 2));
+
+        const direction = distance > prevDistance ? "in" : "out";
+
+        const newCenterX = t1.clientX + Math.abs(t1.clientX - t2.clientX) / 2;
+        const newCenterY = t1.clientY + Math.abs(t1.clientY - t2.clientY) / 2;
+
+        onWheel(newCenterX, newCenterY, direction === "in" ? -1 : 1, 0, 0, 0.01);
+        containerLastPinchMove.current = e.touches;
+
+    }
+
     return (
-        <div
-            ref={containerRef}
-            className="relative w-full touch-none"
-            onMouseMove={(e) => { onMouseMoveUpdateCropperPosition(e.clientX, e.clientY); onMousemoveUpdatedZoomPosition(e.clientX, e.clientY); }}
-            onTouchMove={(e) => {
-                if (e.touches.length === 1) {
-                    onMouseMoveUpdateCropperPosition(e.touches[0].clientX, e.touches[0].clientY);
-                    onMousemoveUpdatedZoomPosition(e.touches[0].clientX, e.touches[0].clientY);
-                }
-            }}
-            onPointerDown={() => {
-                grabbingContainerRef.current = true;
-            }}
-
-        >
-            <canvas
-                ref={canvasRef}
-                className="w-full"
-                style={{ height: containerHeight }}
-                width={containerWidth}
-                height={containerHeight}
-                onWheel={(e) => {
-                    onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ);
-                }}
-            >
-
-            </canvas>
+        <div className="w-full touch-none">
             <div
-                ref={cropperRef}
-                style={{ width: cropperWidth ?? 0, height: cropperHeight ?? 0, top: cropperY, left: cropperX }}
-                className="absolute bg-black opacity-50"
-                onWheel={(e) => {
-                    onWheel(e.clientX, e.clientY,  e.deltaY, e.deltaX, e.deltaZ);
-                }}
-                onPointerDown={(e) => {e.stopPropagation(); onCropperPointerDown(e.clientX, e.clientY);}}
-                onTouchStart={(e) => e.touches.length === 1 && onCropperPointerDown(e.touches[0].clientX, e.touches[0].clientY)}
-            >
+                ref={containerRef}
+                className="relative w-full"
+                onMouseMove={(e) => { onMove(e.clientX, e.clientY); }}
+                onTouchMove={(e) => {
+                    if (e.touches.length === 1) {
 
+                        onMove(e.touches[0].clientX, e.touches[0].clientY);
+
+                    } else if (e.touches.length === 2) {
+
+                        onContainerPinchMove(e);
+
+                    }
+                }}
+                onTouchStart={(e) => {
+                    if (e.touches.length === 2) {
+                        containerPinchRef.current = true;
+                    }
+                }}
+                onTouchEnd={(e) => {
+                    containerPinchRef.current = false;
+                }}
+                onPointerDown={() => {
+                    grabbingContainerRef.current = true;
+                }}
+            >
+                <canvas
+                    ref={canvasRef}
+                    className="w-full"
+                    style={{ height: containerHeight }}
+                    width={containerWidth}
+                    height={containerHeight}
+                    onWheel={(e) => {
+                        onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ, 0.05);
+                    }}
+                >
+
+                </canvas>
+                {
+                    false &&
+                    <div
+                        ref={cropperRef}
+                        style={{ width: cropperWidth ?? 0, height: cropperHeight ?? 0, top: cropperY, left: cropperX }}
+                        className="absolute bg-black opacity-50"
+                        onWheel={(e) => {
+                            onWheel(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ, 0.05);
+                        }}
+                        onPointerDown={(e) => { console.log("cropper pointer down"); e.stopPropagation(); onCropperPointerDown(e.clientX, e.clientY); }}
+                        onTouchStart={(e) => e.touches.length === 1 && onCropperPointerDown(e.touches[0].clientX, e.touches[0].clientY)}
+                        onMouseMove={(e) => { e.stopPropagation(); }}
+                    >
+
+                    </div>
+                }
             </div>
         </div>
     )

@@ -1,9 +1,9 @@
+"use client";
 import ImageCropper from "@/src/shared/components/images/ImageCropper";
+import Cropper from 'react-easy-crop'
 
-export default async function DesignPage() {
+export default function DesignPage() {
     return (
-        <>
-            <ImageCropper src="/test.jpg" width={600} height={800} />
-        </>
+        <></>
     )
 }
