@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Cropper from "react-easy-crop"
 import ImageCropper from "../../../images/ImageCropper";
+import { PaginationDots } from "../../../images/ImageGallery";
 
 export type ImageCrop = {
     images: string[];
@@ -15,10 +16,20 @@ export default function ImageCrop({ images }: ImageCrop) {
     const [index, setIndex] = useState(0);
 
     return (
-        <ImageCropper
-            src={images[index]}
-            height={600}
-            width={800}
-        />
+        <div className="relative">
+
+            <ImageCropper
+                onCrop={() => setIndex(prev => (prev + 1) % images.length)}
+                src={images[index]}
+                width={400}
+                height={900}
+
+            />
+            {
+                images.length > 1 && 
+                <PaginationDots className="absolute top-3 left-1/2 -translate-x-1/2" current={1} total={images.length} />
+            }
+
+        </div>
     )
 }

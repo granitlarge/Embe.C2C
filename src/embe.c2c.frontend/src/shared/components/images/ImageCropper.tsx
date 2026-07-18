@@ -23,8 +23,10 @@ export type ImageCropperProps = {
     src: string;
     width: number;
     height: number;
+    onCrop?: (crop: { x: number, y: number, width: number, height: number }) => void;
+    onCancel?: () => void;
 }
-export default function ImageCropper({ src, width, height }: ImageCropperProps) {
+export default function ImageCropper({ onCrop, onCancel, src, width, height }: ImageCropperProps) {
 
     const scrollSpeed = .05;
     const pointersHistoryRef = useRef(new Map<number, MyPointerEvent>());
@@ -83,6 +85,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         const onContainerPointerMoveCallback = (e: PointerEvent) => {
             e.preventDefault();
             e.stopPropagation();
+            pointersRef.current.set(e.pointerId, { pointerId: e.pointerId, point: { x: e.clientX, y: e.clientY } });
             if (pinchingContainerRef.current === true) {
                 onPinch(e);
             } else if (grabbingContainerRef.current === true || grabbingCropperRef.current === true) {
@@ -179,18 +182,19 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         if (imageWidth === 1 || imageHeight === 1)
             return;
 
-        const cropperWidthToHeightRatio = width / height;
-        let cropperWidth;
-        let cropperHeight;
+        let cropperWidth = 1;
+        let cropperHeight = 1;
 
         if (containerWidth < containerHeight) {
             cropperWidth = containerWidth;
-            cropperHeight = cropperWidth / cropperWidthToHeightRatio;
+            cropperHeight = cropperWidth * height / width;
         } else {
             cropperHeight = containerHeight;
-            cropperWidth = cropperHeight * cropperWidthToHeightRatio;
+            cropperWidth = cropperHeight * width / height;
         }
 
+        cropperWidth = Math.max(Math.min(cropperWidth, containerWidth), width / height);
+        cropperHeight = Math.max(Math.min(cropperHeight, containerHeight), 1);
         setCropperWidth(cropperWidth);
         setCropperHeight(cropperHeight);
 
@@ -349,7 +353,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         const currentDistance = distance({ x: t1.point.x, y: t1.point.y }, { x: t2.point.x, y: t2.point.y });
         const historyDistance = distance({ x: h1.point.x, y: h1.point.y }, { x: h2.point.x, y: h2.point.y });
 
-        const direction = currentDistance > historyDistance ? "out" : "in";
+        const direction = currentDistance < historyDistance ? "out" : "in";
 
         if (!containerRef.current)
             return;
@@ -399,13 +403,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
     }
 
     function onSave() {
-
-    }
-
-    function onCancel() {
-        setViewport({ x: 0, y: 0, width: imageWidth, height: imageHeight });
-        setCropperX(0);
-        setCropperY(0);
+        onCrop?.(viewport ?? { x: 0, y: 0, width: width, height: height });
     }
 
     return (

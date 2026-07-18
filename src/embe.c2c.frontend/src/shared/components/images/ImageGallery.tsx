@@ -6,12 +6,12 @@ import Image from "@/src/shared/components/images/Image";
 import styles from "./ImageGallery.module.css";
 import Button from "../buttons/Button";
 
-type PaginationDotsProps = {
+export type PaginationDotsProps = {
     total: number,
     current: number
     className?: string;
 }
-function PaginationDots({ total, current, className }: PaginationDotsProps) {
+export function PaginationDots({ total, current, className }: PaginationDotsProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
     return (
