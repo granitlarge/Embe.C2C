@@ -78,23 +78,19 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
     }
 
     return (
-        <Surface
-            className={`relative w-20 h-30 flex items-center justify-center cursor-pointer relative rounded-lg ${className}`} onClick={onClick}
+        <Surface className={`relative w-20 h-30 flex items-center justify-center cursor-pointer relative rounded-lg ${className}`} onClick={onClick}
             variant="tertiary">
-            <input ref={inputRef} type="file" multiple className="hidden" accept="image/*"  onChange={onChange} />
+            <input ref={inputRef} type="file" multiple className="hidden" accept="image/*" onChange={onChange} />
             <span className="text-3xl text-(--secondary-fc)">+</span>
             {
                 showCropper &&
                 <LargeModal
-                    className="p-3 flex flex-col gap-3"
+                    className="p-3"
                     header="crop"
                     hidden={false}
                     closed={() => setShowCropper(false)}
                 >
-                    <ImageCrop
-                        images={images} 
-
-                    />
+                    <ImageCrop images={images} />
                 </LargeModal>
             }
         </Surface>

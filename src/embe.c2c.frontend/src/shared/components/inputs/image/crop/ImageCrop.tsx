@@ -15,14 +15,10 @@ export default function ImageCrop({ images }: ImageCrop) {
     const [index, setIndex] = useState(0);
 
     return (
-        <div className="w-full">
-            <div className="relative w-full">
-                <ImageCropper
-                    src={images[index]}
-                    height={600}
-                    width={800}
-                />
-            </div>
-        </div>
+        <ImageCropper
+            src={images[index]}
+            height={600}
+            width={800}
+        />
     )
 }

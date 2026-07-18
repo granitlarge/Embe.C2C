@@ -141,13 +141,12 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             setContainerWidth(containerRef.current.clientWidth);
         })
 
-        setContainerWidth(containerRef.current.clientWidth);
         containerResizeObserver.observe(containerRef.current);
         return () => {
             containerResizeObserver.disconnect();
         }
 
-    }, [])
+    }, [setContainerWidth])
 
     useEffect(() => {
 
@@ -191,15 +190,16 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
         if (containerWidth < containerHeight) {
             cropperWidth = containerWidth;
-            cropperHeight = cropperWidth * 1 / cropperWidthToHeightRatio;
+            cropperHeight = cropperWidth / cropperWidthToHeightRatio;
         } else {
             cropperHeight = containerHeight;
             cropperWidth = cropperHeight * cropperWidthToHeightRatio;
         }
+
         setCropperWidth(cropperWidth);
         setCropperHeight(cropperHeight);
 
-    }, [width, height, imageWidth, imageHeight, containerWidth])
+    }, [width, height, imageWidth, imageHeight, containerWidth, containerHeight, setCropperWidth, setCropperHeight])
 
     function onScroll(windowX: number, windowY: number, direction: "in" | "out" | "none") {
 
@@ -256,7 +256,10 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             const cx = containerRef.current.getBoundingClientRect().left + containerRef.current.getBoundingClientRect().width / 2;
             const cy = containerRef.current.getBoundingClientRect().top + containerRef.current.getBoundingClientRect().height / 2;
 
-            centerViewport(cx - dx, cy - dy, viewport.width, viewport.height);
+            const newCenterX = cx - dx;
+            const newCenterY = cy - dy;
+
+            centerViewport(newCenterX, newCenterY, viewport.width, viewport.height);
             pointersHistoryRef.current.set(e.pointerId, { pointerId: e.pointerId, point: { x: e.clientX, y: e.clientY } });
         }
 
@@ -407,7 +410,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
                 <canvas
                     ref={canvasRef}
                     className="w-full"
-                    style={{ height: containerHeight }}
+                    style={{ height: containerHeight, width: containerWidth}}
                     width={containerWidth}
                     height={containerHeight}
                 >
