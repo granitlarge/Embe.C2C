@@ -40,10 +40,11 @@ export default function LargeModal({ children, className, closed, hidden, header
                 flex flex-col
                 ${styles.modal}
                 m-auto 
-                rounded-lg 
+                rounded-lg
                 scrollbar-gutter-stable
                 `}
             onClick={(e) => {
+                e.stopPropagation();
                 if (e.target === e.currentTarget) {
                     dialog.current?.close();
                 }

@@ -86,6 +86,8 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
             {
                 showCropper &&
                 <LargeModal
+                    className="p-3 flex flex-col gap-3"
+                    header="crop"
                     hidden={false}
                     closed={() => setShowCropper(false)}
                 >

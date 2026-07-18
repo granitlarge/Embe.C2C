@@ -12,13 +12,7 @@ export default function ImageCrop({ images }: ImageCrop) {
         throw new Error("images.length must be greater than 0.");
     }
 
-    const [crops, setCrops] = useState<{ x: number, y: number }[]>([{ x: 0, y: 0 }]);
-    const [zoom, setZoom] = useState(1);
     const [index, setIndex] = useState(0);
-
-    function onCropComplete() {
-
-    }
 
     return (
         <div className="w-full">
