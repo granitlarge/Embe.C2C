@@ -21,8 +21,8 @@ export default function ImageCrop({ images }: ImageCrop) {
             <ImageCropper
                 onCrop={() => setIndex(prev => (prev + 1) % images.length)}
                 src={images[index]}
-                width={400}
-                height={900}
+                width={5000}
+                height={5000}
 
             />
             {

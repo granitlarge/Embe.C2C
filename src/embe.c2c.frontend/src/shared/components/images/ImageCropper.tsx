@@ -66,7 +66,9 @@ export default function ImageCropper({ onCrop, onCancel, src, width, height }: I
 
         const onCropperPointerDownCallback = (e: PointerEvent) => {
             e.preventDefault();
-            e.stopPropagation();
+            if (!(Math.abs(cropperWidth - containerWidth) < 10 && Math.abs(cropperHeight - containerHeight) < 10)) {
+                e.stopPropagation();
+            }
             onCropperPointerDown(e.clientX, e.clientY);
         }
 
@@ -185,7 +187,7 @@ export default function ImageCropper({ onCrop, onCancel, src, width, height }: I
         let cropperWidth = 1;
         let cropperHeight = 1;
 
-        if (containerWidth < containerHeight) {
+        if (containerWidth > containerHeight) {
             cropperWidth = containerWidth;
             cropperHeight = cropperWidth * height / width;
         } else {
