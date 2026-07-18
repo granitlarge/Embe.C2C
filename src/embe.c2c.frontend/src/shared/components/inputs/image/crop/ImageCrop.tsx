@@ -27,7 +27,7 @@ export default function ImageCrop({ images }: ImageCrop) {
             />
             {
                 images.length > 1 && 
-                <PaginationDots className="absolute top-3 left-1/2 -translate-x-1/2" current={1} total={images.length} />
+                <PaginationDots className="absolute top-3 left-1/2 -translate-x-1/2" current={index} total={images.length} />
             }
 
         </div>
