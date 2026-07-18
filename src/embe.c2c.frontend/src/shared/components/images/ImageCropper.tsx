@@ -7,6 +7,12 @@ type Point = {
     x: number,
     y: number
 }
+type Viewport = {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+}
 
 type MyPointerEvent = {
     pointerId: number;
@@ -27,73 +33,60 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const cropperRef = useRef<HTMLDivElement>(null);
-    const grabbingCropperRef = useRef<boolean>(false);
-    const grabbingContainerRef = useRef<boolean>(false);
-    const cropperOffsetRef = useRef<Point>({ x: 0, y: 0 });
+
+    const grabbingContainerRef = useRef(false);
     const pinchingContainerRef = useRef(false);
+    const grabbingCropperRef = useRef(false);
 
     const [image, setImage] = useState<HTMLImageElement | null>(null);
-    const [cropperWidth, setCropperWidth] = useState(0);
-    const [cropperHeight, setCropperHeight] = useState(0);
-    const [imageWidth, setImageWidth] = useState(0);
-    const [imageHeight, setImageHeight] = useState(0);
-    const [containerWidth, setContainerWidth] = useState(0);
-    const containerHeight = imageWidth !== 0 ? containerWidth * imageHeight / imageWidth : 0;
+    const [imageWidth, setImageWidth] = useState(1);
+    const [imageHeight, setImageHeight] = useState(1);
 
+    const [containerWidth, setContainerWidth] = useState(1);
+    const containerHeight = containerWidth * imageHeight / imageWidth;
+
+    const [cropperWidth, setCropperWidth] = useState(1);
+    const [cropperHeight, setCropperHeight] = useState(1);
+
+    const [viewport, setViewport] = useState<Viewport | null>(null);
+
+    const cropperOffsetRef = useRef({ x: 0, y: 0 });
     const [cropperX, setCropperX] = useState(0);
     const [cropperY, setCropperY] = useState(0);
-
-    const [viewport, setViewport] = useState({ x: 0, y: 0, width: imageWidth, height: imageHeight })
 
     useEffect(() => {
 
         const onWheel = (e: WheelEvent) => {
-            try {
-                e.preventDefault();
-                e.stopPropagation();
-                onScroll(e.clientX, e.clientY, e.deltaY < 0 ? "in" : "out");
-            } catch (e) {
-                console.error(e);
-            }
+            e.preventDefault();
+            e.stopPropagation();
+            onScroll(e.clientX, e.clientY, e.deltaY < 0 ? "in" : "out");
         }
 
         const onCropperPointerDownCallback = (e: PointerEvent) => {
-            try {
-                e.preventDefault();
-                e.stopPropagation();
-                onCropperPointerDown(e.clientX, e.clientY);
-            } catch (e) {
-                console.error(e);
-            }
+            e.preventDefault();
+            e.stopPropagation();
+            onCropperPointerDown(e.clientX, e.clientY);
         }
 
         const onContainerPointerDownCallback = (e: PointerEvent) => {
-            try {
-                e.preventDefault();
-                e.stopPropagation();
-                pointersRef.current.set(e.pointerId, { pointerId: e.pointerId, point: { x: e.clientX, y: e.clientY } });
-                if (pointersRef.current.size === 2) {
-                    pinchingContainerRef.current = true;
-                } else {
-                    grabbingContainerRef.current = true;
-                    pinchingContainerRef.current = false;
-                }
-            } catch (e) {
-                console.error(e);
+            e.preventDefault();
+            e.stopPropagation();
+            pointersRef.current.set(e.pointerId, { pointerId: e.pointerId, point: { x: e.clientX, y: e.clientY } });
+            if (pointersRef.current.size === 2) {
+                pinchingContainerRef.current = true;
+            } else {
+                grabbingContainerRef.current = true;
+                pinchingContainerRef.current = false;
             }
         }
 
         const onContainerPointerMoveCallback = (e: PointerEvent) => {
-            try {
-                e.preventDefault();
-                e.stopPropagation();
-                if (pinchingContainerRef.current === true) {
-                    onPinch(e);
-                } else if (grabbingContainerRef.current === true || grabbingCropperRef.current === true) {
-                    onMove(e);
-                }
-            } catch (e) {
-                console.error(e);
+            e.preventDefault();
+            e.stopPropagation();
+            if (pinchingContainerRef.current === true) {
+                onPinch(e);
+            } else if (grabbingContainerRef.current === true || grabbingCropperRef.current === true) {
+                onMove(e);
             }
         }
 
@@ -122,11 +115,24 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         }
 
     }, [
-        onScroll, 
-        onCropperPointerDown, 
-        onPinch, 
+        onScroll,
+        onCropperPointerDown,
+        onPinch,
         onMove
     ])
+
+    useEffect(() => {
+
+        const image = new Image();
+        image.onload = () => {
+            setImageWidth(image.width);
+            setImageHeight(image.height);
+            setImage(image);
+            setViewport({ x: 0, y: 0, width: image.width, height: image.height });
+        }
+        image.src = src;
+
+    }, [src]);
 
     useEffect(() => {
 
@@ -146,20 +152,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             containerResizeObserver.disconnect();
         }
 
-    }, [setContainerWidth])
-
-    useEffect(() => {
-
-        const image = new Image();
-        image.onload = () => {
-            setImage(image);
-            setImageWidth(image.width);
-            setImageHeight(image.height);
-            setViewport({ x: 0, y: 0, width: image.width, height: image.height })
-        }
-        image.src = src;
-
-    }, [src, setImage, setImageWidth, setImageHeight, setViewport]);
+    }, [])
 
     useEffect(() => {
 
@@ -171,17 +164,19 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
             return;
         if (!image)
             return;
-        if (imageWidth === 0)
+        if (imageWidth === 1)
+            return;
+        if (!viewport)
             return;
 
         context.clearRect(0, 0, containerWidth, containerHeight);
         context.drawImage(image, viewport.x, viewport.y, viewport.width, viewport.height, 0, 0, containerWidth, containerHeight);
 
-    }, [image, containerWidth, containerHeight, viewport, imageWidth]);
+    }, [image, containerWidth, viewport, imageWidth]);
 
     useEffect(() => {
 
-        if (imageWidth === 0 || imageHeight === 0)
+        if (imageWidth === 1 || imageHeight === 1)
             return;
 
         const cropperWidthToHeightRatio = width / height;
@@ -199,9 +194,11 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
         setCropperWidth(cropperWidth);
         setCropperHeight(cropperHeight);
 
-    }, [width, height, imageWidth, imageHeight, containerWidth, containerHeight, setCropperWidth, setCropperHeight])
+    }, [width, height, imageWidth, imageHeight, containerWidth])
 
     function onScroll(windowX: number, windowY: number, direction: "in" | "out" | "none") {
+        if (!viewport)
+            return;
 
         let newWidth;
         let newHeight;
@@ -245,6 +242,8 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
                 pointersHistoryRef.current.set(e.pointerId, { pointerId: e.pointerId, point: { x: e.clientX, y: e.clientY } });
                 return;
             }
+            if (!viewport)
+                return;
 
             const history = pointersHistoryRef.current.get(e.pointerId)!;
             const current = e;
@@ -364,29 +363,37 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
 
     function centerViewport(windowX: number, windowY: number, width: number, height: number) {
 
-        if (!containerRef.current)
-            return;
+        setViewport(viewport => {
 
-        const containerX = windowX - containerRef.current.getBoundingClientRect().left;
-        const containerY = windowY - containerRef.current.getBoundingClientRect().top;
+            if (!containerRef.current) {
+                return viewport;
+            }
 
-        const viewportX = containerX * viewport.width / containerWidth;
-        const viewportY = containerY * viewport.width / containerWidth;
+            if (!viewport)
+                return viewport;
 
-        const imageX = viewport.x + viewportX;
-        const imageY = viewport.y + viewportY;
+            const containerX = windowX - containerRef.current.getBoundingClientRect().left;
+            const containerY = windowY - containerRef.current.getBoundingClientRect().top;
 
-        const x = imageX - width / 2;
-        const y = imageY - height / 2;
+            const viewportX = containerX * viewport.width / containerWidth;
+            const viewportY = containerY * viewport.width / containerWidth;
 
-        const safeX = Math.max(Math.min(x, imageWidth - width), 0);
-        const safeY = Math.max(Math.min(y, imageHeight - height), 0);
-        
-        setViewport({
-            x: safeX,
-            y: safeY,
-            width: width,
-            height: height
+            const imageX = viewport.x + viewportX;
+            const imageY = viewport.y + viewportY;
+
+            const x = imageX - width / 2;
+            const y = imageY - height / 2;
+
+            const safeX = Math.max(Math.min(x, imageWidth - width), 0);
+            const safeY = Math.max(Math.min(y, imageHeight - height), 0);
+
+            return {
+                x: safeX,
+                y: safeY,
+                width: width,
+                height: height
+            }
+
         });
 
     }
@@ -410,7 +417,7 @@ export default function ImageCropper({ src, width, height }: ImageCropperProps) 
                 <canvas
                     ref={canvasRef}
                     className="w-full"
-                    style={{ height: containerHeight, width: containerWidth}}
+                    style={{ height: containerHeight, width: containerWidth }}
                     width={containerWidth}
                     height={containerHeight}
                 >
