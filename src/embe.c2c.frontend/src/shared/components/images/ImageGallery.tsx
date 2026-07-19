@@ -38,8 +38,8 @@ function ImageGalleryImage({ src, alt, className }: ImageGalleryImageProps) {
             src={src}
             alt={alt}
             className={`${classNames} ${styles.image} rounded-md`}
-            width={0}
-            height={0}
+            width={1000}
+            height={1000 * 2.1}
             unoptimized={process.env.NODE_ENV === "development"}
         />
     )

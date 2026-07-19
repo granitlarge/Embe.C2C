@@ -4,6 +4,7 @@ import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { User as UserIcon, } from "@deemlol/next-icons";
 import Image from "@/src/shared/components/images/Image";
+import { profile } from "console";
 
 export type UserCompactProps = Omit<SurfaceProps<typeof Link>, "as" | "href" | "children"> & {
     className?: string;
@@ -24,7 +25,14 @@ export function UserCompact({ className, dto, ...props }: UserCompactProps) {
                     {user?.alias && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs) font-bold">{user?.alias}</span>}
                     {
                         profilePicture?.imageDetails?.url &&
-                        <Image src={profilePicture?.imageDetails?.url} alt="Profile picture" width={0} height={0} className="w-20 h-20 rounded-full object-cover" unoptimized={process.env.NODE_ENV === "development"} />
+                            <Image 
+                                src={profilePicture?.imageDetails?.smallUrl ?? profilePicture?.imageDetails?.mediumUrl ?? profilePicture.imageDetails?.largeUrl ?? profilePicture?.imageDetails?.url} 
+                                alt="Profile picture" 
+                                width={250}
+                                height={250} 
+                                className="w-20 h-20 rounded-full object-cover" 
+                                unoptimized={process.env.NODE_ENV === "development"} 
+                            />
                     }
                     {
                         !profilePicture?.imageDetails?.url &&
