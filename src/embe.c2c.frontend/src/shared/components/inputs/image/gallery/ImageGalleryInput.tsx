@@ -103,6 +103,9 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
 
 export type Image = {
     url?: string;
+    largeUrl?: string;
+    mediumUrl?: string;
+    smallUrl?: string;
     mimeType: string;
     status?: ImageStatus;
     crop?: {
@@ -153,7 +156,7 @@ export default function ImageGalleryInput<T extends Image = Image>({ data, error
                         <MyImage
                             key={image.__id}
                             id={image.__id}
-                            src={image.url}
+                            src={image.smallUrl ?? image.mediumUrl ?? image.largeUrl ?? image.url}
                             status={image.status}
                             onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, ...image }) => image))}
                         />

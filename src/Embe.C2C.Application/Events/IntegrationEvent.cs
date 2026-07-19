@@ -13,7 +13,8 @@ public enum IntegrationEventType
     MessageUnseen,
 
     ImageRemoved,
-    ImageMoved
+    ImageMoved,
+    ImageResized
 }
 
 public record IntegrationEvent(IntegrationEventType Type)

@@ -85,7 +85,10 @@ function addUserHandlers(
     setUserRef: RefObject<(newUser: ReadDto<User, UserPermission> | undefined) => void>
 ): () => void {
 
-    const onImageStatusChanged = (imageId: Guid, newStatus: ImageStatus) => {
+    const onImageStatusChanged = (
+        imageId: Guid,
+        newStatus: ImageStatus
+    ) => {
 
         console.log("SignalR.ImageStatusChanged");
 
@@ -133,9 +136,69 @@ function addUserHandlers(
 
     }
 
+    const onImageResized = (imageId: Guid, originalUrl: string, largeUrl: string, mediumUrl: string, smallUrl: string) => {
+        console.log("SignalR.ImageResized")
+        const user = userRef.current;
+        const setUser = setUserRef.current;
+        if (!user) {
+            return;
+        }
+
+        const targetImage = [...(user.data.acceptedImages ?? []), ...(user.data.pendingImages ?? [])].find(image => image.id === imageId);
+
+        if (targetImage === undefined) {
+            return;
+        }
+
+        const targetImageStatus = targetImage.imageDetails.status;
+
+        const newAcceptedImages = targetImageStatus === ImageStatus.Accepted ? (user.data.acceptedImages ?? []).map(image => {
+            if (image.id === targetImage.id) {
+                return {
+                    ...image,
+                    imageDetails: {
+                        ...image.imageDetails,
+                        url: originalUrl,
+                        largeUrl: largeUrl,
+                        mediumUrl: mediumUrl,
+                        smallUrl: smallUrl
+                    }
+                }
+            }
+            return image;
+        }) : [];
+
+        const newPendingImages = targetImageStatus === ImageStatus.Pending ? (user.data.pendingImages ?? []).map(image => {
+            if (image.id === targetImage.id) {
+                return {
+                    ...image,
+                    imageDetails: {
+                        ...image.imageDetails,
+                        url: originalUrl,
+                        largeUrl: largeUrl,
+                        mediumUrl: mediumUrl,
+                        smallUrl: smallUrl
+                    }
+                }
+            }
+            return image;
+        }) : [];
+
+        setUser({
+            ...user,
+            data: {
+                ...user.data,
+                acceptedImages: newAcceptedImages,
+                pendingImages: newPendingImages
+            }
+        })
+    }
+
+    connection?.on("ImageResized", onImageResized);
     connection?.on("ImageStatusChanged", onImageStatusChanged);
 
     return () => {
+        connection?.off("ImageResized", onImageResized);
         connection?.off("ImageStatusChanged", onImageStatusChanged);
     }
 

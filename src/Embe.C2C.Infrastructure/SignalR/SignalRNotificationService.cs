@@ -20,6 +20,7 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
             MessageUnseen messageUnseen => SendMessageUnseenNotificationAsync(messageUnseen, cancellationToken),
 
             ImageStatusChangedEvent imageStatusChangedEvent => SendImageStatusChangedNotificationAsync(imageStatusChangedEvent, cancellationToken),
+            ImageResizedEvent imageResizedEvent => SendImageResizedNotificationAsync(imageResizedEvent, cancellationToken),
             _ => Task.CompletedTask
         };
     }
@@ -63,14 +64,30 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
     private async Task SendImageStatusChangedNotificationAsync(ImageStatusChangedEvent imageStatusChanged, CancellationToken cancellationToken)
     {
         var hubContext = await _pool.GetHubContextAsync(cancellationToken);
-        await hubContext.Clients.User(imageStatusChanged.UserId.ToString())
-        .SendAsync
-        (
-            "ImageStatusChanged",
-            imageStatusChanged.ImageId,
-            imageStatusChanged.NewStatus,
-            cancellationToken
-        );
+            await hubContext.Clients.User(imageStatusChanged.UserId.ToString())
+            .SendAsync
+            (
+                "ImageStatusChanged",
+                imageStatusChanged.ImageId,
+                imageStatusChanged.NewStatus,
+                cancellationToken
+            );
+    }
+
+    private async Task SendImageResizedNotificationAsync(ImageResizedEvent imageResizedEvent, CancellationToken cancellationToken)
+    {
+        var hubContext = await _pool.GetHubContextAsync(cancellationToken);
+        await hubContext.Clients.User(imageResizedEvent.UserId.ToString())
+            .SendAsync
+            (
+                "ImageResized",
+                imageResizedEvent.ImageId,
+                imageResizedEvent.OriginalUrl,
+                imageResizedEvent.LargeUrl,
+                imageResizedEvent.MediumUrl,
+                imageResizedEvent.SmallUrl,
+                cancellationToken
+            );
     }
 
     #endregion

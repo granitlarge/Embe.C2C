@@ -53,11 +53,11 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
                     </span>
                 </Surface>
             }
-            <ImageGallery className="h-[300px]" imageUrls={
+            <ImageGallery className="" imageUrls={
                 images
                     .sort((a, b) => a.imageDetails.order - b.imageDetails.order)
-                    .map(i => i.imageDetails.url) ?? []
-                } />
+                    .map(i => i.imageDetails.largeUrl ?? i.imageDetails.url) ?? []
+            } />
             <ProfileShortInfo user={candidate} />
             {
                 candidateSearchProfile &&

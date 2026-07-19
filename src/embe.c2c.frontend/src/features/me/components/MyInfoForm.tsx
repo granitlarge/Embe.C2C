@@ -16,6 +16,9 @@ import Button from "@/src/shared/components/buttons/Button";
 export type ImageData = {
     id?: Guid,
     url?: string,
+    largeUrl?: string,
+    mediumUrl?: string,
+    smallUrl?: string,
     mimeType: string,
     order: number;
     status?: ImageStatus;
@@ -35,7 +38,8 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
 
     const [modalOpen, setModalOpen] = useState(false);
     const isEmpty = initialImages.length === 0;
-    const profilePictureUrl = !isEmpty ? initialImages.sort((a, b) => a.order - b.order)[0].url : undefined;
+    const profilePicture = !isEmpty ? initialImages.sort((a, b) => a.order - b.order)[0] : undefined;
+    const profilePictureUrl = profilePicture?.smallUrl ?? profilePicture?.mediumUrl ?? profilePicture?.largeUrl ?? profilePicture?.url;
     const classNames = [
         className
     ].filter(Boolean).join(" ")

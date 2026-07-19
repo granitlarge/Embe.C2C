@@ -8,7 +8,7 @@
 
 @media (max-width: 832px) {
     .modal {
-        height: 80%;
-        width: 85%;
+        height: 90dvh;
+        width: 100dvw;
     }
 }

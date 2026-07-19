@@ -30,7 +30,6 @@ export default function Me({ className }: MeProps) {
     const user = useApplicationStore(s => s.user);
     const setUser = useApplicationStore(s => s.setUser);
 
-    console.log(user);
 
     const [showPreview, setShowPreview] = useState(false);
     function getBasicFormDataFromCurrentUser(user: ReadDto<User, UserPermission> | undefined) {
@@ -215,7 +214,7 @@ export default function Me({ className }: MeProps) {
                 <Button onClick={onCancel} intent="cancel">cancel</Button>
             </div>
             {
-                showPreview && <LargeModal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header="preview">
+                showPreview && <LargeModal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header={undefined}>
                     <Profile
                         candidate={{
                             id: user?.data?.id!,
@@ -244,7 +243,10 @@ export default function Me({ className }: MeProps) {
                                             mimeType: image.mimeType,
                                             order: index,
                                             name: "",
-                                            status: image.status ?? ImageStatus.Pending
+                                            status: image.status ?? ImageStatus.Pending,
+                                            largeUrl: image.largeUrl,
+                                            mediumUrl: image.mediumUrl,
+                                            smallUrl: image.smallUrl
                                         },
                                         markedForDeletionAt: null,
                                         deletedAt: null,

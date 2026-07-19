@@ -119,12 +119,12 @@ public class IntegrationEventHandler
 
     private async Task HandleStatusChangedEventAsync
     (
-        ImageStatusChangedEvent imageMovedEvent,
+        ImageStatusChangedEvent imageStatusChangedEvent,
         CancellationToken cancellationToken
     )
     {
-        var fromUrl = await _imageService.GetImageUrlAsync(imageMovedEvent.ImageName, imageMovedEvent.OldStatus, ImageSize.Original, cancellationToken);
-        var toUrl = await _imageService.GetImageUrlAsync(imageMovedEvent.ImageName, imageMovedEvent.NewStatus, ImageSize.Original, cancellationToken);
+        var fromUrl = await _imageService.GetImageUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.OldStatus, ImageSize.Original, cancellationToken);
+        var toUrl = await _imageService.GetImageUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Original, cancellationToken);
 
         var fromExists = await _imageService.ExistsByUrlAsync(fromUrl, cancellationToken);
         var toExists = await _imageService.ExistsByUrlAsync(toUrl, cancellationToken);
@@ -137,7 +137,7 @@ public class IntegrationEventHandler
             }
             catch (Exception)
             {
-                await _workItemService.PerformAsync(new ExecuteIntegrationEventHandler<ImageStatusChangedEvent>(imageMovedEvent), cancellationToken);
+                await _workItemService.PerformAsync(new ExecuteIntegrationEventHandler<ImageStatusChangedEvent>(imageStatusChangedEvent), cancellationToken);
                 throw;
             }
         }
@@ -151,21 +151,21 @@ public class IntegrationEventHandler
             return;
         }
 
-        if (imageMovedEvent.NewStatus != Domain.ValueObjects.ImageStatus.Accepted)
+        if (imageStatusChangedEvent.NewStatus != Domain.ValueObjects.ImageStatus.Accepted)
         {
             return;
         }
 
         // If the image has been accepted, we need to resize it.
         // width 1000
-        // width 600
-        // width 150
+        // width 500
+        // width 250
 
-        var user = await _repository.DomainUsersQuery.FirstOrDefaultAsync(du => du.Id == imageMovedEvent.UserId, cancellationToken: cancellationToken);
+        var user = await _repository.DomainUsersQuery.FirstOrDefaultAsync(du => du.Id == imageStatusChangedEvent.UserId, cancellationToken: cancellationToken);
         if (user == null)
             return;
 
-        var image = user.Images.FirstOrDefault(i => i.Id == imageMovedEvent.ImageId);
+        var image = user.Images.FirstOrDefault(i => i.Id == imageStatusChangedEvent.ImageId);
         if (image == null)
             return;
 
@@ -196,15 +196,18 @@ public class IntegrationEventHandler
             }
             catch (Exception)
             {
-                await _workItemService.PerformAsync(new ExecuteIntegrationEventHandler<ImageStatusChangedEvent>(imageMovedEvent), cancellationToken);
+                await _workItemService.PerformAsync(new ExecuteIntegrationEventHandler<ImageStatusChangedEvent>(imageStatusChangedEvent), cancellationToken);
                 throw;
             }
-        } else
+        }
+        else
         {
             croppedImageUrl = await _imageService.GetImageUrlAsync(image.ImageDetails.Name, image.ImageDetails.Status, ImageSize.Large, cancellationToken);
         }
 
         var scalingFactors = new double[] { 0.5, 0.25 };
+        string mediumUrl;
+        string smallUrl;
         foreach (var scalingFactor in scalingFactors)
         {
             var imageSize = Math.Abs(scalingFactor - 0.5) < .001 ? ImageSize.Medium : ImageSize.Small;
@@ -212,7 +215,7 @@ public class IntegrationEventHandler
             {
                 try
                 {
-                    await _imageService.ScaleImageAsync
+                    var url = await _imageService.ScaleImageAsync
                     (
                         croppedImageUrl,
                         scalingFactor,
@@ -221,13 +224,38 @@ public class IntegrationEventHandler
                         imageSize,
                         cancellationToken
                     );
+                    if (imageSize == ImageSize.Medium)
+                    {
+                        mediumUrl = url;
+                    }
+                    else
+                    {
+                        smallUrl = url;
+                    }
                 }
                 catch (Exception)
                 {
-                    await _workItemService.PerformAsync(new ExecuteIntegrationEventHandler<ImageStatusChangedEvent>(imageMovedEvent), cancellationToken);
+                    await _workItemService.PerformAsync(new ExecuteIntegrationEventHandler<ImageStatusChangedEvent>(imageStatusChangedEvent), cancellationToken);
                     throw;
                 }
             }
         }
+
+        var originalUrl = await _imageService.GetImageUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Original, cancellationToken);
+        var sasUrls = await Task.WhenAll
+        (
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Original, FilePermissions.Read, TimeSpan.FromHours(1)),
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Large, FilePermissions.Read, TimeSpan.FromHours(1)),
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Medium, FilePermissions.Read, TimeSpan.FromHours(1)),
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Small, FilePermissions.Read, TimeSpan.FromHours(1))
+        );
+
+        var originalSasUrl = sasUrls[0];
+        var largeSasUrl = sasUrls[1];
+        var mediumSasUrl = sasUrls[2];
+        var smallSasUrl = sasUrls[3];
+
+        await HandleAsync(new ImageResizedEvent(imageStatusChangedEvent.UserId, imageStatusChangedEvent.ImageId, originalSasUrl, largeSasUrl, mediumSasUrl, smallSasUrl), cancellationToken);
+
     }
 }
