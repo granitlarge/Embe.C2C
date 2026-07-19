@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    partial class C2CContextModelSnapshot : ModelSnapshot
+    [Migration("20260718155652_ImageCrop")]
+    partial class ImageCrop
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1054,12 +1057,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                                     b2.Property<Guid>("ImageId")
                                         .HasColumnType("uuid");
 
-                                    b2.Property<double>("CropOffsetX")
-                                        .HasColumnType("double precision");
-
-                                    b2.Property<double>("CropOffsetY")
-                                        .HasColumnType("double precision");
-
                                     b2.Property<string>("MimeType")
                                         .IsRequired()
                                         .HasColumnType("text");
@@ -1083,6 +1080,28 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                                     b2.WithOwner()
                                         .HasForeignKey("ImageId");
+
+                                    b2.OwnsOne("Embe.C2C.Domain.ValueObjects.ImageCropOffset", "CropOffset", b3 =>
+                                        {
+                                            b3.Property<Guid>("ImageDetailsImageId")
+                                                .HasColumnType("uuid");
+
+                                            b3.Property<int>("X")
+                                                .HasColumnType("integer");
+
+                                            b3.Property<int>("Y")
+                                                .HasColumnType("integer");
+
+                                            b3.HasKey("ImageDetailsImageId");
+
+                                            b3.ToTable("Image");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("ImageDetailsImageId");
+                                        });
+
+                                    b2.Navigation("CropOffset")
+                                        .IsRequired();
                                 });
 
                             b1.Navigation("ImageDetails")

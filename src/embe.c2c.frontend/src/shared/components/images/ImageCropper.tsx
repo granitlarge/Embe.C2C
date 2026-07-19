@@ -22,11 +22,11 @@ type MyPointerEvent = {
 export type ImageCropperProps = {
     src: string;
     width: number;
-    height: number;
+    aspect: number;
     onCrop?: (crop: { x: number, y: number, width: number, height: number }) => void;
     onCancel?: () => void;
 }
-export default function ImageCropper({ onCrop, onCancel, src, width, height }: ImageCropperProps) {
+export default function ImageCropper({ onCrop, onCancel, src, width, aspect }: ImageCropperProps) {
 
     const scrollSpeed = .05;
     const pointersHistoryRef = useRef(new Map<number, MyPointerEvent>());
@@ -184,23 +184,15 @@ export default function ImageCropper({ onCrop, onCancel, src, width, height }: I
         if (imageWidth === 1 || imageHeight === 1)
             return;
 
-        let cropperWidth = 1;
-        let cropperHeight = 1;
+        let cropperWidth = width * containerWidth / imageWidth;
+        let cropperHeight = cropperWidth / aspect;
 
-        if (containerWidth > containerHeight) {
-            cropperWidth = containerWidth;
-            cropperHeight = cropperWidth * height / width;
-        } else {
-            cropperHeight = containerHeight;
-            cropperWidth = cropperHeight * width / height;
-        }
-
-        cropperWidth = Math.max(Math.min(cropperWidth, containerWidth), width / height);
-        cropperHeight = Math.max(Math.min(cropperHeight, containerHeight), 1);
+        cropperWidth = Math.max(Math.min(cropperWidth, containerWidth), aspect);
+        cropperHeight = Math.max(Math.min(cropperHeight, containerHeight), 1 / aspect);
         setCropperWidth(cropperWidth);
         setCropperHeight(cropperHeight);
 
-    }, [width, height, imageWidth, imageHeight, containerWidth])
+    }, [width, aspect, imageWidth, imageHeight, containerWidth])
 
     function onScroll(windowX: number, windowY: number, direction: "in" | "out" | "none") {
         if (!viewport)
@@ -215,8 +207,8 @@ export default function ImageCropper({ onCrop, onCancel, src, width, height }: I
             newWidth = Math.min(viewport.width * (1 + scrollSpeed), imageWidth);
             newHeight = Math.min(viewport.height * (1 + scrollSpeed), imageHeight);
         } else {
-            newWidth = width;
-            newHeight = height;
+            newWidth = width * containerWidth / imageWidth;
+            newHeight = newWidth * aspect;
         }
 
         if (!containerRef.current)
@@ -405,7 +397,12 @@ export default function ImageCropper({ onCrop, onCancel, src, width, height }: I
     }
 
     function onSave() {
-        onCrop?.(viewport ?? { x: 0, y: 0, width: width, height: height });
+
+        const offsetX = (viewport?.x ?? 0) + cropperX * imageWidth / containerWidth;
+        const offsetY = (viewport?.y ?? 0) + cropperY * imageWidth / containerWidth;
+
+        onCrop?.({ x: offsetX, y: offsetY, width: 0, height: 0 });
+
     }
 
     return (
@@ -427,11 +424,11 @@ export default function ImageCropper({ onCrop, onCancel, src, width, height }: I
                     <div
                         ref={cropperRef}
                         style={{ width: cropperWidth ?? 0, height: cropperHeight ?? 0, top: cropperY, left: cropperX }}
-                        className="absolute border border-solid border-black border-5 rounded-lg flex gap-0 flex-wrap justify-start"
+                        className="absolute border border-solid border-gray-300 border-5 rounded-lg flex gap-0 flex-wrap justify-start"
                     >
                         {
                             [0, 1, 2, 3, 4, 5, 6, 7, 8].map((_, index) => (
-                                <div key={index} className="w-[33.33333333%] h-[33.333333%] border border-solid border-white border-1">
+                                <div key={index} className="w-[33.33333333%] h-[33.333333%]">
                                 </div>
                             ))
                         }
@@ -440,7 +437,6 @@ export default function ImageCropper({ onCrop, onCancel, src, width, height }: I
             </div>
             <div className="flex gap-1">
                 <Button intent="save" onClick={onSave}>crop</Button>
-                <Button intent="cancel" onClick={onCancel}>cancel</Button>
             </div>
         </div>
     )

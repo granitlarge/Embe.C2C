@@ -58,8 +58,29 @@ public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageRe
         }
 
         var fileName = Guid.CreateVersion7().ToString();
-        var image = user.AddImage(userId, new Domain.ValueObjects.ImageDetails(fileName, command.MimeType, command.Order, Domain.ValueObjects.ImageStatus.Pending));
-        var sas = await _fileService.GenerateImageSasUrlAsync(fileName, Domain.ValueObjects.ImageStatus.Pending, FilePermissions.Write, TimeSpan.FromDays(1), cancellationToken);
+        var image = user.AddImage
+        (
+            userId,
+            new Domain.ValueObjects.ImageDetails
+            (
+                fileName,
+                command.MimeType,
+                command.Order,
+                Domain.ValueObjects.ImageStatus.Pending,
+                command.Crop.X,
+                command.Crop.Y
+            )
+        );
+
+        var sas = await _fileService.GenerateImageSasUrlAsync
+        (
+            fileName,
+            Domain.ValueObjects.ImageStatus.Pending,
+            ImageSize.Original,
+            FilePermissions.Write,
+            TimeSpan.FromHours(1),
+            cancellationToken
+        );
         return new CommandResult<Result<AddImageResponse>>(true, Result<AddImageResponse>.Success(new AddImageResponse(sas, image)));
     }
 }

@@ -30,12 +30,17 @@ export default function Me({ className }: MeProps) {
     const user = useApplicationStore(s => s.user);
     const setUser = useApplicationStore(s => s.setUser);
 
+    console.log(user);
+
     const [showPreview, setShowPreview] = useState(false);
     function getBasicFormDataFromCurrentUser(user: ReadDto<User, UserPermission> | undefined) {
         const images = [...(user?.data.pendingImages ?? []), ...(user?.data.acceptedImages ?? [])];
         const basicFormData = {
             images: images
-                .map(image => ({ id: image.id, url: image.imageDetails.url, mimeType: image.imageDetails.mimeType, order: image.imageDetails.order, status: image.imageDetails.status as (ImageStatus | undefined) }))
+                .map(image => ({
+                    ...image.imageDetails,
+                    id: image.id,
+                }))
                 .sort((a, b) => a.order - b.order) ?? [],
             alias: user?.data?.alias!,
             birthDate: user?.data?.birthDate!,
@@ -71,7 +76,7 @@ export default function Me({ className }: MeProps) {
             id: z.string().optional(),
             url: z.url(),
             mimeType: z.string(),
-            order: z.number()
+            order: z.number(),
         })).optional(),
         alias: z.string().min(1, "alias is required"),
         birthDate: z.string().min(1, "birthDate is required"),
@@ -92,9 +97,9 @@ export default function Me({ className }: MeProps) {
         setShowPreview(true);
     }
 
-    async function addImage(blob: Blob, mimeType: string, order: number): Promise<AddImageResult> {
+    async function addImage(blob: Blob, mimeType: string, order: number, crop: { x: number, y: number, width: number, height: number }): Promise<AddImageResult> {
 
-        const body = JSON.stringify({ mimeType, order })
+        const body = JSON.stringify({ mimeType, order, crop })
         const getSasResponse = await Mutate<AddImageResult, FailureReason>(
             `${process.env.NEXT_PUBLIC_API_URL}/api/user/upload-image`,
             {
@@ -148,19 +153,19 @@ export default function Me({ className }: MeProps) {
 
         const addImageResults = await Promise.all(imagesToAdd.filter(i => i.image.url !== undefined).map(async i => {
             const blob = await (await fetch(i.image.url!)).blob();
-            return await addImage(blob, i.image.mimeType, i.image.order)
+            return await addImage(blob, i.image.mimeType, i.image.order, i.image.crop!)
         }));
 
         const updateProfileResponse = await updateProfile
-            (
-                user?.data?.id!,
-                clientSideBasicFormData.alias!,
-                clientSideBasicFormData.birthDate!,
-                clientSideBasicFormData.gender,
-                clientSideBasicFormData.location,
-                imagesToKeep.concat(addImageResults.map(i => ({ id: i.image.id, order: i.image.imageDetails.order }))),
-                clientSideBasicFormData.bio
-            );
+        (
+            user?.data?.id!,
+            clientSideBasicFormData.alias!,
+            clientSideBasicFormData.birthDate!,
+            clientSideBasicFormData.gender,
+            clientSideBasicFormData.location,
+            imagesToKeep.concat(addImageResults.map(i => ({ id: i.image.id, order: i.image.imageDetails.order }))),
+            clientSideBasicFormData.bio
+        );
 
         if (!updateProfileResponse.success) {
             throw new Error("not implemented");

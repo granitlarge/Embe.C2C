@@ -19,6 +19,12 @@ export type ImageData = {
     mimeType: string,
     order: number;
     status?: ImageStatus;
+    crop?: {
+        x: number,
+        y: number,
+        width: number,
+        height: number
+    }
 }
 type MyImagesFormProps = {
     initialImages: ImageData[]
@@ -59,7 +65,12 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                     data={{ images: initialImages }}
                     onChange={
                         (newImages) => {
-                            onChange?.(newImages.map((image, index) => ({ id: (image as ImageData)?.id, url: image.url, mimeType: image.mimeType, order: index, status: image.status })));
+                            const result = newImages.map((image, index) => ({
+                                ...image,
+                                id: (image as ImageData)?.id,
+                                order: index
+                            }));
+                            onChange?.(result);
                         }
                     }
                 />

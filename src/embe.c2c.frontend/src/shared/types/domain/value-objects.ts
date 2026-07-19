@@ -17,6 +17,9 @@ export type DatingPreferences = {
 
 export type ImageDetails = {
     url?: string;
+    largeUrl?: string;
+    mediumUrl?: string;
+    smallUrl?: string;
     name: string;
     mimeType: string;
     order: number;

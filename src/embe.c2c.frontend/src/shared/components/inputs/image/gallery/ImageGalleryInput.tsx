@@ -7,8 +7,7 @@ import ErrorMessage from "../../ErrorMessage";
 import { ImageStatus } from "@/src/shared/types/domain/value-objects";
 import Button from "../../../buttons/Button";
 import LargeModal from "../../../modal/LargeModal";
-import ImageCropper from "../../../images/ImageCropper";
-import ImageCrop from "../crop/ImageCrop";
+import ImageCropGallery from "../crop/ImageCrop";
 
 type MyImageProps = {
     id: string;
@@ -16,7 +15,6 @@ type MyImageProps = {
     status?: ImageStatus
     onRemove?: () => void;
 }
-
 function MyImage({ id, src, status, onRemove }: MyImageProps) {
     const { ref: draggableRef, isDragging } = useDraggable({
         id
@@ -53,21 +51,20 @@ function MyImage({ id, src, status, onRemove }: MyImageProps) {
 }
 
 type ImageSelectorProps = {
-    onImageSelected?: (image: { url: string, mimeType: string}[]) => void;
+    onImageSelected?: (image: { url: string, mimeType: string, crop: { x: number, y: number, width: number, height: number } }[]) => void;
     className?: string;
 }
-
 function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
 
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [showCropper, setShowCropper] = useState(false);
-    const [images, setImages] = useState([] as string[]);
+    const [images, setImages] = useState([] as { url: string, mimeType: string }[]);
 
     function onChange(event: React.ChangeEvent<HTMLInputElement>) {
         const target = event.target as HTMLInputElement;
         if (target.files && target.files.length > 0) {
             let images = Array.from(target.files).map(f => ({ url: URL.createObjectURL(f), mimeType: f.type }));
-            setImages(images.map(i => i.url));
+            setImages(images);
             setShowCropper(true);
         }
     }
@@ -90,32 +87,45 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
                     hidden={false}
                     closed={() => setShowCropper(false)}
                 >
-                    <ImageCrop images={images} />
+                    <ImageCropGallery images={images.map(i => i.url)} onChange={(crops) => {
+                        const result = images.map((image, index) => ({
+                            ...image,
+                            crop: crops[index]
+                        }))
+                        onImageSelected?.(result);
+                        setShowCropper(false);
+                    }} />
                 </LargeModal>
             }
         </Surface>
-
     )
 }
 
 export type Image = {
     url?: string;
     mimeType: string;
-    status?: ImageStatus
+    status?: ImageStatus;
+    crop?: {
+        x: number,
+        y: number,
+        width: number,
+        height: number
+    }
 }
 
-export type ImageGalleryData<T extends Image = Image> = {
+export type ImageGalleryInputData<T extends Image = Image> = {
     images: T[];
 }
-export type ImageGalleryError = { [P in keyof ImageGalleryData]?: string };
 
-export type ImageGalleryProps<T extends Image = Image> = {
-    data?: ImageGalleryData<T>;
-    error?: ImageGalleryError;
+export type ImageGalleryInputError = { [P in keyof ImageGalleryInputData]?: string };
+
+export type ImageGalleryInputProps<T extends Image = Image> = {
+    data?: ImageGalleryInputData<T>;
+    error?: ImageGalleryInputError;
     className?: string;
     onChange?: (images: (T | Image)[]) => void;
 }
-export default function ImageGalleryInput<T extends Image = Image>({ data, error, className, onChange }: ImageGalleryProps<T>) {
+export default function ImageGalleryInput<T extends Image = Image>({ data, error, className, onChange }: ImageGalleryInputProps<T>) {
 
     const classNames = [
         className
@@ -140,12 +150,12 @@ export default function ImageGalleryInput<T extends Image = Image>({ data, error
             <div className={`flex flex-wrap gap-4 ${classNames} w-full justify-center items-center p-2`}>
                 {
                     images.map((image, index) => (
-                        <MyImage 
-                            key={image.__id} 
-                            id={image.__id} 
-                            src={image.url} 
+                        <MyImage
+                            key={image.__id}
+                            id={image.__id}
+                            src={image.url}
                             status={image.status}
-                            onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, ...image }) => image))} 
+                            onRemove={() => onChange?.(images.filter((_, i) => i !== index).map(({ __id, ...image }) => image))}
                         />
                     ))
                 }

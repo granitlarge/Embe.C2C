@@ -1,35 +1,47 @@
-import { useState } from "react";
-import Cropper from "react-easy-crop"
+import { useRef, useState } from "react";
 import ImageCropper from "../../../images/ImageCropper";
 import { PaginationDots } from "../../../images/ImageGallery";
 
-export type ImageCrop = {
+export type ImageCropGallery = {
     images: string[];
-    onChange?: () => void;
+    onChange?: (crops: { x: number, y: number, width: number, height: number }[]) => void;
 }
-export default function ImageCrop({ images }: ImageCrop) {
+export default function ImageCropGallery({ onChange, images }: ImageCropGallery) {
 
     if (images.length === 0) {
         throw new Error("images.length must be greater than 0.");
     }
 
+    const cropsRef = useRef([] as { x: number, y: number, width: number, height: number }[]);
     const [index, setIndex] = useState(0);
+
+    function onCrop(crop: { x: number, y: number, width: number, height: number }) {
+        cropsRef.current.push(crop);
+        if (index == images.length - 1) {
+            onChange?.(cropsRef.current);
+            setIndex(0);
+            cropsRef.current = [];
+            setIndex(0);
+        } else {
+            setIndex(prev => prev + 1);
+        }
+    }
 
     return (
         <div className="relative">
 
             <ImageCropper
-                onCrop={() => setIndex(prev => (prev + 1) % images.length)}
+                onCrop={onCrop}
                 src={images[index]}
-                width={5000}
-                height={5000}
+                width={1000}
+                aspect={9 / 19.5}
 
             />
             {
-                images.length > 1 && 
+                images.length > 1 &&
                 <PaginationDots className="absolute top-3 left-1/2 -translate-x-1/2" current={index} total={images.length} />
             }
-
         </div>
     )
+
 }
