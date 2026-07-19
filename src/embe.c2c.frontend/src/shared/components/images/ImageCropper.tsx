@@ -426,12 +426,6 @@ export default function ImageCropper({ onCrop, onCancel, src, width, aspect }: I
                         style={{ width: cropperWidth ?? 0, height: cropperHeight ?? 0, top: cropperY, left: cropperX }}
                         className="absolute border border-solid border-gray-300 border-5 rounded-lg flex gap-0 flex-wrap justify-start"
                     >
-                        {
-                            [0, 1, 2, 3, 4, 5, 6, 7, 8].map((_, index) => (
-                                <div key={index} className="w-[33.33333333%] h-[33.333333%]">
-                                </div>
-                            ))
-                        }
                     </div>
                 }
             </div>
