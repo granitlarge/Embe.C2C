@@ -32,7 +32,7 @@ public interface IImageService
     Task<bool> ExistsByUrlAsync(string url, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(string imageName, ImageStatus imageStatus, ImageSize size, CancellationToken cancellationToken = default);
 
-    Task DeleteImageAsync(string name, ImageStatus status, CancellationToken cancellationToken = default);
+    Task DeleteImageAsync(string name, ImageStatus status, ImageSize size, CancellationToken cancellationToken = default);
 
     Task DeleteImageByUrlAsync(string url, CancellationToken cancellationToken = default);
 

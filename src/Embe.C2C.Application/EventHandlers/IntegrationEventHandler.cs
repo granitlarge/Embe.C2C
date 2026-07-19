@@ -107,13 +107,13 @@ public class IntegrationEventHandler
         Console.WriteLine($"Deleting image '{imageRemovedEvent.ImageId}'.");
         try
         {
-            await _imageService.DeleteImageAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, cancellationToken);
+            await Task.WhenAll(Enum.GetValues<ImageSize>().Select(imageSize => _imageService.DeleteImageAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, imageSize, cancellationToken)));
         }
         catch (Exception e)
         {
             Console.WriteLine("Failed to delete image, sending to work-item service {0}.", e);
-            var url = await _imageService.GetImageUrlAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, ImageSize.Original, cancellationToken);
-            await _workItemService.PerformAsync(new DeleteImage(url), cancellationToken);
+            var urls = await Task.WhenAll(Enum.GetValues<ImageSize>().Select(imageSize => _imageService.GetImageUrlAsync(imageRemovedEvent.ImageName, imageRemovedEvent.ImageStatus, imageSize, cancellationToken)));
+            await Task.WhenAll(urls.Select(url => _workItemService.PerformAsync(new DeleteImage(url), cancellationToken)));
         }
     }
 

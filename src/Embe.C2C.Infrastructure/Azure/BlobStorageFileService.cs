@@ -30,10 +30,10 @@ public class BlobStorageImageService : IImageService
         return $"{pathElement}/{imageName}{(size == ImageSize.Original ? "" : Enum.GetName(size))}";
     }
 
-    public async Task DeleteImageAsync(string name, ImageStatus status, CancellationToken cancellationToken = default)
+    public async Task DeleteImageAsync(string name, ImageStatus status, ImageSize imageSize, CancellationToken cancellationToken = default)
     {
         var blobContainerClient = await GetBlobContainerClientAsync(cancellationToken);
-        var blobClient = blobContainerClient.GetBlobClient(GetBlobName(name, status, ImageSize.Original));
+        var blobClient = blobContainerClient.GetBlobClient(GetBlobName(name, status, imageSize));
         await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
