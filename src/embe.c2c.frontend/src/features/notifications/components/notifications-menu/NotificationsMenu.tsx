@@ -4,7 +4,7 @@ import { Bell } from "@deemlol/next-icons"
 import { useEffect, useState } from "react";
 import useNotificationStore from "../../stores";
 import NotificationsModal from "../notifications-modal/NotificationsModal";
-import * as api from "../../actions/action";
+import * as api from "../../../../shared/actions/notifications/action";
 import Button from "@/src/shared/components/buttons/Button";
 
 export type NotificationsMenuProps = {

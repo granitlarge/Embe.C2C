@@ -2,7 +2,7 @@ import LargeModal from "@/src/shared/components/modal/LargeModal";
 import { useEffect, useState } from "react";
 import useNotificationStore from "../../stores";
 import Notification from "../notification/Notification";
-import * as api from "../../actions/action";
+import * as api from "../../../../shared/actions/notifications/action";
 
 export type NotificationsModalProps = {
     hidden: boolean;
@@ -23,7 +23,7 @@ export default function NotificationsModal({ hidden, closed }: NotificationsModa
             if (response.success) {
                 setHasFetched(true);
                 setError(null);
-                setNotifications(response.value!);
+                setNotifications(response.value!.map(e => e.data));
             } else {
                 setError("failed to fetch notifications");
             }

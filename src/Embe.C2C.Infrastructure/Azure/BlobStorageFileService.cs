@@ -27,7 +27,7 @@ public class BlobStorageImageService : IImageService
             ImageStatus.Pending => "pending",
             _ => throw new NotImplementedException()
         };
-        return $"{pathElement}/{imageName}{(size == ImageSize.Original ? "" : Enum.GetName(size))}";
+        return $"{pathElement}/{imageName}{(size == ImageSize.Original ? "" : $"-{Enum.GetName(size)}")}";
     }
 
     public async Task DeleteImageAsync(string name, ImageStatus status, ImageSize imageSize, CancellationToken cancellationToken = default)
@@ -61,6 +61,16 @@ public class BlobStorageImageService : IImageService
         var blobSasPermissions =
             (permissions.HasFlag(FilePermissions.Read) ? BlobSasPermissions.Read : 0) |
             (permissions.HasFlag(FilePermissions.Write) ? BlobSasPermissions.Write : 0);
+
+        if (permissions.HasFlag(FilePermissions.Read) && !permissions.HasFlag(FilePermissions.Write))
+        {
+            var exists = await blobClient.ExistsAsync(cancellationToken);
+            if (!exists)
+            {
+                return null;
+            }
+        }
+
         var sasUri = blobClient.GenerateSasUri(blobSasPermissions, DateTimeOffset.UtcNow.Add(lifetime));
         return sasUri.ToString();
     }

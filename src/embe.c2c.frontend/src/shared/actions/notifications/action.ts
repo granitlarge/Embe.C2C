@@ -5,6 +5,7 @@ import { ApiResponse, FailureReason, } from "@/src/shared/apis/type";
 import { NullGuid, Tag } from "@/src/shared/cache";
 import { Notification } from "@/src/shared/types/domain/aggregates";
 import { getAuthenticatedUser } from "@/src/shared/user";
+import { ReadDto } from "../../types/dtos/types";
 
 async function getUserNotificationTag(): Promise<Tag> {
     const user = await getAuthenticatedUser();
@@ -12,17 +13,17 @@ async function getUserNotificationTag(): Promise<Tag> {
     return tag;
 }
 
-export async function getNotifications(): Promise<ApiResponse<Notification[], FailureReason>> {
-    const response = await Read<Notification[]>
-    (
-        `${process.env.API_URL}/api/notification`,
-        {
-            method: "GET",
-            next: {
-                tags: [await getUserNotificationTag()]
+export async function getNotifications(): Promise<ApiResponse<ReadDto<Notification, NotificationPermission>[], FailureReason>> {
+    const response = await Read<ReadDto<Notification, NotificationPermission>[]>
+        (
+            `${process.env.API_URL}/api/notification`,
+            {
+                method: "GET",
+                next: {
+                    tags: [await getUserNotificationTag()]
+                }
             }
-        }
-    );
+        );
 
     return response;
 }
