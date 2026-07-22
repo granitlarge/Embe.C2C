@@ -56,12 +56,12 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
             if (message is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Message not found."));
 
-            var matching = await context.MatchingsQuery.SingleOrDefaultAsync(m => m.Conversation.Messages!.Any(msg => msg.Id == message.Id), cancellationToken);
+            var matching = await context.MatchingsQuery.SingleOrDefaultAsync(m => m.Messages!.Any(msg => msg.Id == message.Id), cancellationToken);
             if (matching is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found for the message."));
 
             var newLastMessage = await context.MessagesQuery
-                .Where(m => m.ConversationId == matching.Conversation.Id && m.Id != message.Id)
+                .Where(m => m.MatchingId == matching.Id && m.Id != message.Id)
                 .OrderByDescending(m => m.CreatedAt)
                 .FirstOrDefaultAsync(cancellationToken);
 

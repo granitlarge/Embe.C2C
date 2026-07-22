@@ -1,5 +1,4 @@
 using Embe.C2C.Application.Authorizations;
-using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Matchings;
 
@@ -10,8 +9,9 @@ public record MatchingDto
     Guid Id,
     Guid UserId1,
     Guid UserId2,
-    ConversationDto? Conversation,
     DateTimeOffset? CreatedAt,
+    ReadDto<MessageDto, MessagePermission>? LastMessage,
+    List<ReadDto<MessageDto, MessagePermission>>? Messages,
     ReadDto<UserDto, UserPermission>? User1,
     ReadDto<UserDto, UserPermission>? User2,
     ReadDto<SearchProfileDto, SearchProfilePermission>? User1SearchProfile,
@@ -29,7 +29,8 @@ public class MatchingDtoMapper
     (
         Matching matching,
         MatchingVariant variant,
-        ConversationDto? conversation,
+        ReadDto<MessageDto, MessagePermission>? lastMessage,
+        List<ReadDto<MessageDto, MessagePermission>>? messages,
         ReadDto<UserDto, UserPermission>? user1,
         ReadDto<UserDto, UserPermission>? user2,
         ReadDto<SearchProfileDto, SearchProfilePermission>? user1SearchProfile,
@@ -44,8 +45,9 @@ public class MatchingDtoMapper
             matching.Id,
             matching.UserId1,
             matching.UserId2,
-            conversation,
             variant.IncludeCreatedAt ? matching.CreatedAt : null,
+            lastMessage,
+            messages,
             user1,
             user2,
             user1SearchProfile,

@@ -31,11 +31,9 @@ public class MatchingService : DomainService
             throw new DomainException(new DomainError<MessageError>(MessageError.CannotCommunicate));
         }
 
-        var conversation = matching.Conversation;
-        var message = Message.Create(conversation.Id, replyToMessage?.Id, author.Id, content);
+        var message = Message.Create(matching.Id, replyToMessage?.Id, author.Id, content);
         _domainEventStore.AddDomainEvent(new MessageCreatedEvent(message));
-        conversation.UpdateLastMessageId(message.Id);
-        conversation.IncrementMessageCount();
+        matching.UpdateLastMessageId(message.Id);
 
         return message;
     }
@@ -73,9 +71,7 @@ public class MatchingService : DomainService
             }
         }
 
-        var conversation = matching.Conversation;
-        conversation.DecrementMessageCount();
-        conversation.UpdateLastMessageId(newLastMessage?.Id);
+        matching.UpdateLastMessageId(newLastMessage?.Id);
         message.Remove();
 
         foreach (var reply in replies)

@@ -1,7 +1,6 @@
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Authorizations.FactGenerators;
-using Embe.C2C.Application.Authorizations.FactStores.Conversations;
 using Embe.C2C.Application.Authorizations.FactStores.Judgements;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
@@ -72,7 +71,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.SearchProfiles.Handlers.GetSearchProfileHandler>();
         services.AddScoped<Queries.SearchProfiles.Handlers.GetAllSearchProfilesHandler>();
 
-        services.AddScoped<ConversationAuthorizationFactStore>();
         services.AddScoped<UserAuthorizationFactStore>();
         services.AddScoped<MatchingAuthorizationFactStore>();
         services.AddScoped<MessageAuthorizationFactStore>();
@@ -104,7 +102,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ImageDtoMapper>();
         services.AddScoped<JudgementDtoMapper>();
         services.AddScoped<MessageDtoMapper>();
-        services.AddScoped<ConversationDtoMapper>();
         services.AddScoped<MatchingDtoMapper>();
         services.AddScoped<SearchProfileDtoMapper>();
 

@@ -1,6 +1,6 @@
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactGenerators;
-using Embe.C2C.Application.Authorizations.FactStores.Conversations;
+using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages.Facts;
 using Embe.C2C.Domain.Aggregates.Messages;
 
@@ -8,12 +8,12 @@ namespace Embe.C2C.Application.Authorizations.FactStores.Messages;
 
 public class MessageAuthorizationFactStore
 (
-    ConversationAuthorizationFactStore conversationFactStore,
+    MatchingAuthorizationFactStore matchingAuthorizationFactStore,
     MessageFactGenerator messageFactGenerator,
     IAuthenticatedUserService authenticatedUserService
 ) : AuthorizationFactStore(authenticatedUserService)
 {
-    private readonly ConversationAuthorizationFactStore _conversationFactStore = conversationFactStore;
+    private readonly MatchingAuthorizationFactStore _matchingAuthorizationFactStore = matchingAuthorizationFactStore;
     private readonly MessageFactGenerator _messageFactGenerator = messageFactGenerator;
 
     public AuthorMessageFact GetAuthorFact(Message message)
@@ -34,8 +34,8 @@ public class MessageAuthorizationFactStore
             return fact;
         }
 
-        var isConversationParticipantFact = await _conversationFactStore.GetIsParticipantFactAsync(message.ConversationId, cancellationToken);
-        fact = _messageFactGenerator.GetRecipientFact(message, isConversationParticipantFact);
+        var isMatchedFact = await _matchingAuthorizationFactStore.GetIsParticipantFactAsync(message.MatchingId, cancellationToken);
+        fact = _messageFactGenerator.GetRecipientFact(message, isMatchedFact);
         return SetFact(fact);
     }
 

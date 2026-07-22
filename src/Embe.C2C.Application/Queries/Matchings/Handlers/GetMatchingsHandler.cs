@@ -4,7 +4,6 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
-using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +26,6 @@ public class GetMatchingsHandler
     UserDtoMapper userDtoMapper,
     MessageAuthorizationService messageAuthorizationService,
     MessageDtoMapper messageDtoMapper,
-    ConversationDtoMapper conversationDtoMapper,
     IAuthenticatedUserService authenticatedUserService,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
     SearchProfileDtoMapper searchProfileDtoMapper
@@ -40,7 +38,6 @@ public class GetMatchingsHandler
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
     private readonly MessageAuthorizationService _messageAuthorizationService = messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper = messageDtoMapper;
-    private readonly ConversationDtoMapper _conversationDtoMapper = conversationDtoMapper;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
@@ -60,8 +57,7 @@ public class GetMatchingsHandler
             .Include(m => m.User2)
             .Include(m => m.User1SearchProfile)
             .Include(m => m.User2SearchProfile)
-            .Include(m => m.Conversation)
-                .ThenInclude(c => c.LastMessage)
+            .Include(m => m.LastMessage)
             .OrderByDescending(m => m.CreatedAt)
             .Skip((query.Page - 1) * query.Size)
             .Take(query.Size)
@@ -83,7 +79,6 @@ public class GetMatchingsHandler
                 _userDtoMapper,
                 _messageAuthorizationService,
                 _messageDtoMapper,
-                _conversationDtoMapper,
                 _searchProfileAuthorizationService,
                 _searchProfileDtoMapper,
                 cancellationToken

@@ -1,7 +1,6 @@
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Entities;
 using Embe.C2C.Domain.Exceptions;
 
 namespace Embe.C2C.Domain.Aggregates.Matchings;
@@ -26,7 +25,6 @@ public class Matching : Aggregate
         UserId2 = userId2;
         UserId1SearchProfileId = userId1SearchProfileId;
         UserId2SearchProfileId = userId2SearchProfileId;
-        Conversation = Conversation.Create(Id, userId1, userId2);
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
@@ -39,8 +37,13 @@ public class Matching : Aggregate
     public Guid UserId2 { get; private set; }
     public Guid? UserId1SearchProfileId { get; private set; }
     public Guid? UserId2SearchProfileId { get; private set; }
-    public Conversation Conversation { get; private set; }
+    public Guid? LastMessageId { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
+
+    public void UpdateLastMessageId(Guid? lastMessageId)
+    {
+        LastMessageId = lastMessageId;
+    }
 
     public void Remove(Guid actorUserId)
     {
@@ -74,6 +77,8 @@ public class Matching : Aggregate
     public User? User2 { get; private set; }
     public SearchProfile? User1SearchProfile { get; private set; }
     public SearchProfile? User2SearchProfile { get; private set; }
+    public List<Messages.Message>? Messages { get; private set; }
+    public Messages.Message? LastMessage { get; private set; }
     #endregion
 }
 

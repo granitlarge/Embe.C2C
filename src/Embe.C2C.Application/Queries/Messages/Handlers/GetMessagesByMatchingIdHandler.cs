@@ -30,7 +30,7 @@ public class GetMessagesByMatchingIdHandler
     public async Task<Result<List<ReadDto<MessageDto, MessagePermission>>>> HandleAsync(GetMessagesByMatchingIdQuery query, CancellationToken cancellationToken)
     {
         var messages = await _repository.MessagesQuery
-            .Where(m => m.Conversation!.Matching!.Id == query.Filter)
+            .Where(m => m.MatchingId == query.Filter)
                 .Include(m => m.ReplyToMessage)
             .OrderByDescending(m => m.CreatedAt)
             .Skip((query.Page - 1) * query.Size)

@@ -159,14 +159,14 @@ public class DomainEventHandler
         CancellationToken cancellationToken
     )
     {
-        var conversationId = messageCreatedEvent.Message.ConversationId;
+        var matchingId = messageCreatedEvent.Message.MatchingId;
         var authorUserId = messageCreatedEvent.Message.AuthorUserId;
         var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Conversation.Id == conversationId)
+            .Where(m => m.Id == matchingId)
             .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
             .FirstOrDefaultAsync(cancellationToken);
         var messageId = messageCreatedEvent.Message.Id;
-        var messageCreated = new MessageCreated(conversationId, authorUserId, recipientUserId, messageId);
+        var messageCreated = new MessageCreated(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageCreated);
     }
 
@@ -176,14 +176,14 @@ public class DomainEventHandler
         CancellationToken cancellationToken
     )
     {
-        var conversationId = messageEditedEvent.Message.ConversationId;
+        var matchingId = messageEditedEvent.Message.MatchingId;
         var authorUserId = messageEditedEvent.Message.AuthorUserId;
         var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Conversation.Id == conversationId)
+            .Where(m => m.Id == matchingId)
             .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
             .FirstOrDefaultAsync(cancellationToken);
         var messageId = messageEditedEvent.Message.Id;
-        var messageEdited = new MessageEdited(conversationId, authorUserId, recipientUserId, messageId);
+        var messageEdited = new MessageEdited(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageEdited);
     }
 
@@ -193,14 +193,14 @@ public class DomainEventHandler
         CancellationToken cancellationToken
     )
     {
-        var conversationId = messageRemovedEvent.Message.ConversationId;
+        var matchingId = messageRemovedEvent.Message.MatchingId;
         var authorUserId = messageRemovedEvent.Message.AuthorUserId;
         var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Conversation.Id == conversationId)
+            .Where(m => m.Id == matchingId)
             .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
             .FirstOrDefaultAsync(cancellationToken);
         var messageId = messageRemovedEvent.Message.Id;
-        var messageDeleted = new MessageDeleted(conversationId, authorUserId, recipientUserId, messageId);
+        var messageDeleted = new MessageDeleted(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageDeleted);
     }
 
@@ -210,14 +210,14 @@ public class DomainEventHandler
         CancellationToken cancellationToken
     )
     {
-        var conversationId = messageSeenEvent.Message.ConversationId;
+        var matchingId = messageSeenEvent.Message.MatchingId;
         var authorUserId = messageSeenEvent.Message.AuthorUserId;
         var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Conversation.Id == conversationId)
+            .Where(m => m.Id == matchingId)
             .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
             .FirstOrDefaultAsync(cancellationToken);
         var messageId = messageSeenEvent.Message.Id;
-        var messageSeen = new MessageSeen(conversationId, authorUserId, recipientUserId, messageId);
+        var messageSeen = new MessageSeen(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageSeen);
     }
 
@@ -227,14 +227,14 @@ public class DomainEventHandler
         CancellationToken cancellationToken
     )
     {
-        var conversationId = messageUnseenEvent.Message.ConversationId;
+        var matchingId = messageUnseenEvent.Message.MatchingId;
         var authorUserId = messageUnseenEvent.Message.AuthorUserId;
         var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Conversation.Id == conversationId)
+            .Where(m => m.Id == matchingId)
             .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
             .FirstOrDefaultAsync(cancellationToken);
         var messageId = messageUnseenEvent.Message.Id;
-        var messageUnseen = new MessageUnseen(conversationId, authorUserId, recipientUserId, messageId);
+        var messageUnseen = new MessageUnseen(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageUnseen);
     }
 

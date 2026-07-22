@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -29,6 +30,11 @@ public class MatchingConfiguration : AggregateConfiguration<Domain.Aggregates.Ma
             .WithMany(sp => sp.MatchingsUserId2)
             .HasForeignKey(m => m.UserId2SearchProfileId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(m => m.LastMessage)
+                .WithOne()
+                .HasForeignKey<Matching>(m => m.LastMessageId)
+                .OnDelete(DeleteBehavior.SetNull);
 
         base.Configure(builder);
     }

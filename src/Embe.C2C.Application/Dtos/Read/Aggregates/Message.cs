@@ -38,7 +38,7 @@ public class MessageDtoMapper
         return new MessageDto
         (
             message.Id,
-            message.ConversationId,
+            message.MatchingId,
             message.ReplyToMessageId,
             message.AuthorUserId,
             variant.IncludeIsReply ? message.IsReply : null,

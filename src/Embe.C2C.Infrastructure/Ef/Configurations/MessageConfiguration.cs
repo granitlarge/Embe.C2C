@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.ValueObjects;
@@ -12,9 +13,9 @@ public class MessageConfiguration : AggregateConfiguration<Message>
     public override void Configure(EntityTypeBuilder<Message> builder)
     {
         builder.HasKey(m => m.Id);
-        builder.HasOne(m => m.Conversation)
+        builder.HasOne(m => m.Matching)
             .WithMany(c => c.Messages)
-            .HasForeignKey(m => m.ConversationId)
+            .HasForeignKey(m => m.MatchingId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(m => m.ReplyToMessage)

@@ -14,18 +14,18 @@ public class MatchingFactGenerator
 {
     private readonly IRepository _repo = repo;
 
-    public IsParticipantMatchFact GetIsParticipantFact(Matching matching)
+    public IsParticipantInMatchingFact GetIsParticipantFact(Matching matching)
     {
-        var fact = new IsParticipantMatchFact(matching.Id, matching.UserId1 == CurrentUserId || matching.UserId2 == CurrentUserId);
+        var fact = new IsParticipantInMatchingFact(matching.Id, matching.UserId1 == CurrentUserId || matching.UserId2 == CurrentUserId);
         return fact;
     }
 
-    public async ValueTask<IsParticipantMatchFact> GetIsParticipantFactAsync(Guid matchingId, CancellationToken cancellationToken)
+    public async ValueTask<IsParticipantInMatchingFact> GetIsParticipantFactAsync(Guid matchingId, CancellationToken cancellationToken)
     {
         var fact = await _repo.MatchingsQuery
             .Where(m => m.Id == matchingId)
-            .Select(m => new IsParticipantMatchFact(m.Id, m.UserId1 == CurrentUserId || m.UserId2 == CurrentUserId))
-            .SingleOrDefaultAsync(cancellationToken) ?? new IsParticipantMatchFact(matchingId, false);
+            .Select(m => new IsParticipantInMatchingFact(m.Id, m.UserId1 == CurrentUserId || m.UserId2 == CurrentUserId))
+            .SingleOrDefaultAsync(cancellationToken) ?? new IsParticipantInMatchingFact(matchingId, false);
 
         return fact;
     }

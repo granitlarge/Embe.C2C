@@ -1,6 +1,6 @@
 import { Guid } from "../../cache";
 import { ReadDto } from "../dtos/types";
-import { Conversation, Image } from "./entities";
+import { Image } from "./entities";
 import { DatingPreferences, Engagement, Gender, Location, Money, RelationshipType, TransactionReason, TransactionType } from "./value-objects";
 
 export type User = {
@@ -75,12 +75,13 @@ export type Matching = {
     userId2: Guid;
     userId1SearchProfileId?: Guid;
     userId2SearchProfileId?: Guid;
-    conversation?: Conversation;
     createdAt?: string;
     user1?: ReadDto<User, UserPermission>;
     user2?: ReadDto<User, UserPermission>;
     user1SearchProfile?: ReadDto<SearchProfile, SearchProfilePermission>;
     user2SearchProfile?: ReadDto<SearchProfile, SearchProfilePermission>;
+    lastMessage?: ReadDto<Message, MessagePermission>;
+    messages?: ReadDto<Message, MessagePermission>[];
 }
 
 export enum MatchingPermission {

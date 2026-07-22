@@ -2,7 +2,7 @@ namespace Embe.C2C.Application.Events.Messages;
 
 public record MessageCreated
 (
-    Guid ConversationId,
+    Guid MatchingId,
     Guid AuthorUserId,
     Guid RecipientUserId,
     Guid MessageId

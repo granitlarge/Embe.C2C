@@ -1,8 +1,6 @@
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
-using Embe.C2C.Application.Dtos.Read.Entities;
-using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
 
@@ -22,7 +20,6 @@ public static class MatchingExtensions
         UserDtoMapper userDtoMapper,
         MessageAuthorizationService messageAuthorizationService,
         MessageDtoMapper messageDtoMapper,
-        ConversationDtoMapper conversationDtoMapper,
         SearchProfileAuthorizationService searchProfileAuthorizationService,
         SearchProfileDtoMapper searchProfileDtoMapper,
         CancellationToken cancellationToken = default
@@ -40,7 +37,7 @@ public static class MatchingExtensions
         var user2Dto = await (enrichedUser2?.ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<UserDto, UserPermission>?>(null));
 
         var messageDtos = new List<ReadDto<MessageDto, MessagePermission>>();
-        foreach (var message in matching.Conversation.Messages ?? [])
+        foreach (var message in matching.Messages ?? [])
         {
             var messageDto = await message.ToDtoAsync(messageAuthorizationService, messageDtoMapper, cancellationToken);
             if (messageDto != null)
@@ -49,22 +46,15 @@ public static class MatchingExtensions
             }
         }
 
-        var lastMessageDto = await (matching.Conversation.LastMessage?.ToDtoAsync(messageAuthorizationService, messageDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<MessageDto, MessagePermission>?>(null));
-        var conversation = conversationDtoMapper.ToDto
-        (
-            matching.Conversation,
-            ConversationVariant.Full,
-            lastMessageDto,
-            [.. messageDtos]
-        );
-
+        var lastMessageDto = await (matching.LastMessage?.ToDtoAsync(messageAuthorizationService, messageDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<MessageDto, MessagePermission>?>(null));
         var user1SearchProfileDto = await (matching.User1SearchProfile?.ToDtoAsync(searchProfileAuthorizationService, searchProfileDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<SearchProfileDto, SearchProfilePermission>?>(null));
         var user2SearchProfileDto = await (matching.User2SearchProfile?.ToDtoAsync(searchProfileAuthorizationService, searchProfileDtoMapper, cancellationToken) ?? Task.FromResult<ReadDto<SearchProfileDto, SearchProfilePermission>?>(null));
         var matchingDto = matchingDtoMapper.ToDto
         (
             matching,
             matchingVariant,
-            conversation: conversation,
+            lastMessageDto,
+            messageDtos,
             user1: user1Dto,
             user2: user2Dto,
             user1SearchProfile: user1SearchProfileDto,

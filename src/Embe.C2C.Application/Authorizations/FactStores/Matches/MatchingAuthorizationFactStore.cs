@@ -13,15 +13,15 @@ public class MatchingAuthorizationFactStore
 {
     private readonly MatchingFactGenerator _factGenerator = factGenerator;
 
-    internal IsParticipantMatchFact GetIsParticipantFact(Matching matching)
+    internal IsParticipantInMatchingFact GetIsParticipantFact(Matching matching)
     {
-        var fact = GetFact<IsParticipantMatchFact>(matching.Id) ?? SetFact(_factGenerator.GetIsParticipantFact(matching));
+        var fact = GetFact<IsParticipantInMatchingFact>(matching.Id) ?? SetFact(_factGenerator.GetIsParticipantFact(matching));
         return fact;
     }
 
-    internal async ValueTask<IsParticipantMatchFact> GetIsParticipantFactAsync(Guid matchingId, CancellationToken cancellationToken)
+    internal async ValueTask<IsParticipantInMatchingFact> GetIsParticipantFactAsync(Guid matchingId, CancellationToken cancellationToken)
     {
-        var fact = GetFact<IsParticipantMatchFact>(matchingId) ?? SetFact(await _factGenerator.GetIsParticipantFactAsync(matchingId, cancellationToken));
+        var fact = GetFact<IsParticipantInMatchingFact>(matchingId) ?? SetFact(await _factGenerator.GetIsParticipantFactAsync(matchingId, cancellationToken));
         return fact;
     }
 }

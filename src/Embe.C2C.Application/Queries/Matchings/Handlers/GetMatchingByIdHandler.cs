@@ -4,7 +4,6 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
-using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +17,6 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
     private readonly UserDtoMapper _userDtoMapper;
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper;
-    private readonly ConversationDtoMapper _conversationDtoMapper;
     private readonly IAuthenticatedUserService _authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
@@ -32,7 +30,6 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         UserDtoMapper userDtoMapper,
         MessageAuthorizationService messageAuthorizationService,
         MessageDtoMapper messageDtoMapper,
-        ConversationDtoMapper conversationDtoMapper,
         IAuthenticatedUserService authenticatedUserService,
         SearchProfileAuthorizationService searchProfileAuthorizationService,
         SearchProfileDtoMapper searchProfileDtoMapper
@@ -44,7 +41,6 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         _userDtoMapper = userDtoMapper;
         _messageAuthorizationService = messageAuthorizationService;
         _messageDtoMapper = messageDtoMapper;
-        _conversationDtoMapper = conversationDtoMapper;
         _authenticatedUserService = authenticatedUserService;
         _searchProfileAuthorizationService = searchProfileAuthorizationService;
         _searchProfileDtoMapper = searchProfileDtoMapper;
@@ -66,9 +62,8 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             .Include(m => m.User2)
             .Include(m => m.User1SearchProfile)
             .Include(m => m.User2SearchProfile)
-            .Include(m => m.Conversation)
-                .ThenInclude(c => c.Messages!.OrderByDescending(m => m.CreatedAt).Take(50))
-                    .ThenInclude(m => m.ReplyToMessage)
+            .Include(m => m.Messages!.OrderByDescending(mes => mes.CreatedAt).Take(50))
+                .ThenInclude(mes => mes.ReplyToMessage)
             .SingleOrDefaultAsync(m => m.Id == query.MatchingId, cancellationToken);
 
         if (matching == null)
@@ -87,7 +82,6 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             _userDtoMapper,
             _messageAuthorizationService,
             _messageDtoMapper,
-            _conversationDtoMapper,
             _searchProfileAuthorizationService,
             _searchProfileDtoMapper,
             cancellationToken

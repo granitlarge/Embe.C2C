@@ -26,7 +26,6 @@ public class JudgeHandler : CommandHandler<JudgeCommand, Result<ReadDto<Matching
     private readonly UserDtoMapper _userDtoMapper;
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper;
-    private readonly ConversationDtoMapper _conversationDtoMapper;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
 
@@ -45,7 +44,6 @@ public class JudgeHandler : CommandHandler<JudgeCommand, Result<ReadDto<Matching
         UserDtoMapper userDtoMapper,
         MessageAuthorizationService messageAuthorizationService,
         MessageDtoMapper messageDtoMapper,
-        ConversationDtoMapper conversationDtoMapper,
         SearchProfileAuthorizationService searchProfileAuthorizationService,
         SearchProfileDtoMapper searchProfileDtoMapper
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
@@ -59,7 +57,6 @@ public class JudgeHandler : CommandHandler<JudgeCommand, Result<ReadDto<Matching
         _userDtoMapper = userDtoMapper;
         _messageAuthorizationService = messageAuthorizationService;
         _messageDtoMapper = messageDtoMapper;
-        _conversationDtoMapper = conversationDtoMapper;
         _searchProfileAuthorizationService = searchProfileAuthorizationService;
         _searchProfileDtoMapper = searchProfileDtoMapper;
     }
@@ -158,7 +155,6 @@ public class JudgeHandler : CommandHandler<JudgeCommand, Result<ReadDto<Matching
             _userDtoMapper,
             _messageAuthorizationService,
             _messageDtoMapper,
-            _conversationDtoMapper,
             _searchProfileAuthorizationService,
             _searchProfileDtoMapper,
             cancellationToken

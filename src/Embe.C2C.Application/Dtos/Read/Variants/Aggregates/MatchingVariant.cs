@@ -23,39 +23,6 @@ public record MatchingVariant
     public bool IncludeCreatedAt { get; }
 }
 
-public record ConversationVariant
-{
-    public static readonly ConversationVariant Empty = new
-    (
-        includeMessageCount: false,
-        includeUpdatedAt: false,
-        includeCreatedAt: false
-    );
-
-    public static readonly ConversationVariant Full = new
-    (
-        includeMessageCount: true,
-        includeUpdatedAt: true,
-        includeCreatedAt: true
-    );
-
-    public ConversationVariant
-    (
-        bool includeMessageCount,
-        bool includeUpdatedAt,
-        bool includeCreatedAt
-    )
-    {
-        IncludeMessageCount = includeMessageCount;
-        IncludeUpdatedAt = includeUpdatedAt;
-        IncludeCreatedAt = includeCreatedAt;
-    }
-
-    public bool IncludeMessageCount { get; init; }
-    public bool IncludeUpdatedAt { get; init; }
-    public bool IncludeCreatedAt { get; init; }
-}
-
 public record MessageVariant
 {
     public static readonly MessageVariant Empty = new

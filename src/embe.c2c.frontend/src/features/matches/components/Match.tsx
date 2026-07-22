@@ -92,7 +92,7 @@ export default function Match({ match, user, className }: MatchProps) {
     const connection = useRef<HubConnection | null>(null);
 
     const [partnerIsTyping, setPartnerIsTyping] = useState(false);
-    const [messages, setMessages] = useState(sortMessages(match.data.conversation?.messages || []));
+    const [messages, setMessages] = useState(sortMessages(match.data?.messages || []));
     const page = messages.length > 0 ? 2 : 1;
     const pageSize = messages.length > 0 ? messages.length : 50;
 
@@ -191,9 +191,9 @@ export default function Match({ match, user, className }: MatchProps) {
 
         connection.current = getOrCreateConnectionOld();
 
-        const onMessageAddedHandler = async (messageId: Guid, conversationId: Guid) => {
+        const onMessageAddedHandler = async (messageId: Guid, matchingId: Guid) => {
 
-            if (conversationId !== matchRef.current.data.conversation?.id) {
+            if (matchingId !== matchRef.current.data.id) {
                 return;
             }
 
@@ -212,9 +212,9 @@ export default function Match({ match, user, className }: MatchProps) {
 
         };
 
-        const onMessageEditedHandler = async (messageId: Guid, conversationId: Guid) => {
+        const onMessageEditedHandler = async (messageId: Guid, matchingId: Guid) => {
 
-            if (conversationId !== matchRef.current.data.conversation?.id) {
+            if (matchingId !== matchRef.current.data.id) {
                 return;
             }
 
@@ -234,9 +234,9 @@ export default function Match({ match, user, className }: MatchProps) {
 
         };
 
-        const onMessageDeletedHandler = (messageId: Guid, conversationId: Guid) => {
+        const onMessageDeletedHandler = (messageId: Guid, matchingId: Guid) => {
 
-            if (conversationId !== matchRef.current.data.conversation?.id) {
+            if (matchingId !== matchRef.current.data.id) {
                 return;
             }
 
@@ -244,9 +244,9 @@ export default function Match({ match, user, className }: MatchProps) {
 
         };
 
-        const onMessagesSeenHandler = (messageIds: Guid[], conversationId: Guid) => {
+        const onMessagesSeenHandler = (messageIds: Guid[], matchingId: Guid) => {
 
-            if (conversationId !== matchRef.current.data.conversation?.id) {
+            if (matchingId !== matchRef.current.data.id) {
                 return;
             }
 
@@ -254,9 +254,9 @@ export default function Match({ match, user, className }: MatchProps) {
 
         };
 
-        const onMessagesUnseenHandler = (messageIds: Guid[], conversationId: Guid) => {
+        const onMessagesUnseenHandler = (messageIds: Guid[], matchingId: Guid) => {
 
-            if (conversationId !== matchRef.current.data.conversation?.id) {
+            if (matchingId !== matchRef.current.data.id) {
                 return;
             }
 
@@ -264,9 +264,9 @@ export default function Match({ match, user, className }: MatchProps) {
 
         }
 
-        const onStartedTypingHandler = (conversationId: Guid) => {
+        const onStartedTypingHandler = (matchingId: Guid) => {
 
-            if (conversationId !== matchRef.current.data.conversation?.id) {
+            if (matchingId !== matchRef.current.data.id) {
                 return;
             }
 
@@ -274,9 +274,9 @@ export default function Match({ match, user, className }: MatchProps) {
 
         }
 
-        const onStoppedTypingHandler = (conversationId: Guid) => {
+        const onStoppedTypingHandler = (matchingId: Guid) => {
 
-            if (conversationId !== matchRef.current.data.conversation?.id) {
+            if (matchingId !== matchRef.current.data.id) {
                 return;
             }
 
@@ -497,7 +497,7 @@ export default function Match({ match, user, className }: MatchProps) {
 
     return (
         <div className={`flex flex-col justify-between gap-3 ${className}`}>
-            <MatchHeader partner={partner} matchId={match.data.id}/>
+            <MatchHeader partner={partner} matchId={match.data.id} />
             <InfiniteScroll direction="up" className="flex flex-col gap-3 grow-1" callback={loadMessages}>
                 {items}
             </InfiniteScroll>

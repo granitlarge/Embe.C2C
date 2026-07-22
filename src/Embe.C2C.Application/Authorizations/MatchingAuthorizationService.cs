@@ -100,7 +100,7 @@ public class MatchingAuthorizationService
 
     private static ImmutableHashSet<MatchingPermission> GetPermissions
     (
-        IsParticipantMatchFact fact
+        IsParticipantInMatchingFact fact
     )
     {
         var permissions = new HashSet<MatchingPermission>();

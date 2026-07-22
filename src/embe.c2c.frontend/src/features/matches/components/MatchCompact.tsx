@@ -3,9 +3,9 @@ import { formatTimeAgo } from "@/src/shared/time";
 import { Matching, MatchingPermission } from "@/src/shared/types/domain/aggregates";
 import { UserCompact } from "./UserCompact";
 import Link from "next/link";
-import ConversationCompact from "./ConversationCompact";
 import { AuthenticatedUser } from "@/src/shared/user";
 import { ReadDto } from "@/src/shared/types/dtos/types";
+import MessageCompact from "./MessageBrief";
 
 export type MatchCompactProps = {
     dto: ReadDto<Matching, MatchingPermission>;
@@ -29,9 +29,15 @@ export function MatchCompact({ dto, className, user }: MatchCompactProps) {
                 <div className="flex flex-col items-end gap-2 w-full">
                     {match.createdAt && <span className="text-(--secondary-fc) text-(length:--secondary-fs) mb-auto" suppressHydrationWarning>{formatTimeAgo(match.createdAt)}</span>}
                     {
-                        match.conversation &&
                         <Surface as={Link} className="flex flex-col w-full grow-1 no-underline mb-auto" href={`/protected/matches/${match.id}`} padding="none" variant="inherit">
-                            <ConversationCompact className="grow-1 fs-group-primary" conversation={match.conversation} user={user} />
+                            <Surface className={`grow-1 fs-group-primary w-full flex flex-col justify-center`} padding="none" variant="inherit">
+                                {
+                                    dto.data.lastMessage && <MessageCompact className="grow-1" messageDto={dto.data.lastMessage} user={user} /> ||
+                                    <span className="surface-tertiary text-(--primary-fc) text-center text-(length:--primary-fs) w-full grow-1 flex items-center justify-center rounded-md">
+                                        no messages yet
+                                    </span>
+                                }
+                            </Surface>
                         </Surface>
                     }
                 </div>

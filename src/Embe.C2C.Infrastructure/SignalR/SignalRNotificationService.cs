@@ -30,7 +30,7 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
     {
         var hubContext = await _pool.GetHubContextAsync(cancellationToken);
         await hubContext.Clients.User(messageCreated.RecipientUserId.ToString())
-            .SendAsync("MessageAdded", messageCreated.MessageId, messageCreated.ConversationId, cancellationToken);
+            .SendAsync("MessageAdded", messageCreated.MessageId, messageCreated.MatchingId, cancellationToken);
     }
 
     private async Task SendMessageEditedNotificationAsync(MessageEdited messageEdited, CancellationToken cancellationToken)

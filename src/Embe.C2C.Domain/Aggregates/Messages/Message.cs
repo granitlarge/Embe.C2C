@@ -8,14 +8,14 @@ public class Message : Aggregate
 {
     private Message
     (
-        Guid conversationId,
+        Guid matchingId,
         Guid? replyToMessageId,
         Guid authorUserId,
         MessageContent content
     )
     {
         Id = Guid.CreateVersion7();
-        ConversationId = conversationId;
+        MatchingId = matchingId;
         ReplyToMessageId = replyToMessageId;
         IsReply = replyToMessageId.HasValue;
         AuthorUserId = authorUserId;
@@ -32,7 +32,7 @@ public class Message : Aggregate
     }
 
     public Guid Id { get; }
-    public Guid ConversationId { get; }
+    public Guid MatchingId { get; }
     public Guid? ReplyToMessageId { get; private set; }
     public bool IsReply { get; private set; }
     public Guid AuthorUserId { get; }
@@ -67,14 +67,14 @@ public class Message : Aggregate
         SeenAt = seen ? DateTimeOffset.UtcNow : null;
     }
 
-    public void Remove()
+    internal void Remove()
     {
         AddDomainEvent(new MessageRemovedEvent(this));
     }
 
-    internal static Message Create(Guid conversationId, Guid? replyToMessageId, Guid authorUserId, MessageContent content)
+    internal static Message Create(Guid matchingId, Guid? replyToMessageId, Guid authorUserId, MessageContent content)
     {
-        return new Message(conversationId, replyToMessageId, authorUserId, content);
+        return new Message(matchingId, replyToMessageId, authorUserId, content);
     }
 
     internal void ReplyMessageRemoved()
@@ -83,7 +83,7 @@ public class Message : Aggregate
     }
 
     #region Read Only Navigation Properties
-    public Conversation? Conversation { get; private set; }
+    public Matchings.Matching? Matching { get; private set; }
     public Message? ReplyToMessage { get; private set; }
     #endregion
 }
