@@ -46,7 +46,7 @@ public static class ServiceCollectionExtensions
         );
 
         services.AddScoped<IImageService, BlobStorageImageService>();
-        services.AddScoped<INotificationService, SignalRNotificationService>();
+        services.AddScoped<IRealTimeNotificationService, SignalRRealTimeNotificationService>();
         services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
         services.AddScoped<IWorkItemService, ServiceBusWorkItemService>();
         services.AddScoped<IAuthService, AuthService>();

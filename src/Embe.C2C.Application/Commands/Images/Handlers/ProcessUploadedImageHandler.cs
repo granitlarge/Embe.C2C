@@ -50,6 +50,6 @@ public class ProcessUploadedImageHandler
         {
             user.RemoveImage(user.Id, targetImage.Id);
         }
-        return new CommandResult<Result>(Commit: true, Result.Success());
+        return new CommandResult<Result>(true, Result.Success());
     }
 }

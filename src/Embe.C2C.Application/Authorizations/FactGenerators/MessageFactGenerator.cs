@@ -77,15 +77,12 @@ public class MessageFactGenerator
 
     private async Task<AuthorizationFact[]> LoadFactsAsync(Guid messageId, CancellationToken cancellationToken)
     {
-        var facts = await _repo
-            .MessagesQuery
-            .Where(m => m.Id == messageId)
-            .Select(m => new
-            {
-                m.AuthorUserId,
-                RecipientUserId = m.Conversation!.UserId1 != m.AuthorUserId ? m.Conversation.UserId1 : m.Conversation.UserId2
-            })
-            .SingleOrDefaultAsync(cancellationToken);
+        var message = await _repo.MessagesQuery.Include(m => m.Conversation).SingleOrDefaultAsync(m => m.Id == messageId, cancellationToken);
+        var facts = message != null ? new
+        {
+            message.AuthorUserId,
+            RecipientUserId = message.Conversation!.UserId1 != message.AuthorUserId ? message.Conversation.UserId1 : message.Conversation.UserId2
+        } : null;
 
         AuthorMessageFact authorMessageFact;
         RecipientMessageFact recipientMessageFact;

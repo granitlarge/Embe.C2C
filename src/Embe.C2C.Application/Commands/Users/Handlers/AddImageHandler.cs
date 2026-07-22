@@ -52,7 +52,7 @@ public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageRe
         {
             return new CommandResult<Result<AddImageResponse>>
             (
-                Commit: false,
+                Save: false,
                 Result<AddImageResponse>.Failure(FailureReason.NotFound, "user does not exist")
             );
         }

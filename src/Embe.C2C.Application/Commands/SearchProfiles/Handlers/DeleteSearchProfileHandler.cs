@@ -36,7 +36,7 @@ public class DeleteSearchProfileHandler
         {
             return new CommandResult<Result>
             (
-                Commit: false,
+                Save: false,
                 Result.Failure
                 (
                     FailureReason.Forbidden,
@@ -50,7 +50,7 @@ public class DeleteSearchProfileHandler
         {
             return new CommandResult<Result>
             (
-                Commit: false,
+                Save: false,
                 Result.Failure
                 (
                     FailureReason.NotFound,
@@ -64,7 +64,7 @@ public class DeleteSearchProfileHandler
 
         return new CommandResult<Result>
         (
-            Commit: true,
+            Save: true,
             Result.Success()
         );
     }

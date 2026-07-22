@@ -91,7 +91,13 @@ public class DomainEventHandler
         var matching = matchingCreatedEvent.Matching;
         var matcheeUserId = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
         var matcherUserId = matchingCreatedEvent.LastJudgeUserId;
-        var matcheeUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == matcheeUserId, cancellationToken);
+        var matcheeUser = await _context.DomainUsers.FindAsync([matcheeUserId], cancellationToken);
+
+        if (matcheeUser is null)
+        {
+            // Matchee has been deleted, don't issue a notification or an integration event to him.
+            return;
+        }
 
         var notification = new MatchingCreated
         (
@@ -101,6 +107,7 @@ public class DomainEventHandler
             matcheeUser.Alias.Value,
             matcheeUser.ProfilePicture?.ImageDetails.Name
         );
+
         _context.Notifications.Add(notification);
 
         var notificationDto = notification.ToDto();
@@ -114,21 +121,7 @@ public class DomainEventHandler
         CancellationToken cancellationToken
     )
     {
-        var matching = matchingRemovedEvent.Matching;
-        var matchRemoveeUserId = matchingRemovedEvent.RemoverUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
-        var matchRemoverUserId = matchingRemovedEvent.RemoverUserId;
-        var matcheeUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == matchRemoveeUserId, cancellationToken);
-
-        var notification = new MatchingCreated
-        (
-            matchRemoveeUserId,
-            matching.Id,
-            matchRemoverUserId,
-            matcheeUser.Alias.Value,
-            matcheeUser.ProfilePicture?.ImageDetails.Name
-        );
-        _context.Notifications.Add(notification);
-        AddIntegrationEvent(new NotificationCreatedEvent(notification.ToDto()));
+        throw new NotImplementedException();
     }
 
     private Task HandleNotificationUpdatedEventAsync
@@ -149,7 +142,7 @@ public class DomainEventHandler
     )
     {
         var notification = notificationRemovedEvent.Notification;
-        AddIntegrationEvent(new NotificationDeletedEvent(notification.Id));
+        AddIntegrationEvent(new NotificationDeletedEvent(notification.RecipientUserId, notification.Id));
         return Task.CompletedTask;
     }
 

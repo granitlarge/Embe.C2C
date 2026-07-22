@@ -187,6 +187,11 @@ export default function ImageCropper({ onCrop, onCancel, src, width, aspect }: I
         let cropperWidth = width * containerWidth / imageWidth;
         let cropperHeight = cropperWidth / aspect;
 
+        if (cropperHeight > imageHeight) {
+            cropperHeight = imageHeight;
+            cropperWidth = cropperHeight * aspect;
+        }
+
         cropperWidth = Math.max(Math.min(cropperWidth, containerWidth), aspect);
         cropperHeight = Math.max(Math.min(cropperHeight, containerHeight), 1 / aspect);
         setCropperWidth(cropperWidth);

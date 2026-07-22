@@ -77,7 +77,7 @@ public class JudgeHandler : CommandHandler<JudgeCommand, Result<ReadDto<Matching
         {
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>
             (
-                Commit: false,
+                Save: false,
                 Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure
                 (
                     FailureReason.Forbidden,

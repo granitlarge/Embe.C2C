@@ -18,6 +18,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
     {
         void Add(T entity);
         void Remove(T entity);
+        ValueTask<T?> FindAsync(object?[]? keys, CancellationToken cancellationToken);
     }
 
     public interface ISparseRepository

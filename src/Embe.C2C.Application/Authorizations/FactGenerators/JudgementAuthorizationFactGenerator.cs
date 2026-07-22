@@ -16,17 +16,17 @@ public class JudgementAuthorizationFactGenerator
 
     public async Task<List<AuthorizationFact>> GetAuthorizationFactsAsync(Guid judgementId)
     {
-        var result = await _repository
+        var judgement = await _repository
             .JudgementsQuery
-            .AsNoTracking()
-            .Where(j => j.Id == judgementId)
-            .Select(j => new
-            {
-                IsJudge = j.Candidate!.UserId == CurrentUserId,
-                IsJudgee = j.Candidate!.CandidateUserId == CurrentUserId,
-                IsPositivelyJudged = j.Candidate!.CandidateUserId == CurrentUserId && j.IsPositive
-            })
-            .FirstOrDefaultAsync();
+            .Include(j => j.Candidate)
+            .SingleOrDefaultAsync(j => j.Id == judgementId);
+
+        var result = judgement != null ? new
+        {
+            IsJudge = judgement.Candidate!.UserId == CurrentUserId,
+            IsJudgee = judgement.Candidate!.CandidateUserId == CurrentUserId,
+            IsPositivelyJudged = judgement.Candidate!.CandidateUserId == CurrentUserId && judgement.IsPositive
+        } : null;
 
         var facts = new List<AuthorizationFact>
         {
