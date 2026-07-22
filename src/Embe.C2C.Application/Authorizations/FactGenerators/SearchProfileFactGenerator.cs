@@ -16,20 +16,18 @@ public class SearchProfileFactGenerator
 
     public async Task<List<AuthorizationFact>> GetAuthorizationFactsAsync(Guid searchProfileId, CancellationToken cancellationToken = default)
     {
-        var searchProfile = await _repository.SearchProfilesQuery
-            .Include(sp => sp.MatchingsUserId1!.Where(m => m.UserId2 == CurrentUserId))
-            .Include(sp => sp.MatchingsUserId2!.Where(m => m.UserId1 == CurrentUserId))
-            .Include(sp => sp.User)
-                .ThenInclude(u => u!.CandidateUsers)
-            .SingleOrDefaultAsync(sp => sp.Id == searchProfileId);
-
-        var result = searchProfile != null ? new
-        {
-            searchProfile.Id,
-            IsOwnedByUser = searchProfile.UserId == CurrentUserId,
-            IsMatchedWithUser = searchProfile.MatchingsUserId1!.Any(m => m.UserId2 == CurrentUserId) || searchProfile.MatchingsUserId2!.Any(m => m.UserId1 == CurrentUserId),
-            IsCandidateForUser = searchProfile.User!.CandidateUsers!.Any(c => c.CandidateUserId == CurrentUserId)
-        } : null;
+        var result = await _repository
+            .SearchProfilesQuery
+            .AsNoTracking()
+            .Where(sp => sp.Id == searchProfileId)
+            .Select(sp => new
+            {
+                sp.Id,
+                IsOwnedByUser = sp.UserId == CurrentUserId,
+                IsMatchedWithUser = sp.MatchingsUserId1!.Any(m => m.UserId2 == CurrentUserId) || sp.MatchingsUserId2!.Any(m => m.UserId1 == CurrentUserId),
+                IsCandidateForUser = sp.User!.CandidateUsers!.Any(c => c.CandidateUserId == CurrentUserId)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
         var facts = new List<AuthorizationFact>
         {

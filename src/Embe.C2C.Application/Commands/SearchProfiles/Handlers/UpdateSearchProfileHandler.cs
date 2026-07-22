@@ -68,7 +68,7 @@ public class UpdateSearchProfileHandler
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
-                    Save: false,
+                    Commit: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                     (
                         FailureReason.NotFound,
@@ -82,7 +82,7 @@ public class UpdateSearchProfileHandler
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
-                    Save: false,
+                    Commit: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                     (
                         FailureReason.Forbidden,
@@ -128,7 +128,7 @@ public class UpdateSearchProfileHandler
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
-                    Save: false,
+                    Commit: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                     (
                         FailureReason.Forbidden,
@@ -140,7 +140,7 @@ public class UpdateSearchProfileHandler
             var result = Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto);
             return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                Save: true,
+                Commit: true,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto)
             );
         }
@@ -148,7 +148,7 @@ public class UpdateSearchProfileHandler
         {
             return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                Save: false,
+                Commit: false,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                 (
                     FailureReason.DomainError,

@@ -6,7 +6,6 @@ using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
-using Embe.C2C.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.EventHandlers;
@@ -14,19 +13,18 @@ namespace Embe.C2C.Application.EventHandlers;
 public class IntegrationEventHandler
 (
     IRepository repository,
-    IRealTimeNotificationService notificationService,
+    INotificationService notificationService,
     IImageService imageService,
     IWorkItemService workItemService
 )
 {
     private readonly IRepository _repository = repository;
-    private readonly IRealTimeNotificationService _notificationService = notificationService;
+    private readonly INotificationService _notificationService = notificationService;
     private readonly IImageService _imageService = imageService;
     private readonly IWorkItemService _workItemService = workItemService;
 
     public async Task HandleAsync(IntegrationEventCollector eventCollector, CancellationToken cancellationToken = default)
     {
-#warning consider whether we should catch exceptions here or not, i.e. are integration-events uncorrelated or correlated?
         var events = eventCollector.CollectedEvents;
         foreach (var @event in events.OrderBy(e => e.Timestamp))
         {
@@ -37,7 +35,7 @@ public class IntegrationEventHandler
     private async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
     {
         // Notify clients about the event using the notification service
-        await _notificationService.SendAsync(integrationEvent, cancellationToken);
+        await _notificationService.SendNotificationAsync(integrationEvent, cancellationToken);
 
         switch (integrationEvent)
         {

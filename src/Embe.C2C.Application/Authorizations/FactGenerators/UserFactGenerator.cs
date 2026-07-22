@@ -51,22 +51,17 @@ public class UserFactGenerator
         CancellationToken cancellationToken = default
     )
     {
-        var user = await _repo.DomainUsersQuery
-            .Include(u => u.Blocked!.Where(bu => bu.BlockedUserId == userId))
-            .Include(u => u.BlockedBy!.Where(bu => bu.BlockerUserId == userId))
-            .Include(u => u.Matchings1!.Where(m => m.UserId2 == userId))
-            .Include(u => u.Matchings2!.Where(m => m.UserId1 == userId))
-            .Include(u => u.CandidateCandidates!.Where(c => c.UserId == userId))
-                .ThenInclude(cc => cc.Judgement)
-            .SingleOrDefaultAsync(u => u.Id == CurrentUserId, cancellationToken);
-
-        var facts = user != null ? new
-        {
-            IsBlocking = user.Blocked!.Any(bu => bu.BlockedUserId == userId),
-            IsBlockedBy = user.BlockedBy!.Any(bu => bu.BlockerUserId == userId),
-            IsMatched = user.Matchings1!.Any(m => m.UserId2 == userId) || user.Matchings2!.Any(m => m.UserId1 == userId),
-            IsPositivelyJudged = user.CandidateCandidates!.Any(c => c.UserId == userId && c.Judgement!.IsPositive)
-        } : null;
+        var facts = await _repo
+            .DomainUsersQuery
+            .Where(u => u.Id == CurrentUserId)
+            .Select(u => new
+            {
+                IsBlocking = u.Blocked!.Any(bu => bu.BlockedUserId == userId),
+                IsBlockedBy = u.BlockedBy!.Any(bu => bu.BlockerUserId == userId),
+                IsMatched = u.Matchings1!.Any(m => m.UserId2 == userId) || u.Matchings2!.Any(m => m.UserId1 == userId),
+                IsPositivelyJudged = u.CandidateCandidates!.Any(c => c.UserId == userId && c.Judgement!.IsPositive)
+            })
+            .SingleOrDefaultAsync(cancellationToken);
 
         var blockedByFact = new BlockedByUserFact(userId, facts?.IsBlockedBy ?? false);
         var blockingFact = new BlockingUserFact(userId, facts?.IsBlocking ?? false);

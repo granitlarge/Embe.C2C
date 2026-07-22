@@ -30,6 +30,6 @@ public class RefreshHandler : CommandHandler<RefreshCommand, TypedResult<Refresh
     )
     {
         var result = await _authService.RefreshAsync(command.RefreshToken, cancellationToken);
-        return new CommandResult<TypedResult<RefreshFailureReason, Credentials>>(true, result);
+        return new CommandResult<TypedResult<RefreshFailureReason, Credentials>>(result.IsSuccess, result);
     }
 }

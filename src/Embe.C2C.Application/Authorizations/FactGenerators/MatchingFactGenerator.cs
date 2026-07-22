@@ -22,8 +22,11 @@ public class MatchingFactGenerator
 
     public async ValueTask<IsParticipantMatchFact> GetIsParticipantFactAsync(Guid matchingId, CancellationToken cancellationToken)
     {
-        var matching = await _repo.Matchings.FindAsync([matchingId], cancellationToken);
-        var fact = matching != null ? new IsParticipantMatchFact(matching.Id, matching.UserId1 == CurrentUserId || matching.UserId2 == CurrentUserId) : new IsParticipantMatchFact(matchingId, false);
+        var fact = await _repo.MatchingsQuery
+            .Where(m => m.Id == matchingId)
+            .Select(m => new IsParticipantMatchFact(m.Id, m.UserId1 == CurrentUserId || m.UserId2 == CurrentUserId))
+            .SingleOrDefaultAsync(cancellationToken) ?? new IsParticipantMatchFact(matchingId, false);
+
         return fact;
     }
 }

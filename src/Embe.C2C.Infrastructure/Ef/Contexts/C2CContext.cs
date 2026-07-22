@@ -11,6 +11,7 @@ using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Entities.SearchProfiles;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

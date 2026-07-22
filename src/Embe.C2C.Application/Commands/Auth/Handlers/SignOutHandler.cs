@@ -31,6 +31,6 @@ public class SignOutHandler : CommandHandler<SignOutCommand, TypedResult<SignOut
     )
     {
         var result = await _authService.SignOutAsync(command.RefreshToken, cancellationToken);
-        return new CommandResult<TypedResult<SignOutFailureReason, bool>>(true, result);
+        return new CommandResult<TypedResult<SignOutFailureReason, bool>>(result.IsSuccess, result);
     }
 }
