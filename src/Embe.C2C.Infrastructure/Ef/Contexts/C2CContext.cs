@@ -100,15 +100,6 @@ public class C2CContext
         }
     }
 
-    IDbSet<Account> ISparseRepository.Accounts
-    {
-        get
-        {
-            return new MyDbSet<Account>(Accounts);
-        }
-    }
-
-
     IDbSet<Matching> ISparseRepository.Matchings
     {
         get

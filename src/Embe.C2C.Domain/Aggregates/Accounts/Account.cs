@@ -131,7 +131,7 @@ public class Account : Aggregate
         AddDomainEvent(new AccountOpenedEvent(this));
     }
 
-    public void Remove()
+    internal void Remove()
     {
         if (IsOpen)
         {

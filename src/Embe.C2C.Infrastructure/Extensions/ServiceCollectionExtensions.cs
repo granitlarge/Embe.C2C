@@ -51,6 +51,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IWorkItemService, ServiceBusWorkItemService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IAccountRepository, AccountRepository>();
 
         if (environment.IsDevelopment())
         {

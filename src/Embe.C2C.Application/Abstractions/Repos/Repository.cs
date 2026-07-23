@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Domain;
-using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Matchings;
@@ -20,7 +19,6 @@ namespace Embe.C2C.Application.Abstractions.Repos
 
     public interface ISparseRepository
     {
-        public IDbSet<Account> Accounts { get; }
         public IDbSet<Matching> Matchings { get; }
         public IDbSet<Notification> Notifications { get; }
         public IDbSet<Message> Messages { get; }
@@ -28,7 +26,6 @@ namespace Embe.C2C.Application.Abstractions.Repos
         public IDbSet<SearchProfile> SearchProfiles { get; }
         public IDbSet<Candidate> Candidates { get; }
 
-        public IQueryable<Account> AccountsQuery { get; }
         public IQueryable<Matching> MatchingsQuery { get; }
         public IQueryable<Notification> NotificationsQuery { get; }
         public IQueryable<Message> MessagesQuery { get; }
@@ -71,13 +68,11 @@ namespace Embe.C2C.Application.Abstractions.Repos
             _context = context;
         }
 
-        public IDbSet<Account> Accounts => _context.Accounts;
         public IDbSet<Matching> Matchings => _context.Matchings;
         public IDbSet<Notification> Notifications => _context.Notifications;
         public IDbSet<Message> Messages => _context.Messages;
         public IDbSet<Blocking> Blockings => _context.Blockings;
         public IDbSet<SearchProfile> SearchProfiles => _context.SearchProfiles;
-        public IQueryable<Account> AccountsQuery => _context.AccountsQuery;
         public IQueryable<Matching> MatchingsQuery => _context.MatchingsQuery;
         public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
         public IQueryable<SearchProfile> SearchProfilesQuery => _context.SearchProfilesQuery;
