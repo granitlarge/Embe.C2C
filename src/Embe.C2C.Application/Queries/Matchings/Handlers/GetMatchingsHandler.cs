@@ -18,6 +18,7 @@ namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
 public class GetMatchingsHandler
 (
+    IUserRepository userRepo,
     IRepository repository,
     IImageService fileService,
     MatchingAuthorizationService matchingAuthorizationService,
@@ -31,6 +32,7 @@ public class GetMatchingsHandler
     SearchProfileDtoMapper searchProfileDtoMapper
 ) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
+    private readonly IUserRepository _userRepo = userRepo;
     private readonly IImageService _fileService = fileService;
     private readonly MatchingAuthorizationService _matchingAuthorizationService = matchingAuthorizationService;
     private readonly MatchingDtoMapper _matchingDtoMapper = matchingDtoMapper;
@@ -64,7 +66,7 @@ public class GetMatchingsHandler
             .ToListAsync(cancellationToken);
 
         var userId = _authenticatedUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
-        var queryingUser = await repo.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
         var dtos = new List<ReadDto<MatchingDto, MatchingPermission>>();
         foreach (var matching in matchings)
         {

@@ -17,6 +17,7 @@ namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
 {
+    private readonly IUserRepository _userRepo;
     private readonly MatchingAuthorizationService _matchingAuthorizationService;
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUser;
@@ -25,6 +26,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
 
     public CreateMessageHandler
     (
+        IUserRepository userRepo,
         DomainEventStore domainEventStore,
         MatchingAuthorizationService matchingAuthorizationService,
         MessageAuthorizationService messageAuthorizationService,
@@ -41,6 +43,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
         _authenticatedUser = authenticatedUser;
         _matchingService = matchingService;
         _messageDtoMapper = messageDtoMapper;
+        _userRepo = userRepo;
     }
 
     protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
@@ -61,7 +64,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
             var messageContent = MessageContent.Create(command.Content);
             var replyToMessageId = command.ReplyToMessageId;
 
-            var user = await context.DomainUsersQuery.SingleAsync(u => u.Id == _authenticatedUser.UserId, cancellationToken);
+            var user = await _userRepo.GetByIdAsync(_authenticatedUser.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
             if (user is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 
@@ -69,7 +72,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
             if (matching is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Matching not found."));
 
-            var receiver = await context.DomainUsersQuery.SingleAsync(u => u.Id == matching.GetOtherUserId(_authenticatedUser.UserId), cancellationToken);
+            var receiver = await _userRepo.GetByIdAsync(matching.GetOtherUserId(_authenticatedUser.UserId)!.Value, cancellationToken);
             if (receiver is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Receiver user not found."));
 

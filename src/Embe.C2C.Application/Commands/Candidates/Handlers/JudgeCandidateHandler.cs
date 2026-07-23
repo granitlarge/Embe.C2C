@@ -14,6 +14,7 @@ namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
 public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
 {
+    private readonly IUserRepository _userRepo;
     private readonly CandidateAuthorizationService _candidateAuthorizationService;
     private readonly UserAuthorizationService _userAuthorizationService;
     private readonly CandidateService _judgementService;
@@ -28,6 +29,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
 
     public JudgeCandidateHandler
     (
+        IUserRepository userRepo,
         IRepository context,
         UserAuthorizationService userAuthorizationService,
         CandidateService judgementService,
@@ -56,6 +58,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         _searchProfileAuthorizationService = searchProfileAuthorizationService;
         _searchProfileDtoMapper = searchProfileDtoMapper;
         _candidateAuthorizationService = candidateAuthorizationService;
+        _userRepo = userRepo;
     }
 
     protected override async Task<CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
@@ -78,13 +81,13 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Commit: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "The candidate does not exist."));
         }
 
-        var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
         if (user == null)
         {
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "User not found."));
         }
 
-        var candidateUser = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == candidate.CandidateUserId, cancellationToken);
+        var candidateUser = await _userRepo.GetByIdAsync(candidate.CandidateUserId, cancellationToken);
         if (candidateUser == null)
         {
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Judgee not found."));
@@ -117,7 +120,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         if (matching == null)
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(null));
 
-        var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
         var readDto = await matching.ToDtoAsync
         (
             queryingUser,

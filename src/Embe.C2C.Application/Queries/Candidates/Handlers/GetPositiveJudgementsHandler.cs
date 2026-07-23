@@ -15,6 +15,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
     Result<List<ReadDto<CandidateDto, CandidatePermission>>>
 >
 {
+    private readonly IUserRepository _userRepo;
     private readonly IAuthenticatedUserService _authenticatedUserService;
     private readonly UserAuthorizationService _userAuthorizationService;
     private readonly UserDtoMapper _userDtoMapper;
@@ -25,6 +26,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
 
     public GetPositiveJudgementsHandler
     (
+        IUserRepository userRepo,
         IRepository repository,
         IAuthenticatedUserService authenticatedUserService,
         UserAuthorizationService userAuthorizationService,
@@ -42,6 +44,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
         _searchProfileDtoMapper = searchProfileDtoMapper;
         _candidateAuthorizationService = candidateAuthorizationService;
         _candidateDtoMapper = candidateDtoMapper;
+        _userRepo = userRepo;
     }
 
     protected async override Task<Result<List<ReadDto<CandidateDto, CandidatePermission>>>> ExecuteAsync
@@ -52,7 +55,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user isn't authenticated");
-        var queryingUser = await repository.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
         var candidates = await repository
             .CandidatesQuery
             .AsNoTracking()

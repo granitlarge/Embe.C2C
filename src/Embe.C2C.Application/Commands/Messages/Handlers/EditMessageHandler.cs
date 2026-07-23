@@ -16,6 +16,7 @@ namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
 {
+    private readonly IUserRepository _userRepo;
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUser;
     private readonly MatchingService _matchingService;
@@ -23,6 +24,7 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<Read
 
     public EditMessageHandler
     (
+        IUserRepository userRepo,
         MessageAuthorizationService messageAuthorizationService,
         IAuthenticatedUserService authenticatedUser,
         MatchingService matchingService,
@@ -33,6 +35,7 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<Read
         MessageDtoMapper messageDtoMapper
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
+        _userRepo = userRepo;
         _messageAuthorizationService = messageAuthorizationService;
         _authenticatedUser = authenticatedUser;
         _matchingService = matchingService;
@@ -55,7 +58,7 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<Read
 
         try
         {
-            var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == _authenticatedUser.UserId, cancellationToken);
+            var user = await _userRepo.GetByIdAsync(_authenticatedUser.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
             if (user is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 

@@ -13,6 +13,7 @@ namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
 public class GenerateCandidatesHandler
 (
+    IUserRepository userRepo,
     IAuthenticatedUserService authenticatedUserService,
     UserAuthorizationService userAuthorizationService,
     IRepository context,
@@ -32,6 +33,7 @@ public class GenerateCandidatesHandler
     integrationEventHandler
 )
 {
+    private readonly IUserRepository _userRepo = userRepo;
     private readonly CandidateDtoMapper _candidateDtoMapper = candidateDtoMapper;
     private readonly CandidateAuthorizationService _candidateAuthorizationService = candidateAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
@@ -48,7 +50,7 @@ public class GenerateCandidatesHandler
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-        var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
         var userHasCandidates = await context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         if (!userHasCandidates)
         {

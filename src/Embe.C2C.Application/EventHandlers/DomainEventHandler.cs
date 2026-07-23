@@ -17,10 +17,12 @@ namespace Embe.C2C.Application.EventHandlers;
 
 public class DomainEventHandler
 (
+    IUserRepository userRepo,
     IRepository context
 ) : IntegrationEventCollector
 {
     private readonly IRepository _context = context;
+    private readonly IUserRepository _userRepo = userRepo;
 
     public async Task HandleAsync(DomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
@@ -91,15 +93,21 @@ public class DomainEventHandler
         var matching = matchingCreatedEvent.Matching;
         var matcheeUserId = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
         var matcherUserId = matchingCreatedEvent.LastJudgeUserId;
-        var matcheeUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == matcheeUserId, cancellationToken);
+        var matcherUser = await _userRepo.GetByIdAsync(matcherUserId, cancellationToken);
+
+        if (matcherUser is null)
+        {
+            // Matcher has been deleted -> no matching.
+            return;
+        }
 
         var notification = new MatchingCreated
         (
             matcheeUserId,
             matching.Id,
             matcherUserId,
-            matcheeUser.Alias.Value,
-            matcheeUser.ProfilePicture?.ImageDetails.Name
+            matcherUser.Alias.Value,
+            matcherUser.ProfilePicture?.ImageDetails.Name
         );
         _context.Notifications.Add(notification);
 
@@ -117,16 +125,22 @@ public class DomainEventHandler
         var matching = matchingRemovedEvent.Matching;
         var matchRemoveeUserId = matchingRemovedEvent.RemoverUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
         var matchRemoverUserId = matchingRemovedEvent.RemoverUserId;
-        var matcheeUser = await _context.DomainUsersQuery.AsNoTracking().SingleAsync(u => u.Id == matchRemoveeUserId, cancellationToken);
+        var matcherUser = await _userRepo.GetByIdAsync(matchRemoveeUserId, cancellationToken);
+
+        if (matcherUser is null)
+        {
+            return;
+        }
 
         var notification = new MatchingCreated
         (
             matchRemoveeUserId,
             matching.Id,
             matchRemoverUserId,
-            matcheeUser.Alias.Value,
-            matcheeUser.ProfilePicture?.ImageDetails.Name
+            matcherUser.Alias.Value,
+            matcherUser.ProfilePicture?.ImageDetails.Name
         );
+
         _context.Notifications.Add(notification);
         AddIntegrationEvent(new NotificationCreatedEvent(notification.ToDto()));
     }

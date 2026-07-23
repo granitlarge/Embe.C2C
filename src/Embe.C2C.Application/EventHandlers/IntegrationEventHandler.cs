@@ -12,12 +12,14 @@ namespace Embe.C2C.Application.EventHandlers;
 
 public class IntegrationEventHandler
 (
+    IUserRepository userRepo,
     IRepository repository,
     INotificationService notificationService,
     IImageService imageService,
     IWorkItemService workItemService
 )
 {
+    private readonly IUserRepository _userRepo = userRepo;
     private readonly IRepository _repository = repository;
     private readonly INotificationService _notificationService = notificationService;
     private readonly IImageService _imageService = imageService;
@@ -161,7 +163,7 @@ public class IntegrationEventHandler
         // width 500
         // width 250
 
-        var user = await _repository.DomainUsersQuery.FirstOrDefaultAsync(du => du.Id == imageStatusChangedEvent.UserId, cancellationToken: cancellationToken);
+        var user = await _userRepo.GetByIdAsync(imageStatusChangedEvent.UserId, cancellationToken);
         if (user == null)
             return;
 

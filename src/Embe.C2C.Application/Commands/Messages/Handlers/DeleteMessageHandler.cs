@@ -12,12 +12,14 @@ namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
 {
+    private readonly IUserRepository _userRepo;
     private readonly MessageAuthorizationService _messageAuthorizationPolicy;
     private readonly IAuthenticatedUserService _authenticatedUser;
     private readonly MatchingService _matchingService;
 
     public DeleteMessageHandler
     (
+        IUserRepository userRepo,
         MessageAuthorizationService messageAuthorizationPolicy,
         IAuthenticatedUserService authenticatedUser,
         MatchingService matchingService,
@@ -27,6 +29,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
         DomainEventStore domainEventStore
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
+        _userRepo = userRepo;
         _messageAuthorizationPolicy = messageAuthorizationPolicy;
         _authenticatedUser = authenticatedUser;
         _matchingService = matchingService;
@@ -47,7 +50,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
 
         try
         {
-            var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == _authenticatedUser.UserId, cancellationToken);
+            var user = await _userRepo.GetByIdAsync(_authenticatedUser.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
             if (user is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 

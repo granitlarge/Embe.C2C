@@ -11,12 +11,14 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class DeleteHandler : CommandHandler<DeleteCommand, Result>
 {
+    private readonly IUserRepository _userRepo;
     private readonly UserAuthorizationService _authorizationPolicy;
     private readonly UserService _userService;
     private readonly IAuthService _authService;
 
     public DeleteHandler
     (
+        IUserRepository userRepo,
         IRepository context,
         UserAuthorizationService authorizationPolicy,
         UserService userService,
@@ -29,6 +31,7 @@ public class DeleteHandler : CommandHandler<DeleteCommand, Result>
         _authorizationPolicy = authorizationPolicy;
         _userService = userService;
         _authService = authService;
+        _userRepo = userRepo;
     }
 
     protected override async Task<CommandResult<Result>> HandleAsync(ISparseRepository context, DeleteCommand command, CancellationToken cancellationToken = default)
@@ -39,7 +42,7 @@ public class DeleteHandler : CommandHandler<DeleteCommand, Result>
             return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You are not authorized to delete this user."));
         }
 
-        var user = await context.DomainUsersQuery.SingleOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+        var user = await _userRepo.GetByIdAsync(command.UserId, cancellationToken);
         if (user is null)
         {
             return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "User not found."));
@@ -55,7 +58,7 @@ public class DeleteHandler : CommandHandler<DeleteCommand, Result>
 
         _userService.Delete(user, [.. accounts]);
 
-        context.DomainUsers.Remove(user);
+        _userRepo.Set.Remove(user);
         foreach (var account in accounts)
         {
             context.Accounts.Remove(account);

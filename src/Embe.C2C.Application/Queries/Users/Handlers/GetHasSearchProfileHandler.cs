@@ -7,23 +7,26 @@ namespace Embe.C2C.Application.Queries.Users.Handlers;
 
 public class GetHasSearchProfileHandler
 {
+    private readonly IUserRepository _userRepo;
     private readonly IRepository _repository;
     private readonly IAuthenticatedUserService _authenticatedUserService;
 
     public GetHasSearchProfileHandler
     (
+        IUserRepository userRepo,
         IRepository repository,
         IAuthenticatedUserService authenticatedUserService
     )
     {
         _repository = repository;
         _authenticatedUserService = authenticatedUserService;
+        _userRepo = userRepo;
     }
 
     public async Task<Result<bool>> HandleAsync(GetHasSearchProfileQuery query, CancellationToken cancellationToken)
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-        var result = await _repository.DomainUsersQuery.AnyAsync(u => u.Id == userId && u.SearchProfiles!.Any(), cancellationToken);
+        var result = await _userRepo.HasSearchProfilesAsync(userId, cancellationToken);
         return Result<bool>.Success(result);
     }
 

@@ -10,10 +10,12 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<RegisterUserFailureReason>>
 {
+    private readonly IUserRepository _userRepo;
     private readonly IAuthService _authService;
 
     public RegisterHandler
     (
+        IUserRepository userRepo,
         IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
@@ -22,6 +24,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<Regist
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authService = authService;
+        _userRepo = userRepo;
     }
 
     protected override async Task<CommandResult<ResultBase<RegisterUserFailureReason>>> HandleAsync(ISparseRepository context, RegisterCommand command, CancellationToken cancellationToken = default)
@@ -44,7 +47,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<Regist
             var identityUserId = registerUserResult.Value!.Id;
             var user = User.Register(email, alias, birthDate, gender: null, location: null, images: null, bio: null, identityUserId);
 
-            context.DomainUsers.Add(user);
+            _userRepo.Set.Add(user);
 
             return new CommandResult<ResultBase<RegisterUserFailureReason>>(true, ResultBase<RegisterUserFailureReason>.Success());
 

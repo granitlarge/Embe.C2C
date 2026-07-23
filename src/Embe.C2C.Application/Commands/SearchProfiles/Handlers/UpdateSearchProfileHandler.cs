@@ -17,6 +17,7 @@ namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 
 public class UpdateSearchProfileHandler
 (
+    IUserRepository userRepo,
     DomainEventStore domainEventStore,
     IRepository context,
     DomainEventHandler domainEventHandler,
@@ -34,6 +35,7 @@ public class UpdateSearchProfileHandler
     integrationEventHandler
 )
 {
+    private readonly IUserRepository _userRepo = userRepo;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
     private readonly SearchProfileService _searchProfileService = searchProfileService;
@@ -49,7 +51,7 @@ public class UpdateSearchProfileHandler
         try
         {
             var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated");
-            var user = await context.DomainUsersQuery.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: cancellationToken);
+            var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
             if (user is null)
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>

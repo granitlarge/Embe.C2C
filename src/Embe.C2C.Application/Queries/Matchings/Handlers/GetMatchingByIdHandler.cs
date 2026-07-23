@@ -11,6 +11,7 @@ namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
 public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQuery, Result<ReadDto<MatchingDto, MatchingPermission>>>
 {
+    private readonly IUserRepository _userRepo;
     private readonly MatchingAuthorizationService _matchingAuthorizationService;
     private readonly MatchingDtoMapper _matchingDtoMapper;
     private readonly UserAuthorizationService _userAuthorizationService;
@@ -23,6 +24,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
 
     public GetMatchingByIdHandler
     (
+        IUserRepository userRepo,
         IRepository repository,
         MatchingAuthorizationService matchingAuthorizationService,
         MatchingDtoMapper matchingDtoMapper,
@@ -44,6 +46,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         _authenticatedUserService = authenticatedUserService;
         _searchProfileAuthorizationService = searchProfileAuthorizationService;
         _searchProfileDtoMapper = searchProfileDtoMapper;
+        _userRepo = userRepo;
     }
 
     protected override async Task<Result<ReadDto<MatchingDto, MatchingPermission>>> ExecuteAsync(GetMatchingByIdQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
@@ -70,7 +73,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         {
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.NotFound, "Matching not found.");
         }
-        var queryingUser = await repository.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == _authenticatedUserService.UserId, cancellationToken);
+        var queryingUser = await _userRepo.GetByIdAsync(_authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
         var readDto = await matching.ToDtoAsync
         (
             queryingUser,

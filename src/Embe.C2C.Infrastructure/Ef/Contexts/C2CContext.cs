@@ -100,14 +100,6 @@ public class C2CContext
         }
     }
 
-    IDbSet<User> ISparseRepository.DomainUsers
-    {
-        get
-        {
-            return new MyDbSet<User>(DomainUsers);
-        }
-    }
-
     IDbSet<Account> ISparseRepository.Accounts
     {
         get

@@ -16,11 +16,13 @@ public record AddImageResponse
 
 public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageResponse>>
 {
+    private readonly IUserRepository _userRepo;
     private readonly IImageService _fileService;
     private readonly IAuthenticatedUserService _authenticatedUserService;
 
     public AddImageHandler
     (
+        IUserRepository userRepo,
         IImageService fileService,
         DomainEventStore domainEventStore,
         IRepository context,
@@ -35,6 +37,7 @@ public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageRe
         integrationEventHandler
     )
     {
+        _userRepo = userRepo;
         _fileService = fileService;
         _authenticatedUserService = authenticatedUserService;
     }
@@ -47,7 +50,7 @@ public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageRe
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated");
-        var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
             return new CommandResult<Result<AddImageResponse>>

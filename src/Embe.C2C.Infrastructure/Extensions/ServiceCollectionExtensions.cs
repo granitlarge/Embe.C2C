@@ -5,6 +5,7 @@ using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Infrastructure.AspNetCore;
 using Embe.C2C.Infrastructure.Azure;
 using Embe.C2C.Infrastructure.Ef.Contexts;
+using Embe.C2C.Infrastructure.Ef.Repositories;
 using Embe.C2C.Infrastructure.Identity;
 using Embe.C2C.Infrastructure.SignalR;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +26,6 @@ public static class ServiceCollectionExtensions
         IHostEnvironment environment
     )
     {
-
         services.AddScoped<Settings>();
         services.AddIdentityCore<MyIdentityUser>(options =>
         {
@@ -50,6 +50,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
         services.AddScoped<IWorkItemService, ServiceBusWorkItemService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+
         if (environment.IsDevelopment())
         {
             services.AddScoped<IContentSafetyService, NullContentSafetyService>();
@@ -72,6 +74,5 @@ public static class ServiceCollectionExtensions
         });
 
         return services;
-
     }
 }

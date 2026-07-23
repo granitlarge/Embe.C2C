@@ -5,18 +5,19 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Users.Handlers;
 
 public class GetUserByIdHandler
 (
+    IUserRepository userRepo,
     UserAuthorizationService authorizationPolicy,
     IRepository context,
     UserDtoMapper userDtoMapper,
     IAuthenticatedUserService authenticatedUserService
 ) : TransactionalQueryHandler<GetUserByIdQuery, Result<ReadDto<UserDto, UserPermission>?>>(context)
 {
+    private readonly IUserRepository _userRepo = userRepo;
     private readonly UserAuthorizationService _authorizationService = authorizationPolicy;
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
@@ -34,8 +35,9 @@ public class GetUserByIdHandler
             return Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.Forbidden, "You are not authorized to view this user.");
         }
 
-        var queryingUser = await repo.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == _authenticatedUserService.UserId, cancellationToken);
-        var user = await repo.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
+        var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated");
+        var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
+        var user = await _userRepo.GetByIdAsync(request.Id, cancellationToken);
         if (user is null)
             return Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found.");
 

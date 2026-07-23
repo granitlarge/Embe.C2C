@@ -17,6 +17,7 @@ namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 
 public class CreateSearchProfileHandler
 (
+    IUserRepository userRepo,
     IAuthenticatedUserService authenticatedUserService,
     DomainEventStore domainEventStore,
     IRepository context,
@@ -34,6 +35,7 @@ public class CreateSearchProfileHandler
     integrationEventHandler
 )
 {
+    private readonly IUserRepository _userRepo = userRepo;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
@@ -49,7 +51,7 @@ public class CreateSearchProfileHandler
         try
         {
             var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User must be authenticated");
-            var user = await context.DomainUsersQuery.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: cancellationToken);
+            var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
             if (user is null)
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>

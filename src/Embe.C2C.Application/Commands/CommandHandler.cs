@@ -19,7 +19,7 @@ public abstract class CommandHandler<T_Command, T_Result>
 )
 {
     private readonly DomainEventStore _domainEventStore = domainEventStore;
-    private readonly IRepository _context = context;
+    private readonly IRepository _repo = context;
     private readonly DomainEventHandler _domainEventHandler = domainEventHandler;
     private readonly IntegrationEventHandler _integrationEventHandler = integrationEventHandler;
 
@@ -29,17 +29,17 @@ public abstract class CommandHandler<T_Command, T_Result>
         CancellationToken cancellationToken = default
     )
     {
-        using var transaction = await _context.BeginTransactionAsync(cancellationToken);
-        var result = await HandleAsync(new SparseRepository(_context), command, cancellationToken);
+        using var transaction = await _repo.BeginTransactionAsync(cancellationToken);
+        var result = await HandleAsync(new SparseRepository(_repo), command, cancellationToken);
 
-        foreach (var domainEvent in _context.DomainEvents.Union(_domainEventStore.DomainEvents).OrderBy(de => de.Timestamp))
+        foreach (var domainEvent in _repo.DomainEvents.Union(_domainEventStore.DomainEvents).OrderBy(de => de.Timestamp))
         {
             await _domainEventHandler.HandleAsync(domainEvent, cancellationToken);
         }
 
         if (result.Commit)
         {
-            await _context.SaveChangesAsync(cancellationToken);
+            await _repo.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
 #warning What should we do if this fails? We have already committed the transaction, but failed to publish the events. This could lead to an inconsistent state.
             await _integrationEventHandler.HandleAsync(_domainEventHandler, cancellationToken);

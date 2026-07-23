@@ -17,6 +17,7 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDto, UserPermission>?>>
 {
+    private readonly IUserRepository _userRepo;
     private readonly IAuthenticatedUserService _user;
     private readonly UserAuthorizationService _authorizationPolicy;
     private readonly UserDtoMapper _userDtoMapper;
@@ -24,6 +25,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
 
     public UpdateHandler
     (
+        IUserRepository userRepo,
         IAuthenticatedUserService user,
         IRepository context,
         UserAuthorizationService authorizationPolicy,
@@ -38,6 +40,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
         _authorizationPolicy = authorizationPolicy;
         _userDtoMapper = userDtoMapper;
         _searchProfileService = searchProfileService;
+        _userRepo = userRepo;
     }
 
     protected override async Task<CommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
@@ -63,7 +66,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
             var location = command.Location != null ? new Location(command.Location.Latitude, command.Location.Longitude) : null;
             var bio = string.IsNullOrWhiteSpace(command.Bio) ? null : command.Bio;
 
-            var user = await context.DomainUsersQuery.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+            var user = await _userRepo.GetByIdAsync(command.UserId, cancellationToken);
             if (user == null)
             {
                 return new CommandResult<Result<ReadDto<UserDto, UserPermission>?>>(false, Result<ReadDto<UserDto, UserPermission>?>.Failure(FailureReason.NotFound, "User not found."));
@@ -114,7 +117,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
                 user.ChangeImageOrder(actorId, image.Id, image.Order);
             }
 
-            var queryingUser = await context.DomainUsersQuery.AsNoTracking().SingleOrDefaultAsync(u => u.Id == actorId, cancellationToken);
+            var queryingUser = await _userRepo.GetByIdAsync(actorId, cancellationToken);
             var enrichedUser = user.Enrich(queryingUser);
             var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
             var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);

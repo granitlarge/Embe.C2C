@@ -11,6 +11,7 @@ namespace Embe.C2C.Application.Commands.Images.Handlers;
 
 public class ProcessUploadedImageHandler
 (
+    IUserRepository userRepo,
     DomainEventStore domainEventStore,
     IRepository context,
     DomainEventHandler domainEventHandler,
@@ -24,6 +25,7 @@ public class ProcessUploadedImageHandler
     integrationEventHandler
 )
 {
+    private readonly IUserRepository _userRepo = userRepo;
     private readonly IContentSafetyService _contentSafetyService = contentSafetyService;
 
     protected override async Task<CommandResult<Result>> HandleAsync
@@ -35,7 +37,11 @@ public class ProcessUploadedImageHandler
     {
         var safetyScore = await _contentSafetyService.GetSafetyScoreAsync(command.ImageBytes, cancellationToken);
 #warning this hackkkkk (accessing hidden properties) should be fixed
-        var user = await context.DomainUsersQuery.FirstOrDefaultAsync(du => EF.Property<List<Image>>(du, "_images").Any(i => i.ImageDetails.Name == command.ImageId.ToString()), cancellationToken);
+        var user = await _userRepo.GetImageOwnerAsync(command.ImageId, cancellationToken);
+        if (user is null)
+        {
+            return new CommandResult<Result>(true, Result.Failure(FailureReason.NotFound, "user not found"));
+        }
         var isSafe = Math.Abs(safetyScore) < 0.001m;
         if (user is null)
         {
