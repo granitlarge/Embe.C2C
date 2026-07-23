@@ -5,30 +5,12 @@ namespace Embe.C2C.Application.Abstractions.Repos;
 
 public interface IMatchingRepository : IAggregateRepository<Matching, Guid>
 {
+    public Task<List<Matching>> GetMatchingsAsync(Guid userId, int page, int pageSize, CancellationToken cancellationToken);
+    public Task<Matching?> GetMatchingByIdAsync(Guid id, CancellationToken cancellationToken);
+
     public Task<List<Matching>> GetByUserIdAsync
     (
         Guid userId,
-        bool includeUser1,
-        bool includeUser2,
-        bool includeUser1SearchProfile,
-        bool includeUser2SearchProfile,
-        bool includeLastMessage,
-        int page,
-        int pageSize,
-        CancellationToken cancellationToken
-    );
-
-    public Task<Matching?> GetByIdAsync
-    (
-        Guid id,
-        bool includeUser1,
-        bool includeUser2,
-        bool includeUser1SearchProfile,
-        bool includeUser2SearchProfile,
-        bool includeLastMessage,
-        bool includeMessages,
-        bool includeMessagesReplyToMessage,
-        int numberOfMessagesToInclude,
         CancellationToken cancellationToken
     );
 

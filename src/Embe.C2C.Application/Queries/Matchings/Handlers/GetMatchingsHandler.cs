@@ -8,13 +8,6 @@ using Embe.C2C.Application.Extensions.Domain.Aggregates;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
-/**
-    1. Figure out which matchings the user is allowed to see.
-    2. Figure out which related entities the user is allowed to see.
-    3. Figure out which permissions the user has for the matching.
-    4. Figure out the slice of information to return based on the permissions.
-*/
-
 public class GetMatchingsHandler
 (
     IMatchingRepository matchingRepo,
@@ -53,14 +46,9 @@ public class GetMatchingsHandler
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated");
-        var matchings = await _matchingRepo.GetByUserIdAsync
+        var matchings = await _matchingRepo.GetMatchingsAsync
         (
             userId,
-            includeUser1: true,
-            includeUser2: true,
-            includeUser1SearchProfile: true,
-            includeUser2SearchProfile: true,
-            includeLastMessage: true,
             query.Page,
             query.Size,
             cancellationToken

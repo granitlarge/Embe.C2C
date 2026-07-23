@@ -17,62 +17,25 @@ public class MatchingRepository(C2CContext context) : IMatchingRepository
         return await _context.MatchingsQuery.SingleOrDefaultAsync(matching => matching.Id == id, cancellationToken);
     }
 
-    public async Task<Matching?> GetByIdAsync
+    public async Task<Matching?> GetMatchingByIdAsync
     (
         Guid id,
-        bool includeUser1,
-        bool includeUser2,
-        bool includeUser1SearchProfile,
-        bool includeUser2SearchProfile,
-        bool includeLastMessage,
-        bool includeMessages,
-        bool includeMessagesReplyToMessage,
-        int numberOfMessagesToInclude,
         CancellationToken cancellationToken
     )
     {
-        var query = _context.MatchingsQuery;
+        var matching = await _context
+            .MatchingsQuery
+            .AsSplitQuery()
+            .Include(m => m.User1)
+            .Include(m => m.User2)
+            .Include(m => m.User1SearchProfile)
+            .Include(m => m.User2SearchProfile)
+            .Include(m => m.LastMessage)
+            .Include(m => m.Messages!.OrderByDescending(mes => mes.CreatedAt).Take(50))
+                .ThenInclude(m => m.ReplyToMessage)
+            .SingleOrDefaultAsync(m => m.Id == id, cancellationToken);
 
-        if (includeUser1)
-        {
-            query = query.Include(m => m.User1);
-        }
-
-        if (includeUser2)
-        {
-            query = query.Include(m => m.User2);
-        }
-
-        if (includeUser1SearchProfile)
-        {
-            query = query.Include(m => m.User1SearchProfile);
-        }
-
-        if (includeUser2SearchProfile)
-        {
-            query = query.Include(m => m.User2SearchProfile);
-        }
-
-        if (includeLastMessage)
-        {
-            query = query.Include(m => m.LastMessage);
-        }
-
-        if (includeMessages)
-        {
-            if (includeMessagesReplyToMessage)
-            {
-                query = query
-                    .Include(m => m.Messages!.OrderByDescending(mes => mes.CreatedAt).Take(numberOfMessagesToInclude))
-                    .ThenInclude(m => m.ReplyToMessage);
-            }
-            else
-            {
-                query = query.Include(m => m.Messages!.OrderByDescending(mes => mes.CreatedAt).Take(numberOfMessagesToInclude));
-            }
-        }
-
-        return await query.AsSplitQuery().SingleOrDefaultAsync(matching => matching.Id == id, cancellationToken);
+        return matching;
     }
 
     public async Task<Matching?> GetByMessageIdAsync
@@ -84,54 +47,35 @@ public class MatchingRepository(C2CContext context) : IMatchingRepository
         return await _context.MatchingsQuery.SingleOrDefaultAsync(m => m.Messages!.Any(msg => msg.Id == messageId), cancellationToken);
     }
 
-    public Task<List<Matching>> GetByUserIdAsync
+    public async Task<List<Matching>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var matchings = await _context.MatchingsQuery
+            .Where(m => m.UserId1 == userId || m.UserId2 == userId)
+            .ToListAsync(cancellationToken);
+
+        return matchings;
+    }
+
+    public async Task<List<Matching>> GetMatchingsAsync
     (
         Guid userId,
-        bool includeUser1,
-        bool includeUser2,
-        bool includeUser1SearchProfile,
-        bool includeUser2SearchProfile,
-        bool includeLastMessage,
         int page,
         int pageSize,
         CancellationToken cancellationToken
     )
     {
-        var query = _context.MatchingsQuery;
-        if (includeUser1)
-        {
-            query = query.Include(m => m.User1);
-        }
-
-        if (includeUser2)
-        {
-            query = query.Include(m => m.User2);
-        }
-
-        if (includeUser1SearchProfile)
-        {
-            query = query.Include(m => m.User1SearchProfile);
-        }
-
-        if (includeUser2SearchProfile)
-        {
-            query = query.Include(m => m.User2SearchProfile);
-        }
-
-        if (includeLastMessage)
-        {
-            query = query.Include(m => m.LastMessage);
-        }
-
-        var result = query
-            .AsSplitQuery()
+        var matchings = await _context.MatchingsQuery
+            .Include(m => m.User1)
+            .Include(m => m.User2)
+            .Include(m => m.User1SearchProfile)
+            .Include(m => m.User2SearchProfile)
+            .Include(m => m.LastMessage)
             .Where(m => m.UserId1 == userId || m.UserId2 == userId)
-            .OrderByDescending(m => m.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return result;
+        return matchings;
     }
 
     public async Task<IsParticipantInMatchingFact> GetIsParticipantInMatchingFactAsync

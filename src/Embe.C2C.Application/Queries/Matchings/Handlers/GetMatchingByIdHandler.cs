@@ -59,17 +59,9 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.Forbidden, "You do not have permission to view this matching.");
         }
 
-        var matching = await _matchingRepo.GetByIdAsync
+        var matching = await _matchingRepo.GetMatchingByIdAsync
         (
             query.MatchingId,
-            includeUser1: true,
-            includeUser2: true,
-            includeUser1SearchProfile: true,
-            includeUser2SearchProfile: true,
-            includeLastMessage: false,
-            includeMessages: true,
-            includeMessagesReplyToMessage: true,
-            numberOfMessagesToInclude: 50,
             cancellationToken
         );
 
@@ -77,6 +69,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         {
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.NotFound, "Matching not found.");
         }
+
         var queryingUser = await _userRepo.GetByIdAsync(_authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
         var readDto = await matching.ToDtoAsync
         (
