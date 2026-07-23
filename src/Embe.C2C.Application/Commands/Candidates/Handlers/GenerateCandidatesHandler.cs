@@ -7,12 +7,12 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
 public class GenerateCandidatesHandler
 (
+    ICandidateRepository candidateRepository,
     IUserRepository userRepo,
     IAuthenticatedUserService authenticatedUserService,
     UserAuthorizationService userAuthorizationService,
@@ -33,6 +33,7 @@ public class GenerateCandidatesHandler
     integrationEventHandler
 )
 {
+    private readonly ICandidateRepository _candidateRepository = candidateRepository;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly CandidateDtoMapper _candidateDtoMapper = candidateDtoMapper;
     private readonly CandidateAuthorizationService _candidateAuthorizationService = candidateAuthorizationService;
@@ -57,13 +58,7 @@ public class GenerateCandidatesHandler
             return new CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, Result<List<ReadDto<CandidateDto, CandidatePermission>>>.Success([]));
         }
 
-        var candidates = await context.CandidatesQuery
-            .Include(c => c.CandidateUser)
-            .Include(c => c.CandidateSearchProfile)
-            .Where(c => c.UserId == userId)
-            .Take(20)
-            .ToListAsync(cancellationToken);
-
+        var candidates = await _candidateRepository.GetByUserIdAsync(userId, cancellationToken);
         var dtos = new List<ReadDto<CandidateDto, CandidatePermission>>();
         foreach (var candidate in candidates)
         {

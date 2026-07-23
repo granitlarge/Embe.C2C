@@ -8,12 +8,12 @@ using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
 public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
 {
+    private readonly ICandidateRepository _candidateRepository;
     private readonly IMatchingRepository _matchingRepo;
     private readonly IUserRepository _userRepo;
     private readonly CandidateAuthorizationService _candidateAuthorizationService;
@@ -30,6 +30,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
 
     public JudgeCandidateHandler
     (
+        ICandidateRepository candidateRepository,
         IMatchingRepository matchingRepo,
         IUserRepository userRepo,
         IRepository context,
@@ -62,6 +63,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         _candidateAuthorizationService = candidateAuthorizationService;
         _userRepo = userRepo;
         _matchingRepo = matchingRepo;
+        _candidateRepository = candidateRepository;
     }
 
     protected override async Task<CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
@@ -78,7 +80,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Commit: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "You do not have permission to judge this candidate."));
         }
 
-        var candidate = await context.CandidatesQuery.FirstOrDefaultAsync(c => c.Id == command.CandidateId, cancellationToken: cancellationToken);
+        var candidate = await _candidateRepository.GetByIdAsync(command.CandidateId, cancellationToken);
         if (candidate is null)
         {
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Commit: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "The candidate does not exist."));
@@ -96,15 +98,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Judgee not found."));
         }
 
-        var oppositeCandidate = await context.CandidatesQuery.SingleOrDefaultAsync
-        (
-            c => c.UserId == candidate.CandidateUserId &&
-                c.CandidateUserId == userId &&
-                c.UserSearchProfileId == candidate.CandidateSearchProfileId &&
-                c.CandidateSearchProfileId == candidate.UserSearchProfileId,
-                cancellationToken
-        );
-
+        var oppositeCandidate = await _candidateRepository.GetByParametersAsync(candidate.CandidateUserId, userId, candidate.CandidateSearchProfileId, candidate.UserSearchProfileId, cancellationToken);
         if (oppositeCandidate is null)
         {
             return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Opposite candidate not found"));
@@ -115,8 +109,8 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         {
             candidate.Remove();
             oppositeCandidate?.Remove();
-            context.Candidates.Remove(candidate);
-            context.Candidates.Remove(oppositeCandidate ?? throw new InvalidOperationException("opposite candidate cannot be null when a match is created."));
+            _candidateRepository.Set.Remove(candidate);
+            _candidateRepository.Set.Remove(oppositeCandidate!);
             _matchingRepo.Set.Add(matching);
         }
 

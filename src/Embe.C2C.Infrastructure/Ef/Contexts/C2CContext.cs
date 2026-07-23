@@ -83,7 +83,6 @@ public class C2CContext
 
     public IQueryable<Candidate> CandidatesQuery => Candidates;
 
-    IDbSet<Candidate> ISparseRepository.Candidates => new MyDbSet<Candidate>(Candidates);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

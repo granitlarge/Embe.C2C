@@ -15,6 +15,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
     Result<List<ReadDto<CandidateDto, CandidatePermission>>>
 >
 {
+    private readonly ICandidateRepository _candidateRepository;
     private readonly IUserRepository _userRepo;
     private readonly IAuthenticatedUserService _authenticatedUserService;
     private readonly UserAuthorizationService _userAuthorizationService;
@@ -26,6 +27,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
 
     public GetPositiveJudgementsHandler
     (
+        ICandidateRepository candidateRepository,
         IUserRepository userRepo,
         IRepository repository,
         IAuthenticatedUserService authenticatedUserService,
@@ -45,6 +47,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
         _candidateAuthorizationService = candidateAuthorizationService;
         _candidateDtoMapper = candidateDtoMapper;
         _userRepo = userRepo;
+        _candidateRepository = candidateRepository;
     }
 
     protected async override Task<Result<List<ReadDto<CandidateDto, CandidatePermission>>>> ExecuteAsync
@@ -56,16 +59,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user isn't authenticated");
         var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
-        var candidates = await repository
-            .CandidatesQuery
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Where(c => c.CandidateUserId == userId)
-            .Include(c => c.User)
-            .Include(c => c.UserSearchProfile)
-            .Skip((query.Page - 1) * query.PageSize)
-            .Take(query.PageSize)
-            .ToListAsync(cancellationToken);
+        var candidates  = await _candidateRepository.GetPositiveJudgementsAsync(userId, query.Page, query.PageSize, cancellationToken);
 
         var dtos = new List<ReadDto<CandidateDto, CandidatePermission>>();
         foreach (var candidate in candidates)
