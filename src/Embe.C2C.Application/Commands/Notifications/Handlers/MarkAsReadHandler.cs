@@ -8,8 +8,11 @@ namespace Embe.C2C.Application.Commands.Notifications.Handlers;
 
 public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, Result>
 {
+    private readonly INotificationRepository _notificationRepository;
+
     public MarkAsReadHandler
     (
+        INotificationRepository notificationRepository,
         IRepository context,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
@@ -17,12 +20,12 @@ public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, Result>
     )
         : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
-
+        _notificationRepository = notificationRepository;
     }
 
     protected async override Task<CommandResult<Result>> HandleAsync(ISparseRepository context, MarkAsReadCommand command, CancellationToken cancellationToken = default)
     {
-        var notification = await context.NotificationsQuery.FirstOrDefaultAsync(n => n.Id == command.NotificationId, cancellationToken);
+        var notification = await _notificationRepository.GetByIdAsync(command.NotificationId, cancellationToken);
         if (notification is null)
         {
             return new CommandResult<Result>(Commit: false, Result.Failure(FailureReason.NotFound, "Notification not found."));

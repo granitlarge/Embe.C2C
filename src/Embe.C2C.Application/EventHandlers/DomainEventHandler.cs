@@ -17,11 +17,13 @@ namespace Embe.C2C.Application.EventHandlers;
 
 public class DomainEventHandler
 (
+    INotificationRepository notificationRepository,
     IUserRepository userRepo,
     IRepository context,
     IMatchingRepository matchingRepo
 ) : IntegrationEventCollector
 {
+    private readonly INotificationRepository _notificationRepository = notificationRepository;
     private readonly IRepository _context = context;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
@@ -111,7 +113,8 @@ public class DomainEventHandler
             matcherUser.Alias.Value,
             matcherUser.ProfilePicture?.ImageDetails.Name
         );
-        _context.Notifications.Add(notification);
+
+        _notificationRepository.Set.Add(notification);
 
         var notificationDto = notification.ToDto();
         var integrationEvent = new NotificationCreatedEvent(notificationDto);
@@ -143,7 +146,7 @@ public class DomainEventHandler
             matcherUser.ProfilePicture?.ImageDetails.Name
         );
 
-        _context.Notifications.Add(notification);
+        _notificationRepository.Set.Add(notification);
         AddIntegrationEvent(new NotificationCreatedEvent(notification.ToDto()));
     }
 

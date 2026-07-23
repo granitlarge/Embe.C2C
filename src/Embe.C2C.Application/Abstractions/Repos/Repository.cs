@@ -16,9 +16,6 @@ namespace Embe.C2C.Application.Abstractions.Repos
 
     public interface ISparseRepository
     {
-        public IDbSet<Notification> Notifications { get; }
-
-        public IQueryable<Notification> NotificationsQuery { get; }
         public IQueryable<IAdminArea> AdminAreasQuery { get; }
 
         public Task<bool> GenerateCandidatesForUserIdAsync
@@ -55,9 +52,6 @@ namespace Embe.C2C.Application.Abstractions.Repos
         {
             _context = context;
         }
-
-        public IDbSet<Notification> Notifications => _context.Notifications;
-        public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
 
         public IQueryable<IAdminArea> AdminAreasQuery => _context.AdminAreasQuery;
 

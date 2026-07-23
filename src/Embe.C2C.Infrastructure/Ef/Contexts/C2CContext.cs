@@ -67,16 +67,6 @@ public class C2CContext
         }
     }
 
-    IQueryable<Notification> ISparseRepository.NotificationsQuery => throw new NotImplementedException();
-
-    IDbSet<Notification> ISparseRepository.Notifications
-    {
-        get
-        {
-            return new MyDbSet<Notification>(Notifications);
-        }
-    }
-
     public IQueryable<SearchProfile> SearchProfilesQuery => SearchProfiles;
 
     public IQueryable<IAdminArea> AdminAreasQuery => AdminAreas;
