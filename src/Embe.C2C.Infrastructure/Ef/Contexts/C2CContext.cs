@@ -108,12 +108,7 @@ public class C2CContext
         }
     }
 
-    public IQueryable<Message> MessagesQuery => Messages;
 
-
-    IDbSet<Blocking> ISparseRepository.Blockings => new MyDbSet<Blocking>(Blockings);
-
-    public IQueryable<Blocking> BlockingsQuery => Blockings;
 
     IDbSet<SearchProfile> ISparseRepository.SearchProfiles => new MyDbSet<SearchProfile>(SearchProfiles);
 

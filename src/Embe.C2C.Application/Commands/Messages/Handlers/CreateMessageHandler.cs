@@ -11,12 +11,12 @@ using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Policies;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class CreateMessageHandler
 (
+    IBlockingRepository blockingRepo,
     IMessageRepository messageRepo,
     IMatchingRepository matchingRepo,
     IUserRepository userRepo,
@@ -37,6 +37,7 @@ public class CreateMessageHandler
     integrationEventHandler
 )
 {
+    private readonly IBlockingRepository _blockingRepo = blockingRepo;
     private readonly IMessageRepository _messageRepo = messageRepo;
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
     private readonly IUserRepository _userRepo = userRepo;
@@ -88,8 +89,8 @@ public class CreateMessageHandler
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Reply-to message not found."));
             }
 
-            var blocking1 = await context.BlockingsQuery.FirstOrDefaultAsync(b => b.BlockerUserId == user.Id && b.BlockedUserId == receiver.Id, cancellationToken);
-            var blocking2 = await context.BlockingsQuery.FirstOrDefaultAsync(b => b.BlockerUserId == receiver.Id && b.BlockedUserId == user.Id, cancellationToken);
+            var blocking1 = await _blockingRepo.GetByUserIdsAsync(user.Id, receiver.Id, cancellationToken);
+            var blocking2 = await _blockingRepo.GetByUserIdsAsync(receiver.Id, user.Id, cancellationToken);
 
             var communicationPolicy = new CommunicationPolicy(user, receiver, matching, blocking1, blocking2);
             var message = _matchingService.SendMessage(user, matching, messageContent, communicationPolicy, replyToMessage);
