@@ -4,12 +4,12 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 
 public class DeleteSearchProfileHandler
 (
+    ISearchProfileRepository searchProfileRepository,
     DomainEventStore domainEventStore,
     IRepository context,
     DomainEventHandler domainEventHandler,
@@ -24,6 +24,7 @@ public class DeleteSearchProfileHandler
         integrationEventHandler
     )
 {
+    private readonly ISearchProfileRepository _searchProfileRepository = searchProfileRepository;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
 
@@ -44,7 +45,7 @@ public class DeleteSearchProfileHandler
             );
         }
 
-        var searchProfile = await context.SearchProfilesQuery.FirstOrDefaultAsync(sp => sp.Id == command.Id, cancellationToken: cancellationToken);
+        var searchProfile = await _searchProfileRepository.GetByIdAsync(command.Id, cancellationToken);
         if (searchProfile is null)
         {
             return new CommandResult<Result>
@@ -59,7 +60,7 @@ public class DeleteSearchProfileHandler
         }
 
         searchProfile.Remove();
-        context.SearchProfiles.Remove(searchProfile);
+        _searchProfileRepository.Set.Remove(searchProfile);
 
         return new CommandResult<Result>
         (

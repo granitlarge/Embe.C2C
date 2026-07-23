@@ -22,7 +22,7 @@ public class UserRepository(C2CContext context) : IUserRepository
     )
     {
         var facts = await _context
-            .DomainUsersQuery
+            .DomainUsers
             .Where(u => u.Id == currentUserId)
             .Select(u => new
             {

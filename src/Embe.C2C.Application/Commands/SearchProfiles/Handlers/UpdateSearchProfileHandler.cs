@@ -17,6 +17,7 @@ namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 
 public class UpdateSearchProfileHandler
 (
+    ISearchProfileRepository searchProfileRepository,
     IUserRepository userRepo,
     DomainEventStore domainEventStore,
     IRepository context,
@@ -35,6 +36,7 @@ public class UpdateSearchProfileHandler
     integrationEventHandler
 )
 {
+    private readonly ISearchProfileRepository _searchProfileRepository = searchProfileRepository;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
@@ -65,7 +67,7 @@ public class UpdateSearchProfileHandler
                 );
             }
 
-            var searchProfile = await context.SearchProfilesQuery.FirstOrDefaultAsync(sp => sp.Id == command.Id, cancellationToken: cancellationToken);
+            var searchProfile = await _searchProfileRepository.GetByIdAsync(command.Id, cancellationToken);
             if (searchProfile is null)
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>

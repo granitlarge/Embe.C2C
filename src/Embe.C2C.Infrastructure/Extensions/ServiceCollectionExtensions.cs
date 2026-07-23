@@ -55,6 +55,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMatchingRepository, MatchingRepository>();
         services.AddScoped<IBlockingRepository, BlockingRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<ISearchProfileRepository, SearchProfileRepository>();
 
         if (environment.IsDevelopment())
         {

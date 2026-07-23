@@ -16,6 +16,7 @@ namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 
 public class CreateSearchProfileHandler
 (
+    ISearchProfileRepository searchProfileRepository,
     IUserRepository userRepo,
     IAuthenticatedUserService authenticatedUserService,
     DomainEventStore domainEventStore,
@@ -34,6 +35,7 @@ public class CreateSearchProfileHandler
     integrationEventHandler
 )
 {
+    private readonly ISearchProfileRepository _searchProfileRepository = searchProfileRepository;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
@@ -91,7 +93,7 @@ public class CreateSearchProfileHandler
                 maximumDistanceKm
             );
 
-            context.SearchProfiles.Add(searchProfile);
+            _searchProfileRepository.Set.Add(searchProfile);
             await context.SaveChangesAsync(cancellationToken);
 
             var dto = await searchProfile.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);

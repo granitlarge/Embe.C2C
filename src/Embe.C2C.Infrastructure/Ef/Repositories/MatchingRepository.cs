@@ -14,7 +14,7 @@ public class MatchingRepository(C2CContext context) : IMatchingRepository
 
     public async Task<Matching?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.MatchingsQuery.SingleOrDefaultAsync(matching => matching.Id == id, cancellationToken);
+        return await _context.Matchings.SingleOrDefaultAsync(matching => matching.Id == id, cancellationToken);
     }
 
     public async Task<Matching?> GetMatchingByIdAsync
@@ -24,7 +24,7 @@ public class MatchingRepository(C2CContext context) : IMatchingRepository
     )
     {
         var matching = await _context
-            .MatchingsQuery
+            .Matchings
             .AsSplitQuery()
             .Include(m => m.User1)
             .Include(m => m.User2)
@@ -44,12 +44,12 @@ public class MatchingRepository(C2CContext context) : IMatchingRepository
         CancellationToken cancellationToken
     )
     {
-        return await _context.MatchingsQuery.SingleOrDefaultAsync(m => m.Messages!.Any(msg => msg.Id == messageId), cancellationToken);
+        return await _context.Matchings.SingleOrDefaultAsync(m => m.Messages!.Any(msg => msg.Id == messageId), cancellationToken);
     }
 
     public async Task<List<Matching>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var matchings = await _context.MatchingsQuery
+        var matchings = await _context.Matchings
             .Where(m => m.UserId1 == userId || m.UserId2 == userId)
             .ToListAsync(cancellationToken);
 
@@ -64,7 +64,7 @@ public class MatchingRepository(C2CContext context) : IMatchingRepository
         CancellationToken cancellationToken
     )
     {
-        var matchings = await _context.MatchingsQuery
+        var matchings = await _context.Matchings
             .Include(m => m.User1)
             .Include(m => m.User2)
             .Include(m => m.User1SearchProfile)
@@ -85,7 +85,7 @@ public class MatchingRepository(C2CContext context) : IMatchingRepository
         CancellationToken cancellationToken
     )
     {
-        var isParticipantInMatching = await _context.MatchingsQuery
+        var isParticipantInMatching = await _context.Matchings
             .Where(m => m.Id == matchingId)
             .Where(m => m.UserId1 == currentUserId || m.UserId2 == currentUserId)
             .AnyAsync(cancellationToken);

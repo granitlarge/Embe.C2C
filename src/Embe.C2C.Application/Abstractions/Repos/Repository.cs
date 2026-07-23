@@ -1,11 +1,8 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Domain;
-using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Candidates;
-using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
-using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Embe.C2C.Application.Abstractions.Repos
@@ -20,11 +17,9 @@ namespace Embe.C2C.Application.Abstractions.Repos
     public interface ISparseRepository
     {
         public IDbSet<Notification> Notifications { get; }
-        public IDbSet<SearchProfile> SearchProfiles { get; }
         public IDbSet<Candidate> Candidates { get; }
 
         public IQueryable<Notification> NotificationsQuery { get; }
-        public IQueryable<SearchProfile> SearchProfilesQuery { get; }
         public IQueryable<IAdminArea> AdminAreasQuery { get; }
         public IQueryable<Candidate> CandidatesQuery { get; }
 
@@ -64,9 +59,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
         }
 
         public IDbSet<Notification> Notifications => _context.Notifications;
-        public IDbSet<SearchProfile> SearchProfiles => _context.SearchProfiles;
         public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
-        public IQueryable<SearchProfile> SearchProfilesQuery => _context.SearchProfilesQuery;
         public IQueryable<Candidate> CandidatesQuery => _context.CandidatesQuery;
 
         public IQueryable<IAdminArea> AdminAreasQuery => _context.AdminAreasQuery;

@@ -67,38 +67,7 @@ public class C2CContext
         }
     }
 
-    public IQueryable<User> DomainUsersQuery
-    {
-        get
-        {
-            return DomainUsers;
-        }
-    }
-
-    public IQueryable<Account> AccountsQuery
-    {
-        get
-        {
-            return Accounts;
-        }
-    }
-
-
-    public IQueryable<Matching> MatchingsQuery
-    {
-        get
-        {
-            return Matchings;
-        }
-    }
-
-    public IQueryable<Notification> NotificationsQuery
-    {
-        get
-        {
-            return Notifications;
-        }
-    }
+    IQueryable<Notification> ISparseRepository.NotificationsQuery => throw new NotImplementedException();
 
     IDbSet<Notification> ISparseRepository.Notifications
     {
@@ -107,10 +76,6 @@ public class C2CContext
             return new MyDbSet<Notification>(Notifications);
         }
     }
-
-
-
-    IDbSet<SearchProfile> ISparseRepository.SearchProfiles => new MyDbSet<SearchProfile>(SearchProfiles);
 
     public IQueryable<SearchProfile> SearchProfilesQuery => SearchProfiles;
 

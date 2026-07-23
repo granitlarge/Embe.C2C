@@ -11,6 +11,7 @@ namespace Embe.C2C.Application.Queries.SearchProfiles.Handlers;
 
 public class GetAllSearchProfilesHandler
 {
+    private readonly ISearchProfileRepository _searchProfileRepository;
     private readonly IRepository _repository;
     private readonly IAuthenticatedUserService _authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
@@ -18,6 +19,7 @@ public class GetAllSearchProfilesHandler
 
     public GetAllSearchProfilesHandler
     (
+        ISearchProfileRepository searchProfileRepository,
         IRepository repository,
         IAuthenticatedUserService authenticatedUserService,
         SearchProfileAuthorizationService searchProfileAuthorizationService,
@@ -28,6 +30,7 @@ public class GetAllSearchProfilesHandler
         _authenticatedUserService = authenticatedUserService;
         _searchProfileAuthorizationService = searchProfileAuthorizationService;
         _searchProfileDtoMapper = searchProfileDtoMapper;
+        _searchProfileRepository = searchProfileRepository;
     }
 
     public async Task<Result<List<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
@@ -37,12 +40,7 @@ public class GetAllSearchProfilesHandler
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
-        var searchProfiles = await _repository.SearchProfilesQuery
-        .AsNoTracking()
-        .Where(sp => sp.UserId == userId)
-        .Skip((query.Page - 1) * query.PageSize)
-        .Take(query.PageSize)
-        .ToListAsync(cancellationToken);
+        var searchProfiles = await _searchProfileRepository.GetByUserIdAsync(userId, query.Page, query.PageSize, cancellationToken);
 
         var dtos = new List<ReadDto<SearchProfileDto, SearchProfilePermission>>();
         foreach (var searchProfile in searchProfiles)

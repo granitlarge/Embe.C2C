@@ -17,6 +17,7 @@ namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDto, UserPermission>?>>
 {
+    private readonly ISearchProfileRepository _searchProfileRepository;
     private readonly IUserRepository _userRepo;
     private readonly IAuthenticatedUserService _user;
     private readonly UserAuthorizationService _authorizationPolicy;
@@ -25,6 +26,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
 
     public UpdateHandler
     (
+        ISearchProfileRepository searchProfileRepository,
         IUserRepository userRepo,
         IAuthenticatedUserService user,
         IRepository context,
@@ -41,6 +43,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
         _userDtoMapper = userDtoMapper;
         _searchProfileService = searchProfileService;
         _userRepo = userRepo;
+        _searchProfileRepository = searchProfileRepository;
     }
 
     protected override async Task<CommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
@@ -83,10 +86,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
             // If the user clears his location, disable the maximum distance filter on all of his search profiles.
             if (isClearingLocation)
             {
-                var searchProfilesWithDistanceFilter = await context.SearchProfilesQuery
-                    .Where(spq => spq.UserId == user.Id && spq.MaximumDistance != null)
-                    .ToListAsync(cancellationToken);
-
+                var searchProfilesWithDistanceFilter = await _searchProfileRepository.GetByUserIdAndHasMaximumDistanceFilter(user.Id, cancellationToken);
                 foreach (var sp in searchProfilesWithDistanceFilter)
                 {
                     _searchProfileService.Update
@@ -97,7 +97,7 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
                         sp.Description,
                         sp.RelationshipType,
                         sp.Engagement,
-                        sp.Genders.Select(g => g.Gender).ToImmutableHashSet(),
+                        [.. sp.Genders.Select(g => g.Gender)],
                         sp.AgeRangeMin,
                         sp.AgeRangeMax,
                         null,
