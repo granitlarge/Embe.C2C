@@ -2,8 +2,6 @@ using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
-using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles;
-using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
@@ -11,7 +9,7 @@ using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Embe.C2C.Application.Commands.Users.Handlers;
+namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
 public class GenerateCandidatesHandler
 (
@@ -20,13 +18,13 @@ public class GenerateCandidatesHandler
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
-    UserAuthorizationFactStore userAuthorizationFactStore,
     DomainEventStore domainEventStore,
     UserDtoMapper userDtoMapper,
-    SearchProfileAuthorizationFactStore searchProfileAuthorizationFactStore,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
-    SearchProfileDtoMapper searchProfileDtoMapper
-) : CommandHandler<GenerateCandidatesCommand, Result<List<GeneratedCandidate>>>
+    SearchProfileDtoMapper searchProfileDtoMapper,
+    CandidateDtoMapper candidateDtoMapper,
+    CandidateAuthorizationService candidateAuthorizationService
+) : CommandHandler<GenerateCandidatesCommand, Result<List<ReadDto<CandidateDto, CandidatePermission>>>>
 (
     domainEventStore,
     context,
@@ -34,15 +32,15 @@ public class GenerateCandidatesHandler
     integrationEventHandler
 )
 {
+    private readonly CandidateDtoMapper _candidateDtoMapper = candidateDtoMapper;
+    private readonly CandidateAuthorizationService _candidateAuthorizationService = candidateAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;
-    private readonly UserAuthorizationFactStore _userAuthorizationFactStore = userAuthorizationFactStore;
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
-    private readonly SearchProfileAuthorizationFactStore _searchProfileAuthorizationFactStore = searchProfileAuthorizationFactStore;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
 
-    protected override async Task<CommandResult<Result<List<GeneratedCandidate>>>> HandleAsync
+    protected override async Task<CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>> HandleAsync
     (
         ISparseRepository context,
         GenerateCandidatesCommand command,
@@ -54,7 +52,7 @@ public class GenerateCandidatesHandler
         var userHasCandidates = await context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         if (!userHasCandidates)
         {
-            return new CommandResult<Result<List<GeneratedCandidate>>>(true, Result<List<GeneratedCandidate>>.Success([]));
+            return new CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, Result<List<ReadDto<CandidateDto, CandidatePermission>>>.Success([]));
         }
 
         var candidates = await context.CandidatesQuery
@@ -64,9 +62,11 @@ public class GenerateCandidatesHandler
             .Take(20)
             .ToListAsync(cancellationToken);
 
-        var dtos = new List<GeneratedCandidate>();
+        var dtos = new List<ReadDto<CandidateDto, CandidatePermission>>();
         foreach (var candidate in candidates)
         {
+#warning we're not setting facts here anymore, which means we'll query the database for every candidate, find a way of avoiding that
+            /*
             var user = candidate.CandidateUser!;
             var candidateSearchProfile = candidate.CandidateSearchProfile!;
 
@@ -82,17 +82,24 @@ public class GenerateCandidatesHandler
             }
 
             dtos.Add(new GeneratedCandidate(candidate.Id, userDto, candidate.UserSearchProfileId, candidateSearchProfileDto));
+            */
+            var candidateDto = await candidate.ToDtoAsync
+            (
+                queryingUser,
+                _userAuthorizationService,
+                _userDtoMapper,
+                _searchProfileAuthorizationService,
+                _searchProfileDtoMapper,
+                _candidateAuthorizationService,
+                _candidateDtoMapper,
+                cancellationToken
+            );
+
+            if (candidateDto != null)
+                dtos.Add(candidateDto);
         }
 
-        var result = Result<List<GeneratedCandidate>>.Success(dtos);
-        return new CommandResult<Result<List<GeneratedCandidate>>>(true, result);
+        var result = Result<List<ReadDto<CandidateDto, CandidatePermission>>>.Success(dtos);
+        return new CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, result);
     }
 }
-
-public record GeneratedCandidate
-(
-    Guid Id,
-    ReadDto<UserDto, UserPermission> Candidate,
-    Guid UserSearchProfileId,
-    ReadDto<SearchProfileDto, SearchProfilePermission> CandidateSearchProfile
-);

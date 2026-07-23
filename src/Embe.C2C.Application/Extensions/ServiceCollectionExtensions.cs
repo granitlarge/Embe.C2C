@@ -1,7 +1,7 @@
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Authorizations.FactGenerators;
-using Embe.C2C.Application.Authorizations.FactStores.Judgements;
+using Embe.C2C.Application.Authorizations.FactStores.Candidates;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
 using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles;
@@ -23,11 +23,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Users.Handlers.RegisterHandler>();
         services.AddScoped<Commands.Users.Handlers.DeleteHandler>();
         services.AddScoped<Commands.Users.Handlers.UpdateHandler>();
-        services.AddScoped<Commands.Users.Handlers.GenerateCandidatesHandler>();
         services.AddScoped<Commands.Users.Handlers.AddImageHandler>();
 
+        services.AddScoped<Commands.Candidates.Handlers.GenerateCandidatesHandler>();
+        services.AddScoped<Commands.Candidates.Handlers.JudgeCandidateHandler>();
+
         services.AddScoped<Commands.Matching.Handlers.UnmatchHandler>();
-        services.AddScoped<Commands.Judgements.Handlers.JudgeHandler>();
 
         services.AddScoped<Commands.Auth.Handlers.SignInHandler>();
         services.AddScoped<Commands.Auth.Handlers.SignOutHandler>();
@@ -57,8 +58,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.Messages.Handlers.GetMessagesByMatchingIdHandler>();
         services.AddScoped<Queries.Messages.Handlers.GetMessageByIdHandler>();
 
-        services.AddScoped<Queries.Judgements.Handlers.GetPositiveJudgementsHandler>();
-
         services.AddScoped<Queries.Users.Handlers.GetUserByIdHandler>();
         services.AddScoped<Queries.Users.Handlers.GetMeHandler>();
         services.AddScoped<Queries.Users.Handlers.GetHasSearchProfileHandler>();
@@ -74,20 +73,20 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UserAuthorizationFactStore>();
         services.AddScoped<MatchingAuthorizationFactStore>();
         services.AddScoped<MessageAuthorizationFactStore>();
-        services.AddScoped<JudgementAuthorizationFactStore>();
         services.AddScoped<SearchProfileAuthorizationFactStore>();
+        services.AddScoped<CandidateAuthorizationFactStore>();
 
         services.AddScoped<UserFactGenerator>();
         services.AddScoped<MatchingFactGenerator>();
         services.AddScoped<MessageFactGenerator>();
         services.AddScoped<SearchProfileFactGenerator>();
-        services.AddScoped<JudgementAuthorizationFactGenerator>();
+        services.AddScoped<CandidateAuthorizationFactGenerator>();
 
         services.AddScoped<MatchingAuthorizationService>();
         services.AddScoped<UserAuthorizationService>();
         services.AddScoped<MessageAuthorizationService>();
-        services.AddScoped<JudgementAuthorizationService>();
         services.AddScoped<SearchProfileAuthorizationService>();
+        services.AddScoped<CandidateAuthorizationService>();
 
         services.AddScoped<DomainEventHandler>();
         services.AddScoped<IntegrationEventHandler>();
@@ -95,15 +94,15 @@ public static class ServiceCollectionExtensions
         services.AddScoped<DomainEventStore>();
         services.AddScoped<UserService>();
         services.AddScoped<MatchingService>();
-        services.AddScoped<JudgementService>();
+        services.AddScoped<CandidateService>();
         services.AddScoped<SearchProfileService>();
 
         services.AddScoped<UserDtoMapper>();
         services.AddScoped<ImageDtoMapper>();
-        services.AddScoped<JudgementDtoMapper>();
         services.AddScoped<MessageDtoMapper>();
         services.AddScoped<MatchingDtoMapper>();
         services.AddScoped<SearchProfileDtoMapper>();
+        services.AddScoped<CandidateDtoMapper>();
 
         services.AddScoped<IFileUrlGenerator, FileUrlGenerator>((services) =>
         {

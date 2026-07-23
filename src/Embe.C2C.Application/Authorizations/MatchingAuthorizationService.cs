@@ -2,9 +2,6 @@ using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Matches.Facts;
-using Embe.C2C.Application.Dtos.Read;
-using Embe.C2C.Application.Dtos.Read.Aggregates;
-using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Matchings;
 
@@ -14,21 +11,15 @@ public class MatchingAuthorizationService
 {
     private readonly IRepository _repo;
     private readonly MatchingAuthorizationFactStore _facts;
-    private readonly MessageAuthorizationService _messageAuthorizationPolicy;
-    private readonly UserAuthorizationService _userAuthorizationPolicy;
 
     public MatchingAuthorizationService
     (
         IRepository repo,
-        MatchingAuthorizationFactStore facts,
-        MessageAuthorizationService messageAuthorizationPolicy,
-        UserAuthorizationService userAuthorizationPolicy
+        MatchingAuthorizationFactStore facts
     )
     {
         _repo = repo;
         _facts = facts;
-        _messageAuthorizationPolicy = messageAuthorizationPolicy;
-        _userAuthorizationPolicy = userAuthorizationPolicy;
     }
 
     public IQueryable<Matching> GetViewable()
@@ -42,47 +33,7 @@ public class MatchingAuthorizationService
     {
         return GetPermissions(await _facts.GetIsParticipantFactAsync(matchingId, cancellationToken));
     }
-/*
-    public async Task<ReadDto<MatchingDto, MatchingPermission>?> ToDtoAsync
-    (
-        Matching matching,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var (permissions, variant) = Get(matching);
-        if (!permissions.Contains(MatchingPermission.View))
-        {
-            return null;
-        }
 
-        var messageDtos = new List<ReadDto<MessageDto, MessagePermission>>();
-        foreach (var message in matching.Conversation.Messages ?? [])
-        {
-            var messageDto = await _messageAuthorizationPolicy.ToDtoAsync(message, cancellationToken);
-            if (messageDto != null)
-            {
-                messageDtos.Add(messageDto);
-            }
-        }
-
-        var conversation = matching.Conversation.ToDto
-        (
-            ConversationVariant.Full,
-            matching.Conversation?.LastMessage != null ? await _messageAuthorizationPolicy.ToDtoAsync(matching.Conversation.LastMessage, cancellationToken) : null,
-            [.. messageDtos]
-        );
-
-        var user1 = matching.User1 != null ? await _userAuthorizationPolicy.ToDtoAsync(matching.User1, cancellationToken) : null;
-        var user2 = matching.User2 != null ? await _userAuthorizationPolicy.ToDtoAsync(matching.User2, cancellationToken) : null;
-
-        var matchingDto = matching.ToDto(variant, conversation, user1, user2);
-        if (matchingDto == null)
-        {
-            return null;
-        }
-        return new ReadDto<MatchingDto, MatchingPermission>(matchingDto, permissions);
-    }
-*/
     public (ImmutableHashSet<MatchingPermission> Permissions, MatchingVariant Variant) Get
     (
         Matching matching

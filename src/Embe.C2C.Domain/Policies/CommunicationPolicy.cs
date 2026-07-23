@@ -1,5 +1,4 @@
 using Embe.C2C.Domain.Aggregates.Blockings;
-using Embe.C2C.Domain.Aggregates.Contacts;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
 

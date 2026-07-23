@@ -1,8 +1,6 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
 using Embe.C2C.Application.Authorizations.FactStores.Messages.Facts;
-using Embe.C2C.Application.Dtos.Read;
-using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Messages;
 

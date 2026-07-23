@@ -4,7 +4,6 @@ using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Embe.C2C.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NetTopologySuite.Geometries;
 
 namespace Embe.C2C.Infrastructure.Ef.Configurations;
 

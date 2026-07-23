@@ -5,13 +5,11 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Candidates;
-using Embe.C2C.Domain.Aggregates.Judgements;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Entities.SearchProfiles;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -48,7 +46,6 @@ public class C2CContext
 {
     public DbSet<User> DomainUsers { get; set; }
     public DbSet<Account> Accounts { get; set; }
-    public DbSet<Judgement> Judgements { get; set; }
     public DbSet<Matching> Matchings { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
@@ -86,13 +83,6 @@ public class C2CContext
         }
     }
 
-    public IQueryable<Judgement> JudgementsQuery
-    {
-        get
-        {
-            return Judgements;
-        }
-    }
 
     public IQueryable<Matching> MatchingsQuery
     {
@@ -126,13 +116,6 @@ public class C2CContext
         }
     }
 
-    IDbSet<Judgement> ISparseRepository.Judgements
-    {
-        get
-        {
-            return new MyDbSet<Judgement>(Judgements);
-        }
-    }
 
     IDbSet<Matching> ISparseRepository.Matchings
     {

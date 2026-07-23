@@ -1,6 +1,5 @@
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactGenerators;
-using Embe.C2C.Application.Authorizations.FactStores.Judgements.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 
 namespace Embe.C2C.Application.Authorizations.FactStores.Users;
@@ -75,16 +74,16 @@ public class UserAuthorizationFactStore
         return fact;
     }
 
-    public async ValueTask<IsPositivelyJudged> GetIsPositivelyJudgedByUserFactAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async ValueTask<IsPositivelyJudgedByUser> GetIsPositivelyJudgedByUserFactAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var fact = GetFact<IsPositivelyJudged>(userId);
+        var fact = GetFact<IsPositivelyJudgedByUser>(userId);
         if (fact != null)
         {
             return fact;
         }
 
         await LoadUserFactsAsync(userId, cancellationToken);
-        return GetFact<IsPositivelyJudged>(userId) ?? throw new InvalidOperationException("IsPositivelyJudgedJudgee fact should have been loaded.");
+        return GetFact<IsPositivelyJudgedByUser>(userId) ?? throw new InvalidOperationException("IsPositivelyJudgedJudgee fact should have been loaded.");
     }
 
     private async Task LoadUserFactsAsync(Guid userId, CancellationToken cancellationToken = default)

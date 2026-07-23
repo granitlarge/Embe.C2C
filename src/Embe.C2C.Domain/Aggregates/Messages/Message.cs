@@ -1,5 +1,4 @@
 using Embe.C2C.Domain.Aggregates.Messages.Events;
-using Embe.C2C.Domain.Entities;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Domain.Aggregates.Messages;

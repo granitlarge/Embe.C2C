@@ -1,4 +1,4 @@
-namespace Embe.C2C.Application.Commands.Users;
+namespace Embe.C2C.Application.Commands.Candidates;
 
 public record GenerateCandidatesCommand
 {

@@ -3,7 +3,6 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 

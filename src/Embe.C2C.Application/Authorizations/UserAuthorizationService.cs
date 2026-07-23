@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Embe.C2C.Application.Authorizations.FactStores.Judgements.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
@@ -64,7 +63,7 @@ public class UserAuthorizationService
         CandidateUserFact? isCandidate,
         SameUserFact? isSame,
         MatchedUserFact? isMatched,
-        IsPositivelyJudged? isPositivelyJudgedByUserFact = null
+        IsPositivelyJudgedByUser? isPositivelyJudgedByUserFact = null
     )
     {
         if (isBlockedBy?.Value == true || isBlocking?.Value == true)
@@ -102,7 +101,7 @@ public class UserAuthorizationService
         CandidateUserFact? isCandidate,
         SameUserFact? isSame,
         MatchedUserFact? isMatched,
-        IsPositivelyJudged? isPositivelyJudgedByUserFact = null
+        IsPositivelyJudgedByUser? isPositivelyJudgedByUserFact = null
     )
     {
         if (isBlockedBy?.Value == true || isBlocking?.Value == true)
@@ -126,7 +125,6 @@ public class UserAuthorizationService
         if (isCandidate?.Value == true)
         {
             permissions.Add(UserPermission.View);
-            permissions.Add(UserPermission.Judge);
         }
 
         if (isPositivelyJudgedByUserFact?.Value == true)
@@ -143,6 +141,5 @@ public enum UserPermission
 {
     View = 0,
     Update = 1,
-    Delete = 2,
-    Judge = 3
+    Delete = 2
 }

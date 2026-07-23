@@ -4,7 +4,6 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 

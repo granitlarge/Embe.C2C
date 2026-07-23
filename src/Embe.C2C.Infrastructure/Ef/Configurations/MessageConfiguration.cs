@@ -1,4 +1,3 @@
-using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.ValueObjects;

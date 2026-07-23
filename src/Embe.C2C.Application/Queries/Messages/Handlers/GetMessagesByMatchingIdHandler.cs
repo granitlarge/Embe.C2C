@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations;

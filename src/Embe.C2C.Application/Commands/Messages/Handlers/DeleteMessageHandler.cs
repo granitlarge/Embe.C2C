@@ -7,7 +7,6 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 

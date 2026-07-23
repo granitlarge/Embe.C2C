@@ -1,4 +1,6 @@
 using Embe.C2C.Api.Extensions;
+using Embe.C2C.Application.Commands.Candidates;
+using Embe.C2C.Application.Commands.Candidates.Handlers;
 using Embe.C2C.Application.Commands.Users;
 using Embe.C2C.Application.Commands.Users.Handlers;
 using Embe.C2C.Application.Queries.Users;

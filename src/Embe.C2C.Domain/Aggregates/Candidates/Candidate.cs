@@ -1,4 +1,4 @@
-using Embe.C2C.Domain.Aggregates.Judgements;
+using Embe.C2C.Domain.Aggregates.Candidates.Events;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
 
@@ -19,6 +19,8 @@ public class Candidate : Aggregate
         CandidateUserId = candidateUserId;
         UserSearchProfileId = userSearchProfileId;
         CandidateSearchProfileId = candidateSearchProfileId;
+        CreatedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = CreatedAt;
     }
 
     private Candidate() { }
@@ -28,14 +30,26 @@ public class Candidate : Aggregate
     public Guid CandidateUserId { get; private set; }
     public Guid UserSearchProfileId { get; private set; }
     public Guid CandidateSearchProfileId { get; private set; }
+    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset UpdatedAt { get; private set; }
+
+    public bool? Judgement { get; private set; }
 
     #region read-only navigation properties
     public User? User { get; private set; }
     public User? CandidateUser { get; private set; }
     public SearchProfile? UserSearchProfile { get; private set; }
     public SearchProfile? CandidateSearchProfile { get; private set; }
-    public Judgement? Judgement { get; private set; }
     #endregion
+
+    internal void Judge(bool judgement)
+    {
+        if (Judgement == judgement)
+            return;
+        Judgement = judgement;
+        UpdatedAt = DateTimeOffset.UtcNow;
+        AddDomainEvent(new JudgedEvent(this));
+    }
 
     public static Candidate Create
     (
@@ -50,6 +64,6 @@ public class Candidate : Aggregate
 
     public void Remove()
     {
-
+        AddDomainEvent(new RemovedEvent(this));
     }
 }

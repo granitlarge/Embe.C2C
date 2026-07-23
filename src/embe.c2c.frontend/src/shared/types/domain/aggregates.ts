@@ -56,19 +56,6 @@ export type ContactRequest = {
     requestedAt: string;
 }
 
-export type Judgement = {
-    id: Guid;
-    candidateId: Guid;
-    isPositive?: boolean;
-    editedAt?: string;
-    createdAt?: string;
-    judge?: ReadDto<User, UserPermission>;
-}
-
-export enum JudgementPermission {
-    View = 0
-}
-
 export type Matching = {
     id: Guid;
     userId1: Guid;
