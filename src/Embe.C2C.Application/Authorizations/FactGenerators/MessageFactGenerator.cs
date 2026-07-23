@@ -4,17 +4,16 @@ using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Application.Authorizations.FactStores.Matches.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Messages.Facts;
 using Embe.C2C.Domain.Aggregates.Messages;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Authorizations.FactGenerators;
 
 public class MessageFactGenerator
 (
-    IRepository repo,
+    IMessageRepository messageRepo,
     IAuthenticatedUserService authenticatedUserService
 ) : AuthorizationFactGenerator(authenticatedUserService)
 {
-    private readonly IRepository _repo = repo;
+    private readonly IMessageRepository _messageRepo = messageRepo;
 
     private AuthorMessageFact GetAuthorFact(Guid messageId, Guid messageAuthorUserId)
     {
@@ -72,28 +71,12 @@ public class MessageFactGenerator
 
     private async Task<AuthorizationFact[]> LoadFactsAsync(Guid messageId, CancellationToken cancellationToken)
     {
-        var facts = await _repo
-            .MessagesQuery
-            .Where(m => m.Id == messageId)
-            .Select(m => new
-            {
-                m.AuthorUserId,
-                RecipientUserId = m.Matching!.UserId1 != m.AuthorUserId ? m.Matching.UserId1 : m.Matching.UserId2
-            })
-            .SingleOrDefaultAsync(cancellationToken);
-
-        AuthorMessageFact authorMessageFact;
-        RecipientMessageFact recipientMessageFact;
-        if (facts is null)
-        {
-            authorMessageFact = new AuthorMessageFact(messageId, false);
-            recipientMessageFact = new RecipientMessageFact(messageId, false);
-        }
-        else
-        {
-            authorMessageFact = GetAuthorFact(messageId, facts.AuthorUserId);
-            recipientMessageFact = GetRecipientFact(messageId, facts.AuthorUserId, facts.RecipientUserId);
-        }
-        return [authorMessageFact, recipientMessageFact];
+        var facts = await _messageRepo.GetAuthorizationFactsAsync
+        (
+            CurrentUserId ?? throw new InvalidOperationException("user is not authenticated"),
+            messageId,
+            cancellationToken
+        );
+        return facts;
     }
 }

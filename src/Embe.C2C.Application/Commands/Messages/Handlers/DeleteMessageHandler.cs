@@ -6,12 +6,12 @@ using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
 {
+    private readonly IMessageRepository _messageRepo;
     private readonly IMatchingRepository _matchingRepo;
     private readonly IUserRepository _userRepo;
     private readonly MessageAuthorizationService _messageAuthorizationPolicy;
@@ -20,6 +20,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
 
     public DeleteMessageHandler
     (
+        IMessageRepository messageRepo,
         IMatchingRepository matchingRepo,
         IUserRepository userRepo,
         MessageAuthorizationService messageAuthorizationPolicy,
@@ -36,6 +37,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
         _messageAuthorizationPolicy = messageAuthorizationPolicy;
         _authenticatedUser = authenticatedUser;
         _matchingService = matchingService;
+        _messageRepo = messageRepo;
     }
 
     protected async override Task<CommandResult<Result>> HandleAsync
@@ -57,7 +59,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
             if (user is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 
-            var message = await context.MessagesQuery.SingleOrDefaultAsync(m => m.Id == command.MessageId, cancellationToken);
+            var message = await _messageRepo.GetByIdAsync(command.MessageId, cancellationToken);
             if (message is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Message not found."));
 
@@ -65,17 +67,11 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
             if (matching is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found for the message."));
 
-            var newLastMessage = await context.MessagesQuery
-                .Where(m => m.MatchingId == matching.Id && m.Id != message.Id)
-                .OrderByDescending(m => m.CreatedAt)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            var replies = await context.MessagesQuery
-                .Where(m => m.ReplyToMessageId == message.Id)
-                .ToListAsync(cancellationToken);
+            var newLastMessage = await _messageRepo.GetLastMessageAsync(matching.Id, message.Id, cancellationToken);
+            var replies = await _messageRepo.GetRepliesAsync(message.Id, cancellationToken);
 
             _matchingService.DeleteMessage(user, message, newLastMessage, matching, replies);
-            context.Messages.Remove(message);
+            _messageRepo.Set.Remove(message);
 
             var result = Result.Success();
             return new CommandResult<Result>(true, result);

@@ -110,7 +110,6 @@ public class C2CContext
 
     public IQueryable<Message> MessagesQuery => Messages;
 
-    IDbSet<Message> ISparseRepository.Messages => new MyDbSet<Message>(Messages);
 
     IDbSet<Blocking> ISparseRepository.Blockings => new MyDbSet<Blocking>(Blockings);
 

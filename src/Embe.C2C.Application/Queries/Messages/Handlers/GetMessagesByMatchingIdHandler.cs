@@ -4,38 +4,30 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Messages.Handlers;
 
 public class GetMessagesByMatchingIdHandler
 {
-    private readonly IRepository _repository;
+    private readonly IMessageRepository _messageRepo;
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper;
 
     public GetMessagesByMatchingIdHandler
     (
-        IRepository repository,
+        IMessageRepository messageRepo,
         MessageAuthorizationService messageAuthorizationPolicy,
         MessageDtoMapper messageDtoMapper
     )
     {
-        _repository = repository;
         _messageAuthorizationService = messageAuthorizationPolicy;
         _messageDtoMapper = messageDtoMapper;
+        _messageRepo = messageRepo;
     }
 
     public async Task<Result<List<ReadDto<MessageDto, MessagePermission>>>> HandleAsync(GetMessagesByMatchingIdQuery query, CancellationToken cancellationToken)
     {
-        var messages = await _repository.MessagesQuery
-            .Where(m => m.MatchingId == query.Filter)
-                .Include(m => m.ReplyToMessage)
-            .OrderByDescending(m => m.CreatedAt)
-            .Skip((query.Page - 1) * query.Size)
-            .Take(query.Size)
-            .ToListAsync(cancellationToken);
-
+        var messages = await _messageRepo.GetMessagesByMatchingIdAsync(query.Filter, query.Page, query.Size, cancellationToken);
         var dtos = new List<ReadDto<MessageDto, MessagePermission>>();
         foreach (var message in messages)
         {

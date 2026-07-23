@@ -20,13 +20,11 @@ namespace Embe.C2C.Application.Abstractions.Repos
     public interface ISparseRepository
     {
         public IDbSet<Notification> Notifications { get; }
-        public IDbSet<Message> Messages { get; }
         public IDbSet<Blocking> Blockings { get; }
         public IDbSet<SearchProfile> SearchProfiles { get; }
         public IDbSet<Candidate> Candidates { get; }
 
         public IQueryable<Notification> NotificationsQuery { get; }
-        public IQueryable<Message> MessagesQuery { get; }
         public IQueryable<Blocking> BlockingsQuery { get; }
         public IQueryable<SearchProfile> SearchProfilesQuery { get; }
         public IQueryable<IAdminArea> AdminAreasQuery { get; }
@@ -68,12 +66,10 @@ namespace Embe.C2C.Application.Abstractions.Repos
         }
 
         public IDbSet<Notification> Notifications => _context.Notifications;
-        public IDbSet<Message> Messages => _context.Messages;
         public IDbSet<Blocking> Blockings => _context.Blockings;
         public IDbSet<SearchProfile> SearchProfiles => _context.SearchProfiles;
         public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
         public IQueryable<SearchProfile> SearchProfilesQuery => _context.SearchProfilesQuery;
-        public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
         public IQueryable<Blocking> BlockingsQuery => _context.BlockingsQuery;
         public IQueryable<Candidate> CandidatesQuery => _context.CandidatesQuery;
 

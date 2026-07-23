@@ -4,20 +4,19 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Messages.Handlers;
 
 public class GetMessageByIdHandler
 (
-    IRepository repository,
+    IMessageRepository messageRepo,
     MessageAuthorizationService messageAuthorizationService,
     MessageDtoMapper messageDtoMapper
 )
 {
-    private readonly IRepository _repository = repository;
     private readonly MessageAuthorizationService _messageAuthorizationService = messageAuthorizationService;
     private readonly MessageDtoMapper _messageDtoMapper = messageDtoMapper;
+    private readonly IMessageRepository _messageRepo = messageRepo;
 
     public async Task<Result<ReadDto<MessageDto, MessagePermission>>> HandleAsync
     (
@@ -31,10 +30,7 @@ public class GetMessageByIdHandler
             return Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "You don't have permission to view this message.");
         }
 
-        var message = await _repository.MessagesQuery
-            .Include(m => m.ReplyToMessage)
-            .SingleAsync(m => m.Id == query.MessageId, cancellationToken);
-
+        var message = await _messageRepo.GetMessageByIdIncludeReplyAsync(query.MessageId, cancellationToken);
         var dto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
         if (dto is null)
         {

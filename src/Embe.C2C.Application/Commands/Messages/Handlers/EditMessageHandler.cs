@@ -10,12 +10,12 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
 {
+    private readonly IMessageRepository _messageRepo;
     private readonly IUserRepository _userRepo;
     private readonly MessageAuthorizationService _messageAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUser;
@@ -24,6 +24,7 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<Read
 
     public EditMessageHandler
     (
+        IMessageRepository messageRepo,
         IUserRepository userRepo,
         MessageAuthorizationService messageAuthorizationService,
         IAuthenticatedUserService authenticatedUser,
@@ -40,6 +41,7 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<Read
         _authenticatedUser = authenticatedUser;
         _matchingService = matchingService;
         _messageDtoMapper = messageDtoMapper;
+        _messageRepo = messageRepo;
     }
 
     protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
@@ -62,10 +64,7 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<Read
             if (user is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 
-            var message = await context.MessagesQuery
-                .Include(m => m.ReplyToMessage)
-                .SingleOrDefaultAsync(m => m.Id == command.MessageId, cancellationToken);
-
+            var message = await _messageRepo.GetMessageByIdIncludeReplyAsync(command.MessageId, cancellationToken);
             if (message is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Message not found."));
 

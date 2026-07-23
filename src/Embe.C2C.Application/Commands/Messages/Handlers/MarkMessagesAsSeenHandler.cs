@@ -9,6 +9,7 @@ namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class MarkMessagesAsSeenHandler
 (
+    IMessageRepository messageRepo,
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
@@ -17,6 +18,7 @@ public class MarkMessagesAsSeenHandler
 ) : CommandHandler<MarkMessagesAsSeenCommand, Result>(domainEventStore, context, domainEventHandler, integrationEventHandler)
 {
     private readonly MessageAuthorizationService _messageAuthorizationPolicy = messageAuthoriztionPolicy;
+    private readonly IMessageRepository _messageRepo = messageRepo;
 
     protected async override Task<CommandResult<Result>> HandleAsync
     (
@@ -25,7 +27,7 @@ public class MarkMessagesAsSeenHandler
         CancellationToken cancellationToken = default
     )
     {
-        var messages = await context.MessagesQuery.Where(m => command.MessageIds.Contains(m.Id)).ToListAsync(cancellationToken: cancellationToken);
+        var messages = await _messageRepo.GetMessagesByMessageIdsAsync([.. command.MessageIds], cancellationToken);
         if (messages.Count != command.MessageIds.Length)
         {
             return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "One or more messages were not found."));
