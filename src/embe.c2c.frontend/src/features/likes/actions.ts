@@ -1,14 +1,15 @@
 import { Read } from "@/src/shared/apis/api";
 import { NullGuid } from "@/src/shared/cache";
+import { Candidate, CandidatePermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { getAuthenticatedUser } from "@/src/shared/user";
 
 export async function getPositiveJudgements(page: number, size: number) {
 
     const user = await getAuthenticatedUser();
-    const response = Read<ReadDto<Judgement, JudgementPermission>[]>
+    const response = Read<ReadDto<Candidate, CandidatePermission>[]>
         (
-            `${process.env.API_URL}/api/judgement/positive?page=${page}&size=${size}`,
+            `${process.env.API_URL}/api/candidate/positive?page=${page}&size=${size}`,
             {
                 method: "GET",
                 headers: {

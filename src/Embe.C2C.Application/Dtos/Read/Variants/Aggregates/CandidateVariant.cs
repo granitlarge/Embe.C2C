@@ -9,6 +9,13 @@ public record CandidateVariant
         includeUpdatedAt: false
     );
 
+    public static readonly CandidateVariant PositivelyJudged = new
+    (
+        includeJudgement: true,
+        includeCreatedAt: true,
+        includeUpdatedAt: true
+    );
+
     public static readonly CandidateVariant Full = new
     (
         includeJudgement: true,

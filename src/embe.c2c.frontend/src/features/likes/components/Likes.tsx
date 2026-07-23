@@ -1,21 +1,20 @@
 "use client";
 
 import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
-import { Judgement, JudgementPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { useState } from "react";
 import { UserCompact } from "../../matches/components/UserCompact";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { getPositiveJudgements } from "../actions";
-import { useRouter } from "nextjs-toploader/app";
+import { Candidate, CandidatePermission } from "@/src/shared/types/domain/aggregates";
 
 export type LikesProps = {
-    initialLikes: ReadDto<Judgement, JudgementPermission>[];
+    initialLikes: ReadDto<Candidate, CandidatePermission>[];
     className?: string;
 }
 export default function Likes({ initialLikes, className }: LikesProps) {
 
-    const router = useRouter();
+    console.log(initialLikes);
     const [likes, setLikes] = useState(initialLikes);
     const classNames = [className].filter(Boolean).join(" ");
 
@@ -28,8 +27,11 @@ export default function Likes({ initialLikes, className }: LikesProps) {
 
             <li key={like.data.id}>
                 <Surface className="flex gap-2 items-center" variant="secondary" padding="sm">
-                    <UserCompact dto={like.data.judge} />
-                    <span className="text-(--primary-fc) text-(length:--primary-fs) mx-auto">liked you on {new Date(like.data.editedAt!).toLocaleDateString()}</span>
+                    <UserCompact dto={like.data.user} />
+                    {
+                        like.data.updatedAt &&
+                        <span className="text-(--primary-fc) text-(length:--primary-fs) mx-auto">liked you on {new Date(like.data.updatedAt).toLocaleDateString()}</span>
+                    }
                 </Surface>
             </li>
 

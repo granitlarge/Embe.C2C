@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Authorizations.FactStores.Candidates;
 using Embe.C2C.Application.Authorizations.FactStores.Candidates.Facts;
+using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Candidates;
 
@@ -18,7 +19,8 @@ public class CandidateAuthorizationService(CandidateAuthorizationFactStore candi
     {
         var isOwner = await _candidateAuthorizationFactStore.GetIsOwnerAsync(candidateId, cancellationToken);
         var isCandidate = await _candidateAuthorizationFactStore.GetIsCandidateAsync(candidateId, cancellationToken);
-        var permissions = GetPermissions(isOwner, isCandidate);
+        var isPositivelyJudgedCandidate = await _candidateAuthorizationFactStore.GetIsPositivelyJudgedCandidateAsync(candidateId, cancellationToken);
+        var permissions = GetPermissions(isOwner, isCandidate, isPositivelyJudgedCandidate);
         return permissions;
     }
 
@@ -26,15 +28,17 @@ public class CandidateAuthorizationService(CandidateAuthorizationFactStore candi
     {
         var isOwner = _candidateAuthorizationFactStore.GetIsOwner(candidate);
         var isCandidate = _candidateAuthorizationFactStore.GetIsCandidate(candidate);
-        return GetPermissions(isOwner, isCandidate);
+        var isPositivelyJudgedCandidate = _candidateAuthorizationFactStore.GetIsPositivelyJudgedCandidate(candidate);
+        return GetPermissions(isOwner, isCandidate, isPositivelyJudgedCandidate);
     }
 
     public (ImmutableHashSet<CandidatePermission> Permissions, CandidateVariant Variant) Get(Candidate candidate)
     {
         var isOwner = _candidateAuthorizationFactStore.GetIsOwner(candidate);
         var isCandidate = _candidateAuthorizationFactStore.GetIsCandidate(candidate);
+        var isPositivelyJudgedCandidate = _candidateAuthorizationFactStore.GetIsPositivelyJudgedCandidate(candidate);
         var permissions = GetPermissions(candidate);
-        var variant = GetVariant(isOwner, isCandidate);
+        var variant = GetVariant(isOwner, isCandidate, isPositivelyJudgedCandidate);
 
         return (permissions, variant);
     }
@@ -42,12 +46,18 @@ public class CandidateAuthorizationService(CandidateAuthorizationFactStore candi
     private static CandidateVariant GetVariant
     (
         IsOwner isOwner,
-        IsCandidate isCandidate
+        IsCandidate isCandidate,
+        IsPositivelyJudgedCandidate isPositivelyJudgedCandidate
     )
     {
         if (isOwner.Value)
         {
             return CandidateVariant.Full;
+        }
+
+        if (isPositivelyJudgedCandidate.Value)
+        {
+            return CandidateVariant.PositivelyJudged;
         }
 
         return CandidateVariant.Empty;
@@ -56,13 +66,20 @@ public class CandidateAuthorizationService(CandidateAuthorizationFactStore candi
     private static ImmutableHashSet<CandidatePermission> GetPermissions
     (
         IsOwner isOwner,
-        IsCandidate isCandidate
+        IsCandidate isCandidate,
+        IsPositivelyJudgedCandidate isPositivelyJudgedCandidate
     )
     {
         var permissions = new HashSet<CandidatePermission>();
+
         if (isOwner.Value)
         {
             permissions.Add(CandidatePermission.Judge);
+            permissions.Add(CandidatePermission.View);
+        }
+
+        if (isPositivelyJudgedCandidate.Value)
+        {
             permissions.Add(CandidatePermission.View);
         }
 

@@ -109,6 +109,7 @@ app.MapGeographyEndpoints();
 app.MapSearchProfileEndPoints();
 app.MapOpenApiEndpoints();
 app.MapSignalREndPoints();
+app.MapCandidateEndPoints();
 
 if (app.Environment.IsDevelopment())
 {

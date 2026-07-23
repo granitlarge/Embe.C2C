@@ -10,7 +10,7 @@ import { GeneratedCandidate } from "../actions/type";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
 import { ReadDto } from "@/src/shared/types/dtos/types";
-import { SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
+import { Candidate, CandidatePermission, SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
 import Button from "@/src/shared/components/buttons/Button";
 
 type HeaderProps = {
@@ -39,7 +39,7 @@ function Header({ hasSearchProfiles }: HeaderProps) {
 export type SearchProps = {
     searchProfiles: ReadDto<SearchProfile, SearchProfilePermission>[];
     hasSearchProfiles: boolean;
-    candidates: GeneratedCandidate[];
+    candidates: ReadDto<Candidate, CandidatePermission>[];
     className?: string;
 }
 export default function Search({ searchProfiles, candidates: initialCandidates, className, hasSearchProfiles }: SearchProps) {
@@ -60,7 +60,7 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
     }
 
     async function judge(isPositive: boolean) {
-        const response = await api.judge(candidates[0].id, isPositive);
+        const response = await api.judge(candidates[0].data.id, isPositive);
         if (!response.success) {
             throw new Error("Not implemented");
         } else {
@@ -82,7 +82,7 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
                     {
                         candidates[0] &&
                         <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
-                            <Profile className="grow-1" userSearchProfile={searchProfiles.find(sp => sp.data.id === candidates[0].userSearchProfileId)?.data} candidate={candidates[0].candidate.data} candidateSearchProfile={candidates[0].candidateSearchProfile.data} />
+                            <Profile className="grow-1" userSearchProfile={searchProfiles.find(sp => sp.data.id === candidates[0].data.userSearchProfileId)?.data} candidate={candidates[0].data} candidateSearchProfile={candidates[0].data.candidateSearchProfile.data} />
                         </JudgeOverlay>
                     } {
                         !candidates[0] &&

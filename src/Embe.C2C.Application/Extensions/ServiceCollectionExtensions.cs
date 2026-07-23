@@ -70,6 +70,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Queries.SearchProfiles.Handlers.GetSearchProfileHandler>();
         services.AddScoped<Queries.SearchProfiles.Handlers.GetAllSearchProfilesHandler>();
 
+        services.AddScoped<Queries.Candidates.Handlers.GetPositiveJudgementsHandler>();
+
         services.AddScoped<UserAuthorizationFactStore>();
         services.AddScoped<MatchingAuthorizationFactStore>();
         services.AddScoped<MessageAuthorizationFactStore>();

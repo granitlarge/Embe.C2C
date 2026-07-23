@@ -158,3 +158,23 @@ export enum SearchProfilePermission {
     View = 0,
     Modify = 1
 }
+
+export type Candidate = {
+    id: Guid,
+    userId: Guid,
+    candidateUserId: Guid,
+    userSearchProfileId: Guid,
+    candidateSearchProfileId: Guid,
+    createdAt?: string,
+    updatedAt?: string;
+    judgement?: boolean,
+    user?: ReadDto<User, UserPermission>,
+    candidate?: ReadDto<User, UserPermission>,
+    userSearchProfile: ReadDto<SearchProfile, SearchProfilePermission>,
+    candidateSearchProfile: ReadDto<SearchProfile, SearchProfilePermission>
+}
+
+export enum CandidatePermission {
+    View = 1,
+    Judge = 2
+}

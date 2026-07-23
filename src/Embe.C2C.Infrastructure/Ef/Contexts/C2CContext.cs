@@ -221,13 +221,8 @@ public class C2CContext
         and not exists (select * from "Matchings" m where m."UserId1" = u."Id" and m."UserId2" = c."Id")
         and not exists (select * from "Matchings" m where m."UserId1" = c."Id" and m."UserId2" = u."Id")
         and not exists (select * 
-                        from "Judgements" j 
-                        inner join "Candidates" can on can."Id" = j."CandidateId"
-                        where can."UserId" = u."Id" and can."CandidateUserId" = c."Id")
-        and not exists (select * 
-                        from "Judgements" j 
-                        inner join "Candidates" can on can."Id" = j."CandidateId"
-                        where can."UserId" = c."Id" and can."CandidateUserId" = u."Id" and j."IsPositive" = false)
+                        from "Candidates" can
+                        where can."UserId" = c."Id" and can."CandidateUserId" = u."Id" and can."Judgement" = false)
         and not exists (select * 
                         from "Candidates" can 
                         where can."UserId" = u."Id" 

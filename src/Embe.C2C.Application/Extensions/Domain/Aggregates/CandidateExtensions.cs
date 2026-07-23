@@ -22,10 +22,22 @@ public static class CandidateExtensions
     )
     {
         var (permissions, variant) = candidateAuthorizationService.Get(candidate);
+        var candidateCandidateDto = await
+        (
+            candidate.CandidateUser?.Enrich(queryingUser).ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken) ??
+            Task.FromResult<ReadDto<UserDto, UserPermission>?>(null)
+        );
+
         var candidateUserDto = await
         (
             candidate.User?.Enrich(queryingUser).ToDtoAsync(userAuthorizationService, userDtoMapper, cancellationToken) ??
             Task.FromResult<ReadDto<UserDto, UserPermission>?>(null)
+        );
+
+        var userSearchProfileDto = await
+        (
+            candidate.UserSearchProfile?.ToDtoAsync(searchProfileAuthorizationService, searchProfileDtoMapper, cancellationToken) ??
+            Task.FromResult<ReadDto<SearchProfileDto, SearchProfilePermission>?>(null)
         );
 
         var candidateSearchProfileDto = await
@@ -38,14 +50,16 @@ public static class CandidateExtensions
         (
             candidate,
             variant,
-            null,
             candidateUserDto,
-            null,
+            candidateCandidateDto,
+            userSearchProfileDto,
             candidateSearchProfileDto
         );
 
         if (candidateDto is null)
+        {
             return null;
+        }
 
         return new ReadDto<CandidateDto, CandidatePermission>(candidateDto, permissions);
     }

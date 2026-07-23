@@ -22,14 +22,16 @@ public class CandidateAuthorizationFactGenerator
             {
                 c.Id,
                 IsOwner = c.UserId == CurrentUserId,
-                IsCandidate = c.CandidateUserId == CurrentUserId
+                IsCandidate = c.CandidateUserId == CurrentUserId,
+                IsPositivelyJudgedCandidate = c.CandidateUserId == CurrentUserId && c.Judgement == true
             })
             .SingleOrDefaultAsync(c => c.Id == candidateId, cancellationToken);
 
         return
         [
             new IsOwner(candidateId, facts?.IsOwner ?? false),
-            new IsCandidate(candidateId, facts?.IsCandidate ?? false)
+            new IsCandidate(candidateId, facts?.IsCandidate ?? false),
+            new IsPositivelyJudgedCandidate(candidateId, facts?.IsPositivelyJudgedCandidate ?? false)
         ];
     }
 }

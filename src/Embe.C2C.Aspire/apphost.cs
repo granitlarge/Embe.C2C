@@ -7,7 +7,10 @@
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres").WithImage("postgis/postgis");
+var postgres = builder
+    .AddPostgres("postgres")
+    .WithImage("postgis/postgis");
+
 var defaultConnection = postgres.AddDatabase("DefaultConnection", "c2c");
 
 var azureSignalR = builder.AddExecutable("AzureSignalR", "asrs-emulator", ".", "start");
