@@ -6,7 +6,6 @@ using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.EventHandlers;
 

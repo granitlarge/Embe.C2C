@@ -14,6 +14,7 @@ namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
 public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
 {
+    private readonly IMatchingRepository _matchingRepo;
     private readonly IUserRepository _userRepo;
     private readonly CandidateAuthorizationService _candidateAuthorizationService;
     private readonly UserAuthorizationService _userAuthorizationService;
@@ -29,6 +30,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
 
     public JudgeCandidateHandler
     (
+        IMatchingRepository matchingRepo,
         IUserRepository userRepo,
         IRepository context,
         UserAuthorizationService userAuthorizationService,
@@ -59,6 +61,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         _searchProfileDtoMapper = searchProfileDtoMapper;
         _candidateAuthorizationService = candidateAuthorizationService;
         _userRepo = userRepo;
+        _matchingRepo = matchingRepo;
     }
 
     protected override async Task<CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
@@ -114,7 +117,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
             oppositeCandidate?.Remove();
             context.Candidates.Remove(candidate);
             context.Candidates.Remove(oppositeCandidate ?? throw new InvalidOperationException("opposite candidate cannot be null when a match is created."));
-            context.Matchings.Add(matching);
+            _matchingRepo.Set.Add(matching);
         }
 
         if (matching == null)

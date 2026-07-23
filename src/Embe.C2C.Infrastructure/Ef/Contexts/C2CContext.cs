@@ -100,14 +100,6 @@ public class C2CContext
         }
     }
 
-    IDbSet<Matching> ISparseRepository.Matchings
-    {
-        get
-        {
-            return new MyDbSet<Matching>(Matchings);
-        }
-    }
-
     IDbSet<Notification> ISparseRepository.Notifications
     {
         get
@@ -229,9 +221,9 @@ public class C2CContext
 
     public async Task<List<IAdminArea>> SearchAdminAreasAsync
     (
-        string? parentId, 
-        double? longitude, 
-        double? latitude, 
+        string? parentId,
+        double? longitude,
+        double? latitude,
         int page,
         int size,
         CancellationToken cancellationToken = default
@@ -239,7 +231,7 @@ public class C2CContext
     {
         var maxDistanceMeters = 1000;
         List<AdminArea> result = [];
-        while (result.Count == 0  && maxDistanceMeters <= 25_000_000)
+        while (result.Count == 0 && maxDistanceMeters <= 25_000_000)
         {
             var pointFilter = (longitude.HasValue && latitude.HasValue) ? new NetTopologySuite.Geometries.Point(longitude.Value, latitude.Value) { SRID = 4326 } : null;
             var parentIdFilter = !string.IsNullOrEmpty(parentId) ? parentId : null;

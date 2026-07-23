@@ -5,12 +5,12 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
 public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQuery, Result<ReadDto<MatchingDto, MatchingPermission>>>
 {
+    private readonly IMatchingRepository _matchingRepo;
     private readonly IUserRepository _userRepo;
     private readonly MatchingAuthorizationService _matchingAuthorizationService;
     private readonly MatchingDtoMapper _matchingDtoMapper;
@@ -24,6 +24,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
 
     public GetMatchingByIdHandler
     (
+        IMatchingRepository matchingRepo,
         IUserRepository userRepo,
         IRepository repository,
         MatchingAuthorizationService matchingAuthorizationService,
@@ -37,6 +38,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         SearchProfileDtoMapper searchProfileDtoMapper
     ) : base(repository)
     {
+        _matchingRepo = matchingRepo;
         _matchingAuthorizationService = matchingAuthorizationService;
         _matchingDtoMapper = matchingDtoMapper;
         _userAuthorizationService = userAuthorizationService;
@@ -57,17 +59,19 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
             return Result<ReadDto<MatchingDto, MatchingPermission>>.Failure(FailureReason.Forbidden, "You do not have permission to view this matching.");
         }
 
-        var matching = await repository
-            .MatchingsQuery
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Include(m => m.User1)
-            .Include(m => m.User2)
-            .Include(m => m.User1SearchProfile)
-            .Include(m => m.User2SearchProfile)
-            .Include(m => m.Messages!.OrderByDescending(mes => mes.CreatedAt).Take(50))
-                .ThenInclude(mes => mes.ReplyToMessage)
-            .SingleOrDefaultAsync(m => m.Id == query.MatchingId, cancellationToken);
+        var matching = await _matchingRepo.GetByIdAsync
+        (
+            query.MatchingId,
+            includeUser1: true,
+            includeUser2: true,
+            includeUser1SearchProfile: true,
+            includeUser2SearchProfile: true,
+            includeLastMessage: false,
+            includeMessages: true,
+            includeMessagesReplyToMessage: true,
+            numberOfMessagesToInclude: 50,
+            cancellationToken
+        );
 
         if (matching == null)
         {

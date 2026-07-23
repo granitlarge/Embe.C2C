@@ -3,9 +3,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
-using Embe.C2C.Domain.Entities;
 using Embe.C2C.Domain.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Images.Handlers;
 

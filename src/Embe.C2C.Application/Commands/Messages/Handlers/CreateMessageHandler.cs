@@ -17,6 +17,7 @@ namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<ReadDto<MessageDto, MessagePermission>>>
 {
+    private readonly IMatchingRepository _matchingRepo;
     private readonly IUserRepository _userRepo;
     private readonly MatchingAuthorizationService _matchingAuthorizationService;
     private readonly MessageAuthorizationService _messageAuthorizationService;
@@ -26,6 +27,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
 
     public CreateMessageHandler
     (
+        IMatchingRepository matchingRepo,
         IUserRepository userRepo,
         DomainEventStore domainEventStore,
         MatchingAuthorizationService matchingAuthorizationService,
@@ -44,6 +46,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
         _matchingService = matchingService;
         _messageDtoMapper = messageDtoMapper;
         _userRepo = userRepo;
+        _matchingRepo = matchingRepo;
     }
 
     protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
@@ -68,7 +71,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
             if (user is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.Forbidden, "Authenticated user not found."));
 
-            var matching = await context.MatchingsQuery.SingleAsync(m => m.Id == command.MatchingId, cancellationToken);
+            var matching = await _matchingRepo.GetByIdAsync(command.MatchingId, cancellationToken);
             if (matching is null)
                 return new CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>(false, Result<ReadDto<MessageDto, MessagePermission>>.Failure(FailureReason.NotFound, "Matching not found."));
 
@@ -85,6 +88,7 @@ public class CreateMessageHandler : CommandHandler<CreateMessageCommand, Result<
 
             var communicationPolicy = new CommunicationPolicy(user, receiver, matching, blocking1, blocking2);
             var message = _matchingService.SendMessage(user, matching, messageContent, communicationPolicy, replyToMessage);
+
             context.Messages.Add(message);
 
             var readDto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken) ??

@@ -5,7 +5,6 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
@@ -18,6 +17,7 @@ namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
 public class GetMatchingsHandler
 (
+    IMatchingRepository matchingRepo,
     IUserRepository userRepo,
     IRepository repository,
     IImageService fileService,
@@ -32,6 +32,7 @@ public class GetMatchingsHandler
     SearchProfileDtoMapper searchProfileDtoMapper
 ) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
+    private readonly IMatchingRepository _matchingRepo = matchingRepo;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly IImageService _fileService = fileService;
     private readonly MatchingAuthorizationService _matchingAuthorizationService = matchingAuthorizationService;
@@ -51,21 +52,20 @@ public class GetMatchingsHandler
         CancellationToken cancellationToken
     )
     {
-        var viewable = _matchingAuthorizationService.GetViewable();
-        var matchings = await viewable
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Include(m => m.User1)
-            .Include(m => m.User2)
-            .Include(m => m.User1SearchProfile)
-            .Include(m => m.User2SearchProfile)
-            .Include(m => m.LastMessage)
-            .OrderByDescending(m => m.CreatedAt)
-            .Skip((query.Page - 1) * query.Size)
-            .Take(query.Size)
-            .ToListAsync(cancellationToken);
+        var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated");
+        var matchings = await _matchingRepo.GetByUserIdAsync
+        (
+            userId,
+            includeUser1: true,
+            includeUser2: true,
+            includeUser1SearchProfile: true,
+            includeUser2SearchProfile: true,
+            includeLastMessage: true,
+            query.Page,
+            query.Size,
+            cancellationToken
+        );
 
-        var userId = _authenticatedUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
         var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
         var dtos = new List<ReadDto<MatchingDto, MatchingPermission>>();
         foreach (var matching in matchings)

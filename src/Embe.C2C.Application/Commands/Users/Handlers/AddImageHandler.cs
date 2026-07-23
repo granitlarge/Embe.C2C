@@ -4,7 +4,6 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 

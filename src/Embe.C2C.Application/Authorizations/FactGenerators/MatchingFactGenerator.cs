@@ -2,17 +2,16 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactStores.Matches.Facts;
 using Embe.C2C.Domain.Aggregates.Matchings;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Authorizations.FactGenerators;
 
 public class MatchingFactGenerator
 (
-    IRepository repo,
+    IMatchingRepository matchingRepo,
     IAuthenticatedUserService currentUserService
 ) : AuthorizationFactGenerator(currentUserService)
 {
-    private readonly IRepository _repo = repo;
+    private readonly IMatchingRepository _matchingRepo = matchingRepo;
 
     public IsParticipantInMatchingFact GetIsParticipantFact(Matching matching)
     {
@@ -22,11 +21,7 @@ public class MatchingFactGenerator
 
     public async ValueTask<IsParticipantInMatchingFact> GetIsParticipantFactAsync(Guid matchingId, CancellationToken cancellationToken)
     {
-        var fact = await _repo.MatchingsQuery
-            .Where(m => m.Id == matchingId)
-            .Select(m => new IsParticipantInMatchingFact(m.Id, m.UserId1 == CurrentUserId || m.UserId2 == CurrentUserId))
-            .SingleOrDefaultAsync(cancellationToken) ?? new IsParticipantInMatchingFact(matchingId, false);
-
+        var fact = await _matchingRepo.GetIsParticipantInMatchingFactAsync(CurrentUserId ?? Guid.Empty, matchingId, cancellationToken);
         return fact;
     }
 }

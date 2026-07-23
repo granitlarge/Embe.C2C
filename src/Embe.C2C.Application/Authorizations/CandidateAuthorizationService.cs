@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Authorizations.FactStores.Candidates;
 using Embe.C2C.Application.Authorizations.FactStores.Candidates.Facts;
-using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Candidates;
 

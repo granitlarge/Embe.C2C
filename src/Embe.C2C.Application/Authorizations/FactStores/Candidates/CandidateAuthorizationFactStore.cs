@@ -1,8 +1,6 @@
-using System.Data.Common;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactGenerators;
 using Embe.C2C.Application.Authorizations.FactStores.Candidates.Facts;
-using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Domain.Aggregates.Candidates;
 
 namespace Embe.C2C.Application.Authorizations.FactStores.Candidates;

@@ -3,7 +3,6 @@ using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Candidates;
-using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
@@ -11,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Embe.C2C.Application.Abstractions.Repos
 {
+
     public interface IDbSet<T>
     {
         void Add(T entity);
@@ -19,14 +19,12 @@ namespace Embe.C2C.Application.Abstractions.Repos
 
     public interface ISparseRepository
     {
-        public IDbSet<Matching> Matchings { get; }
         public IDbSet<Notification> Notifications { get; }
         public IDbSet<Message> Messages { get; }
         public IDbSet<Blocking> Blockings { get; }
         public IDbSet<SearchProfile> SearchProfiles { get; }
         public IDbSet<Candidate> Candidates { get; }
 
-        public IQueryable<Matching> MatchingsQuery { get; }
         public IQueryable<Notification> NotificationsQuery { get; }
         public IQueryable<Message> MessagesQuery { get; }
         public IQueryable<Blocking> BlockingsQuery { get; }
@@ -49,6 +47,7 @@ namespace Embe.C2C.Application.Abstractions.Repos
             int size,
             CancellationToken cancellationToken = default
         );
+
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 
@@ -68,12 +67,10 @@ namespace Embe.C2C.Application.Abstractions.Repos
             _context = context;
         }
 
-        public IDbSet<Matching> Matchings => _context.Matchings;
         public IDbSet<Notification> Notifications => _context.Notifications;
         public IDbSet<Message> Messages => _context.Messages;
         public IDbSet<Blocking> Blockings => _context.Blockings;
         public IDbSet<SearchProfile> SearchProfiles => _context.SearchProfiles;
-        public IQueryable<Matching> MatchingsQuery => _context.MatchingsQuery;
         public IQueryable<Notification> NotificationsQuery => _context.NotificationsQuery;
         public IQueryable<SearchProfile> SearchProfilesQuery => _context.SearchProfilesQuery;
         public IQueryable<Message> MessagesQuery => _context.MessagesQuery;
@@ -107,4 +104,5 @@ namespace Embe.C2C.Application.Abstractions.Repos
             return await _context.SearchAdminAreasAsync(parentId, longitude, latitude, page, size, cancellationToken);
         }
     }
+
 }

@@ -1,7 +1,6 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Users.Handlers;
 

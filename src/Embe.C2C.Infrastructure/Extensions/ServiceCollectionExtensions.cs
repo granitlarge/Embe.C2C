@@ -52,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<IMatchingRepository, MatchingRepository>();
 
         if (environment.IsDevelopment())
         {

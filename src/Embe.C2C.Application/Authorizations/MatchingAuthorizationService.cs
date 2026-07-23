@@ -9,24 +9,20 @@ namespace Embe.C2C.Application.Authorizations;
 
 public class MatchingAuthorizationService
 {
+    private readonly IMatchingRepository _matchingRepo;
     private readonly IRepository _repo;
     private readonly MatchingAuthorizationFactStore _facts;
 
     public MatchingAuthorizationService
     (
+        IMatchingRepository matchingRepo,
         IRepository repo,
         MatchingAuthorizationFactStore facts
     )
     {
+        _matchingRepo = matchingRepo;
         _repo = repo;
         _facts = facts;
-    }
-
-    public IQueryable<Matching> GetViewable()
-    {
-        var userId = _facts.CurrentUserId;
-#warning if this changes, we'll have to make the update in two places, maybe we can unify the logic somehow?
-        return _repo.MatchingsQuery.Where(m => m.UserId1 == userId || m.UserId2 == userId);
     }
 
     public async Task<ImmutableHashSet<MatchingPermission>> GetPermissionsAsync(Guid matchingId, CancellationToken cancellationToken)

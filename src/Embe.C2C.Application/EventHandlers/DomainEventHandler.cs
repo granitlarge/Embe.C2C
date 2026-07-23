@@ -18,11 +18,13 @@ namespace Embe.C2C.Application.EventHandlers;
 public class DomainEventHandler
 (
     IUserRepository userRepo,
-    IRepository context
+    IRepository context,
+    IMatchingRepository matchingRepo
 ) : IntegrationEventCollector
 {
     private readonly IRepository _context = context;
     private readonly IUserRepository _userRepo = userRepo;
+    private readonly IMatchingRepository _matchingRepo = matchingRepo;
 
     public async Task HandleAsync(DomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
@@ -175,10 +177,10 @@ public class DomainEventHandler
     {
         var matchingId = messageCreatedEvent.Message.MatchingId;
         var authorUserId = messageCreatedEvent.Message.AuthorUserId;
-        var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Id == matchingId)
-            .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
-            .FirstOrDefaultAsync(cancellationToken);
+        var matching = await _matchingRepo.GetByIdAsync(matchingId, cancellationToken);
+        if (matching is null)
+            return;
+        var recipientUserId = matching.UserId1 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageCreatedEvent.Message.Id;
         var messageCreated = new MessageCreated(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageCreated);
@@ -192,10 +194,10 @@ public class DomainEventHandler
     {
         var matchingId = messageEditedEvent.Message.MatchingId;
         var authorUserId = messageEditedEvent.Message.AuthorUserId;
-        var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Id == matchingId)
-            .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
-            .FirstOrDefaultAsync(cancellationToken);
+        var matching = await _matchingRepo.GetByIdAsync(matchingId, cancellationToken);
+        if (matching is null)
+            return;
+        var recipientUserId = matching.UserId1 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageEditedEvent.Message.Id;
         var messageEdited = new MessageEdited(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageEdited);
@@ -209,10 +211,10 @@ public class DomainEventHandler
     {
         var matchingId = messageRemovedEvent.Message.MatchingId;
         var authorUserId = messageRemovedEvent.Message.AuthorUserId;
-        var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Id == matchingId)
-            .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
-            .FirstOrDefaultAsync(cancellationToken);
+        var matching = await _matchingRepo.GetByIdAsync(matchingId, cancellationToken);
+        if (matching is null)
+            return;
+        var recipientUserId = matching.UserId1 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageRemovedEvent.Message.Id;
         var messageDeleted = new MessageDeleted(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageDeleted);
@@ -226,10 +228,10 @@ public class DomainEventHandler
     {
         var matchingId = messageSeenEvent.Message.MatchingId;
         var authorUserId = messageSeenEvent.Message.AuthorUserId;
-        var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Id == matchingId)
-            .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
-            .FirstOrDefaultAsync(cancellationToken);
+        var matching = await _matchingRepo.GetByIdAsync(matchingId, cancellationToken);
+        if (matching is null)
+            return;
+        var recipientUserId = matching.UserId2 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageSeenEvent.Message.Id;
         var messageSeen = new MessageSeen(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageSeen);
@@ -243,10 +245,10 @@ public class DomainEventHandler
     {
         var matchingId = messageUnseenEvent.Message.MatchingId;
         var authorUserId = messageUnseenEvent.Message.AuthorUserId;
-        var recipientUserId = await _context.MatchingsQuery
-            .Where(m => m.Id == matchingId)
-            .Select(m => m.UserId1 == authorUserId ? m.UserId2 : m.UserId1)
-            .FirstOrDefaultAsync(cancellationToken);
+        var matching = await _matchingRepo.GetByIdAsync(matchingId, cancellationToken);
+        if (matching is null)
+            return;
+        var recipientUserId = matching.UserId2 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageUnseenEvent.Message.Id;
         var messageUnseen = new MessageUnseen(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageUnseen);

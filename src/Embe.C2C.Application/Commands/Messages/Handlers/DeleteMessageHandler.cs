@@ -12,6 +12,7 @@ namespace Embe.C2C.Application.Commands.Messages.Handlers;
 
 public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
 {
+    private readonly IMatchingRepository _matchingRepo;
     private readonly IUserRepository _userRepo;
     private readonly MessageAuthorizationService _messageAuthorizationPolicy;
     private readonly IAuthenticatedUserService _authenticatedUser;
@@ -19,6 +20,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
 
     public DeleteMessageHandler
     (
+        IMatchingRepository matchingRepo,
         IUserRepository userRepo,
         MessageAuthorizationService messageAuthorizationPolicy,
         IAuthenticatedUserService authenticatedUser,
@@ -29,6 +31,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
         DomainEventStore domainEventStore
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
+        _matchingRepo = matchingRepo;
         _userRepo = userRepo;
         _messageAuthorizationPolicy = messageAuthorizationPolicy;
         _authenticatedUser = authenticatedUser;
@@ -58,7 +61,7 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
             if (message is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Message not found."));
 
-            var matching = await context.MatchingsQuery.SingleOrDefaultAsync(m => m.Messages!.Any(msg => msg.Id == message.Id), cancellationToken);
+            var matching = await _matchingRepo.GetByMessageIdAsync(message.Id, cancellationToken);
             if (matching is null)
                 return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "Matching not found for the message."));
 
