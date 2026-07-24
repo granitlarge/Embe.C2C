@@ -23,9 +23,9 @@ public class AdminAreaRepository(C2CContext context) : IAdminAreaRepository
         return adminAreas;
     }
 
-    public async Task<List<IAdminArea>> ReverseGeocodeAsync(double longitude, double latitude)
+    public async Task<List<IAdminArea>> ReverseGeocodeAsync(double longitude, double latitude, CancellationToken cancellationToken)
     {
-        var adminArea = (await SearchAdminAreasAsync(null, longitude, latitude, 1, 1)).FirstOrDefault();
+        var adminArea = (await SearchAdminAreasAsync(null, longitude, latitude, 1, 1, cancellationToken)).FirstOrDefault();
         if (adminArea == null)
         {
             return [];
@@ -35,7 +35,7 @@ public class AdminAreaRepository(C2CContext context) : IAdminAreaRepository
         var highestLevelAdminArea = adminAreas[0];
         while (highestLevelAdminArea.ParentId != null)
         {
-            var parent = await _context.AdminAreas.AsNoTracking().FirstOrDefaultAsync(aa => aa.Id == highestLevelAdminArea.ParentId);
+            var parent = await _context.AdminAreas.AsNoTracking().FirstOrDefaultAsync(aa => aa.Id == highestLevelAdminArea.ParentId, cancellationToken: cancellationToken);
             if (parent == null)
             {
                 break;
@@ -45,11 +45,6 @@ public class AdminAreaRepository(C2CContext context) : IAdminAreaRepository
         }
 
         return adminAreas;
-    }
-
-    public Task<List<IAdminArea>> ReverseGeocodeAsync(double longitude, double latitude, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken)

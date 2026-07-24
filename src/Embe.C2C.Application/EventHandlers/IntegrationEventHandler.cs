@@ -245,10 +245,10 @@ public class IntegrationEventHandler
         var originalUrl = await _imageService.GetImageUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Original, cancellationToken);
         var sasUrls = await Task.WhenAll
         (
-            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Original, FilePermissions.Read, TimeSpan.FromHours(1)),
-            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Large, FilePermissions.Read, TimeSpan.FromHours(1)),
-            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Medium, FilePermissions.Read, TimeSpan.FromHours(1)),
-            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Small, FilePermissions.Read, TimeSpan.FromHours(1))
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Original, FilePermissions.Read, TimeSpan.FromHours(1), cancellationToken),
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Large, FilePermissions.Read, TimeSpan.FromHours(1), cancellationToken),
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Medium, FilePermissions.Read, TimeSpan.FromHours(1), cancellationToken),
+            _imageService.GenerateImageSasUrlAsync(imageStatusChangedEvent.ImageName, imageStatusChangedEvent.NewStatus, ImageSize.Small, FilePermissions.Read, TimeSpan.FromHours(1), cancellationToken)
         );
 
         var originalSasUrl = sasUrls[0];
