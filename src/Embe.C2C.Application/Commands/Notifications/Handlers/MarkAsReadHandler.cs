@@ -22,16 +22,16 @@ public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, Result>
         _notificationRepository = notificationRepository;
     }
 
-    protected async override Task<CommandResult<Result>> HandleAsync(ISparseRepository context, MarkAsReadCommand command, CancellationToken cancellationToken = default)
+    protected async override Task<CommandResult<Result>> InternalHandleAsync(MarkAsReadCommand command, CancellationToken cancellationToken = default)
     {
         var notification = await _notificationRepository.GetByIdAsync(command.NotificationId, cancellationToken);
         if (notification is null)
         {
-            return new CommandResult<Result>(Commit: false, Result.Failure(FailureReason.NotFound, "Notification not found."));
+            return new CommandResult<Result>(Save: false, Result.Failure(FailureReason.NotFound, "Notification not found."));
         }
 
         notification.MarkAsRead(command.IsRead);
 
-        return new CommandResult<Result>(Commit: true, Result.Success());
+        return new CommandResult<Result>(Save: true, Result.Success());
     }
 }

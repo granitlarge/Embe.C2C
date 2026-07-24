@@ -40,9 +40,8 @@ public class DeleteMessageHandler : CommandHandler<DeleteMessageCommand, Result>
         _messageRepo = messageRepo;
     }
 
-    protected async override Task<CommandResult<Result>> HandleAsync
+    protected async override Task<CommandResult<Result>> InternalHandleAsync
     (
-        ISparseRepository context,
         DeleteMessageCommand command,
         CancellationToken cancellationToken = default
     )

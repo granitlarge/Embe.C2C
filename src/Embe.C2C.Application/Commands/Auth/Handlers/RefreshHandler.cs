@@ -22,9 +22,8 @@ public class RefreshHandler : CommandHandler<RefreshCommand, TypedResult<Refresh
         _authService = authService;
     }
 
-    protected override async Task<CommandResult<TypedResult<RefreshFailureReason, Credentials>>> HandleAsync
+    protected override async Task<CommandResult<TypedResult<RefreshFailureReason, Credentials>>> InternalHandleAsync
     (
-        ISparseRepository context,
         RefreshCommand command,
         CancellationToken cancellationToken = default
     )

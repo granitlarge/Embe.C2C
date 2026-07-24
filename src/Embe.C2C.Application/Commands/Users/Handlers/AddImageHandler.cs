@@ -41,9 +41,8 @@ public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageRe
         _authenticatedUserService = authenticatedUserService;
     }
 
-    protected async override Task<CommandResult<Result<AddImageResponse>>> HandleAsync
+    protected async override Task<CommandResult<Result<AddImageResponse>>> InternalHandleAsync
     (
-        ISparseRepository context,
         AddImageCommand command,
         CancellationToken cancellationToken = default
     )
@@ -54,7 +53,7 @@ public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageRe
         {
             return new CommandResult<Result<AddImageResponse>>
             (
-                Commit: false,
+                Save: false,
                 Result<AddImageResponse>.Failure(FailureReason.NotFound, "user does not exist")
             );
         }

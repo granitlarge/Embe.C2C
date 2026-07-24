@@ -44,9 +44,8 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, Result<Read
         _messageRepo = messageRepo;
     }
 
-    protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
+    protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> InternalHandleAsync
     (
-        ISparseRepository context,
         EditMessageCommand command,
         CancellationToken cancellationToken = default
     )

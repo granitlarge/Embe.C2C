@@ -44,9 +44,8 @@ public class UpdateHandler : CommandHandler<UpdateCommand, Result<ReadDto<UserDt
         _searchProfileRepository = searchProfileRepository;
     }
 
-    protected override async Task<CommandResult<Result<ReadDto<UserDto, UserPermission>?>>> HandleAsync
+    protected override async Task<CommandResult<Result<ReadDto<UserDto, UserPermission>?>>> InternalHandleAsync
     (
-        ISparseRepository context,
         UpdateCommand command,
         CancellationToken cancellationToken = default
     )

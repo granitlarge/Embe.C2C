@@ -52,7 +52,6 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
     protected async override Task<Result<List<ReadDto<CandidateDto, CandidatePermission>>>> ExecuteAsync
     (
         GetPositiveJudgementsQuery query,
-        ISparseRepository repository,
         CancellationToken cancellationToken = default
     )
     {

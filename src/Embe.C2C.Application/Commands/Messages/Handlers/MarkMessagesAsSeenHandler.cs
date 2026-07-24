@@ -19,9 +19,8 @@ public class MarkMessagesAsSeenHandler
     private readonly MessageAuthorizationService _messageAuthorizationPolicy = messageAuthoriztionPolicy;
     private readonly IMessageRepository _messageRepo = messageRepo;
 
-    protected async override Task<CommandResult<Result>> HandleAsync
+    protected async override Task<CommandResult<Result>> InternalHandleAsync
     (
-        ISparseRepository context,
         MarkMessagesAsSeenCommand command,
         CancellationToken cancellationToken = default
     )

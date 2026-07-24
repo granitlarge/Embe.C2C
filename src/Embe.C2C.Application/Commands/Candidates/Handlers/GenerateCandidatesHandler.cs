@@ -43,16 +43,15 @@ public class GenerateCandidatesHandler
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
 
-    protected override async Task<CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>> HandleAsync
+    protected override async Task<CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>> InternalHandleAsync
     (
-        ISparseRepository context,
         GenerateCandidatesCommand command,
         CancellationToken cancellationToken = default
     )
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
         var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
-        var userHasCandidates = await context.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
+        var userHasCandidates = await _candidateRepository.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         if (!userHasCandidates)
         {
             return new CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, Result<List<ReadDto<CandidateDto, CandidatePermission>>>.Success([]));

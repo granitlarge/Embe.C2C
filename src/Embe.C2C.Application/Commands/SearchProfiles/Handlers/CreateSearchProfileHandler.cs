@@ -42,9 +42,8 @@ public class CreateSearchProfileHandler
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
     private readonly SearchProfileService _searchProfileService = searchProfileService;
 
-    protected async override Task<CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
+    protected async override Task<CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> InternalHandleAsync
     (
-        ISparseRepository context,
         CreateSearchProfileCommand command,
         CancellationToken cancellationToken = default
     )
@@ -101,7 +100,7 @@ public class CreateSearchProfileHandler
             {
                 return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
                 (
-                    Commit: false,
+                    Save: false,
                     Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                     (
                         FailureReason.Forbidden,
@@ -113,7 +112,7 @@ public class CreateSearchProfileHandler
             var result = Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto);
             return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                Commit: true,
+                Save: true,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto)
             );
         }
@@ -121,7 +120,7 @@ public class CreateSearchProfileHandler
         {
             return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                Commit: false,
+                Save: false,
                 Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
                 (
                     FailureReason.DomainError,

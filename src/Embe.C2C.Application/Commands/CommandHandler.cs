@@ -6,7 +6,7 @@ namespace Embe.C2C.Application.Commands;
 
 public record CommandResult<T>
 (
-    bool Commit,
+    bool Save,
     T Value
 );
 
@@ -30,14 +30,14 @@ public abstract class CommandHandler<T_Command, T_Result>
     )
     {
         using var transaction = await _repo.BeginTransactionAsync(cancellationToken);
-        var result = await HandleAsync(new SparseRepository(_repo), command, cancellationToken);
+        var result = await InternalHandleAsync(command, cancellationToken);
 
         foreach (var domainEvent in _repo.DomainEvents.Union(_domainEventStore.DomainEvents).OrderBy(de => de.Timestamp))
         {
             await _domainEventHandler.HandleAsync(domainEvent, cancellationToken);
         }
 
-        if (result.Commit)
+        if (result.Save)
         {
             await _repo.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
@@ -52,5 +52,5 @@ public abstract class CommandHandler<T_Command, T_Result>
         return result.Value;
     }
 
-    protected abstract Task<CommandResult<T_Result>> HandleAsync(ISparseRepository context, T_Command command, CancellationToken cancellationToken = default);
+    protected abstract Task<CommandResult<T_Result>> InternalHandleAsync(T_Command command, CancellationToken cancellationToken = default);
 }

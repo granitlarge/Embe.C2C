@@ -66,9 +66,8 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         _candidateRepository = candidateRepository;
     }
 
-    protected override async Task<CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> HandleAsync
+    protected override async Task<CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> InternalHandleAsync
     (
-        ISparseRepository context,
         JudgeCandidateCommand command,
         CancellationToken cancellationToken = default
     )
@@ -77,13 +76,13 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         var permissions = await _candidateAuthorizationService.GetPermissionsAsync(command.CandidateId, cancellationToken);
         if (!permissions.Contains(CandidatePermission.Judge))
         {
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Commit: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "You do not have permission to judge this candidate."));
+            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Save: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "You do not have permission to judge this candidate."));
         }
 
         var candidate = await _candidateRepository.GetByIdAsync(command.CandidateId, cancellationToken);
         if (candidate is null)
         {
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Commit: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "The candidate does not exist."));
+            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Save: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "The candidate does not exist."));
         }
 
         var user = await _userRepo.GetByIdAsync(userId, cancellationToken);

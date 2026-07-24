@@ -1,24 +1,49 @@
-using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Repos;
-using Embe.C2C.Domain;
-using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Embe.C2C.Infrastructure.Ef.Repositories;
 
-public class Repository(C2CContext context) : INewRepository
+public class MyDbTransaction : IDbTransaction
 {
-    private readonly C2CContext _context = context;
+    private readonly IDbContextTransaction _dbContextTransaction;
 
-    public IImmutableList<DomainEvent> DomainEvents => _context.DomainEvents;
-
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public MyDbTransaction(IDbContextTransaction dbContextTransaction)
     {
-        return _context.BeginTransactionAsync(cancellationToken);
+        _dbContextTransaction = dbContextTransaction;
     }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+    public Task CommitAsync(CancellationToken cancellationToken)
     {
-        return _context.SaveChangesAsync(cancellationToken);
+        return _dbContextTransaction.CommitAsync(cancellationToken);
+    }
+
+    public Task CreateSavePointAsync(string name, CancellationToken cancellationToken)
+    {
+        return _dbContextTransaction.CreateSavepointAsync(name, cancellationToken);
+    }
+
+    public void Dispose()
+    {
+        _dbContextTransaction.Dispose();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return _dbContextTransaction.DisposeAsync();
+    }
+
+    public Task ReleaseSavePointAsync(string name, CancellationToken cancellationToken)
+    {
+        return _dbContextTransaction.ReleaseSavepointAsync(name, cancellationToken);
+    }
+
+    public Task RollbackAsync(CancellationToken cancellationToken)
+    {
+        return _dbContextTransaction.RollbackAsync(cancellationToken);
+    }
+
+    public Task RollbackToSavePointAsync(string name, CancellationToken cancellationToken)
+    {
+        return _dbContextTransaction.RollbackToSavepointAsync(name, cancellationToken);
     }
 }

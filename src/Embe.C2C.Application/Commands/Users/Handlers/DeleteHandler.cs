@@ -36,7 +36,7 @@ public class DeleteHandler : CommandHandler<DeleteCommand, Result>
         _accountRepo = accountRepo;
     }
 
-    protected override async Task<CommandResult<Result>> HandleAsync(ISparseRepository context, DeleteCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<CommandResult<Result>> InternalHandleAsync(DeleteCommand command, CancellationToken cancellationToken = default)
     {
         var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Delete))

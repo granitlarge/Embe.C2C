@@ -47,9 +47,8 @@ public class CreateMessageHandler
     private readonly MatchingService _matchingService = matchingService;
     private readonly MessageDtoMapper _messageDtoMapper = messageDtoMapper;
 
-    protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> HandleAsync
+    protected async override Task<CommandResult<Result<ReadDto<MessageDto, MessagePermission>>>> InternalHandleAsync
     (
-        ISparseRepository context,
         CreateMessageCommand command,
         CancellationToken cancellationToken = default
     )

@@ -30,7 +30,7 @@ public class GetMeHandler : TransactionalQueryHandler<GetMeQuery, Result<ReadDto
         _userRepo = userRepo;
     }
 
-    protected override async Task<Result<ReadDto<UserDto, UserPermission>>> ExecuteAsync(GetMeQuery query, ISparseRepository repository, CancellationToken cancellationToken = default)
+    protected override async Task<Result<ReadDto<UserDto, UserPermission>>> ExecuteAsync(GetMeQuery query, CancellationToken cancellationToken = default)
     {
         var userId = _authenticatedUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
         var user = await _userRepo.GetByIdAsync(userId, cancellationToken);

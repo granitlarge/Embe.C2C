@@ -26,9 +26,8 @@ public class ProcessUploadedImageHandler
     private readonly IUserRepository _userRepo = userRepo;
     private readonly IContentSafetyService _contentSafetyService = contentSafetyService;
 
-    protected override async Task<CommandResult<Result>> HandleAsync
+    protected override async Task<CommandResult<Result>> InternalHandleAsync
     (
-        ISparseRepository context,
         ProcessUploadedImageCommand command,
         CancellationToken cancellationToken = default
     )
@@ -54,6 +53,6 @@ public class ProcessUploadedImageHandler
         {
             user.RemoveImage(user.Id, targetImage.Id);
         }
-        return new CommandResult<Result>(Commit: true, Result.Success());
+        return new CommandResult<Result>(Save: true, Result.Success());
     }
 }

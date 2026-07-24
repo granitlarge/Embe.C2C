@@ -22,9 +22,8 @@ public class SignOutHandler : CommandHandler<SignOutCommand, TypedResult<SignOut
         _authService = authService;
     }
 
-    protected override async Task<CommandResult<TypedResult<SignOutFailureReason, bool>>> HandleAsync
+    protected override async Task<CommandResult<TypedResult<SignOutFailureReason, bool>>> InternalHandleAsync
     (
-        ISparseRepository context,
         SignOutCommand command,
         CancellationToken cancellationToken = default
     )

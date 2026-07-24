@@ -27,7 +27,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<Regist
         _userRepo = userRepo;
     }
 
-    protected override async Task<CommandResult<ResultBase<RegisterUserFailureReason>>> HandleAsync(ISparseRepository context, RegisterCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<CommandResult<ResultBase<RegisterUserFailureReason>>> InternalHandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
     {
 
         try

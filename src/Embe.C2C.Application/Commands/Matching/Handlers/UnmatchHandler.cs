@@ -29,9 +29,8 @@ public class UnmatchHandler : CommandHandler<UnmatchCommand, Result>
         _matchingRepo = matchingRepo;
     }
 
-    protected override async Task<CommandResult<Result>> HandleAsync
+    protected override async Task<CommandResult<Result>> InternalHandleAsync
     (
-        ISparseRepository context,
         UnmatchCommand command,
         CancellationToken cancellationToken = default
     )

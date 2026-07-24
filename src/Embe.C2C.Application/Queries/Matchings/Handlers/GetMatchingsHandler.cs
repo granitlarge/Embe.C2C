@@ -41,7 +41,6 @@ public class GetMatchingsHandler
     protected override async Task<Result<List<ReadDto<MatchingDto, MatchingPermission>>>> ExecuteAsync
     (
         GetMatchingsQuery query,
-        ISparseRepository repo,
         CancellationToken cancellationToken
     )
     {

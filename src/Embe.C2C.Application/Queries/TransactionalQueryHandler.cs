@@ -14,14 +14,13 @@ public abstract class TransactionalQueryHandler<T_Query, T_Result>
     public async Task<T_Result> HandleAsync(T_Query command, CancellationToken cancellationToken = default)
     {
         using var transaction = await _repository.BeginTransactionAsync(cancellationToken);
-        var result = await ExecuteAsync(command, new SparseRepository(_repository), cancellationToken);
+        var result = await ExecuteAsync(command, cancellationToken);
         return result;
     }
 
     protected abstract Task<T_Result> ExecuteAsync
     (
         T_Query query,
-        ISparseRepository repository,
         CancellationToken cancellationToken = default
     );
 }

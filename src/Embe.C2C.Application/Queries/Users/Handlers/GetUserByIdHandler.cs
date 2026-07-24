@@ -25,7 +25,6 @@ public class GetUserByIdHandler
     protected override async Task<Result<ReadDto<UserDto, UserPermission>?>> ExecuteAsync
     (
         GetUserByIdQuery request,
-        ISparseRepository repo,
         CancellationToken cancellationToken
     )
     {

@@ -28,7 +28,7 @@ public class DeleteSearchProfileHandler
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
 
-    protected async override Task<CommandResult<Result>> HandleAsync(ISparseRepository context, DeleteSearchProfileCommand command, CancellationToken cancellationToken = default)
+    protected async override Task<CommandResult<Result>> InternalHandleAsync(DeleteSearchProfileCommand command, CancellationToken cancellationToken = default)
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("Authenticated user ID is null.");
         var (permissions, variant) = await _searchProfileAuthorizationService.GetAsync(command.Id, cancellationToken);
@@ -36,7 +36,7 @@ public class DeleteSearchProfileHandler
         {
             return new CommandResult<Result>
             (
-                Commit: false,
+                Save: false,
                 Result.Failure
                 (
                     FailureReason.Forbidden,
@@ -50,7 +50,7 @@ public class DeleteSearchProfileHandler
         {
             return new CommandResult<Result>
             (
-                Commit: false,
+                Save: false,
                 Result.Failure
                 (
                     FailureReason.NotFound,
@@ -64,7 +64,7 @@ public class DeleteSearchProfileHandler
 
         return new CommandResult<Result>
         (
-            Commit: true,
+            Save: true,
             Result.Success()
         );
     }
