@@ -150,6 +150,7 @@ public class User : Aggregate
 
         var image = Entities.Image.Create(Id, imageDetails);
         _images.Add(image);
+        UpdatedAt = DateTimeOffset.UtcNow;
         return image;
     }
 
@@ -158,6 +159,7 @@ public class User : Aggregate
         EnsureActorIsOwner(actorId);
         var image = _images.Single(f => f.Id == imageId);
         image.ChangeOrder(newOrder);
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void ChangeImageStatus(Guid actorId, Guid imageId, ImageStatus newStatus)
@@ -166,6 +168,7 @@ public class User : Aggregate
         var image = _images.Single(i => i.Id == imageId);
         var oldStatus = image.ImageDetails.Status;
         image.ChangeStatus(newStatus);
+        UpdatedAt = DateTimeOffset.UtcNow;
         AddDomainEvent(new UserImageStatusChangedEvent(oldStatus, image));
     }
 
@@ -174,6 +177,7 @@ public class User : Aggregate
         EnsureActorIsOwner(actorId);
         var image = _images.Single(f => f.Id == imageId);
         _images.Remove(image);
+        UpdatedAt = DateTimeOffset.UtcNow;
         AddDomainEvent(new UserImageRemovedEvent(image));
     }
 
