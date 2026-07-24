@@ -17,8 +17,7 @@ public record UserDto
     int? Age,
     Gender? Gender,
     LocationDto? Location,
-    ImmutableHashSet<ImageDto>? AcceptedImages,
-    ImmutableHashSet<ImageDto>? PendingImages,
+    ImmutableHashSet<ImageDto>? Images,
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt,
     double? DistanceKmToQueryingUser,
@@ -47,15 +46,9 @@ public class UserDtoMapper
         }
 
         var user = userEnriched.User;
-        var acceptedImages = await Task.WhenAll(user.Images
-            .Where(i => variant.IncludeAcceptedImages && i.ImageDetails.Status == ImageStatus.Accepted)
+        var images = await Task.WhenAll(user.Images
+            .Where(i => variant.IncludeImages)
             .Select(image => _imageDtoMapper.ToDtoAsync(image, cancellationToken)));
-
-        var pendingImages = await Task.WhenAll(
-            user.Images
-                .Where(i => variant.IncludePendingImages && i.ImageDetails.Status == ImageStatus.Pending)
-                .Select(image => _imageDtoMapper.ToDtoAsync(image, cancellationToken))
-        );
 
         return new UserDto
         (
@@ -66,8 +59,7 @@ public class UserDtoMapper
             variant.IncludeAge ? user.Age.Value : null,
             variant.IncludeGender ? user.Gender : null,
             variant.IncludeLocation ? user.Location?.ToDto() : null,
-            variant.IncludeAcceptedImages ? [.. acceptedImages] : null,
-            variant.IncludePendingImages ? [.. pendingImages] : null,
+            variant.IncludeImages ? [.. images] : null,
             variant.IncludeCreatedAt ? user.CreatedAt : null,
             variant.IncludeUpdatedAt ? user.UpdatedAt : null,
             variant.IncludeDistanceToQueryingUser ? userEnriched.DistanceKmToQueryingUser : null,

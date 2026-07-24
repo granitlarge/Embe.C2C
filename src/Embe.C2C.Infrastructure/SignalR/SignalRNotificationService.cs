@@ -19,7 +19,6 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
             MessageSeen messageSeen => SendMessageSeenNotificationAsync(messageSeen, cancellationToken),
             MessageUnseen messageUnseen => SendMessageUnseenNotificationAsync(messageUnseen, cancellationToken),
 
-            ImageStatusChangedEvent imageStatusChangedEvent => SendImageStatusChangedNotificationAsync(imageStatusChangedEvent, cancellationToken),
             ImageResizedEvent imageResizedEvent => SendImageResizedNotificationAsync(imageResizedEvent, cancellationToken),
             _ => Task.CompletedTask
         };
@@ -59,19 +58,6 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
         var hubContext = await _pool.GetHubContextAsync(cancellationToken);
         await hubContext.Clients.User(messageUnseen.AuthorUserId.ToString())
             .SendAsync("MessagesUnseen", new[] { messageUnseen.MessageId }, messageUnseen.ConversationId, cancellationToken);
-    }
-
-    private async Task SendImageStatusChangedNotificationAsync(ImageStatusChangedEvent imageStatusChanged, CancellationToken cancellationToken)
-    {
-        var hubContext = await _pool.GetHubContextAsync(cancellationToken);
-            await hubContext.Clients.User(imageStatusChanged.UserId.ToString())
-            .SendAsync
-            (
-                "ImageStatusChanged",
-                imageStatusChanged.ImageId,
-                imageStatusChanged.NewStatus,
-                cancellationToken
-            );
     }
 
     private async Task SendImageResizedNotificationAsync(ImageResizedEvent imageResizedEvent, CancellationToken cancellationToken)

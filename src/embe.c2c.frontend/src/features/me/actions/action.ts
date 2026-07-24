@@ -6,6 +6,7 @@ import { Guid } from "@/src/shared/cache";
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import { ReadDto } from "@/src/shared/types/dtos/types";
+import { ImageData } from "../components/MyInfoForm";
 
 export async function updateProfile
     (
@@ -34,3 +35,33 @@ export async function updateProfile
 
 }
 
+export async function addImages(
+    images: { image: ImageData, base64Data: string }[]
+): Promise<ApiResponse<ReadDto<User, UserPermission>, FailureReason>> {
+
+    var body = JSON.stringify({
+        images: images.map((i, index) => {
+            return {
+                base64EncodedImageData: i.base64Data,
+                mimeType: i.image.mimeType,
+                order: i.image.order,
+                cropOffsetX: i.image.crop?.x,
+                cropOffsetY: i.image.crop?.y
+            }
+        })
+    });
+
+    const response = Mutate<ReadDto<User, UserPermission>, FailureReason>(
+        `${process.env.API_URL}/api/user/upload-images`,
+        {
+            method: "POST",
+            body: body,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+    )
+
+    return response;
+
+}

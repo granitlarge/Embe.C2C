@@ -14,7 +14,7 @@ export default function FindUserDating({ dto, className }: FindUserDatingProps) 
     const permissions = dto.permissions;
 
     const classNames = [className].filter(Boolean).join(" ");
-    const images = [...(user.pendingImages ?? []), ...(user.acceptedImages ?? [])];
+    const images = [...(user.images ?? [])];
     return (
         <Surface variant="inherit" className={`flex flex-col ${classNames}`}>
             {

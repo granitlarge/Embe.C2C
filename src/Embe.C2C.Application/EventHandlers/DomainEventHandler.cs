@@ -64,9 +64,6 @@ public class DomainEventHandler
                 await HandleMessageUnseenEventAsync(messageUnseenEvent, cancellationToken);
                 break;
 
-            case UserImageStatusChangedEvent userImageStatusChangedEvent:
-                await HandleUserImageStatusChangedEventAsync(userImageStatusChangedEvent, cancellationToken);
-                break;
             case UserImageRemovedEvent userImageRemovedEvent:
                 await HandleUserImageRemovedEventAsync(userImageRemovedEvent, cancellationToken);
                 break;
@@ -256,17 +253,6 @@ public class DomainEventHandler
         AddIntegrationEvent(messageUnseen);
     }
 
-    private async Task HandleUserImageStatusChangedEventAsync
-    (
-        UserImageStatusChangedEvent userImageStatusChangedEvent,
-        CancellationToken cancellationToken
-    )
-    {
-        var oldStatus = userImageStatusChangedEvent.OldStatus;
-        var image = userImageStatusChangedEvent.Image;
-        AddIntegrationEvent(new ImageStatusChangedEvent(image.OwnerUserId, image.Id, image.ImageDetails.Name, oldStatus, image.ImageDetails.Status)); ;
-    }
-
     private async Task HandleUserImageRemovedEventAsync
     (
         UserImageRemovedEvent userImageRemovedEvent,
@@ -274,6 +260,6 @@ public class DomainEventHandler
     )
     {
         var image = userImageRemovedEvent.Image;
-        AddIntegrationEvent(new ImageRemovedEvent(image.OwnerUserId, image.Id, image.ImageDetails.Name, image.ImageDetails.Status));
+        AddIntegrationEvent(new ImageRemovedEvent(image.OwnerUserId, image.Id, image.ImageDetails.Name));
     }
 }

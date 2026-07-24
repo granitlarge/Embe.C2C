@@ -4,7 +4,6 @@ import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { User as UserIcon, } from "@deemlol/next-icons";
 import Image from "@/src/shared/components/images/Image";
-import { profile } from "console";
 
 export type UserCompactProps = Omit<SurfaceProps<typeof Link>, "as" | "href" | "children"> & {
     className?: string;
@@ -13,7 +12,7 @@ export type UserCompactProps = Omit<SurfaceProps<typeof Link>, "as" | "href" | "
 export function UserCompact({ className, dto, ...props }: UserCompactProps) {
     const classNames = [className].filter(Boolean).join(" ");
     const user = dto?.data;
-    const profilePicture = [...(dto?.data?.acceptedImages ?? []), ...(dto?.data?.pendingImages ?? [])]
+    const profilePicture = [...(dto?.data?.images ?? [])]
         .sort((a, b) => a.imageDetails.order - b.imageDetails.order)
         .at(0);
 

@@ -6,12 +6,9 @@ public record ImageDetails
 {
     public ImageDetails
     (
-        string name, 
-        string mimeType, 
-        int order, 
-        ImageStatus status,
-        double cropOffsetX,
-        double cropOffsetY
+        string name,
+        string mimeType,
+        int order
     )
     {
         if (order < 0)
@@ -29,17 +26,9 @@ public record ImageDetails
             throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidMimeType));
         }
 
-        if (cropOffsetX < 0 || cropOffsetY < 0)
-        {
-            throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidOffsets));
-        }
-
         Name = name;
         MimeType = mimeType;
         Order = order;
-        Status = status;
-        CropOffsetX = cropOffsetX;
-        CropOffsetY = cropOffsetY;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -52,32 +41,6 @@ public record ImageDetails
     public string Name { get; }
     public string MimeType { get; }
     public int Order { get; init; }
-    public ImageStatus Status { get; init; }
-    public double CropOffsetX {get;}
-    public double CropOffsetY {get;}
-}
-
-public record ImageCropOffset
-{
-    public ImageCropOffset
-    (
-        double x,
-        double y
-    )
-    {
-        if (x < 0 || y < 0)
-            throw new DomainException(new DomainError<ImageCropError>(ImageCropError.NegativeOffset));
-        X = x;
-        Y = y;
-    }
-
-    private ImageCropOffset()
-    {
-
-    }
-
-    public double X { get; }
-    public double Y { get; }
 }
 
 public enum ImageDetailsError
@@ -86,16 +49,4 @@ public enum ImageDetailsError
     InvalidName = 2,
     InvalidMimeType = 3,
     InvalidOffsets = 4
-}
-
-public enum ImageStatus
-{
-    Pending = 1,
-    Rejected = 2,
-    Accepted = 3
-}
-
-public enum ImageCropError
-{
-    NegativeOffset
 }

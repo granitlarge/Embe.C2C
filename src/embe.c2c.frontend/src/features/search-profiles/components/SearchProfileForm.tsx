@@ -218,7 +218,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 user.birthDate!,
                 user.gender,
                 newUserLocation,
-                [...(user.acceptedImages ?? []), ...(user.pendingImages ?? [])].map((image, index) => ({ id: image.id, order: index })),
+                [...(user.images ?? [])].map((image, index) => ({ id: image.id, order: index })),
                 user.bio
             );
 

@@ -56,8 +56,6 @@ public class UserConfiguration : AggregateConfiguration<User>
                     fd.Property(d => d.MimeType);
                     fd.Property(d => d.Order);
                     fd.HasIndex(d => d.Name).IsUnique();
-                    fd.Property(fd => fd.CropOffsetX);
-                    fd.Property(fd => fd.CropOffsetY);
                 });
                 image.Property(image => image.RowVersion).IsRowVersion();
             });

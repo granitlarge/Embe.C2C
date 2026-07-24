@@ -10,8 +10,7 @@ public record ImageDetailsDto
     string? SmallUrl,
     string? Name,
     string MimeType,
-    int? Order,
-    ImageStatus Status
+    int? Order
 );
 
 public static class ImageDetailsDtoExtensions
@@ -19,10 +18,10 @@ public static class ImageDetailsDtoExtensions
     public static async Task<ImageDetailsDto> ToDtoAsync(this ImageDetails fileDetails, IFileUrlGenerator fileUrlGenerator, CancellationToken cancellationToken = default)
     {
         var urls = await Task.WhenAll(
-            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, fileDetails.Status, Abstractions.Services.ImageSize.Original, Abstractions.Services.FilePermissions.Read, cancellationToken),
-            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, fileDetails.Status, Abstractions.Services.ImageSize.Large, Abstractions.Services.FilePermissions.Read, cancellationToken),
-            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, fileDetails.Status, Abstractions.Services.ImageSize.Medium, Abstractions.Services.FilePermissions.Read, cancellationToken),
-            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, fileDetails.Status, Abstractions.Services.ImageSize.Small, Abstractions.Services.FilePermissions.Read, cancellationToken)
+            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, Abstractions.Services.ImageSize.Original, Abstractions.Services.FilePermissions.Read, cancellationToken),
+            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, Abstractions.Services.ImageSize.Large, Abstractions.Services.FilePermissions.Read, cancellationToken),
+            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, Abstractions.Services.ImageSize.Medium, Abstractions.Services.FilePermissions.Read, cancellationToken),
+            fileUrlGenerator.GenerateUrlAsync(fileDetails.Name, Abstractions.Services.ImageSize.Small, Abstractions.Services.FilePermissions.Read, cancellationToken)
         );
 
         var original = urls[0];
@@ -30,6 +29,6 @@ public static class ImageDetailsDtoExtensions
         var medium = urls[2];
         var small = urls[3];
 
-        return new ImageDetailsDto(original, large, medium, small, fileDetails.Name, fileDetails.MimeType, fileDetails.Order, fileDetails.Status);
+        return new ImageDetailsDto(original, large, medium, small, fileDetails.Name, fileDetails.MimeType, fileDetails.Order);
     }
 }

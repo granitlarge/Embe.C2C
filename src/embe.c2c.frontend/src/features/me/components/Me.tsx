@@ -6,7 +6,7 @@ import { User, UserPermission } from "@/src/shared/types/domain/aggregates"
 import { ReadDto } from "@/src/shared/types/dtos/types"
 import { useEffect, useState } from "react"
 import Button from "@/src/shared/components/buttons/Button";
-import { updateProfile } from "../actions/action";
+import { addImages, updateProfile } from "../actions/action";
 import * as z from "zod";
 import { Gender, ImageStatus } from "@/src/shared/types/domain/value-objects";
 import LargeModal from "@/src/shared/components/modal/LargeModal";
@@ -14,10 +14,7 @@ import Profile from "@/src/shared/components/user/Profile";
 import { calculateAge } from "@/src/shared/time";
 import AlertDialog from "@/src/shared/components/infos/AlertDialog";
 import { useRouter } from "nextjs-toploader/app";
-import { Mutate } from "@/src/shared/apis/api";
-import { FailureReason } from "@/src/shared/apis/type";
-import { AddImageResult } from "../actions/type";
-import { NullGuid } from "@/src/shared/cache";
+import { Guid, NullGuid } from "@/src/shared/cache";
 import { useApplicationStore } from "@/src/shared/stores/provider";
 
 export type MeProps = {
@@ -33,7 +30,7 @@ export default function Me({ className }: MeProps) {
 
     const [showPreview, setShowPreview] = useState(false);
     function getBasicFormDataFromCurrentUser(user: ReadDto<User, UserPermission> | undefined) {
-        const images = [...(user?.data.pendingImages ?? []), ...(user?.data.acceptedImages ?? [])];
+        const images = [...(user?.data.images ?? [])];
         const basicFormData = {
             images: images
                 .map(image => ({
@@ -96,40 +93,18 @@ export default function Me({ className }: MeProps) {
         setShowPreview(true);
     }
 
-    async function addImage(blob: Blob, mimeType: string, order: number, crop: { x: number, y: number, width: number, height: number }): Promise<AddImageResult> {
+    async function getBase64EncodedData(url: string): Promise<string> {
+        const response = await fetch(url);
+        const bytes = await response.bytes();
 
-        const body = JSON.stringify({ mimeType, order, crop })
-        const getSasResponse = await Mutate<AddImageResult, FailureReason>(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user/upload-image`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body
-            },
-        );
+        let binary = "";
+        const chunkSize = 0x8000;
 
-        if (!getSasResponse.success || !getSasResponse.value?.uploadUrl) {
-            throw new Error("not implemented");
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
         }
 
-        const uploadUrl = getSasResponse.value;
-        const response = await fetch(uploadUrl.uploadUrl!, {
-            method: "PUT",
-            headers: {
-                "x-ms-blob-type": "BlockBlob",
-                "Content-Type": mimeType
-            },
-            body: blob
-        })
-
-        if (!response.ok) {
-            throw new Error("not implemented");
-        }
-
-        return getSasResponse.value;
-
+        return btoa(binary);
     }
 
     async function onSave() {
@@ -150,10 +125,28 @@ export default function Me({ className }: MeProps) {
         const imagesToKeep = imageAndIndex.filter(({ image }) => image.id !== undefined).map(({ image, index }) => ({ id: image.id!, order: index }));
         const imagesToAdd = imageAndIndex.filter(({ image }) => image.id === undefined);
 
-        const addImageResults = await Promise.all(imagesToAdd.filter(i => i.image.url !== undefined).map(async i => {
-            const blob = await (await fetch(i.image.url!)).blob();
-            return await addImage(blob, i.image.mimeType, i.image.order, i.image.crop!)
-        }));
+        let addedImages: { id: Guid, order: number }[] = [];
+
+        if (imagesToAdd.length > 0) {
+
+            const payload = await Promise.all(imagesToAdd.map(({ image, index }) => ({
+                ...image,
+                order: index
+            })).map(async image => ({
+                image,
+                base64Data: await getBase64EncodedData(image.url!)
+            })));
+
+            const addImagesResult = await addImages(payload);
+            if (!addImagesResult.success) {
+                throw new Error("not implemented");
+            }
+
+            addedImages =
+                (addImagesResult.value?.data.images ?? [])
+                    .filter(newImage => !imageAndIndex.some(existingImage => newImage.id == existingImage.image.id))
+                    .map(ni => ({ id: ni.id, order: ni.imageDetails.order }))
+        }
 
         const updateProfileResponse = await updateProfile
         (
@@ -162,7 +155,7 @@ export default function Me({ className }: MeProps) {
             clientSideBasicFormData.birthDate!,
             clientSideBasicFormData.gender,
             clientSideBasicFormData.location,
-            imagesToKeep.concat(addImageResults.map(i => ({ id: i.image.id, order: i.image.imageDetails.order }))),
+            imagesToKeep.concat(addedImages),
             clientSideBasicFormData.bio
         );
 
@@ -229,9 +222,8 @@ export default function Me({ className }: MeProps) {
                             createdAt: user?.data?.createdAt,
                             updatedAt: user?.data?.updatedAt,
                             email: user?.data?.email,
-                            acceptedImages: clientSideBasicFormData.images
+                            images: clientSideBasicFormData.images
                                 ?.map((image, index) => ({ image, index }))
-                                .filter(({ image }) => image.status === ImageStatus.Accepted || image.status === undefined)
                                 .map(({ image, index }) => {
                                     return {
                                         id: image.id ?? NullGuid,
@@ -243,7 +235,6 @@ export default function Me({ className }: MeProps) {
                                             mimeType: image.mimeType,
                                             order: index,
                                             name: "",
-                                            status: image.status ?? ImageStatus.Pending,
                                             largeUrl: image.largeUrl,
                                             mediumUrl: image.mediumUrl,
                                             smallUrl: image.smallUrl
@@ -251,27 +242,7 @@ export default function Me({ className }: MeProps) {
                                         markedForDeletionAt: null,
                                         deletedAt: null,
                                     }
-                                }) ?? [],
-                            pendingImages: clientSideBasicFormData.images
-                                ?.map((image, index) => ({ image, index }))
-                                .filter(({ image }) => image.status === ImageStatus.Pending)
-                                .map(({ image, index }) => {
-                                    return {
-                                        id: image.id ?? NullGuid,
-                                        ownerUserId: NullGuid,
-                                        createdAt: "",
-                                        updatedAt: new Date().toISOString(),
-                                        imageDetails: {
-                                            url: image.url,
-                                            mimeType: image.mimeType,
-                                            order: index,
-                                            name: "",
-                                            status: image.status ?? ImageStatus.Pending
-                                        },
-                                        markedForDeletionAt: null,
-                                        deletedAt: null,
-                                    }
-                                }) ?? [],
+                                }) ?? []
                         }}
                     />
                 </LargeModal>

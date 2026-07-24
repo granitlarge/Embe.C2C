@@ -162,16 +162,6 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void ChangeImageStatus(Guid actorId, Guid imageId, ImageStatus newStatus)
-    {
-        EnsureActorIsOwner(actorId);
-        var image = _images.Single(i => i.Id == imageId);
-        var oldStatus = image.ImageDetails.Status;
-        image.ChangeStatus(newStatus);
-        UpdatedAt = DateTimeOffset.UtcNow;
-        AddDomainEvent(new UserImageStatusChangedEvent(oldStatus, image));
-    }
-
     public void RemoveImage(Guid actorId, Guid imageId)
     {
         EnsureActorIsOwner(actorId);

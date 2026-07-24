@@ -12,8 +12,7 @@ export type User = {
     gender?: Gender;
     datingPreferences?: DatingPreferences;
     location?: Location;
-    acceptedImages?: Image[];
-    pendingImages?: Image[];
+    images?: Image[];
     createdAt?: string;
     updatedAt?: string;
     distanceKmToQueryingUser?: number;

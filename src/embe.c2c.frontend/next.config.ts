@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
     ],
   },
   allowedDevOrigins: ['192.168.8.7', 'frontend-embe.c2c.aspire.dev.localhost'],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "100mb"
+    }
+  },
   async redirects() {
     return [
       {

@@ -23,7 +23,6 @@ export type ImageDetails = {
     name: string;
     mimeType: string;
     order: number;
-    status: ImageStatus
 }
 
 export type Currency = {

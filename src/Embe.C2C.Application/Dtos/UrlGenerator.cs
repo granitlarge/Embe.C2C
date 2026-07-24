@@ -5,7 +5,7 @@ namespace Embe.C2C.Application.Dtos;
 
 public interface IFileUrlGenerator
 {
-    Task<string?> GenerateUrlAsync(string fileName, ImageStatus imageStatus, ImageSize size, FilePermissions filePermissions, CancellationToken cancellationToken = default);
+    Task<string?> GenerateUrlAsync(string fileName, ImageSize size, FilePermissions filePermissions, CancellationToken cancellationToken = default);
 }
 
 public class FileUrlGenerator : IFileUrlGenerator
@@ -23,9 +23,9 @@ public class FileUrlGenerator : IFileUrlGenerator
         _sasDuration = sasDuration;
     }
 
-    public Task<string?> GenerateUrlAsync(string fileName, ImageStatus imageStatus, ImageSize size, FilePermissions filePermissions, CancellationToken cancellationToken = default)
+    public Task<string?> GenerateUrlAsync(string fileName, ImageSize size, FilePermissions filePermissions, CancellationToken cancellationToken = default)
     {
-        return _fileService.GenerateImageSasUrlAsync(fileName, imageStatus, size, filePermissions, _sasDuration, cancellationToken);
+        return _fileService.GenerateImageSasUrlAsync(fileName, size, filePermissions, _sasDuration, cancellationToken);
 
     }
 }

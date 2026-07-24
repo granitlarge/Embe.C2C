@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Users.Handlers.RegisterHandler>();
         services.AddScoped<Commands.Users.Handlers.DeleteHandler>();
         services.AddScoped<Commands.Users.Handlers.UpdateHandler>();
-        services.AddScoped<Commands.Users.Handlers.AddImageHandler>();
+        services.AddScoped<Commands.Users.Handlers.AddImagesHandler>();
 
         services.AddScoped<Commands.Candidates.Handlers.GenerateCandidatesHandler>();
         services.AddScoped<Commands.Candidates.Handlers.JudgeCandidateHandler>();
@@ -41,7 +41,6 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
 
-        services.AddScoped<Commands.Images.Handlers.ProcessUploadedImageHandler>();
 
         services.AddScoped<Commands.SearchProfiles.Handlers.CreateSearchProfileHandler>();
         services.AddScoped<Commands.SearchProfiles.Handlers.UpdateSearchProfileHandler>();
