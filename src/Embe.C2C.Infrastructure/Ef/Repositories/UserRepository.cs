@@ -54,9 +54,11 @@ public class UserRepository(C2CContext context) : IUserRepository
         return await _context.DomainUsers.SingleOrDefaultAsync(du => du.Id == id, cancellationToken);
     }
 
-    public async Task<User?> GetImageOwnerAsync(Guid imageId, CancellationToken cancellationToken)
+    public async Task<User?> GetImageOwnerAsync(string imageName, CancellationToken cancellationToken)
     {
-        var user = await _context.DomainUsers.Where(du => EF.Property<List<Image>>(du, "_images").Any(image => image.Id == imageId)).SingleOrDefaultAsync(cancellationToken);
+        var user = await _context.DomainUsers
+            .Where(du => EF.Property<List<Image>>(du, "_images").Any(image => image.ImageDetails.Name == imageName))
+            .SingleOrDefaultAsync(cancellationToken);
         return user;
     }
 

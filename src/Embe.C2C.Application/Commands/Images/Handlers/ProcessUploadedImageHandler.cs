@@ -33,19 +33,15 @@ public class ProcessUploadedImageHandler
     )
     {
         var safetyScore = await _contentSafetyService.GetSafetyScoreAsync(command.ImageBytes, cancellationToken);
-#warning this hackkkkk (accessing hidden properties) should be fixed
-        var user = await _userRepo.GetImageOwnerAsync(command.ImageId, cancellationToken);
+        var user = await _userRepo.GetImageOwnerAsync(command.ImageName, cancellationToken);
         if (user is null)
         {
+            Console.WriteLine("ERORR: Failed to find user that owns image.");
             return new CommandResult<Result>(true, Result.Failure(FailureReason.NotFound, "user not found"));
         }
-        var isSafe = Math.Abs(safetyScore) < 0.001m;
-        if (user is null)
-        {
-            return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "user does not exist"));
-        }
 
-        var targetImage = user.Images.Single(i => i.ImageDetails.Name == command.ImageId.ToString());
+        var isSafe = Math.Abs(safetyScore) < 0.001m;
+        var targetImage = user.Images.Single(i => i.ImageDetails.Name == command.ImageName);
         var newStatus = isSafe ? ImageStatus.Accepted : ImageStatus.Rejected;
 
         user.ChangeImageStatus(user.Id, targetImage.Id, newStatus);

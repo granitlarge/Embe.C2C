@@ -17,7 +17,7 @@ public class ImageProcessingPipelineFunctions
     {
         using var memoryStream = new MemoryStream();
         stream.CopyTo(memoryStream);
-        var command = new ProcessUploadedImageCommand(Guid.Parse(name), memoryStream.ToArray());
+        var command = new ProcessUploadedImageCommand(name, memoryStream.ToArray());
         var result = await _processUploadedImageHandler.HandleAsync(command);
     }
 }

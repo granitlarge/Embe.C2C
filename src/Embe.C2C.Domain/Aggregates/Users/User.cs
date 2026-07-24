@@ -77,7 +77,7 @@ public class User : Aggregate
 
     private readonly List<Entities.Image> _images;
     [NotMapped]
-    public IReadOnlyCollection<Entities.Image> Images => _images.AsReadOnly();
+    public IReadOnlyCollection<Entities.Image> Images => _images;
     [NotMapped]
     public Entities.Image? ProfilePicture => _images.OrderBy(f => f.ImageDetails.Order).FirstOrDefault();
 

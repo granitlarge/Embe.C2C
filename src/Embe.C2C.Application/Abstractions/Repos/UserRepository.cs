@@ -7,5 +7,5 @@ public interface IUserRepository : IGenericRepository<User, Guid>
 {
     Task<bool> HasSearchProfilesAsync(Guid userId, CancellationToken cancellationToken);
     Task<AuthorizationFact[]> GetAuthorizationFactsAsync(Guid currentUserId, Guid targetUserId, CancellationToken cancellationToken);
-    Task<User?> GetImageOwnerAsync(Guid imageId, CancellationToken cancellationToken);
+    Task<User?> GetImageOwnerAsync(string imageName, CancellationToken cancellationToken);
 }

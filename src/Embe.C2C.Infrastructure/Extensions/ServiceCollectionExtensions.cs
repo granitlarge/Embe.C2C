@@ -58,6 +58,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISearchProfileRepository, SearchProfileRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IAdminAreaRepository, AdminAreaRepository>();
+        services.AddScoped<ICandidateRepository, CandidateRepository>();
 
         if (environment.IsDevelopment())
         {
