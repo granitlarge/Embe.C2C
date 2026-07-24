@@ -18,7 +18,7 @@ public interface INewRepository : ISaveChanges
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }
 
-public interface IAggregateRepository<T_Aggregate, T_Aggregate_Id> : ISaveChanges
+public interface IGenericRepository<T_Aggregate, T_Aggregate_Id> : ISaveChanges
 {
     IDbSet<T_Aggregate> Set { get; }
     Task<T_Aggregate?> GetByIdAsync(T_Aggregate_Id id, CancellationToken cancellationToken);

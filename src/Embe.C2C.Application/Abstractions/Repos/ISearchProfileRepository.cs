@@ -3,7 +3,7 @@ using Embe.C2C.Domain.Aggregates.SearchProfiles;
 
 namespace Embe.C2C.Application.Abstractions.Repos;
 
-public interface ISearchProfileRepository : IAggregateRepository<SearchProfile, Guid>
+public interface ISearchProfileRepository : IGenericRepository<SearchProfile, Guid>
 {
     public Task<List<SearchProfile>> GetByUserIdAndHasMaximumDistanceFilter(Guid userId, CancellationToken cancellationToken);
     public Task<AuthorizationFact[]> GetAuthorizationFactsAsync

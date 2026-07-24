@@ -3,7 +3,7 @@ using Embe.C2C.Domain.Aggregates.Matchings;
 
 namespace Embe.C2C.Application.Abstractions.Repos;
 
-public interface IMatchingRepository : IAggregateRepository<Matching, Guid>
+public interface IMatchingRepository : IGenericRepository<Matching, Guid>
 {
     public Task<List<Matching>> GetMatchingsAsync(Guid userId, int page, int pageSize, CancellationToken cancellationToken);
     public Task<Matching?> GetMatchingByIdAsync(Guid id, CancellationToken cancellationToken);

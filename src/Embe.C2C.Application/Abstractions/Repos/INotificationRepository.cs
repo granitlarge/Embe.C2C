@@ -2,7 +2,7 @@ using Embe.C2C.Domain.Aggregates.Notifications;
 
 namespace Embe.C2C.Application.Abstractions.Repos;
 
-public interface INotificationRepository : IAggregateRepository<Notification, Guid>
+public interface INotificationRepository : IGenericRepository<Notification, Guid>
 {
     Task<bool> HasUnreadAsync(Guid userId, CancellationToken cancellationToken);
 

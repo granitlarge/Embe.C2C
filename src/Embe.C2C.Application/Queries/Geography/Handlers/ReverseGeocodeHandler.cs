@@ -6,16 +6,16 @@ namespace Embe.C2C.Application.Queries.Geography.Handlers;
 
 public class ReverseGeocodeHandler
 {
-    private readonly IRepository _repository;
+    private readonly IAdminAreaRepository _adminAreaRepository;
 
-    public ReverseGeocodeHandler(IRepository repository)
+    public ReverseGeocodeHandler(IAdminAreaRepository adminAreaRepository)
     {
-        _repository = repository;
+        _adminAreaRepository = adminAreaRepository;
     }
 
-    public async Task<Result<List<IAdminArea>>> HandleAsync(ReverseGeocodeQuery query)
+    public async Task<Result<List<IAdminArea>>> HandleAsync(ReverseGeocodeQuery query, CancellationToken cancellationToken)
     {
-        var result = await _repository.ReverseGeocodeAsync(query.Longitude, query.Latitude);
+        var result = await _adminAreaRepository.ReverseGeocodeAsync(query.Longitude, query.Latitude, cancellationToken);
         return Result<List<IAdminArea>>.Success(result);
     }
 }

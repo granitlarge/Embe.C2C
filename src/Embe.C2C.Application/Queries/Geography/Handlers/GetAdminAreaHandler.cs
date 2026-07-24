@@ -6,14 +6,14 @@ namespace Embe.C2C.Application.Queries.Geography.Handlers;
 
 public class SearchAdminAreaHandler
 {
-    private readonly IRepository _repository;
+    private readonly IAdminAreaRepository _repository;
 
-    public SearchAdminAreaHandler(IRepository repository)
+    public SearchAdminAreaHandler(IAdminAreaRepository repository)
     {
         _repository = repository;
     }
 
-    public async Task<Result<List<IAdminArea>>> HandleAsync(SearchAdminAreaQuery query)
+    public async Task<Result<List<IAdminArea>>> HandleAsync(SearchAdminAreaQuery query, CancellationToken cancellationToken)
     {
         var adminAreas = await _repository.SearchAdminAreasAsync
         (
@@ -21,7 +21,8 @@ public class SearchAdminAreaHandler
             query.Longitude,
             query.Latitude,
             query.Page,
-            query.Size
+            query.Size,
+            cancellationToken
         );
         return Result<List<IAdminArea>>.Success(adminAreas);
     }

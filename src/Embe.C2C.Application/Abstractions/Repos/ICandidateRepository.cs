@@ -3,7 +3,7 @@ using Embe.C2C.Domain.Aggregates.Candidates;
 
 namespace Embe.C2C.Application.Abstractions.Repos;
 
-public interface ICandidateRepository : IAggregateRepository<Candidate, Guid>
+public interface ICandidateRepository : IGenericRepository<Candidate, Guid>
 {
     public Task<Candidate?> GetByParametersAsync
     (

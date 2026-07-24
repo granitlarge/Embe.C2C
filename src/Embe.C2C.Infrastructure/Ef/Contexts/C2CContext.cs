@@ -167,60 +167,6 @@ public class C2CContext
         return candidates1.Count > 0;
     }
 
-    public async Task<List<IAdminArea>> SearchAdminAreasAsync
-    (
-        string? parentId,
-        double? longitude,
-        double? latitude,
-        int page,
-        int size,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var maxDistanceMeters = 1000;
-        List<AdminArea> result = [];
-        while (result.Count == 0 && maxDistanceMeters <= 25_000_000)
-        {
-            var pointFilter = (longitude.HasValue && latitude.HasValue) ? new NetTopologySuite.Geometries.Point(longitude.Value, latitude.Value) { SRID = 4326 } : null;
-            var parentIdFilter = !string.IsNullOrEmpty(parentId) ? parentId : null;
-            result = await AdminAreas
-            .AsNoTracking()
-            .Where(aa => pointFilter == null || aa.Point != null && aa.Point.Distance(pointFilter) <= maxDistanceMeters)
-            .Where(aa => parentIdFilter == null || aa.ParentId == parentIdFilter)
-            .OrderBy(aa => pointFilter != null && aa.Point != null ? aa.Point.Distance(pointFilter) : int.MaxValue)
-            .Skip((page - 1) * size)
-            .Take(size)
-            .ToListAsync(cancellationToken);
-            maxDistanceMeters *= 2;
-        }
-
-        return [.. result.Cast<IAdminArea>()];
-    }
-
-    public async Task<List<IAdminArea>> ReverseGeocodeAsync(double longitude, double latitude)
-    {
-        var adminArea = (await SearchAdminAreasAsync(null, longitude, latitude, 1, 1)).FirstOrDefault();
-        if (adminArea == null)
-        {
-            return [];
-        }
-
-        var adminAreas = new List<IAdminArea> { adminArea };
-        var highestLevelAdminArea = adminAreas[0];
-        while (highestLevelAdminArea.ParentId != null)
-        {
-            var parent = await AdminAreas.AsNoTracking().FirstOrDefaultAsync(aa => aa.Id == highestLevelAdminArea.ParentId);
-            if (parent == null)
-            {
-                break;
-            }
-            adminAreas.Add(parent);
-            highestLevelAdminArea = parent;
-        }
-
-        return adminAreas;
-    }
-
     public Task<bool> IsCandidateSearchProfileForUserIdAsync(Guid userId, Guid searchProfileId, CancellationToken cancellationToken = default)
     {
         return Candidates.AnyAsync(c => c.UserId == userId && c.CandidateSearchProfileId == searchProfileId, cancellationToken);

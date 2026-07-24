@@ -16,9 +16,9 @@ public static class GeographyEndpoints
         group.MapPost("/reverse-geocode", ReverseGeocode);
     }
 
-    private static async Task<IResult> GetCountryAdminAreas([FromServices] GetCountryAdminAreaHandler handler)
+    private static async Task<IResult> GetCountryAdminAreas([FromServices] GetCountryAdminAreaHandler handler, CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync();
+        var result = await handler.HandleAsync(cancellationToken);
         return result.ToResult();
     }
 
@@ -29,16 +29,17 @@ public static class GeographyEndpoints
         [FromQuery] double? latitude,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
-        [FromServices] SearchAdminAreaHandler handler
+        [FromServices] SearchAdminAreaHandler handler,
+        CancellationToken cancellationToken
     )
     {
-        var result = await handler.HandleAsync(new SearchAdminAreaQuery(parentId, longitude, latitude, page ?? 1, pageSize ?? 50));
+        var result = await handler.HandleAsync(new SearchAdminAreaQuery(parentId, longitude, latitude, page ?? 1, pageSize ?? 50), cancellationToken);
         return result.ToResult();
     }
 
-    private static async Task<IResult> GetAdminAreaById([FromRoute] string id, [FromServices] GetAdminAreaByIdHandler handler)
+    private static async Task<IResult> GetAdminAreaById([FromRoute] string id, [FromServices] GetAdminAreaByIdHandler handler, CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(new GetAdminAreaByIdQuery(id));
+        var result = await handler.HandleAsync(new GetAdminAreaByIdQuery(id), cancellationToken);
         return result.ToResult();
     }
 
@@ -46,10 +47,11 @@ public static class GeographyEndpoints
     private static async Task<IResult> ReverseGeocode
     (
         [FromBody] ReverseGeocodeRequest request,
-        [FromServices] ReverseGeocodeHandler handler
+        [FromServices] ReverseGeocodeHandler handler,
+        CancellationToken cancellationToken
     )
     {
-        var result = await handler.HandleAsync(new ReverseGeocodeQuery(request.Longitude, request.Latitude));
+        var result = await handler.HandleAsync(new ReverseGeocodeQuery(request.Longitude, request.Latitude), cancellationToken);
         return result.ToResult();
     }
 

@@ -4,7 +4,7 @@ using Embe.C2C.Domain.Aggregates.Messages;
 
 namespace Embe.C2C.Application.Abstractions.Repos;
 
-public interface IMessageRepository : IAggregateRepository<Message, Guid>
+public interface IMessageRepository : IGenericRepository<Message, Guid>
 {
     public Task<List<Message>> GetMessagesByMatchingIdAsync
     (
