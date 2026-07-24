@@ -1,12 +1,13 @@
 "use server";
 
 import { RegisterRequest, RegisterUserFailureReason } from "./types";
-import { ApiResponse } from "@/src/shared/apis/type";
 import { Mutate } from "@/src/shared/apis/api";
+import { Credentials } from "@/src/shared/types/application/types";
+import { saveAccessToken, saveRefreshToken } from "@/src/shared/security/functions";
 
-export async function register(request: RegisterRequest): Promise<ApiResponse<void, RegisterUserFailureReason>> {
+export async function register(request: RegisterRequest): Promise<RegisterUserFailureReason | undefined> {
 
-    const response = await Mutate<void, RegisterUserFailureReason>
+    const response = await Mutate<Credentials, RegisterUserFailureReason>
         (
             `${process.env.API_URL}/api/user/register`,
             {
@@ -19,6 +20,13 @@ export async function register(request: RegisterRequest): Promise<ApiResponse<vo
             false
         );
 
-    return response;
+    if (response.success) {
+        await Promise.all([
+            saveAccessToken(response.value!.accessToken),
+            saveRefreshToken(response.value!.refreshToken)
+        ]);
+    }
+
+    return response.success ? undefined : response.reason;
 
 }

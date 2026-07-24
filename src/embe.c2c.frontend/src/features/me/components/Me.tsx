@@ -128,7 +128,6 @@ export default function Me({ className }: MeProps) {
         let addedImages: { id: Guid, order: number }[] = [];
 
         if (imagesToAdd.length > 0) {
-
             const payload = await Promise.all(imagesToAdd.map(({ image, index }) => ({
                 ...image,
                 order: index

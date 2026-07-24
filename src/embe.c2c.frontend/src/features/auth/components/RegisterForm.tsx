@@ -290,9 +290,9 @@ export default function RegisterForm({ className }: RegisterFormProps) {
             location: location
         });
 
-        if (response.success) {
+        if (response == undefined) {
             router.refresh();
-            router.push("/public/login");
+            router.push("/protected/search");
         } else {
             throw new Error("not implemented");
         }

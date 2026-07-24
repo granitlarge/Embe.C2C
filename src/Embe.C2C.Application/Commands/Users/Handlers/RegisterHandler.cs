@@ -8,7 +8,7 @@ using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<RegisterUserFailureReason>>
+public class RegisterHandler : CommandHandler<RegisterCommand, TypedResult<RegisterUserFailureReason, Credentials>>
 {
     private readonly IUserRepository _userRepo;
     private readonly IAuthService _authService;
@@ -27,7 +27,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<Regist
         _userRepo = userRepo;
     }
 
-    protected override async Task<CommandResult<ResultBase<RegisterUserFailureReason>>> InternalHandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<CommandResult<TypedResult<RegisterUserFailureReason, Credentials>>> InternalHandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
     {
 
         try
@@ -36,7 +36,15 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<Regist
             var registerUserResult = await _authService.RegisterUserAsync(command.Email, command.Password, cancellationToken);
             if (!registerUserResult.IsSuccess)
             {
-                return new CommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(registerUserResult.Reason, registerUserResult.Message!));
+                return new CommandResult<TypedResult<RegisterUserFailureReason, Credentials>>
+                (
+                    false,
+                    TypedResult<RegisterUserFailureReason, Credentials>.Failure
+                    (
+                        registerUserResult.Reason,
+                        registerUserResult.Message!
+                    )
+                );
             }
 
             var email = Email.Create(command.Email);
@@ -49,12 +57,36 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ResultBase<Regist
 
             _userRepo.Set.Add(user);
 
-            return new CommandResult<ResultBase<RegisterUserFailureReason>>(true, ResultBase<RegisterUserFailureReason>.Success());
+            await _userRepo.SaveChangesAsync(cancellationToken);
+
+            var signInResult = await _authService.SignInAsync(email.Value, command.Password, cancellationToken);
+
+            if (!signInResult.IsSuccess)
+            {
+                throw new NotImplementedException();
+            }
+
+            return new CommandResult<TypedResult<RegisterUserFailureReason, Credentials>>
+            (
+                true, 
+                TypedResult<RegisterUserFailureReason, Credentials>.Success
+                (
+                    signInResult.Value!
+                )
+            );
 
         }
         catch (DomainException ex)
         {
-            return new CommandResult<ResultBase<RegisterUserFailureReason>>(false, ResultBase<RegisterUserFailureReason>.Failure(RegisterUserFailureReason.DomainError, ex.Message));
+            return new CommandResult<TypedResult<RegisterUserFailureReason, Credentials>>
+            (
+                false,
+                TypedResult<RegisterUserFailureReason, Credentials>.Failure
+                (
+                    RegisterUserFailureReason.DomainError,
+                    ex.Message
+                )
+            );
         }
 
     }
