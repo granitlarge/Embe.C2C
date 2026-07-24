@@ -13,7 +13,7 @@ public abstract class TransactionalQueryHandler<T_Query, T_Result>
 
     public async Task<T_Result> HandleAsync(T_Query command, CancellationToken cancellationToken = default)
     {
-        using var transaction = await _repository.BeginTransactionAsync(cancellationToken);
+        using var transaction = await _repository.BeginTransactionAsync(serializable: false, cancellationToken);
         var result = await ExecuteAsync(command, cancellationToken);
         return result;
     }

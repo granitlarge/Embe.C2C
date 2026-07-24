@@ -33,7 +33,8 @@ public class AddImageHandler : CommandHandler<AddImageCommand, Result<AddImageRe
         domainEventStore,
         context,
         domainEventHandler,
-        integrationEventHandler
+        integrationEventHandler,
+        serializable: true
     )
     {
         _userRepo = userRepo;

@@ -15,13 +15,15 @@ public abstract class CommandHandler<T_Command, T_Result>
     DomainEventStore domainEventStore,
     IRepository context,
     DomainEventHandler domainEventHandler,
-    IntegrationEventHandler integrationEventHandler
+    IntegrationEventHandler integrationEventHandler,
+    bool serializable = false
 )
 {
     private readonly DomainEventStore _domainEventStore = domainEventStore;
     private readonly IRepository _repo = context;
     private readonly DomainEventHandler _domainEventHandler = domainEventHandler;
     private readonly IntegrationEventHandler _integrationEventHandler = integrationEventHandler;
+    private readonly bool _serializable = serializable;
 
     public async Task<T_Result> HandleAsync
     (
@@ -29,7 +31,7 @@ public abstract class CommandHandler<T_Command, T_Result>
         CancellationToken cancellationToken = default
     )
     {
-        using var transaction = await _repo.BeginTransactionAsync(cancellationToken);
+        using var transaction = await _repo.BeginTransactionAsync(serializable: _serializable, cancellationToken);
         var result = await InternalHandleAsync(command, cancellationToken);
 
         foreach (var domainEvent in _repo.DomainEvents.Union(_domainEventStore.DomainEvents).OrderBy(de => de.Timestamp))

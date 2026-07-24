@@ -53,9 +53,9 @@ public class C2CContext
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
 
-    public async Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+    public async Task<IDbTransaction> BeginTransactionAsync(bool serializable, CancellationToken cancellationToken)
     {
-        var transaction = await Database.BeginTransactionAsync(cancellationToken);
+        var transaction = await Database.BeginTransactionAsync(serializable ? System.Data.IsolationLevel.Serializable : System.Data.IsolationLevel.Snapshot, cancellationToken);
         return new MyDbTransaction(transaction);
     }
 }

@@ -27,7 +27,7 @@ public interface IDbSet<T>
 }
 public interface IBeginTransaction
 {
-    Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+    Task<IDbTransaction> BeginTransactionAsync(bool serializable, CancellationToken cancellationToken = default);
 }
 
 public interface IRepository : ISaveChanges, IBeginTransaction
