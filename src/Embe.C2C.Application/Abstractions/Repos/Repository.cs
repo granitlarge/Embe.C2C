@@ -1,8 +1,6 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Domain;
-using Embe.C2C.Domain.Aggregates.Candidates;
-using Embe.C2C.Domain.Aggregates.Notifications;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Embe.C2C.Application.Abstractions.Repos

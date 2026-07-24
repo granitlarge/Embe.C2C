@@ -11,7 +11,6 @@ using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 

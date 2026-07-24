@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
@@ -11,7 +10,6 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 

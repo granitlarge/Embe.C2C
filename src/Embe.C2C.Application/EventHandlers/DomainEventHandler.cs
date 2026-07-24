@@ -10,7 +10,6 @@ using Embe.C2C.Domain.Aggregates.Messages.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Users.Events;
-using Microsoft.EntityFrameworkCore;
 using NotificationUpdatedEvent = Embe.C2C.Domain.Aggregates.Notifications.Events.NotificationUpdatedEvent;
 
 namespace Embe.C2C.Application.EventHandlers;

@@ -5,7 +5,6 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
-using Microsoft.EntityFrameworkCore;
 
 namespace Embe.C2C.Application.Queries.Candidates.Handlers;
 
