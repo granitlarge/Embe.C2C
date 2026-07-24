@@ -12,6 +12,7 @@ import TextAreaInput from "@/src/shared/components/inputs/text-area-input/TextAr
 import Image from "@/src/shared/components/images/Image";
 import { Guid } from "@/src/shared/cache";
 import Button from "@/src/shared/components/buttons/Button";
+import { Plus } from "@deemlol/next-icons";
 
 export type ImageData = {
     id?: Guid,
@@ -60,6 +61,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                 {
                     (isEmpty || !profilePictureUrl) &&
                     <div className={`rounded-full w-[150px] h-[150px] flex flex-col items-center justify-center bg-gray-300`}>
+                        <Plus className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" />
                     </div>
                 }
             </Button>
