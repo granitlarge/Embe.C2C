@@ -18,19 +18,19 @@ public class UserConfiguration : AggregateConfiguration<User>
         builder.Property(u => u.Email)
             .HasConversion(
                 email => email.Value,
-                value => Email.Create(value))
+                value => Email.Create(value).Value)
             .IsRequired();
 
         builder.Property(u => u.Alias)
             .HasConversion(
                 userName => userName.Value,
-                value => Alias.Create(value))
+                value => Alias.Create(value).Value)
             .IsRequired();
 
         builder.Property(u => u.BirthDate)
             .HasConversion(
                 birthDate => birthDate.Value,
-                value => new BirthDate(value))
+                value => BirthDate.Create(value).Value)
             .IsRequired();
 
         builder.Property(u => u.Coordinates).HasColumnType("geography");

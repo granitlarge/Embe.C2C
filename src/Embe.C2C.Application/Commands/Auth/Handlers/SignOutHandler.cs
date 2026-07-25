@@ -3,10 +3,11 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Auth.Handlers;
 
-public class SignOutHandler : CommandHandler<SignOutCommand, TypedResult<SignOutFailureReason, bool>>
+public class SignOutHandler : CommandHandler<SignOutCommand, ErrorOr<bool>>
 {
     private readonly IAuthService _authService;
 
@@ -22,13 +23,13 @@ public class SignOutHandler : CommandHandler<SignOutCommand, TypedResult<SignOut
         _authService = authService;
     }
 
-    protected override async Task<CommandResult<TypedResult<SignOutFailureReason, bool>>> InternalHandleAsync
+    protected override async Task<CommandResult<ErrorOr<bool>>> InternalHandleAsync
     (
         SignOutCommand command,
         CancellationToken cancellationToken = default
     )
     {
         var result = await _authService.SignOutAsync(command.RefreshToken, cancellationToken);
-        return new CommandResult<TypedResult<SignOutFailureReason, bool>>(result.IsSuccess, result);
+        return new CommandResult<ErrorOr<bool>>(result.IsSuccess, result);
     }
 }

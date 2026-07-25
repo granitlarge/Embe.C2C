@@ -65,7 +65,7 @@ public static class SearchProfileEndPoints
     )
     {
         var result = await handler.HandleAsync(new GetAllSearchProfilesQuery(page, pageSize), cancellationToken);
-        return result.ToResult();
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> Delete

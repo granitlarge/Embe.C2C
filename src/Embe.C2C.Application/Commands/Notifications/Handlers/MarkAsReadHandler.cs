@@ -2,10 +2,11 @@ using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Notifications.Handlers;
 
-public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, Result>
+public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, ErrorOr<Success>>
 {
     private readonly INotificationRepository _notificationRepository;
 
@@ -22,16 +23,16 @@ public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, Result>
         _notificationRepository = notificationRepository;
     }
 
-    protected async override Task<CommandResult<Result>> InternalHandleAsync(MarkAsReadCommand command, CancellationToken cancellationToken = default)
+    protected async override Task<CommandResult<ErrorOr<Success>>> InternalHandleAsync(MarkAsReadCommand command, CancellationToken cancellationToken = default)
     {
         var notification = await _notificationRepository.GetByIdAsync(command.NotificationId, cancellationToken);
         if (notification is null)
         {
-            return new CommandResult<Result>(Save: false, Result.Failure(FailureReason.NotFound, "Notification not found."));
+            return new CommandResult<ErrorOr<Success>>(false, Error.NotFound("notification_not_found", "Notification not found."));
         }
 
         notification.MarkAsRead(command.IsRead);
 
-        return new CommandResult<Result>(Save: true, Result.Success());
+        return new CommandResult<ErrorOr<Success>>(Save: true, Result.Success);
     }
 }

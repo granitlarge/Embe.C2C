@@ -66,7 +66,7 @@ public static class UserEndPoints
     private static async Task<IResult> HasSearchProfile([FromServices] GetHasSearchProfileHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(GetHasSearchProfileQuery.Instance, cancellationToken);
-        return result.ToResult();
+        return Results.Ok(result);
     }
     private static async Task<IResult> AddImages([FromBody] AddImagesCommand command, [FromServices] AddImagesHandler handler, CancellationToken cancellationToken = default)
     {

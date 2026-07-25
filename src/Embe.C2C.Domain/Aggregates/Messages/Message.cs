@@ -86,10 +86,3 @@ public class Message : Aggregate
     public Message? ReplyToMessage { get; private set; }
     #endregion
 }
-
-public enum MessageError
-{
-    CannotCommunicate,
-    Unauthorized,
-    InvalidReply
-}

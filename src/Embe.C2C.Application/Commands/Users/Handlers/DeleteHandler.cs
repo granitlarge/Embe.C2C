@@ -5,10 +5,11 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
-public class DeleteHandler : CommandHandler<DeleteCommand, Result>
+public class DeleteHandler : CommandHandler<DeleteCommand, ErrorOr<Success>>
 {
     private readonly IAccountRepository _accountRepo;
     private readonly IUserRepository _userRepo;
@@ -36,24 +37,24 @@ public class DeleteHandler : CommandHandler<DeleteCommand, Result>
         _accountRepo = accountRepo;
     }
 
-    protected override async Task<CommandResult<Result>> InternalHandleAsync(DeleteCommand command, CancellationToken cancellationToken = default)
+    protected override async Task<CommandResult<ErrorOr<Success>>> InternalHandleAsync(DeleteCommand command, CancellationToken cancellationToken = default)
     {
         var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Delete))
         {
-            return new CommandResult<Result>(false, Result.Failure(FailureReason.Forbidden, "You are not authorized to delete this user."));
+            return new CommandResult<ErrorOr<Success>>(false, Error.Forbidden("forbidden", "User is not authorized to delete this profile."));
         }
 
         var user = await _userRepo.GetByIdAsync(command.UserId, cancellationToken);
         if (user is null)
         {
-            return new CommandResult<Result>(false, Result.Failure(FailureReason.NotFound, "User not found."));
+            return new CommandResult<ErrorOr<Success>>(false, Error.NotFound("not_found", $"User with ID {command.UserId} not found."));
         }
 
         var deleteIdentityUserResult = await _authService.DeleteUserAsync(user.IdentityUserId, cancellationToken);
         if (!deleteIdentityUserResult.IsSuccess)
         {
-            return new CommandResult<Result>(false, Result.Failure(FailureReason.Unknown, deleteIdentityUserResult.Message!));
+            return new CommandResult<ErrorOr<Success>>(false, deleteIdentityUserResult.Errors);
         }
 
         var accounts = await _accountRepo.GetByUserIdAsync(command.UserId, cancellationToken);
@@ -65,6 +66,6 @@ public class DeleteHandler : CommandHandler<DeleteCommand, Result>
             _accountRepo.Set.Remove(account);
         }
 
-        return new CommandResult<Result>(true, Result.Success());
+        return new CommandResult<ErrorOr<Success>>(true, ErrorOr.Result.Success);
     }
 }

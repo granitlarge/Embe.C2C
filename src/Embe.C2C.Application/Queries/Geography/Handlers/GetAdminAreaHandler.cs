@@ -13,7 +13,7 @@ public class SearchAdminAreaHandler
         _repository = repository;
     }
 
-    public async Task<Result<List<IAdminArea>>> HandleAsync(SearchAdminAreaQuery query, CancellationToken cancellationToken)
+    public async Task<List<IAdminArea>> HandleAsync(SearchAdminAreaQuery query, CancellationToken cancellationToken)
     {
         var adminAreas = await _repository.SearchAdminAreasAsync
         (
@@ -24,6 +24,6 @@ public class SearchAdminAreaHandler
             query.Size,
             cancellationToken
         );
-        return Result<List<IAdminArea>>.Success(adminAreas);
+        return adminAreas;
     }
 }

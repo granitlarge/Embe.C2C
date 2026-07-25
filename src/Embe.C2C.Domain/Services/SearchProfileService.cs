@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Services;
 
@@ -16,7 +16,7 @@ public class SearchProfileService : DomainService
         _domainEventStore = domainEventStore;
     }
 
-    public SearchProfile Create
+    public ErrorOr<SearchProfile> Create
     (
         User owner,
         string name,
@@ -31,7 +31,10 @@ public class SearchProfileService : DomainService
     {
         if (maximumDistance != null && owner.Location == null)
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.OwnerLocationNotSet));
+            return DomainErrors.SearchProfileOwnerDistanceFilterButLocationNotSet.ToValidationErrorOr(new Dictionary<string, object>
+            {
+                { "ownerId", owner.Id }
+            });
         }
 
         return SearchProfile.Create
@@ -48,7 +51,7 @@ public class SearchProfileService : DomainService
         );
     }
 
-    public void Update
+    public ErrorOr<SearchProfile> Update
     (
         User owner,
         SearchProfile searchProfile,
@@ -65,15 +68,45 @@ public class SearchProfileService : DomainService
     {
         if (newMaximumDistance != null && owner.Location == null)
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.OwnerLocationNotSet));
+            return DomainErrors.SearchProfileOwnerDistanceFilterButLocationNotSet.ToValidationErrorOr(new Dictionary<string, object>
+            {
+                { "ownerId", owner.Id }
+            });
         }
 
-        searchProfile.ChangeName(newName);
-        searchProfile.ChangeDescription(newDescription);
+        var errors = new List<Error>();
+        var nameChangeResult = searchProfile.ChangeName(newName);
+        if (nameChangeResult.IsError)
+        {
+            errors.AddRange(nameChangeResult.Errors);
+        }
+
+        var descriptionChangeResult = searchProfile.ChangeDescription(newDescription);
+        if (descriptionChangeResult.IsError)
+        {
+            errors.AddRange(descriptionChangeResult.Errors);
+        }
+
         searchProfile.ChangeRelationshipType(newRelationshipType);
-        searchProfile.ChangeEngagement(newEngagement);
-        searchProfile.ChangeGenders(newGenders);
-        searchProfile.ChangeAgeRange(newAgeRangeMin, newAgeRangeMax);
+
+        var engagementChangeResult = searchProfile.ChangeEngagement(newEngagement);
+        if (engagementChangeResult.IsError)
+        {
+            errors.AddRange(engagementChangeResult.Errors);
+        }
+
+        var gendersChangeResult = searchProfile.ChangeGenders(newGenders);
+        if (gendersChangeResult.IsError)
+        {
+            errors.AddRange(gendersChangeResult.Errors);
+        }
+
+        var ageRangeChangeResult = searchProfile.ChangeAgeRange(newAgeRangeMin, newAgeRangeMax);
+        if (ageRangeChangeResult.IsError)
+        {
+            errors.AddRange(ageRangeChangeResult.Errors);
+        }
+
         searchProfile.ChangeMaximumDistance(newMaximumDistance);
 
         if (newActive != searchProfile.Active)
@@ -81,5 +114,6 @@ public class SearchProfileService : DomainService
             searchProfile.ToggleActive();
         }
 
+        return searchProfile;
     }
 }

@@ -11,7 +11,7 @@ namespace Embe.C2C.Application.Queries.Candidates.Handlers;
 public class GetPositiveJudgementsHandler : TransactionalQueryHandler
 <
     GetPositiveJudgementsQuery,
-    Result<List<ReadDto<CandidateDto, CandidatePermission>>>
+    List<ReadDto<CandidateDto, CandidatePermission>>
 >
 {
     private readonly ICandidateRepository _candidateRepository;
@@ -49,7 +49,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
         _candidateRepository = candidateRepository;
     }
 
-    protected async override Task<Result<List<ReadDto<CandidateDto, CandidatePermission>>>> ExecuteAsync
+    protected async override Task<List<ReadDto<CandidateDto, CandidatePermission>>> ExecuteAsync
     (
         GetPositiveJudgementsQuery query,
         CancellationToken cancellationToken = default
@@ -80,6 +80,6 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
             }
         }
 
-        return Result<List<ReadDto<CandidateDto, CandidatePermission>>>.Success(dtos);
+        return dtos;
     }
 }

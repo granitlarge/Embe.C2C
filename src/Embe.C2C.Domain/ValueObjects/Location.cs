@@ -1,27 +1,36 @@
-using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
 public record Location
 {
-    public Location
+    private Location
     (
         double latitude,
         double longitude
     )
     {
+        Latitude = latitude;
+        Longitude = longitude;
+    }
+
+    public static ErrorOr<Location> Create(double latitude, double longitude)
+    {
+        var errors = new List<Error>();
         if (latitude < -90 || latitude > 90)
         {
-            throw new DomainException(new DomainError<LocationError>(LocationError.InvalidLatitude));
+            errors.Add(DomainErrors.InvalidLatitude.ToValidationErrorOr());
         }
 
         if (longitude < -180 || longitude > 180)
         {
-            throw new DomainException(new DomainError<LocationError>(LocationError.InvalidLongitude));
+            errors.Add(DomainErrors.InvalidLongitude.ToValidationErrorOr());
         }
 
-        Latitude = latitude;
-        Longitude = longitude;
+        if (errors.Count != 0)
+            return errors;
+
+        return new Location(latitude, longitude);
     }
 
     public double Latitude { get; }
@@ -29,7 +38,7 @@ public record Location
 
     public Distance DistanceTo(Location location)
     {
-        return new Distance(Haversine(Latitude, Longitude, location.Latitude, location.Longitude) / 1000, LengthUnit.Kilometers);
+        return Distance.Create(Haversine(Latitude, Longitude, location.Latitude, location.Longitude) / 1000, LengthUnit.Kilometers).Value;
     }
 
     private const double EarthRadiusMeters = 6371000.0;
@@ -56,10 +65,4 @@ public record Location
 
     private static double DegreesToRadians(double degrees)
         => degrees * Math.PI / 180.0;
-}
-
-public enum LocationError
-{
-    InvalidLatitude,
-    InvalidLongitude
 }

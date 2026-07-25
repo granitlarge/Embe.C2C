@@ -7,6 +7,7 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
@@ -25,7 +26,7 @@ public class GenerateCandidatesHandler
     SearchProfileDtoMapper searchProfileDtoMapper,
     CandidateDtoMapper candidateDtoMapper,
     CandidateAuthorizationService candidateAuthorizationService
-) : CommandHandler<GenerateCandidatesCommand, Result<List<ReadDto<CandidateDto, CandidatePermission>>>>
+) : CommandHandler<GenerateCandidatesCommand, ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>
 (
     domainEventStore,
     context,
@@ -43,7 +44,7 @@ public class GenerateCandidatesHandler
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
 
-    protected override async Task<CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>> InternalHandleAsync
+    protected override async Task<CommandResult<ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>> InternalHandleAsync
     (
         GenerateCandidatesCommand command,
         CancellationToken cancellationToken = default
@@ -54,7 +55,7 @@ public class GenerateCandidatesHandler
         var userHasCandidates = await _candidateRepository.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         if (!userHasCandidates)
         {
-            return new CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, Result<List<ReadDto<CandidateDto, CandidatePermission>>>.Success([]));
+            return new CommandResult<ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>(false, Error.NotFound("not_found", "No candidates found for the authenticated user."));
         }
 
         var candidates = await _candidateRepository.GetByUserIdAsync(userId, cancellationToken);
@@ -95,7 +96,6 @@ public class GenerateCandidatesHandler
                 dtos.Add(candidateDto);
         }
 
-        var result = Result<List<ReadDto<CandidateDto, CandidatePermission>>>.Success(dtos);
-        return new CommandResult<Result<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, result);
+        return new CommandResult<ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, dtos);
     }
 }

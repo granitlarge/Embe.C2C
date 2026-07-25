@@ -1,4 +1,4 @@
-using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
@@ -6,21 +6,17 @@ public record MessageContent
 {
     private MessageContent(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new DomainException(new DomainError<MessageContentError>(MessageContentError.InvalidMessageContent));
-        }
         Value = value;
     }
 
     public string Value { get; }
-    public static MessageContent Create(string value)
+
+    public static ErrorOr<MessageContent> Create(string value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return DomainErrors.Empty.ToValidationErrorOr();
+        }
         return new MessageContent(value);
     }
-}
-
-public enum MessageContentError
-{
-    InvalidMessageContent
 }

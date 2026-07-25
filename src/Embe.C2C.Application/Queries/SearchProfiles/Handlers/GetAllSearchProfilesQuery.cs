@@ -32,7 +32,7 @@ public class GetAllSearchProfilesHandler
         _searchProfileRepository = searchProfileRepository;
     }
 
-    public async Task<Result<List<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
+    public async Task<List<ReadDto<SearchProfileDto, SearchProfilePermission>>> HandleAsync
     (
         GetAllSearchProfilesQuery query,
         CancellationToken cancellationToken
@@ -49,6 +49,6 @@ public class GetAllSearchProfilesHandler
                 dtos.Add(dto);
         }
 
-        return Result<List<ReadDto<SearchProfileDto, SearchProfilePermission>>>.Success(dtos);
+        return dtos;
     }
 }

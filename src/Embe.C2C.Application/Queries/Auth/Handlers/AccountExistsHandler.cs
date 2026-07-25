@@ -12,9 +12,9 @@ public class AccountExistsHandler
         _authService = authService;
     }
 
-    public async Task<Result<bool>> HandleAsync(AccountExistsQuery query, CancellationToken cancellationToken = default)
+    public async Task<bool> HandleAsync(AccountExistsQuery query, CancellationToken cancellationToken = default)
     {
         var exists = await _authService.AccountExistsAsync(query.Email, cancellationToken);
-        return Result<bool>.Success(exists);
+        return exists;
     }
 }

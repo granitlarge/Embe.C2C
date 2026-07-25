@@ -19,11 +19,11 @@ public class GetNotificationsHandler
         _notificationRepository = notificationRepository;
     }
 
-    public async Task<Result<List<NotificationDto>>> HandleAsync(PagedQuery query, CancellationToken cancellationToken = default)
+    public async Task<List<NotificationDto>> HandleAsync(PagedQuery query, CancellationToken cancellationToken = default)
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("Authenticated user must have a user id.");
         var notifications = await _notificationRepository.GetNotificationsAsync(userId, query.Page, query.Size, cancellationToken);
         var dtos = notifications.Select(n => n.ToDto()).ToList();
-        return Result<List<NotificationDto>>.Success(dtos);
+        return dtos;
     }
 }

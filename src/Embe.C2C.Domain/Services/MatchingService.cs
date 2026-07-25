@@ -2,9 +2,9 @@ using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Messages.Events;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Policies;
 using Embe.C2C.Domain.ValueObjects;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Services;
 
@@ -17,7 +17,7 @@ public class MatchingService : DomainService
         _domainEventStore = domainEventStore;
     }
 
-    public Message SendMessage
+    public ErrorOr<Message> SendMessage
     (
         User author,
         Matching matching,
@@ -28,7 +28,11 @@ public class MatchingService : DomainService
     {
         if (!communicationPolicy.CanCommunicate())
         {
-            throw new DomainException(new DomainError<MessageError>(MessageError.CannotCommunicate));
+            return DomainErrors.MatchingSendMessageCannotCommunicate.ToValidationErrorOr(new Dictionary<string, object>
+            {
+                { "authorId", author.Id },
+                { "recipientId", matching.GetOtherUserId(author.Id)! }
+            });
         }
 
         var message = Message.Create(matching.Id, replyToMessage?.Id, author.Id, content);
@@ -38,18 +42,23 @@ public class MatchingService : DomainService
         return message;
     }
 
-    public void EditMessage(User editor, Message message, MessageContent newContent)
+    public ErrorOr<Message> EditMessage(User editor, Message message, MessageContent newContent)
     {
         if (message.AuthorUserId != editor.Id)
         {
-            throw new DomainException(new DomainError<MessageError>(MessageError.Unauthorized));
+            return DomainErrors.Forbidden.ToValidationErrorOr(new Dictionary<string, object>
+            {
+                { "editorId", editor.Id },
+                { "messageId", message.Id }
+            });
         }
 
         message.Edit(newContent);
         _domainEventStore.AddDomainEvent(new MessageEditedEvent(message));
+        return message;
     }
 
-    public void DeleteMessage
+    public ErrorOr<Message> DeleteMessage
     (
         User deleter,
         Message message,
@@ -60,14 +69,21 @@ public class MatchingService : DomainService
     {
         if (message.AuthorUserId != deleter.Id)
         {
-            throw new DomainException(new DomainError<MessageError>(MessageError.Unauthorized));
+            return DomainErrors.Forbidden.ToValidationErrorOr(new Dictionary<string, object>
+            {
+                { "deleterId", deleter.Id },
+                { "messageId", message.Id }
+            });
         }
 
         foreach (var reply in replies)
         {
             if (reply.ReplyToMessageId != message.Id)
             {
-                throw new DomainException(new DomainError<MessageError>(MessageError.InvalidReply));
+                return DomainErrors.MessageInvalidReply.ToValidationErrorOr(new Dictionary<string, object>
+                {
+                    { "messageId", message.Id }
+                });
             }
         }
 
@@ -80,5 +96,6 @@ public class MatchingService : DomainService
         }
 
         _domainEventStore.AddDomainEvent(new MessageRemovedEvent(message));
+        return message;
     }
 }

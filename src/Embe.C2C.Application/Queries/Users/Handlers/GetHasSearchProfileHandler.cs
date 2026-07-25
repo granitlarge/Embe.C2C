@@ -22,11 +22,11 @@ public class GetHasSearchProfileHandler
         _userRepo = userRepo;
     }
 
-    public async Task<Result<bool>> HandleAsync(GetHasSearchProfileQuery query, CancellationToken cancellationToken)
+    public async Task<bool> HandleAsync(GetHasSearchProfileQuery query, CancellationToken cancellationToken)
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
         var result = await _userRepo.HasSearchProfilesAsync(userId, cancellationToken);
-        return Result<bool>.Success(result);
+        return result;
     }
 
 }

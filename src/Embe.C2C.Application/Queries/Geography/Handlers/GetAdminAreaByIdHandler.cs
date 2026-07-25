@@ -1,6 +1,6 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Application.Abstractions.Repos;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.Geography.Handlers;
 
@@ -13,14 +13,14 @@ public class GetAdminAreaByIdHandler
         _repository = repository;
     }
 
-    public async Task<Result<IAdminArea>> HandleAsync(GetAdminAreaByIdQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<IAdminArea>> HandleAsync(GetAdminAreaByIdQuery query, CancellationToken cancellationToken)
     {
         var adminArea = await _repository.GetByIdAsync(query.Id, cancellationToken);
         if (adminArea == null)
         {
-            return Result<IAdminArea>.Failure(FailureReason.NotFound, $"Admin area with id {query.Id} not found.");
+            return Error.NotFound("not_found", $"Admin area with id {query.Id} not found.");
         }
 
-        return Result<IAdminArea>.Success(adminArea);
+        return ErrorOrFactory.From(adminArea);
     }
 }

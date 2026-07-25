@@ -1,7 +1,7 @@
 using Embe.C2C.Domain.Aggregates.Accounts.Events;
 using Embe.C2C.Domain.Aggregates.Transactions;
-using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Aggregates.Accounts;
 
@@ -15,7 +15,7 @@ public class Account : Aggregate
     {
         Id = Guid.CreateVersion7();
         UserId = userId;
-        Balance = Money.Create(0, currency);
+        Balance = Money.Create(0, currency).Value;
         Open();
     }
 
@@ -26,7 +26,7 @@ public class Account : Aggregate
 
     }
 
-    public static Account Open(Guid userId, Currency currency)
+    public static ErrorOr<Account> Open(Guid userId, Currency currency)
     {
         return new Account(userId, currency);
     }
@@ -37,29 +37,29 @@ public class Account : Aggregate
     public Currency Currency => Balance.Currency;
     public bool IsOpen { get; private set; }
 
-    public Transaction Withdraw(Money amount)
+    public ErrorOr<Transaction> Withdraw(Money amount)
     {
         if (!IsOpen)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.Closed));
+            return DomainErrors.AccountTransactWhileClosed.ToFailureErrorOr();
         }
 
         if (amount.Currency != Currency)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.CurrencyMismatch));
+            return DomainErrors.AccountTransactIncorrectCurrency.ToFailureErrorOr();
         }
 
         if (amount.Amount > Balance.Amount)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.InsufficientFunds));
+            return DomainErrors.AccountWithdrawExceedsBalance.ToFailureErrorOr();
         }
 
         if (amount.Amount <= 0)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.ZeroOrNegativeAmount));
+            return DomainErrors.AccountTransactNonPositiveAmount.ToFailureErrorOr();
         }
 
-        Balance = Money.Create(Balance.Amount - amount.Amount, Balance.Currency);
+        Balance = Money.Create(Balance.Amount - amount.Amount, Balance.Currency).Value;
         var transaction = Transaction.Create
         (
             Id,
@@ -69,28 +69,34 @@ public class Account : Aggregate
             DateTimeOffset.UtcNow
         );
 
-        AddDomainEvent(new WithdrawalEvent(this, transaction));
+        if (transaction.IsError)
+        {
+            return transaction.Errors;
+        }
+
+        AddDomainEvent(new WithdrawalEvent(this, transaction.Value));
         return transaction;
     }
 
-    public Transaction Deposit(Money amount)
+    public ErrorOr<Transaction> Deposit(Money amount)
     {
         if (!IsOpen)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.Closed));
+            return DomainErrors.AccountTransactWhileClosed.ToFailureErrorOr();
         }
 
         if (amount.Currency != Currency)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.CurrencyMismatch));
+            return DomainErrors.AccountTransactIncorrectCurrency.ToFailureErrorOr();
         }
 
         if (amount.Amount <= 0)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.ZeroOrNegativeAmount));
+            return DomainErrors.AccountTransactNonPositiveAmount.ToFailureErrorOr();
         }
 
-        Balance = Money.Create(Balance.Amount + amount.Amount, Balance.Currency);
+        Balance = Money.Create(Balance.Amount + amount.Amount, Balance.Currency).Value;
+
         var transaction = Transaction.Create
         (
             Id,
@@ -99,57 +105,57 @@ public class Account : Aggregate
             TransactionReason.Deposit,
             DateTimeOffset.UtcNow
         );
-
-        AddDomainEvent(new DepositEvent(this, transaction));
+        if (transaction.IsError)
+        {
+            return transaction.Errors;
+        }
+        AddDomainEvent(new DepositEvent(this, transaction.Value));
         return transaction;
     }
 
-    public void Close()
+    public ErrorOr<Success> Close()
     {
+        var errors = new List<Error>();
         if (!IsOpen)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.AlreadyClosed));
+            errors.Add(DomainErrors.AccountCloseAlreadyClosed.ToFailureErrorOr());
         }
 
         if (Balance.Amount != 0)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.BalanceNotZero));
+            errors.Add(DomainErrors.AccountClosePositiveBalance.ToFailureErrorOr());
+        }
+
+        if (errors.Count != 0)
+        {
+            return errors;
         }
 
         IsOpen = false;
         AddDomainEvent(new AccountClosedEvent(this));
+        return Result.Success;
     }
 
-    public void Open()
+    public ErrorOr<Success> Open()
     {
         if (IsOpen)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.AlreadyOpened));
+            return DomainErrors.AccountOpenAlreadyOpened.ToFailureErrorOr();
         }
 
         IsOpen = true;
         AddDomainEvent(new AccountOpenedEvent(this));
+        return Result.Success;
     }
 
-    internal void Remove()
+    internal ErrorOr<Success> Remove()
     {
         if (IsOpen)
         {
-            throw new DomainException(new DomainError<AccountError>(AccountError.AccountMustBeClosed));
+            return DomainErrors.AccountRemoveWhileOpen.ToFailureErrorOr();
         }
-        AddDomainEvent(new AccountRemovedEvent(this));
-    }
-}
 
-public enum AccountError
-{
-    Closed,
-    CurrencyMismatch,
-    InsufficientFunds,
-    ZeroOrNegativeAmount,
-    AlreadyClosed,
-    BalanceNotZero,
-    AlreadyOpened,
-    AccountMustBeClosed,
-    Unauthorized
+        AddDomainEvent(new AccountRemovedEvent(this));
+        return Result.Success;
+    }
 }

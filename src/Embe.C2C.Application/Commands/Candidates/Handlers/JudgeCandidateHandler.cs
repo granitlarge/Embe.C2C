@@ -8,10 +8,11 @@ using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
-public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Result<ReadDto<MatchingDto, MatchingPermission>?>>
+public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>
 {
     private readonly ICandidateRepository _candidateRepository;
     private readonly IMatchingRepository _matchingRepo;
@@ -66,7 +67,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         _candidateRepository = candidateRepository;
     }
 
-    protected override async Task<CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>> InternalHandleAsync
+    protected override async Task<CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>> InternalHandleAsync
     (
         JudgeCandidateCommand command,
         CancellationToken cancellationToken = default
@@ -76,48 +77,59 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
         var permissions = await _candidateAuthorizationService.GetPermissionsAsync(command.CandidateId, cancellationToken);
         if (!permissions.Contains(CandidatePermission.Judge))
         {
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Save: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.Forbidden, "You do not have permission to judge this candidate."));
+            return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>(false, Error.Failure("forbidden", "You do not have permission to judge this candidate."));
         }
 
         var candidate = await _candidateRepository.GetByIdAsync(command.CandidateId, cancellationToken);
         if (candidate is null)
         {
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(Save: false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "The candidate does not exist."));
+            return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>(false, Error.Failure("not_found", "The candidate does not exist."));
         }
 
         var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
         if (user == null)
         {
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "User not found."));
+            return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>(false, Error.Failure("not_found", "User not found."));
         }
 
         var candidateUser = await _userRepo.GetByIdAsync(candidate.CandidateUserId, cancellationToken);
         if (candidateUser == null)
         {
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Judgee not found."));
+            return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>(false, Error.Failure("not_found", "Judgee not found."));
         }
 
         var oppositeCandidate = await _candidateRepository.GetByParametersAsync(candidate.CandidateUserId, userId, candidate.CandidateSearchProfileId, candidate.UserSearchProfileId, cancellationToken);
         if (oppositeCandidate is null)
         {
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(false, Result<ReadDto<MatchingDto, MatchingPermission>?>.Failure(FailureReason.NotFound, "Opposite candidate not found"));
+            return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>(false, Error.Failure("not_found", "Opposite candidate not found"));
         }
 
         var matching = _judgementService.Judge(user, candidate, oppositeCandidate, command.IsPositive);
-        if (matching != null)
+        if (matching.IsError)
+        {
+            return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>(false, matching.Errors);
+        }
+
+        if (matching.Value != null)
         {
             candidate.Remove();
             oppositeCandidate?.Remove();
             _candidateRepository.Set.Remove(candidate);
             _candidateRepository.Set.Remove(oppositeCandidate!);
-            _matchingRepo.Set.Add(matching);
+            _matchingRepo.Set.Add(matching.Value);
         }
 
-        if (matching == null)
-            return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(null));
+        if (matching.Value == null)
+        {
+            return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>
+            (
+                true,
+                ErrorOrFactory.From((ReadDto<MatchingDto, MatchingPermission>?)null)
+            );
+        }
 
         var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
-        var readDto = await matching.ToDtoAsync
+        var readDto = await matching.Value.ToDtoAsync
         (
             queryingUser,
             user,
@@ -133,6 +145,6 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Resul
             cancellationToken
         );
 
-        return new CommandResult<Result<ReadDto<MatchingDto, MatchingPermission>?>>(true, Result<ReadDto<MatchingDto, MatchingPermission>?>.Success(readDto));
+        return new CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>(true, ErrorOrFactory.From(readDto));
     }
 }

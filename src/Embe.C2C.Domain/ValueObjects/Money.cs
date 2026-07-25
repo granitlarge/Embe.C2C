@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
@@ -6,11 +7,6 @@ public record Money : IComparable<Money>
 {
     private Money(decimal amount, Currency currency)
     {
-        if (amount < 0)
-        {
-            throw new DomainException(new DomainError<MoneyError>(MoneyError.NegativeAmount));
-        }
-
         Amount = amount;
         Currency = currency;
     }
@@ -25,8 +21,19 @@ public record Money : IComparable<Money>
     public decimal Amount { get; }
     public Currency Currency { get; }
 
-    public static Money Create(decimal amount, Currency currency)
+    public static ErrorOr<Money> Create(decimal amount, Currency currency)
     {
+        var errors = new List<Error>();
+        if (amount < 0)
+        {
+            errors.Add(Error.Validation(DomainErrors.NegativeMoney.Code, DomainErrors.NegativeMoney.Message));
+        }
+
+        if (errors.Count != 0)
+        {
+            return errors;
+        }
+
         return new Money(amount, currency);
     }
 

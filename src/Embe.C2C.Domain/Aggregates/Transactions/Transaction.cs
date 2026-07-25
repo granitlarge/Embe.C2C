@@ -1,5 +1,5 @@
-using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Aggregates.Transactions;
 
@@ -15,17 +15,6 @@ public class Transaction : Aggregate
         string? note = null
     )
     {
-
-        if (amount.Amount <= 0)
-        {
-            throw new DomainException(new DomainError<TransactionError>(TransactionError.ZeroOrNegativeAmount));
-        }
-
-        if (transactionDate > DateTimeOffset.UtcNow)
-        {
-            throw new DomainException(new DomainError<TransactionError>(TransactionError.FutureTransactionDate));
-        }
-
         Id = Guid.CreateVersion7();
         AccountId = accountId;
         Amount = amount;
@@ -53,7 +42,7 @@ public class Transaction : Aggregate
 
     public DateTimeOffset CreatedAt { get; private set; }
 
-    internal static Transaction Create
+    internal static ErrorOr<Transaction> Create
     (
         Guid AccountId,
         Money amount,
@@ -63,12 +52,22 @@ public class Transaction : Aggregate
         string? note = null
     )
     {
+        var errors = new List<Error>();
+        if (amount.Amount <= 0)
+        {
+            errors.Add(DomainErrors.TransactionAmountInvalid.ToValidationErrorOr());
+        }
+
+        if (transactionDate > DateTimeOffset.UtcNow)
+        {
+            errors.Add(DomainErrors.TransactionFutureDate.ToValidationErrorOr());
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
+        }
+
         return new Transaction(AccountId, amount, type, reason, transactionDate, note);
     }
-}
-
-public enum TransactionError
-{
-    ZeroOrNegativeAmount,
-    FutureTransactionDate
 }

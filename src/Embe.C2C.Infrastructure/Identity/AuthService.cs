@@ -3,10 +3,10 @@ using System.Text;
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
-using Embe.C2C.Application.Commands.Users.Handlers;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Entities;
+using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -28,7 +28,7 @@ public class AuthService
     private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan _refreshTokenLifetime = TimeSpan.FromDays(7);
 
-    public async Task<TypedResult<RefreshFailureReason, Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
     {
         var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
         var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtSettings.RefreshTokenSecret));
@@ -49,13 +49,13 @@ public class AuthService
 
             if (validatedToken is null)
             {
-                return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
+                return Error.Failure("invalid_refresh_token", "Invalid refresh token.");
             }
 
             var refreshTokenIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "tokenId");
             if (refreshTokenIdClaim == null || !Guid.TryParse(refreshTokenIdClaim.Value, out var refreshTokenId))
             {
-                return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
+                return Error.Failure("invalid_refresh_token", "Invalid refresh token.");
             }
 
             var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -64,25 +64,25 @@ public class AuthService
             var refreshTokenEntity = await _context.RefreshTokens.AsNoTracking().SingleOrDefaultAsync(rt => rt.Id == refreshTokenId, cancellationToken);
             if (refreshTokenEntity == null)
             {
-                return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
+                return Error.Failure("invalid_refresh_token", "Invalid refresh token.");
             }
 
             var refreshTokenHasExpired = refreshTokenEntity.ExpiresAt < DateTimeOffset.UtcNow;
             if (refreshTokenHasExpired)
             {
-                return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.ExpiredRefreshToken, "Refresh token has expired.");
+                return Error.Failure("invalid_refresh_token", "Refresh token has expired.");
             }
 
             var user = await _context.DomainUsers.AsNoTracking().SingleOrDefaultAsync(u => u.Id == refreshTokenEntity.UserId, cancellationToken);
             if (user == null)
             {
-                return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
+                return Error.Failure("invalid_refresh_token", "Invalid refresh token.");
             }
 
             var identityUser = await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == user.Email.Value, cancellationToken);
             if (identityUser == null)
             {
-                return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
+                return Error.Failure("invalid_refresh_token", "Invalid refresh token.");
             }
 
             var refreshToken = new RefreshToken(refreshTokenId, refreshTokenValue, refreshTokenEntity.ExpiresAt);
@@ -96,15 +96,15 @@ public class AuthService
                 await transaction.DisposeAsync();
             }
 
-            return TypedResult<RefreshFailureReason, Credentials>.Success(credentials);
+            return credentials;
         }
         catch (Exception)
         {
-            return TypedResult<RefreshFailureReason, Credentials>.Failure(RefreshFailureReason.InvalidRefreshToken, "Invalid refresh token.");
+            return Error.Failure("invalid_refresh_token", "Invalid refresh token.");
         }
     }
 
-    public async Task<TypedResult<SignInFailureReason, Credentials>> SignInAsync(string email, string password, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<Credentials>> SignInAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
         var ownsTransaction = _context.Database.CurrentTransaction == null;
@@ -112,19 +112,25 @@ public class AuthService
         var identityUser = await _userManager.FindByEmailAsync(email);
         if (identityUser == null)
         {
-            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotFound, "User not found.");
+            return Error.NotFound("invalid_email", "No user found with the provided email.");
         }
 
         var signInResult = await _userManager.CheckPasswordAsync(identityUser, password);
         if (!signInResult)
         {
-            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.InvalidCredentials, "Invalid email or password.");
+            return Error.Failure("invalid_credentials", "Invalid email or password.");
         }
 
-        var user = await _context.DomainUsers.SingleAsync(u => u.Email == Email.Create(email), cancellationToken);
+        var domainEmail = Email.Create(email);
+        if (domainEmail.IsError)
+        {
+            return domainEmail.Errors;
+        }
+
+        var user = await _context.DomainUsers.SingleAsync(u => u.Email == domainEmail.Value, cancellationToken);
         if (identityUser == null)
         {
-            return TypedResult<SignInFailureReason, Credentials>.Failure(SignInFailureReason.UserNotFound, "User not found.");
+            return Error.NotFound("invalid_email", "No user found with the provided email.");
         }
 
         var credentials = GenerateCredentials(identityUser, user);
@@ -138,15 +144,15 @@ public class AuthService
             await transaction.DisposeAsync();
         }
 
-        return TypedResult<SignInFailureReason, Credentials>.Success(credentials);
+        return credentials;
     }
 
-    public async Task<TypedResult<SignOutFailureReason, bool>> SignOutAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<bool>> SignOutAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
     {
         var userId = _userService.UserId;
         if (userId == null)
         {
-            return TypedResult<SignOutFailureReason, bool>.Failure(SignOutFailureReason.Unauthorized, "User is not authenticated.");
+            return Error.Failure("unauthorized", "User is not authenticated.");
         }
 
         var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -156,8 +162,9 @@ public class AuthService
         var refreshTokenEntity = await _context.RefreshTokens.SingleOrDefaultAsync(rt => rt.Id == refreshToken.Id && rt.UserId == userId, cancellationToken);
         if (refreshTokenEntity == null)
         {
-            return TypedResult<SignOutFailureReason, bool>.Failure(SignOutFailureReason.Unauthorized, "Refresh token not found for the user.");
+            return true;
         }
+
         _context.RefreshTokens.Remove(refreshTokenEntity);
         await _context.SaveChangesAsync(cancellationToken);
         if (ownsTransaction)
@@ -165,7 +172,7 @@ public class AuthService
             await transaction.CommitAsync(cancellationToken);
             await transaction.DisposeAsync();
         }
-        return TypedResult<SignOutFailureReason, bool>.Success(true);
+        return true;
     }
 
     private Credentials GenerateCredentials(IdentityUser identityUser, User user)
@@ -226,21 +233,20 @@ public class AuthService
         return new RefreshToken(tokenId, token, DateTimeOffset.UtcNow.Add(_refreshTokenLifetime));
     }
 
-    public async Task<TypedResult<InvalidateRefreshTokenFailureReason, bool>> InvalidateRefreshTokenAsync(string refreshTokenValue, CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> InvalidateRefreshTokenAsync(string refreshTokenValue, CancellationToken cancellationToken)
     {
         var userId = _userService.UserId;
         if (userId == null)
         {
-            return TypedResult<InvalidateRefreshTokenFailureReason, bool>.Failure(InvalidateRefreshTokenFailureReason.Unauthorized, "User is not authenticated.");
+            return Error.Unauthorized("unauthorized", "User is not authenticated.");
         }
-
         var transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(cancellationToken);
         var ownsTransaction = _context.Database.CurrentTransaction == null;
         var refreshToken = ParseRefreshToken(refreshTokenValue);
         var refreshTokenEntity = await _context.RefreshTokens.SingleOrDefaultAsync(rt => rt.Id == refreshToken.Id && rt.UserId == userId, cancellationToken);
         if (refreshTokenEntity == null)
         {
-            return TypedResult<InvalidateRefreshTokenFailureReason, bool>.Failure(InvalidateRefreshTokenFailureReason.Unauthorized, "Refresh token not found for the user.");
+            return true;
         }
         _context.RefreshTokens.Remove(refreshTokenEntity);
         await _context.SaveChangesAsync(cancellationToken);
@@ -249,7 +255,7 @@ public class AuthService
             await transaction.CommitAsync(cancellationToken);
             await transaction.DisposeAsync();
         }
-        return TypedResult<InvalidateRefreshTokenFailureReason, bool>.Success(true);
+        return true;
     }
 
     private static RefreshToken ParseRefreshToken(string refreshTokenValue)
@@ -272,64 +278,56 @@ public class AuthService
         return await _context.Users.AnyAsync(u => u.Email == email, cancellationToken);
     }
 
-    public async Task<TypedResult<RegisterUserFailureReason, IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         var identityUser = new MyIdentityUser { UserName = email, Email = email };
         var result = await _userManager.CreateAsync(identityUser, password);
         if (result.Succeeded)
         {
-            return TypedResult<RegisterUserFailureReason, IIdentityUser>.Success(identityUser);
+            return identityUser;
         }
         else
         {
-            var failureReason = result.Errors.Any(e => e.Code == "PasswordTooShort" || e.Code == "PasswordRequiresNonAlphanumeric" || e.Code == "PasswordRequiresDigit" || e.Code == "PasswordRequiresUpper" || e.Code == "PasswordRequiresLower")
-                ? RegisterUserFailureReason.WeakPassword
-                : RegisterUserFailureReason.UnknownError;
-
-            return TypedResult<RegisterUserFailureReason, IIdentityUser>.Failure(failureReason, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+            return result.Errors.Select(e => Error.Failure("registration_failed", e.Description)).ToList();
         }
     }
 
-    public async Task<ResultBase<ResetPasswordFailureReason>> ResetPasswordAsync(string identityUserId, string newPassword, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<Success>> ResetPasswordAsync(string identityUserId, string newPassword, CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByIdAsync(identityUserId);
         if (user is null)
         {
-            return ResultBase<ResetPasswordFailureReason>.Failure(ResetPasswordFailureReason.UserNotFound, "User not found.");
+            return Error.Failure("user_not_found", "User not found.");
         }
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         if (result.Succeeded)
         {
-            return ResultBase<ResetPasswordFailureReason>.Success();
+            return ErrorOr.Result.Success;
         }
         else
         {
-            var failureReason = result.Errors.Any(e => e.Code == "PasswordTooShort" || e.Code == "PasswordRequiresNonAlphanumeric" || e.Code == "PasswordRequiresDigit" || e.Code == "PasswordRequiresUpper" || e.Code == "PasswordRequiresLower")
-                ? ResetPasswordFailureReason.WeakPassword
-                : ResetPasswordFailureReason.UnknownError;
-
-            return ResultBase<ResetPasswordFailureReason>.Failure(failureReason, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+            return result.Errors.Select(e => Error.Failure("reset_password_failed", e.Description)).ToList();
         }
     }
 
-    public async Task<ResultBase<DeleteUserFailureReason>> DeleteUserAsync(string identityUserId, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<Success>> DeleteUserAsync(string identityUserId, CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByIdAsync(identityUserId);
         if (user is null)
         {
-            return ResultBase<DeleteUserFailureReason>.Failure(DeleteUserFailureReason.UserNotFound, "User not found.");
+            return Error.Failure("user_not_found", "User not found.");
         }
 
         var result = await _userManager.DeleteAsync(user);
         if (result.Succeeded)
         {
-            return ResultBase<DeleteUserFailureReason>.Success();
+            return ErrorOr.Result.Success;
         }
         else
         {
-            return ResultBase<DeleteUserFailureReason>.Failure(DeleteUserFailureReason.UnknownError, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+            return result.Errors.Select(e => Error.Failure("delete_user_failed", e.Description)).ToList();
         }
     }
 }

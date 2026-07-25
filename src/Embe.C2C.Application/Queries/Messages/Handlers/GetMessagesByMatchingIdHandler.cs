@@ -25,7 +25,7 @@ public class GetMessagesByMatchingIdHandler
         _messageRepo = messageRepo;
     }
 
-    public async Task<Result<List<ReadDto<MessageDto, MessagePermission>>>> HandleAsync(GetMessagesByMatchingIdQuery query, CancellationToken cancellationToken)
+    public async Task<List<ReadDto<MessageDto, MessagePermission>>> HandleAsync(GetMessagesByMatchingIdQuery query, CancellationToken cancellationToken)
     {
         var messages = await _messageRepo.GetMessagesByMatchingIdAsync(query.Filter, query.Page, query.Size, cancellationToken);
         var dtos = new List<ReadDto<MessageDto, MessagePermission>>();
@@ -36,6 +36,6 @@ public class GetMessagesByMatchingIdHandler
                 dtos.Add(readDto);
         }
 
-        return Result<List<ReadDto<MessageDto, MessagePermission>>>.Success(dtos);
+        return dtos;
     }
 }

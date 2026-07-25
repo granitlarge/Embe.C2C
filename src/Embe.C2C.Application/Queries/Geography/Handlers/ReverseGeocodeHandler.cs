@@ -13,9 +13,9 @@ public class ReverseGeocodeHandler
         _adminAreaRepository = adminAreaRepository;
     }
 
-    public async Task<Result<List<IAdminArea>>> HandleAsync(ReverseGeocodeQuery query, CancellationToken cancellationToken)
+    public async Task<List<IAdminArea>> HandleAsync(ReverseGeocodeQuery query, CancellationToken cancellationToken)
     {
         var result = await _adminAreaRepository.ReverseGeocodeAsync(query.Longitude, query.Latitude, cancellationToken);
-        return Result<List<IAdminArea>>.Success(result);
+        return result;
     }
 }

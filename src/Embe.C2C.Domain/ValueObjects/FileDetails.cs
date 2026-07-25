@@ -1,31 +1,17 @@
 using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
 public record ImageDetails
 {
-    public ImageDetails
+    private ImageDetails
     (
         string name,
         string mimeType,
         int order
     )
     {
-        if (order < 0)
-        {
-            throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidOrder));
-        }
-
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidName));
-        }
-
-        if (string.IsNullOrWhiteSpace(mimeType))
-        {
-            throw new DomainException(new DomainError<ImageDetailsError>(ImageDetailsError.InvalidMimeType));
-        }
-
         Name = name;
         MimeType = mimeType;
         Order = order;
@@ -41,12 +27,30 @@ public record ImageDetails
     public string Name { get; }
     public string MimeType { get; }
     public int Order { get; init; }
-}
 
-public enum ImageDetailsError
-{
-    InvalidOrder = 1,
-    InvalidName = 2,
-    InvalidMimeType = 3,
-    InvalidOffsets = 4
+    public static ErrorOr<ImageDetails> Create
+    (
+        string name,
+        string mimeType,
+        int order
+    )
+    {
+        var errors = new List<Error>();
+        if (order < 0)
+        {
+            errors.Add(DomainErrors.NegativeOrder.ToValidationErrorOr());
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors.Add(DomainErrors.Empty.ToValidationErrorOr());
+        }
+
+        if (string.IsNullOrWhiteSpace(mimeType))
+        {
+            errors.Add(DomainErrors.Empty.ToValidationErrorOr());
+        }
+
+        return new ImageDetails(name, mimeType, order);
+    }
 }

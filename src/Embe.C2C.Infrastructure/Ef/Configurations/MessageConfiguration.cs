@@ -32,7 +32,7 @@ public class MessageConfiguration : AggregateConfiguration<Message>
             .HasConversion
             (
                 m => m.Value,
-                v => MessageContent.Create(v)
+                v => MessageContent.Create(v).Value
             );
 
         base.Configure(builder);

@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Entities.SearchProfiles;
-using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Aggregates.SearchProfiles;
 
@@ -24,11 +24,6 @@ public class SearchProfile : Aggregate
         Distance? maximumDistance
     )
     {
-        ValidateName(name);
-        ValidateDescription(description);
-        ValidateGenders(genders);
-        ValidateAgeRange(ageRangeMin, ageRangeMax);
-
         Id = Guid.CreateVersion7();
         Active = true;
         UserId = userId;
@@ -77,31 +72,33 @@ public class SearchProfile : Aggregate
     public ICollection<Matching>? MatchingsUserId2 { get; private set; }
     #endregion
 
-    internal void AddGender(Gender gender)
+    internal ErrorOr<Success> AddGender(Gender gender)
     {
         if (_genders.Any(g => g.Gender == gender))
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidGenders));
+            return DomainErrors.SearchProfileGendersInvalid.ToValidationErrorOr();
         }
 
         _genders.Add(SearchProfileGender.Create(Id, gender));
         UpdatedAt = DateTimeOffset.UtcNow;
+        return Result.Success;
     }
 
-    internal void RemoveGender(Gender gender)
+    internal ErrorOr<Success> RemoveGender(Gender gender)
     {
         if (!_genders.Any(g => g.Gender == gender))
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidGenders));
+            return DomainErrors.SearchProfileGendersInvalid.ToValidationErrorOr();
         }
 
         if (_genders.Count == 1)
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidGenders));
+            return DomainErrors.SearchProfileGendersInvalid.ToValidationErrorOr();
         }
 
         _genders.RemoveAll(g => g.Gender == gender);
         UpdatedAt = DateTimeOffset.UtcNow;
+        return Result.Success;
     }
 
     internal void ToggleActive()
@@ -110,59 +107,74 @@ public class SearchProfile : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    internal void ChangeEngagement(Engagement engagement)
+    internal ErrorOr<Success> ChangeEngagement(Engagement engagement)
     {
         Engagement = engagement;
         UpdatedAt = DateTimeOffset.UtcNow;
+        return Result.Success;
     }
 
-    internal void ChangeName(string name)
+    internal ErrorOr<Success> ChangeName(string name)
     {
-        ValidateName(name);
+        var nameValidation = ValidateName(name);
+        if (nameValidation.IsError)
+        {
+            return nameValidation;
+        }
         Name = name;
         UpdatedAt = DateTimeOffset.UtcNow;
+        return Result.Success;
     }
 
-    internal void ChangeDescription(string description)
+    internal ErrorOr<Success> ChangeDescription(string description)
     {
-        ValidateDescription(description);
+        var descriptionValidation = ValidateDescription(description);
+        if (descriptionValidation.IsError)
+        {
+            return descriptionValidation;
+        }
         Description = description;
         UpdatedAt = DateTimeOffset.UtcNow;
+        return Result.Success;
     }
 
-    private static void ValidateName(string name)
+    private static ErrorOr<Success> ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidName));
+            return DomainErrors.Empty.ToValidationErrorOr();
         }
+        return Result.Success;
     }
 
-    private static void ValidateDescription(string description)
+    private static ErrorOr<Success> ValidateDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidDescription));
+            return DomainErrors.Empty.ToValidationErrorOr();
         }
+        return Result.Success;
     }
 
-    private static void ValidateGenders(ImmutableHashSet<Gender> genders)
+    private static ErrorOr<Success> ValidateGenders(ImmutableHashSet<Gender> genders)
     {
         if (genders.Count == 0)
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidGenders));
+            return DomainErrors.SearchProfileGendersEmpty.ToValidationErrorOr();
         }
+        return Result.Success;
     }
 
-    private static void ValidateAgeRange(Age? ageRangeMin, Age? ageRangeMax)
+    private static ErrorOr<Success> ValidateAgeRange(Age? ageRangeMin, Age? ageRangeMax)
     {
         if (ageRangeMin is not null && ageRangeMax is not null && ageRangeMin > ageRangeMax)
         {
-            throw new DomainException(new DomainError<SearchProfileDomainError>(SearchProfileDomainError.InvalidAgeRange));
+            return DomainErrors.SearchProfileAgeRangeInvalid.ToValidationErrorOr();
         }
+        return Result.Success;
     }
 
-    internal static SearchProfile Create
+    internal static ErrorOr<SearchProfile> Create
     (
         Guid userId,
         string name,
@@ -175,6 +187,36 @@ public class SearchProfile : Aggregate
         Distance? maximumDistance
     )
     {
+        var errors = new List<Error>();
+        var nameValidation = ValidateName(name);
+        if (nameValidation.IsError)
+        {
+            errors.AddRange(nameValidation.Errors);
+        }
+
+        var descriptionValidation = ValidateDescription(description);
+        if (descriptionValidation.IsError)
+        {
+            errors.AddRange(descriptionValidation.Errors);
+        }
+
+        var gendersValidation = ValidateGenders(genders);
+        if (gendersValidation.IsError)
+        {
+            errors.AddRange(gendersValidation.Errors);
+        }
+
+        var ageRangeValidation = ValidateAgeRange(ageRangeMin, ageRangeMax);
+        if (ageRangeValidation.IsError)
+        {
+            errors.AddRange(ageRangeValidation.Errors);
+        }
+
+        if (errors.Count != 0)
+        {
+            return errors;
+        }
+
         return new SearchProfile
         (
             userId,
@@ -194,9 +236,13 @@ public class SearchProfile : Aggregate
         RelationshipType = relationshipType;
     }
 
-    internal void ChangeGenders(ImmutableHashSet<Gender> genders)
+    internal ErrorOr<Success> ChangeGenders(ImmutableHashSet<Gender> genders)
     {
-        ValidateGenders(genders);
+        var gendersValidation = ValidateGenders(genders);
+        if (gendersValidation.IsError)
+        {
+            return gendersValidation;
+        }
 
         var deleted = _genders.Where(g => !genders.Contains(g.Gender)).ToList();
         var added = genders.Where(g => !_genders.Any(spg => spg.Gender == g)).ToList();
@@ -209,14 +255,20 @@ public class SearchProfile : Aggregate
         {
             _genders.Add(SearchProfileGender.Create(Id, a));
         }
+        return Result.Success;
     }
 
-    internal void ChangeAgeRange(Age? ageRangeMin, Age? ageRangeMax)
+    internal ErrorOr<Success> ChangeAgeRange(Age? ageRangeMin, Age? ageRangeMax)
     {
-        ValidateAgeRange(ageRangeMin, ageRangeMax);
+        var ageRangeValidation = ValidateAgeRange(ageRangeMin, ageRangeMax);
+        if (ageRangeValidation.IsError)
+        {
+            return ageRangeValidation;
+        }
 
         AgeRangeMin = ageRangeMin;
         AgeRangeMax = ageRangeMax;
+        return Result.Success;
     }
 
     internal void ChangeMaximumDistance(Distance? distance)
@@ -228,15 +280,4 @@ public class SearchProfile : Aggregate
     {
 
     }
-}
-
-public enum SearchProfileDomainError
-{
-    InvalidName,
-    InvalidDescription,
-    FrequencyAndBoundednessCombinationInvalid,
-    FixedTermRequiresStartAndEndDate,
-    InvalidGenders,
-    InvalidAgeRange,
-    OwnerLocationNotSet
 }

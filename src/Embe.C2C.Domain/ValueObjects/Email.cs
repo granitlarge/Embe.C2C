@@ -1,36 +1,30 @@
-using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
 public record Email
 {
-    public static readonly Email Anonymized = new("anonymized@example.com");
-
     private Email
     (
         string value
     )
     {
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(value);
-            Value = addr.Address;
-        }
-        catch (Exception)
-        {
-            throw new DomainException(new DomainError<EmailError>(EmailError.InvalidFormat));
-        }
+        Value = value;
     }
 
     public string Value { get; init; }
 
-    public static Email Create(string value)
+    public static ErrorOr<Email> Create(string value)
     {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(value);
+        }
+        catch (Exception)
+        {
+            return DomainErrors.InvalidEmail.ToValidationErrorOr();
+        }
         return new Email(value);
     }
-}
 
-public enum EmailError
-{
-    InvalidFormat
 }

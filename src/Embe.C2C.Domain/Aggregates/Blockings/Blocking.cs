@@ -1,5 +1,6 @@
 using Embe.C2C.Domain.Aggregates.Blockings.Events;
 using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Aggregates.Blockings;
 
@@ -11,11 +12,6 @@ public class Blocking : Aggregate
         Guid blockedUserId
     )
     {
-        if (blockerUserId == blockedUserId)
-        {
-            throw new DomainException(new DomainError<BlockingError>(BlockingError.SelfBlock));
-        }
-
         Id = Guid.CreateVersion7();
         BlockerUserId = blockerUserId;
         BlockedUserId = blockedUserId;
@@ -35,8 +31,13 @@ public class Blocking : Aggregate
         AddDomainEvent(new BlockingRemovedEvent(this));
     }
 
-    internal static Blocking Create(Guid blockerUserId, Guid blockedUserId)
+    internal static ErrorOr<Blocking> Create(Guid blockerUserId, Guid blockedUserId)
     {
+        if (blockerUserId == blockedUserId)
+        {
+            return DomainErrors.UserSame.ToValidationErrorOr();
+        }
+
         return new Blocking(blockerUserId, blockedUserId);
     }
 }

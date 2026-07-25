@@ -1,12 +1,13 @@
 using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Services;
 
 public class BlockingService : DomainService
 {
-    public Blocking Block
+    public ErrorOr<Blocking> Block
     (
         Blocking? existingBlocking,
         User blockingUser,
@@ -15,7 +16,11 @@ public class BlockingService : DomainService
     {
         if (existingBlocking != null)
         {
-            throw new DomainException(new DomainError<BlockingServiceError>(BlockingServiceError.AlreadyExists));
+            return DomainErrors.BlockingAlreadyExists.ToValidationErrorOr(new Dictionary<string, object>
+            {
+                { "blockingUserId", blockingUser.Id },
+                { "blockedUserId", blockedUser.Id }
+            });
         }
 
         var blocking = Blocking.Create(blockingUser.Id, blockedUser.Id);

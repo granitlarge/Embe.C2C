@@ -23,7 +23,7 @@ public class GetMatchingsHandler
     IAuthenticatedUserService authenticatedUserService,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
     SearchProfileDtoMapper searchProfileDtoMapper
-) : TransactionalQueryHandler<GetMatchingsQuery, Result<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
+) : TransactionalQueryHandler<GetMatchingsQuery, List<ReadDto<MatchingDto, MatchingPermission>>>(repository)
 {
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
     private readonly IUserRepository _userRepo = userRepo;
@@ -38,7 +38,7 @@ public class GetMatchingsHandler
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
 
-    protected override async Task<Result<List<ReadDto<MatchingDto, MatchingPermission>>>> ExecuteAsync
+    protected override async Task<List<ReadDto<MatchingDto, MatchingPermission>>> ExecuteAsync
     (
         GetMatchingsQuery query,
         CancellationToken cancellationToken
@@ -79,6 +79,6 @@ public class GetMatchingsHandler
             }
         }
 
-        return Result<List<ReadDto<MatchingDto, MatchingPermission>>>.Success(dtos);
+        return dtos;
     }
 }

@@ -9,6 +9,7 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
@@ -25,7 +26,7 @@ public class AddImagesHandler
     IWorkItemService workItemService,
     UserAuthorizationService userAuthorizationService,
     UserDtoMapper userDtoMapper
-) : CommandHandler<AddImagesCommand, Result<ReadDto<UserDto, UserPermission>>>
+) : CommandHandler<AddImagesCommand, ErrorOr<ReadDto<UserDto, UserPermission>>>
 (
     domainEventStore,
     context,
@@ -41,7 +42,7 @@ public class AddImagesHandler
     private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
 
-    protected override async Task<CommandResult<Result<ReadDto<UserDto, UserPermission>>>> InternalHandleAsync
+    protected override async Task<CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>> InternalHandleAsync
     (
         AddImagesCommand command,
         CancellationToken cancellationToken = default
@@ -51,14 +52,10 @@ public class AddImagesHandler
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return new CommandResult<Result<ReadDto<UserDto, UserPermission>>>
+            return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>
             (
                 false,
-                Result<ReadDto<UserDto, UserPermission>>.Failure
-                (
-                    FailureReason.NotFound,
-                    "user does not exist"
-                )
+                Error.NotFound("not_found", "user does not exist")
             );
         }
 
@@ -90,25 +87,35 @@ public class AddImagesHandler
                 uploadedImageUrls.Add(uploadImageResult.MediumUrl);
                 uploadedImageUrls.Add(uploadImageResult.SmallUrl);
 
+                var imageDetails = Domain.ValueObjects.ImageDetails.Create
+                (
+                    uploadImageResult.Name,
+                    image.MimeType,
+                    image.Order
+                );
+
+                if (imageDetails.IsError)
+                {
+                    return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>
+                    (
+                        false,
+                        imageDetails.Errors
+                    );
+                }
+
                 user.AddImage
                 (
-                    userId,
-                    new Domain.ValueObjects.ImageDetails
-                    (
-                       uploadImageResult.Name,
-                       image.MimeType,
-                       image.Order
-                    )
+                    imageDetails.Value
                 );
             }
 
             var dto = await user.Enrich(user).ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken) ??
                 throw new InvalidOperationException("User can't read his own data wtf???");
 
-            return new CommandResult<Result<ReadDto<UserDto, UserPermission>>>
+            return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>
             (
-                Save: true,
-                Result<ReadDto<UserDto, UserPermission>>.Success(dto)
+                true,
+                dto
             );
 
         }

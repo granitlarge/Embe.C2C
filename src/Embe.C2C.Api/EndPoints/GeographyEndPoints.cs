@@ -19,7 +19,7 @@ public static class GeographyEndpoints
     private static async Task<IResult> GetCountryAdminAreas([FromServices] GetCountryAdminAreaHandler handler, CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(cancellationToken);
-        return result.ToResult();
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> SearchAdminAreas
@@ -34,13 +34,13 @@ public static class GeographyEndpoints
     )
     {
         var result = await handler.HandleAsync(new SearchAdminAreaQuery(parentId, longitude, latitude, page ?? 1, pageSize ?? 50), cancellationToken);
-        return result.ToResult();
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> GetAdminAreaById([FromRoute] string id, [FromServices] GetAdminAreaByIdHandler handler, CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(new GetAdminAreaByIdQuery(id), cancellationToken);
-        return result.ToResult();
+        return Results.Ok(result);
     }
 
     public record ReverseGeocodeRequest(double Longitude, double Latitude);
@@ -52,7 +52,7 @@ public static class GeographyEndpoints
     )
     {
         var result = await handler.HandleAsync(new ReverseGeocodeQuery(request.Longitude, request.Latitude), cancellationToken);
-        return result.ToResult();
+        return Results.Ok(result);
     }
 
 }

@@ -26,7 +26,7 @@ public static class CandidateEndPoints
     )
     {
         var result = await handler.HandleAsync(new Application.Queries.Candidates.GetPositiveJudgementsQuery(page ?? 1, size ?? 20), cancellationToken);
-        return result.ToResult();
+        return Results.Ok(result);
     }
 
     private async static Task<IResult> Judge

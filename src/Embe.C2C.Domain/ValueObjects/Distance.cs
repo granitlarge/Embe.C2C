@@ -1,16 +1,20 @@
-using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
 public record Distance
 {
-    public Distance(double value, LengthUnit unit)
+    public static ErrorOr<Distance> Create(double value, LengthUnit unit)
     {
         if (value < 0)
         {
-            throw new DomainException(new DomainError<DistanceError>(DistanceError.NegativeDistance));
+            return DomainErrors.NegativeDistance.ToValidationErrorOr();
         }
+        return new Distance(value, unit);
+    }
 
+    private Distance(double value, LengthUnit unit)
+    {
         Value = value;
         Unit = unit;
     }
@@ -37,11 +41,6 @@ public record Distance
             _ => throw new InvalidOperationException("Unknown length unit.")
         };
     }
-}
-
-public enum DistanceError
-{
-    NegativeDistance
 }
 
 public enum LengthUnit

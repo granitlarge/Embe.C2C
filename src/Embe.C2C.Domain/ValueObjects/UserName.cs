@@ -1,4 +1,4 @@
-using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
 
@@ -6,17 +6,17 @@ public record Alias
 {
     private Alias(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new DomainException(new DomainError<AliasError>(AliasError.EmptyOrWhitespace));
-        }
         Value = value;
     }
 
     public string Value { get; }
 
-    public static Alias Create(string value)
+    public static ErrorOr<Alias> Create(string value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Error.Validation(DomainErrors.Empty.Code, DomainErrors.Empty.Message);
+        }
         return new Alias(value);
     }
 }

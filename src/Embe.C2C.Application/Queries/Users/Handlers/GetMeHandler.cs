@@ -5,10 +5,11 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.Users.Handlers;
 
-public class GetMeHandler : TransactionalQueryHandler<GetMeQuery, Result<ReadDto<UserDto, UserPermission>>>
+public class GetMeHandler : TransactionalQueryHandler<GetMeQuery, ErrorOr<ReadDto<UserDto, UserPermission>>>
 {
     private readonly IUserRepository _userRepo;
     private readonly UserAuthorizationService _userAuthorizationService;
@@ -30,19 +31,19 @@ public class GetMeHandler : TransactionalQueryHandler<GetMeQuery, Result<ReadDto
         _userRepo = userRepo;
     }
 
-    protected override async Task<Result<ReadDto<UserDto, UserPermission>>> ExecuteAsync(GetMeQuery query, CancellationToken cancellationToken = default)
+    protected override async Task<ErrorOr<ReadDto<UserDto, UserPermission>>> ExecuteAsync(GetMeQuery query, CancellationToken cancellationToken = default)
     {
         var userId = _authenticatedUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
         var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return Result<ReadDto<UserDto, UserPermission>>.Failure(FailureReason.NotFound, "user does not exist");
+            return Error.NotFound("user_not_found", "user does not exist");
         }
 
         var enrichedUser = user.Enrich(user);
         var readDto = await enrichedUser.ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken: cancellationToken);
         if (readDto is null)
-            return Result<ReadDto<UserDto, UserPermission>>.Failure(FailureReason.Forbidden, "User does not have permission to view their own profile.");
-        return Result<ReadDto<UserDto, UserPermission>>.Success(readDto);
+            return Error.Forbidden("forbidden", "User does not have permission to view their own profile.");
+        return readDto;
     }
 }

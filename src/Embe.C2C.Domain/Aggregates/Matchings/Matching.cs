@@ -1,7 +1,7 @@
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Exceptions;
+using ErrorOr;
 
 namespace Embe.C2C.Domain.Aggregates.Matchings;
 
@@ -15,11 +15,6 @@ public class Matching : Aggregate
         Guid userId2SearchProfileId
     )
     {
-        if (userId1 == userId2)
-        {
-            throw new DomainException(new DomainError<MatchingError>(MatchingError.SelfMatching));
-        }
-
         Id = Guid.CreateVersion7();
         UserId1 = userId1;
         UserId2 = userId2;
@@ -45,16 +40,17 @@ public class Matching : Aggregate
         LastMessageId = lastMessageId;
     }
 
-    public void Remove(Guid actorUserId)
+    public ErrorOr<Success> Remove(Guid actorUserId)
     {
         if (actorUserId != UserId1 && actorUserId != UserId2)
         {
-            throw new DomainException(new DomainError<MatchingError>(MatchingError.Unauthorized));
+            return DomainErrors.Forbidden.ToForbiddenErrorOr();
         }
         AddDomainEvent(new MatchingRemovedEvent(actorUserId, this));
+        return Result.Success;
     }
 
-    internal static Matching Create
+    internal static ErrorOr<Matching> Create
     (
         Guid userId1,
         Guid userId2,
@@ -62,6 +58,11 @@ public class Matching : Aggregate
         Guid userId2SearchProfileId
     )
     {
+        if (userId1 == userId2)
+        {
+            return DomainErrors.UserSame.ToValidationErrorOr();
+        }
+
         return new Matching(userId1, userId2, userId1SearchProfileId, userId2SearchProfileId);
     }
 
@@ -80,10 +81,4 @@ public class Matching : Aggregate
     public List<Messages.Message>? Messages { get; private set; }
     public Messages.Message? LastMessage { get; private set; }
     #endregion
-}
-
-public enum MatchingError
-{
-    SelfMatching,
-    Unauthorized
 }

@@ -35,19 +35,19 @@ public class SearchProfileConfiguration : AggregateConfiguration<SearchProfile>
         builder.Property(sp => sp.AgeRangeMin).HasConversion
         (
             age => age != null ? age.Value : (int?)null,
-            value => value == null ? null : new Age(value.Value)
+            value => value == null ? null : Age.Create(value.Value).Value
         );
 
         builder.Property(sp => sp.AgeRangeMax).HasConversion
         (
             age => age != null ? age.Value : (int?)null,
-            value => value == null ? null : new Age(value.Value)
+            value => value == null ? null : Age.Create(value.Value).Value
         );
 
         builder.Property(sp => sp.MaximumDistance).HasConversion
         (
             distance => distance != null ? distance.ToKilometers().Value : (double?)null,
-            value => value == null ? null : new Distance(value.Value, LengthUnit.Kilometers)
+            value => value == null ? null : Distance.Create(value.Value, LengthUnit.Kilometers).Value
         );
 
         base.Configure(builder);

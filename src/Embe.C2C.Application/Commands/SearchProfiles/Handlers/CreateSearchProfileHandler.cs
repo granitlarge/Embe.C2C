@@ -5,12 +5,14 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Application.Extensions;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Exceptions;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.SearchProfiles.Handlers;
 
@@ -27,7 +29,7 @@ public class CreateSearchProfileHandler
     SearchProfileDtoMapper searchProfileDtoMapper,
     SearchProfileService searchProfileService
 
-) : CommandHandler<CreateSearchProfileCommand, Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+) : CommandHandler<CreateSearchProfileCommand, ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
 (
     domainEventStore,
     context,
@@ -42,91 +44,86 @@ public class CreateSearchProfileHandler
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
     private readonly SearchProfileService _searchProfileService = searchProfileService;
 
-    protected async override Task<CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>> InternalHandleAsync
+    protected async override Task<CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>> InternalHandleAsync
     (
         CreateSearchProfileCommand command,
         CancellationToken cancellationToken = default
     )
     {
-        try
+        var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User must be authenticated");
+        var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
+        if (user is null)
         {
-            var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User must be authenticated");
-            var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
-            if (user is null)
-            {
-                return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
-                (
-                    false,
-                    Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
-                    (
-                        FailureReason.Forbidden,
-                        "user does not exist"
-                    )
-                );
-            }
-
-            var engagement = new Engagement
+            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                command.Engagement.Medium,
-                command.Engagement.Boundedness,
-                command.Engagement.Frequency,
-                command.Engagement.StartDate,
-                command.Engagement.EndDate
-            );
-
-            var genders = command.Genders.Count == 0 ? [.. Enum.GetValues<Gender>()] : command.Genders;
-            var ageRangeMin = command.AgeRangeMin is not null ? new Age(command.AgeRangeMin.Value) : null;
-            var ageRangeMax = command.AgeRangeMax is not null ? new Age(command.AgeRangeMax.Value) : null;
-            var maximumDistanceKm = command.MaximumDistanceKm != null ? new Distance(command.MaximumDistanceKm.Value, LengthUnit.Kilometers) : null;
-
-            var searchProfile = _searchProfileService.Create
-            (
-                user,
-                command.Name,
-                command.Description,
-                command.RelationshipType,
-                engagement,
-                genders,
-                ageRangeMin,
-                ageRangeMax,
-                maximumDistanceKm
-            );
-
-            _searchProfileRepository.Set.Add(searchProfile);
-            await context.SaveChangesAsync(cancellationToken);
-
-            var dto = await searchProfile.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
-            if (dto is null)
-            {
-                return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
-                (
-                    Save: false,
-                    Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
-                    (
-                        FailureReason.Forbidden,
-                        "User does not have permission to view the created search profile."
-                    )
-                );
-            }
-
-            var result = Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto);
-            return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
-            (
-                Save: true,
-                Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Success(dto)
+                false,
+                Error.Forbidden("forbidden", "Authenticated user does not exist in the system.")
             );
         }
-        catch (DomainException de)
+
+        var errors = new List<Error>();
+        var engagement = Engagement.Create
+        (
+            command.Engagement.Medium,
+            command.Engagement.Boundedness,
+            command.Engagement.Frequency,
+            command.Engagement.StartDate,
+            command.Engagement.EndDate
+        ).ElseDo(e => errors.AddRange(e.WithPropertyName("Engagement")));
+
+        var genders = command.Genders.Count == 0 ? [.. Enum.GetValues<Gender>()] : command.Genders;
+        var ageRangeMin = command.AgeRangeMin is not null ? Age.Create(command.AgeRangeMin.Value).ElseDo(e => errors.AddRange(e.WithPropertyName("AgeRangeMin"))) : default;
+        var ageRangeMax = command.AgeRangeMax is not null ? Age.Create(command.AgeRangeMax.Value).ElseDo(e => errors.AddRange(e.WithPropertyName("AgeRangeMax"))) : default;
+        var maximumDistanceKm = command.MaximumDistanceKm != null ? Distance.Create(command.MaximumDistanceKm.Value, LengthUnit.Kilometers) : default;
+
+        if (errors.Count > 0)
         {
-            return new CommandResult<Result<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
-                Save: false,
-                Result<ReadDto<SearchProfileDto, SearchProfilePermission>>.Failure
-                (
-                    FailureReason.DomainError,
-                    de.Message
-                )
+                false,
+                errors
             );
         }
+
+        var searchProfile = _searchProfileService.Create
+        (
+            user,
+            command.Name,
+            command.Description,
+            command.RelationshipType,
+            engagement.Value,
+            genders,
+            ageRangeMin.Value,
+            ageRangeMax.Value,
+            maximumDistanceKm.Value
+        );
+
+        if (searchProfile.IsError)
+        {
+            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            (
+                false,
+                searchProfile.Errors
+            );
+        }
+
+        _searchProfileRepository.Set.Add(searchProfile.Value);
+        await _searchProfileRepository.SaveChangesAsync(cancellationToken);
+
+        var dto = await searchProfile.Value.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
+        if (dto is null)
+        {
+            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            (
+                false,
+                Error.Forbidden("forbidden", "Authenticated user does not have permission to view the search profile.")
+            );
+        }
+
+        return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+        (
+            true,
+            dto
+        );
     }
 }

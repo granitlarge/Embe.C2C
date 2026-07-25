@@ -1,4 +1,3 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Application.Abstractions.Repos;
 
@@ -13,8 +12,8 @@ public class GetCountryAdminAreaHandler
         _repository = repository;
     }
 
-    public async Task<Result<List<IAdminArea>>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<List<IAdminArea>> HandleAsync(CancellationToken cancellationToken)
     {
-        return Result<List<IAdminArea>>.Success(await _repository.GetCountriesAsync(cancellationToken));
+        return await _repository.GetCountriesAsync(cancellationToken);
     }
 }
