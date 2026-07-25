@@ -3,6 +3,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using ErrorOr;
 
@@ -28,19 +29,19 @@ public class GetMessageByIdHandler
         var permissions = await _messageAuthorizationService.GetPermissionsAsync(query.MessageId, cancellationToken);
         if (!permissions.Contains(MessagePermission.View))
         {
-            return Error.Forbidden("forbidden", "Authenticated user does not have permission to view this message.");
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
         }
 
         var message = await _messageRepo.GetMessageByIdIncludeReplyAsync(query.MessageId, cancellationToken);
         if (message is null)
         {
-            return Error.NotFound("message_not_found", "Message not found.");
+            return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
         var dto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
         if (dto is null)
         {
-            return Error.NotFound("message_not_found", "Message not found.");
+            return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
         return dto;

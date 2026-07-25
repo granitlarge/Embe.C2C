@@ -4,6 +4,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using ErrorOr;
 
@@ -57,7 +58,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         var permissions = await _matchingAuthorizationService.GetPermissionsAsync(query.MatchingId, cancellationToken);
         if (!permissions.Contains(MatchingPermission.View))
         {
-            return Error.Forbidden("forbidden", "You do not have permission to view this matching.");
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
         }
 
         var matching = await _matchingRepo.GetMatchingByIdAsync
@@ -68,7 +69,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
 
         if (matching == null)
         {
-            return Error.NotFound("not_found", "Matching not found.");
+            return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
         var queryingUser = await _userRepo.GetByIdAsync(_authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
@@ -90,7 +91,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
 
         if (readDto == null)
         {
-            return Error.Forbidden("forbidden", "You do not have permission to view this matching.");
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
         }
 
         return readDto;

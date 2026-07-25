@@ -4,6 +4,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using ErrorOr;
 
@@ -37,13 +38,15 @@ public class GetMeHandler : TransactionalQueryHandler<GetMeQuery, ErrorOr<ReadDt
         var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return Error.NotFound("user_not_found", "user does not exist");
+            return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
         var enrichedUser = user.Enrich(user);
         var readDto = await enrichedUser.ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken: cancellationToken);
         if (readDto is null)
-            return Error.Forbidden("forbidden", "User does not have permission to view their own profile.");
+        {
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
+        }
         return readDto;
     }
 }

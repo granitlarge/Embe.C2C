@@ -1,14 +1,19 @@
 import { generateCandidates, getAllSearchProfiles } from "@/src/features/search/actions/action";
 import Search from "@/src/features/search/components/Search";
 import { getHasSearchProfile } from "@/src/shared/actions/user/action";
+import { getNextConfigRuntime } from "next/dist/server/config-shared";
 
 export type SearchPageProps = {
 
 }
 export default async function SearchPage({ }: SearchPageProps) {
 
-    const getCandidatesResponse = await generateCandidates();
-    const getAllSearchProfilesResponse = await getAllSearchProfiles(1, 10_000);
+    const getCandidatesResponsePromise = generateCandidates();
+    const getAllSearchProfilesResponsePromise = getAllSearchProfiles(1, 10_000);
+    await Promise.all([getCandidatesResponsePromise, getAllSearchProfilesResponsePromise]);
+    const getCandidatesResponse = await getCandidatesResponsePromise;
+    const getAllSearchProfilesResponse = await getAllSearchProfilesResponsePromise;
+
     if (!getCandidatesResponse.success || !getAllSearchProfilesResponse.success) {
         throw new Error("not implemented");
     }

@@ -18,6 +18,7 @@ public static class ResultExtensions
                 Error error when error.NumericType == (int)ApplicationErrorType.Validation => Results.BadRequest(new { success = false, errors = result.Errors }),
                 Error error when error.NumericType == (int)ApplicationErrorType.NotFound => Results.NotFound(new { success = false, errors = result.Errors }),
                 Error error when error.NumericType == (int)ApplicationErrorType.Forbidden => Results.Forbid(),
+                Error error when error.NumericType == (int)ApplicationErrorType.Unauthorized => Results.Unauthorized(),
                 _ => Results.InternalServerError(new { success = false, errors = result.Errors })
             };
         }

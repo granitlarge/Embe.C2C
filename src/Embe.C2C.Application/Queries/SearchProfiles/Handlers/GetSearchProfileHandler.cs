@@ -3,6 +3,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using ErrorOr;
 
@@ -28,19 +29,19 @@ public class GetSearchProfileHandler
         var (permissions, _) = await _searchProfileAuthorizationService.GetAsync(query.Id, cancellationToken);
         if (!permissions.Contains(SearchProfilePermission.View))
         {
-            return Error.Forbidden("forbidden", "You do not have permission to view this search profile.");
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
         }
 
         var searchProfile = await _searchProfileRepository.GetByIdAsync(query.Id, cancellationToken);
         if (searchProfile is null)
         {
-            return Error.NotFound("search_profile_not_found", "Search profile not found.");
+            return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
         var dto = await searchProfile.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
         if (dto is null)
         {
-            return Error.Forbidden("forbidden", "User does not have permission to view this search profile.");
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
         }
 
         return dto;

@@ -1,4 +1,3 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
@@ -55,7 +54,7 @@ public class GenerateCandidatesHandler
         var userHasCandidates = await _candidateRepository.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         if (!userHasCandidates)
         {
-            return new(true, []);
+            return new(true, ErrorOrFactory.From(new List<ReadDto<CandidateDto, CandidatePermission>>()));
         }
 
         var candidates = await _candidateRepository.GetByUserIdAsync(userId, cancellationToken);
