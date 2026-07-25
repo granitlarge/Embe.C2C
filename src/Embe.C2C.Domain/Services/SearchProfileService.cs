@@ -1,20 +1,17 @@
 using System.Collections.Immutable;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.Services;
 
-public class SearchProfileService : DomainService
+public class SearchProfileService(DomainEventStore domainEventStore) : DomainService
 {
-    private readonly DomainEventStore _domainEventStore;
-
-    public SearchProfileService(DomainEventStore domainEventStore)
-    {
-        _domainEventStore = domainEventStore;
-    }
+    private readonly DomainEventStore _domainEventStore = domainEventStore;
 
     public ErrorOr<SearchProfile> Create
     (
@@ -31,7 +28,7 @@ public class SearchProfileService : DomainService
     {
         if (maximumDistance != null && owner.Location == null)
         {
-            return DomainErrors.SearchProfileOwnerDistanceFilterButLocationNotSet.ToValidationErrorOr(new Dictionary<string, object>
+            return SearchProfileErrors.OwnerDistanceFilterButLocationNotSet.ToValidationErrorOr(new Dictionary<string, object>
             {
                 { "ownerId", owner.Id }
             });
@@ -68,7 +65,7 @@ public class SearchProfileService : DomainService
     {
         if (newMaximumDistance != null && owner.Location == null)
         {
-            return DomainErrors.SearchProfileOwnerDistanceFilterButLocationNotSet.ToValidationErrorOr(new Dictionary<string, object>
+            return SearchProfileErrors.OwnerDistanceFilterButLocationNotSet.ToRuleErrorOr(new Dictionary<string, object>
             {
                 { "ownerId", owner.Id }
             });

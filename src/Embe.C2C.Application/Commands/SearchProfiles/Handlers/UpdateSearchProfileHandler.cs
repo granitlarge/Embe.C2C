@@ -8,6 +8,7 @@ using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;

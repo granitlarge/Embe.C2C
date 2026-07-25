@@ -2,6 +2,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles.Facts;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 

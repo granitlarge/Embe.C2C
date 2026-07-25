@@ -1,5 +1,7 @@
 using Embe.C2C.Domain.Aggregates.Accounts.Events;
 using Embe.C2C.Domain.Aggregates.Transactions;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
 
@@ -41,22 +43,22 @@ public class Account : Aggregate
     {
         if (!IsOpen)
         {
-            return DomainErrors.AccountTransactWhileClosed.ToFailureErrorOr();
+            return AccountErrors.AccountTransactWhileClosed.ToRuleErrorOr();
         }
 
         if (amount.Currency != Currency)
         {
-            return DomainErrors.AccountTransactIncorrectCurrency.ToFailureErrorOr();
+            return AccountErrors.AccountTransactIncorrectCurrency.ToRuleErrorOr();
         }
 
         if (amount.Amount > Balance.Amount)
         {
-            return DomainErrors.AccountWithdrawExceedsBalance.ToFailureErrorOr();
+            return AccountErrors.AccountWithdrawExceedsBalance.ToRuleErrorOr();
         }
 
         if (amount.Amount <= 0)
         {
-            return DomainErrors.AccountTransactNonPositiveAmount.ToFailureErrorOr();
+            return AccountErrors.AccountTransactNonPositiveAmount.ToRuleErrorOr();
         }
 
         Balance = Money.Create(Balance.Amount - amount.Amount, Balance.Currency).Value;
@@ -82,17 +84,17 @@ public class Account : Aggregate
     {
         if (!IsOpen)
         {
-            return DomainErrors.AccountTransactWhileClosed.ToFailureErrorOr();
+            return AccountErrors.AccountTransactWhileClosed.ToRuleErrorOr();
         }
 
         if (amount.Currency != Currency)
         {
-            return DomainErrors.AccountTransactIncorrectCurrency.ToFailureErrorOr();
+            return AccountErrors.AccountTransactIncorrectCurrency.ToRuleErrorOr();
         }
 
         if (amount.Amount <= 0)
         {
-            return DomainErrors.AccountTransactNonPositiveAmount.ToFailureErrorOr();
+            return AccountErrors.AccountTransactNonPositiveAmount.ToRuleErrorOr();
         }
 
         Balance = Money.Create(Balance.Amount + amount.Amount, Balance.Currency).Value;
@@ -105,30 +107,26 @@ public class Account : Aggregate
             TransactionReason.Deposit,
             DateTimeOffset.UtcNow
         );
+
         if (transaction.IsError)
         {
             return transaction.Errors;
         }
+
         AddDomainEvent(new DepositEvent(this, transaction.Value));
         return transaction;
     }
 
     public ErrorOr<Success> Close()
     {
-        var errors = new List<Error>();
         if (!IsOpen)
         {
-            errors.Add(DomainErrors.AccountCloseAlreadyClosed.ToFailureErrorOr());
+            return AccountErrors.AccountCloseAlreadyClosed.ToRuleErrorOr();
         }
 
         if (Balance.Amount != 0)
         {
-            errors.Add(DomainErrors.AccountClosePositiveBalance.ToFailureErrorOr());
-        }
-
-        if (errors.Count != 0)
-        {
-            return errors;
+            return AccountErrors.AccountClosePositiveBalance.ToRuleErrorOr();
         }
 
         IsOpen = false;
@@ -140,7 +138,7 @@ public class Account : Aggregate
     {
         if (IsOpen)
         {
-            return DomainErrors.AccountOpenAlreadyOpened.ToFailureErrorOr();
+            return AccountErrors.AccountOpenAlreadyOpened.ToRuleErrorOr();
         }
 
         IsOpen = true;
@@ -152,7 +150,7 @@ public class Account : Aggregate
     {
         if (IsOpen)
         {
-            return DomainErrors.AccountRemoveWhileOpen.ToFailureErrorOr();
+            return AccountErrors.AccountRemoveWhileOpen.ToRuleErrorOr();
         }
 
         AddDomainEvent(new AccountRemovedEvent(this));

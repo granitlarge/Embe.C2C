@@ -2,6 +2,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations.FactStores.Matches.Facts;
 using Embe.C2C.Domain.Aggregates.Matchings;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Authorizations.FactGenerators;
 

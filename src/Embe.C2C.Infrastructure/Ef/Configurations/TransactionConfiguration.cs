@@ -1,5 +1,6 @@
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Transactions;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -23,7 +24,7 @@ public class TransactionConfiguration : AggregateConfiguration<Transaction>
             });
         });
 
-        builder.HasOne<Account>()
+        builder.HasOne<Domain.Aggregates.Accounts.Account>()
             .WithMany()
             .HasForeignKey(t => t.AccountId)
             .OnDelete(DeleteBehavior.Cascade);

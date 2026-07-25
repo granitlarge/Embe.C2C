@@ -3,6 +3,7 @@ using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles;
 using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles.Facts;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Authorizations;
 

@@ -14,7 +14,7 @@ public record AccountDto
 
 public static class AccountDtoExtensions
 {
-    public static AccountDto ToDto(this Account account)
+    public static AccountDto ToDto(this Domain.Aggregates.Accounts.Account account)
     {
         return new AccountDto
         (

@@ -1,5 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Blockings.Events;
-using Embe.C2C.Domain.Exceptions;
+using Embe.C2C.Domain.Errors;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.Aggregates.Blockings;

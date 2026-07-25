@@ -1,5 +1,7 @@
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
+using Embe.C2C.Domain.Errors.Aggregates;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
 

@@ -1,3 +1,5 @@
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
@@ -11,7 +13,7 @@ public record BirthDate
     {
         if (value < DateOnly.FromDateTime(new DateTime(1900, 1, 1)) || value > DateOnly.FromDateTime(DateTime.UtcNow))
         {
-            return DomainErrors.InvalidBirthdate.ToValidationErrorOr();
+            return BirthdateErrors.Invalid.ToValidationErrorOr();
         }
 
         return new BirthDate(value);

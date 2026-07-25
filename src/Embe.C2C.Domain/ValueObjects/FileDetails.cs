@@ -1,4 +1,5 @@
-using Embe.C2C.Domain.Exceptions;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
@@ -38,7 +39,7 @@ public record ImageDetails
         var errors = new List<Error>();
         if (order < 0)
         {
-            errors.Add(DomainErrors.NegativeOrder.ToValidationErrorOr());
+            errors.Add(ImageDetailsErrors.NegativeOrder.ToValidationErrorOr());
         }
 
         if (string.IsNullOrWhiteSpace(name))

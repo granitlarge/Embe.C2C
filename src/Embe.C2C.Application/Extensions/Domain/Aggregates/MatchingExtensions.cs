@@ -3,6 +3,7 @@ using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Extensions.Domain.Aggregates;
 

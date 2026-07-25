@@ -4,6 +4,7 @@ using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
 namespace Embe.C2C.Application.Commands.Users.Handlers;

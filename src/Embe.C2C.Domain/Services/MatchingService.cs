@@ -2,20 +2,17 @@ using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Messages.Events;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.Policies;
 using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.Services;
 
-public class MatchingService : DomainService
+public class MatchingService(DomainEventStore domainEventStore) : DomainService
 {
-    private readonly DomainEventStore _domainEventStore;
-
-    public MatchingService(DomainEventStore domainEventStore)
-    {
-        _domainEventStore = domainEventStore;
-    }
+    private readonly DomainEventStore _domainEventStore = domainEventStore;
 
     public ErrorOr<Message> SendMessage
     (
@@ -28,7 +25,7 @@ public class MatchingService : DomainService
     {
         if (!communicationPolicy.CanCommunicate())
         {
-            return DomainErrors.MatchingSendMessageCannotCommunicate.ToValidationErrorOr(new Dictionary<string, object>
+            return MatchingErrors.SendMessageCannotCommunicate.ToRuleErrorOr(new Dictionary<string, object>
             {
                 { "authorId", author.Id },
                 { "recipientId", matching.GetOtherUserId(author.Id)! }
@@ -80,7 +77,7 @@ public class MatchingService : DomainService
         {
             if (reply.ReplyToMessageId != message.Id)
             {
-                return DomainErrors.MessageInvalidReply.ToValidationErrorOr(new Dictionary<string, object>
+                return MessageErrors.InvalidReply.ToUnexpectedErrorOr(new Dictionary<string, object>
                 {
                     { "messageId", message.Id }
                 });

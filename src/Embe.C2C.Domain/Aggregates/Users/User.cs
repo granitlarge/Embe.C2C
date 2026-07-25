@@ -5,6 +5,8 @@ using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users.Events;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
 using NetTopologySuite.Geometries;
@@ -66,8 +68,10 @@ public class User : Aggregate
     public ValueObjects.Location? Location => Coordinates != null ? ValueObjects.Location.Create(Coordinates.Y, Coordinates.X).Value : null;
 
     private readonly List<Entities.Image> _images;
+
     [NotMapped]
     public IReadOnlyCollection<Entities.Image> Images => _images;
+
     [NotMapped]
     public Entities.Image? ProfilePicture => _images.OrderBy(f => f.ImageDetails.Order).FirstOrDefault();
 
@@ -102,11 +106,11 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public ErrorOr<Success> UpdateBirthDate( BirthDate newBirthDate)
+    public ErrorOr<Success> UpdateBirthDate(BirthDate newBirthDate)
     {
         if (Age.Create(newBirthDate) < Age.Create(18).Value)
         {
-            return DomainErrors.UserAgeOutOfRange.ToValidationErrorOr();
+            return UserErrors.AgeOutOfRange.ToRuleErrorOr();
         }
 
         BirthDate = newBirthDate;
@@ -130,7 +134,7 @@ public class User : Aggregate
     {
         if (_images.Count >= 10)
         {
-            return DomainErrors.UserInvalidFileCount.ToValidationErrorOr();
+            return UserErrors.InvalidFileCount.ToRuleErrorOr();
         }
 
         var image = Entities.Image.Create(Id, imageDetails);
@@ -181,20 +185,14 @@ public class User : Aggregate
         string identityUserId
     )
     {
-        var errors = new List<Error>();
         if (images != null && (images.Count > 10))
         {
-            errors.Add(DomainErrors.UserInvalidFileCount.ToValidationErrorOr());
+            UserErrors.InvalidFileCount.ToRuleErrorOr();
         }
 
         if (Age.Create(birthDate) < Age.Create(18).Value)
         {
-            errors.Add(DomainErrors.UserAgeOutOfRange.ToValidationErrorOr());
-        }
-
-        if (errors.Count > 0)
-        {
-            return errors;
+            UserErrors.AgeOutOfRange.ToRuleErrorOr();
         }
 
         return new User

@@ -1,3 +1,5 @@
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements.Enums;
 using ErrorOr;
 
@@ -20,26 +22,26 @@ public record Engagement
             boundedness != EngagementBoundedness.OneTime && frequency == EngagementFrequency.Once
         )
         {
-            return DomainErrors.EngagementOneTimeEngagementMustHaveOnceFrequency.ToValidationErrorOr();
+            return EngagementErrors.OneTimeEngagementMustHaveOnceFrequency.ToValidationErrorOr();
         }
 
         if (boundedness == EngagementBoundedness.FixedTerm)
         {
             if (startDate is null || endDate is null)
             {
-                return DomainErrors.EngagementFixedTermRequiresStartAndEndDate.ToValidationErrorOr();
+                return EngagementErrors.FixedTermRequiresStartAndEndDate.ToValidationErrorOr();
             }
 
             if (startDate > endDate)
             {
-                return DomainErrors.EngagementFixedTermStartDateAfterEndDate.ToValidationErrorOr();
+                return EngagementErrors.FixedTermStartDateAfterEndDate.ToValidationErrorOr();
             }
         }
         else
         {
             if (startDate is not null || endDate is not null)
             {
-                return DomainErrors.EngagementStartDateAndEndDateMustBeNullForNonFixedTerm.ToValidationErrorOr();
+                return EngagementErrors.StartDateAndEndDateMustBeNullForNonFixedTerm.ToValidationErrorOr();
             }
         }
 

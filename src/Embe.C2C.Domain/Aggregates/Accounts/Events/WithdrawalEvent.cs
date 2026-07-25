@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Transactions;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Domain.Aggregates.Accounts.Events;
 

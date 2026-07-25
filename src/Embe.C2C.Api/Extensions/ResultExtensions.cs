@@ -1,4 +1,5 @@
 using System.Net;
+using Embe.C2C.Application.Errors;
 using ErrorOr;
 
 namespace Embe.C2C.Api.Extensions;

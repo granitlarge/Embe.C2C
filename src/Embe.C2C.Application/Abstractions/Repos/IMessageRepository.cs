@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Domain.Aggregates.Messages;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Abstractions.Repos;
 

@@ -1,6 +1,8 @@
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.Aggregates;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.Aggregates.Matchings;
@@ -40,14 +42,9 @@ public class Matching : Aggregate
         LastMessageId = lastMessageId;
     }
 
-    public ErrorOr<Success> Remove(Guid actorUserId)
+    public void Remove(Guid actorUserId)
     {
-        if (actorUserId != UserId1 && actorUserId != UserId2)
-        {
-            return DomainErrors.Forbidden.ToForbiddenErrorOr();
-        }
         AddDomainEvent(new MatchingRemovedEvent(actorUserId, this));
-        return Result.Success;
     }
 
     internal static ErrorOr<Matching> Create

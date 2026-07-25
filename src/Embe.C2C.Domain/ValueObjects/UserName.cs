@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Errors;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;

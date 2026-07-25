@@ -1,3 +1,5 @@
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
 
@@ -55,12 +57,12 @@ public class Transaction : Aggregate
         var errors = new List<Error>();
         if (amount.Amount <= 0)
         {
-            errors.Add(DomainErrors.TransactionAmountInvalid.ToValidationErrorOr());
+            errors.Add(TransactionErrors.AmountInvalid.ToRuleErrorOr());
         }
 
         if (transactionDate > DateTimeOffset.UtcNow)
         {
-            errors.Add(DomainErrors.TransactionFutureDate.ToValidationErrorOr());
+            errors.Add(TransactionErrors.FutureDate.ToRuleErrorOr());
         }
 
         if (errors.Count > 0)

@@ -1,4 +1,5 @@
-using Embe.C2C.Domain.Exceptions;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
@@ -23,15 +24,9 @@ public record Money : IComparable<Money>
 
     public static ErrorOr<Money> Create(decimal amount, Currency currency)
     {
-        var errors = new List<Error>();
         if (amount < 0)
         {
-            errors.Add(Error.Validation(DomainErrors.NegativeMoney.Code, DomainErrors.NegativeMoney.Message));
-        }
-
-        if (errors.Count != 0)
-        {
-            return errors;
+            return MoneyErrors.Negative.ToValidationErrorOr();
         }
 
         return new Money(amount, currency);

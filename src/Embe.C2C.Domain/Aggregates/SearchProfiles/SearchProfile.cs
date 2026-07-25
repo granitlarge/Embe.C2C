@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Entities.SearchProfiles;
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.Aggregates;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
 using ErrorOr;
@@ -76,7 +79,7 @@ public class SearchProfile : Aggregate
     {
         if (_genders.Any(g => g.Gender == gender))
         {
-            return DomainErrors.SearchProfileGendersInvalid.ToValidationErrorOr();
+            return SearchProfileErrors.AddGenderAlreadyExists.ToRuleErrorOr();
         }
 
         _genders.Add(SearchProfileGender.Create(Id, gender));
@@ -88,12 +91,12 @@ public class SearchProfile : Aggregate
     {
         if (!_genders.Any(g => g.Gender == gender))
         {
-            return DomainErrors.SearchProfileGendersInvalid.ToValidationErrorOr();
+            return SearchProfileErrors.RemoveGenderDoesNotExist.ToValidationErrorOr();
         }
 
         if (_genders.Count == 1)
         {
-            return DomainErrors.SearchProfileGendersInvalid.ToValidationErrorOr();
+            return SearchProfileErrors.RemoveGenderExceedsMinimumCountOfOne.ToValidationErrorOr();
         }
 
         _genders.RemoveAll(g => g.Gender == gender);
@@ -160,7 +163,7 @@ public class SearchProfile : Aggregate
     {
         if (genders.Count == 0)
         {
-            return DomainErrors.SearchProfileGendersEmpty.ToValidationErrorOr();
+            return SearchProfileErrors.GendersEmpty.ToRuleErrorOr();
         }
         return Result.Success;
     }
@@ -169,7 +172,7 @@ public class SearchProfile : Aggregate
     {
         if (ageRangeMin is not null && ageRangeMax is not null && ageRangeMin > ageRangeMax)
         {
-            return DomainErrors.SearchProfileAgeRangeInvalid.ToValidationErrorOr();
+            return SearchProfileErrors.AgeRangeInvalid.ToValidationErrorOr();
         }
         return Result.Success;
     }

@@ -1,4 +1,5 @@
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

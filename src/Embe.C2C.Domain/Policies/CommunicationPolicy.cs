@@ -1,6 +1,7 @@
 using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Domain.Policies;
 

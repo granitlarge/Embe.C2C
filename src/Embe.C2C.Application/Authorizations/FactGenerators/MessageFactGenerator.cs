@@ -4,6 +4,7 @@ using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Application.Authorizations.FactStores.Matches.Facts;
 using Embe.C2C.Application.Authorizations.FactStores.Messages.Facts;
 using Embe.C2C.Domain.Aggregates.Messages;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Authorizations.FactGenerators;
 

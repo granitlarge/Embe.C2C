@@ -1,5 +1,6 @@
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Domain.Aggregates.Blockings;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,6 +1,7 @@
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.ValueObjects;
 using Embe.C2C.Domain.Aggregates.Transactions;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Dtos.Read.Aggregates;

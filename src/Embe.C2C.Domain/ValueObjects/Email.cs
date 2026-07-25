@@ -1,3 +1,5 @@
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
@@ -22,7 +24,7 @@ public record Email
         }
         catch (Exception)
         {
-            return DomainErrors.InvalidEmail.ToValidationErrorOr();
+            return EmailErrors.Invalid.ToValidationErrorOr();
         }
         return new Email(value);
     }

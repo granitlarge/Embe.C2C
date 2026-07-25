@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Aggregates.Users.Events;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Domain.Services;
 
@@ -17,7 +18,7 @@ public class UserService : DomainService
     public void Delete
     (
         User user,
-        ImmutableHashSet<Account> accounts
+        ImmutableHashSet<Aggregates.Accounts.Account> accounts
     )
     {
         foreach (var account in accounts)

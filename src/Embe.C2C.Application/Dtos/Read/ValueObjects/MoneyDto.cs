@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Dtos.Read.ValueObjects;

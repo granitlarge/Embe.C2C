@@ -1,3 +1,5 @@
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
@@ -13,7 +15,7 @@ public record Age : IComparable<Age>
     {
         if (age < 0 || age > 120)
         {
-            return DomainErrors.AgeOutOfRange.ToValidationErrorOr();
+            return AgeErrors.AgeOutOfRange.ToValidationErrorOr();
         }
 
         return new Age(age);

@@ -1,3 +1,5 @@
+using Embe.C2C.Domain.Errors;
+using Embe.C2C.Domain.Errors.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.ValueObjects;
@@ -19,12 +21,12 @@ public record Location
         var errors = new List<Error>();
         if (latitude < -90 || latitude > 90)
         {
-            errors.Add(DomainErrors.InvalidLatitude.ToValidationErrorOr());
+            errors.Add(LocationErrors.InvalidLatitude.ToValidationErrorOr());
         }
 
         if (longitude < -180 || longitude > 180)
         {
-            errors.Add(DomainErrors.InvalidLongitude.ToValidationErrorOr());
+            errors.Add(LocationErrors.InvalidLongitude.ToValidationErrorOr());
         }
 
         if (errors.Count != 0)

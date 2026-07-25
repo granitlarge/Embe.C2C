@@ -1,6 +1,7 @@
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Matchings;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Dtos.Read.Aggregates;
 

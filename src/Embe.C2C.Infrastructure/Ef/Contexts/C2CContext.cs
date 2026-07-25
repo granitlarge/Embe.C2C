@@ -9,6 +9,7 @@ using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -24,7 +25,7 @@ public class C2CContext
 ) : IdentityDbContext<MyIdentityUser>(options), IRepository
 {
     public DbSet<User> DomainUsers { get; set; }
-    public DbSet<Account> Accounts { get; set; }
+    public DbSet<Domain.Aggregates.Accounts.Account> Accounts { get; set; }
     public DbSet<Matching> Matchings { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }

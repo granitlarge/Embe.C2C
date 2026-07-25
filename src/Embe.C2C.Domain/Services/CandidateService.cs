@@ -2,6 +2,7 @@ using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Users;
+using Embe.C2C.Domain.Errors.Aggregates;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.Services;

@@ -3,6 +3,7 @@ using Embe.C2C.Application.Authorizations.FactStores.Messages;
 using Embe.C2C.Application.Authorizations.FactStores.Messages.Facts;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Messages;
+using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Authorizations;
 
