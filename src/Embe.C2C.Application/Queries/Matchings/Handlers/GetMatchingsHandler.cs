@@ -5,6 +5,7 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.Matchings.Handlers;
 
@@ -23,7 +24,7 @@ public class GetMatchingsHandler
     IAuthenticatedUserService authenticatedUserService,
     SearchProfileAuthorizationService searchProfileAuthorizationService,
     SearchProfileDtoMapper searchProfileDtoMapper
-) : TransactionalQueryHandler<GetMatchingsQuery, List<ReadDto<MatchingDto, MatchingPermission>>>(repository)
+) : TransactionalQueryHandler<GetMatchingsQuery, ErrorOr<List<ReadDto<MatchingDto, MatchingPermission>>>>(repository)
 {
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
     private readonly IUserRepository _userRepo = userRepo;
@@ -38,7 +39,7 @@ public class GetMatchingsHandler
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
 
-    protected override async Task<List<ReadDto<MatchingDto, MatchingPermission>>> ExecuteAsync
+    protected override async Task<ErrorOr<List<ReadDto<MatchingDto, MatchingPermission>>>> ExecuteAsync
     (
         GetMatchingsQuery query,
         CancellationToken cancellationToken

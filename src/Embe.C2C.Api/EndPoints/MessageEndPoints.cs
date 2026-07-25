@@ -31,7 +31,7 @@ public static class MessageEndPoints
     {
         var query = new GetMessagesByMatchingIdQuery(matchingId, page, size);
         var result = await handler.HandleAsync(query, cancellationToken);
-        return Results.Ok(result);
+        return result.ToResult();
     }
 
     private static async Task<IResult> CreateMessage

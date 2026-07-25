@@ -1,28 +1,19 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.Users.Handlers;
 
 public class GetHasSearchProfileHandler
+(
+    IUserRepository userRepo,
+    IAuthenticatedUserService authenticatedUserService
+)
 {
-    private readonly IUserRepository _userRepo;
-    private readonly IRepository _repository;
-    private readonly IAuthenticatedUserService _authenticatedUserService;
+    private readonly IUserRepository _userRepo = userRepo;
+    private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
 
-    public GetHasSearchProfileHandler
-    (
-        IUserRepository userRepo,
-        IRepository repository,
-        IAuthenticatedUserService authenticatedUserService
-    )
-    {
-        _repository = repository;
-        _authenticatedUserService = authenticatedUserService;
-        _userRepo = userRepo;
-    }
-
-    public async Task<bool> HandleAsync(GetHasSearchProfileQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> HandleAsync(GetHasSearchProfileQuery query, CancellationToken cancellationToken)
     {
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
         var result = await _userRepo.HasSearchProfilesAsync(userId, cancellationToken);

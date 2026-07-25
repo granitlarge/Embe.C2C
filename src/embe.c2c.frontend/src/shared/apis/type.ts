@@ -7,13 +7,10 @@ export type Error = {
 }
 
 export enum ErrorType {
-    Failure = 0,
-    Unexpected = 1,
-    Validation = 2,
-    Conflict = 3,
-    NotFound = 4,
-    Unauthorized = 5,
-    Forbidden = 6
+    DomainRule = 0,
+    Validation = 1,
+    Forbidden = 2,
+    Unexpected = 3
 }
 
 export type ApiResponse<T_Value> = {

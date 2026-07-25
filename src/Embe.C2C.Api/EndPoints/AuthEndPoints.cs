@@ -29,7 +29,7 @@ public static class AuthEndPoints
     {
         var query = new AccountExistsQuery(email);
         var result = await handler.HandleAsync(query, cancellationToken);
-        return Results.Ok(result);
+        return result.ToResult();
     }
 
     private static async Task<IResult> SignIn([FromBody] SignInCommand command, [FromServices] SignInHandler handler, CancellationToken cancellationToken = default)

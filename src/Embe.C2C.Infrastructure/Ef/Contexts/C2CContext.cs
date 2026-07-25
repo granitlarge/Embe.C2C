@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Domain;
-using Embe.C2C.Domain.Aggregates.Accounts;
 using Embe.C2C.Domain.Aggregates.Blockings;
 using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Matchings;
@@ -9,7 +8,6 @@ using Embe.C2C.Domain.Aggregates.Messages;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

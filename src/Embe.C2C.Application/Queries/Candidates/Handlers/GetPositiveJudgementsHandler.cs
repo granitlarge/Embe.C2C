@@ -5,13 +5,14 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.Candidates.Handlers;
 
 public class GetPositiveJudgementsHandler : TransactionalQueryHandler
 <
     GetPositiveJudgementsQuery,
-    List<ReadDto<CandidateDto, CandidatePermission>>
+    ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>
 >
 {
     private readonly ICandidateRepository _candidateRepository;
@@ -49,7 +50,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
         _candidateRepository = candidateRepository;
     }
 
-    protected async override Task<List<ReadDto<CandidateDto, CandidatePermission>>> ExecuteAsync
+    protected async override Task<ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>> ExecuteAsync
     (
         GetPositiveJudgementsQuery query,
         CancellationToken cancellationToken = default

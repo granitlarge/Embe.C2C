@@ -1,6 +1,7 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Entities;
 using Embe.C2C.Application.Abstractions.Repos;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.Geography.Handlers;
 
@@ -13,7 +14,7 @@ public class ReverseGeocodeHandler
         _adminAreaRepository = adminAreaRepository;
     }
 
-    public async Task<List<IAdminArea>> HandleAsync(ReverseGeocodeQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<List<IAdminArea>>> HandleAsync(ReverseGeocodeQuery query, CancellationToken cancellationToken)
     {
         var result = await _adminAreaRepository.ReverseGeocodeAsync(query.Longitude, query.Latitude, cancellationToken);
         return result;

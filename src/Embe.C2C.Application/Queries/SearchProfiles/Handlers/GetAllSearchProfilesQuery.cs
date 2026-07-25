@@ -5,13 +5,13 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
+using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.SearchProfiles.Handlers;
 
 public class GetAllSearchProfilesHandler
 {
     private readonly ISearchProfileRepository _searchProfileRepository;
-    private readonly IRepository _repository;
     private readonly IAuthenticatedUserService _authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
@@ -19,20 +19,18 @@ public class GetAllSearchProfilesHandler
     public GetAllSearchProfilesHandler
     (
         ISearchProfileRepository searchProfileRepository,
-        IRepository repository,
         IAuthenticatedUserService authenticatedUserService,
         SearchProfileAuthorizationService searchProfileAuthorizationService,
         SearchProfileDtoMapper searchProfileDtoMapper
     )
     {
-        _repository = repository;
         _authenticatedUserService = authenticatedUserService;
         _searchProfileAuthorizationService = searchProfileAuthorizationService;
         _searchProfileDtoMapper = searchProfileDtoMapper;
         _searchProfileRepository = searchProfileRepository;
     }
 
-    public async Task<List<ReadDto<SearchProfileDto, SearchProfilePermission>>> HandleAsync
+    public async Task<ErrorOr<List<ReadDto<SearchProfileDto, SearchProfilePermission>>>> HandleAsync
     (
         GetAllSearchProfilesQuery query,
         CancellationToken cancellationToken

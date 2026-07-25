@@ -34,7 +34,6 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
     const emailSchema = z.email({ message: "please enter a valid email" });
     const [email, setEmailState] = useState<string | undefined>(value);
     const [emailError, setEmailError] = useState<string | undefined>(undefined);
-    const [error, setError] = useState<string | undefined>(errorMessage);
 
     async function onNavigate() {
         const result = await emailSchema.safeParseAsync(email);
@@ -51,7 +50,7 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
                     finish(false);
                 }
             } else {
-                setError("an unknown error occurred");
+                throw new Error("not implemented");
             }
         }
     }
@@ -63,7 +62,7 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
                 onChange={setEmailState}
                 errorMessage={emailError}
             />
-            {error && <span className="text-(--error-fc)">{error}</span>}
+            {errorMessage && <span className="text-(--error-fc)">{errorMessage}</span>}
             <Button intent="navigate" onClick={onNavigate}>next</Button>
         </Surface>
     )
@@ -269,6 +268,8 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         password?: string;
     }>({});
 
+    const [emailError, setEmailError] = useState<string | undefined>(undefined);
+
     const steps: Step[] = [
         "email",
         "password",
@@ -291,10 +292,18 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         });
 
         if (response == undefined) {
+
             router.refresh();
             router.push("/protected/search");
+
         } else {
-            throw new Error("not implemented");
+
+            const hasEmailAlreadyInUseError = response?.some(e => e.code === "auth.duplicate_username") ?? false;
+            if (hasEmailAlreadyInUseError) {
+                setStep("email");
+                setEmailError("an account with that e-mail already exists");
+            }
+
         }
 
     }
@@ -304,6 +313,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
             {step !== "account exists" && <ProgressBar steps={steps} progress={steps.indexOf(step) + 1} onClick={(index) => { navigate(steps[index]) }} />}
             {step === "account exists" && <span className="mx-auto label">{step}</span>}
             <EmailStep
+                errorMessage={emailError}
                 hidden={step !== "email"}
                 finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}
                 setEmail={(email) => setData(prev => ({ ...prev, email }))}

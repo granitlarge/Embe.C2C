@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using System.Text;
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Entities;
+using Embe.C2C.Infrastructure.Extensions;
 using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -98,6 +98,7 @@ public class AuthService
             }
 
             return credentials;
+
         }
         catch (Exception)
         {
@@ -289,7 +290,7 @@ public class AuthService
         }
         else
         {
-            return result.Errors.Select(e => Error.Failure("registration_failed", e.Description)).ToList();
+            return ErrorOrFactory.From<IIdentityUser>(result.Errors.ToApplicationErrors().ToValidationErrorOr());
         }
     }
 
@@ -324,7 +325,7 @@ public class AuthService
         var result = await _userManager.DeleteAsync(user);
         if (result.Succeeded)
         {
-            return ErrorOr.Result.Success;
+            return Result.Success;
         }
         else
         {

@@ -30,7 +30,7 @@ public static class MatchingEndPoints
     private static async Task<IResult> Get([FromQuery] int page, [FromQuery] int size, [FromServices] GetMatchingsHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(new GetMatchingsQuery(page, size), cancellationToken);
-        return Results.Ok(result);
+        return result.ToResult();
     }
 
     private static async Task<IResult> Unmatch([FromRoute] Guid matchingId, [FromServices] UnmatchHandler handler, CancellationToken cancellationToken = default)

@@ -1,4 +1,3 @@
-using System.Net;
 using Embe.C2C.Application.Errors;
 using ErrorOr;
 
@@ -16,14 +15,10 @@ public static class ResultExtensions
         {
             return result.FirstError switch
             {
-                Error error when error.Type == ErrorType.Validation => Results.BadRequest(new { success = false, errors = result.Errors }),
-                Error error when error.Type == ErrorType.NotFound => Results.NotFound(new { success = false, errors = result.Errors }),
-                Error error when error.Type == ErrorType.Conflict => Results.Conflict(new { success = false, errors = result.Errors }),
-                Error error when error.Type == ErrorType.Forbidden => Results.Forbid(),
-                Error error when error.Type == ErrorType.Unauthorized => Results.Unauthorized(),
-                Error error when error.Type == ErrorType.Unexpected => Results.InternalServerError(new { success = false, errors = result.Errors }),
-                Error error when error.Type == ErrorType.Failure => Results.InternalServerError(new { success = false, errors = result.Errors }),
-                _ => Results.StatusCode((int)HttpStatusCode.InternalServerError)
+                Error error when error.NumericType == (int)ApplicationErrorType.Validation => Results.BadRequest(new { success = false, errors = result.Errors }),
+                Error error when error.NumericType == (int)ApplicationErrorType.NotFound => Results.NotFound(new { success = false, errors = result.Errors }),
+                Error error when error.NumericType == (int)ApplicationErrorType.Forbidden => Results.Forbid(),
+                _ => Results.InternalServerError(new { success = false, errors = result.Errors })
             };
         }
     }

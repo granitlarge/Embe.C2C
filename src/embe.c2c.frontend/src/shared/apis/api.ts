@@ -17,7 +17,7 @@ async function parseResponse<T>(response: Response): Promise<T | undefined> {
         }
 
     } catch (error) {
-
+        console.error(error);
     }
 
     return undefined;

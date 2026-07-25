@@ -35,7 +35,7 @@ public static class NotificationEndPoints
             ? new PagedQuery(pageNumber.Value, pageSize.Value)
             : new PagedQuery(1, 10);
         var result = await handler.HandleAsync(query, cancellationToken);
-        return Results.Ok(result);
+        return result.ToResult();
     }
 
     private static async Task<IResult> MarkAsRead
@@ -56,6 +56,6 @@ public static class NotificationEndPoints
     )
     {
         var result = await handler.HandleAsync(cancellationToken);
-        return Results.Ok(result);
+        return result.ToResult();
     }
 }
