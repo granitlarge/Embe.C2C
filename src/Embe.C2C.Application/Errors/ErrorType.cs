@@ -12,6 +12,7 @@ public enum ApplicationErrorType
     Forbidden = 2,
     Unexpected = 3,
     NotFound = 4,
+    Unauthorized = 5,
 }
 
 public static class ApplicationErrorExtensions
@@ -34,6 +35,11 @@ public static class ApplicationErrorExtensions
     public static Error ToUnexpectedErrorOr(this ApplicationError applicationError, Dictionary<string, object>? metadata = null)
     {
         return Error.Custom((int)ApplicationErrorType.Unexpected, applicationError.Code, applicationError.Message, metadata);
+    }
+
+    public static Error ToUnauthorizedErrorOr(this ApplicationError applicationError, Dictionary<string, object>? metadata = null)
+    {
+        return Error.Custom((int)ApplicationErrorType.Unauthorized, applicationError.Code, applicationError.Message, metadata);
     }
 
     public static IEnumerable<Error> ToValidationErrorOr(this IEnumerable<ApplicationError> applicationErrors)

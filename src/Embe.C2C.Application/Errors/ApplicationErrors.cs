@@ -5,6 +5,7 @@ public static class ApplicationErrors
     public static readonly ApplicationError NotFound = new("not_found", "The requested resource was not found.");
     public static readonly ApplicationError Forbidden = new("forbidden", "The authenticated user does not have access to the requested resource.");
     public static readonly ApplicationError Unexpected = new("unexpected", "An unexpected error occurred.");
+    public static readonly ApplicationError Unauthorized = new("unauthorized", "The requestor is not authenticated.");
 
     public static readonly ApplicationError PasswordMismatch = new("auth.password_mismatch", "The supplied password is invalid.");
     public static readonly ApplicationError InvalidToken = new("auth.invalid_token", "Invalid or expired token.");
@@ -27,4 +28,8 @@ public static class ApplicationErrors
     public static readonly ApplicationError PasswordRequiresLower = new("auth.password_requires_lower", "The password requires lowercase characters, but none were specified.");
     public static readonly ApplicationError PasswordRequiresUpper = new("auth.password_requires_upper", "The password requires uppercase characters, but none were specified.");
 
+    public static readonly ApplicationError NoUserWithSuppliedEmail = new("auth.no_user_with_supplied_email", "There's no registered account associated with the supplied e-mail.");
+    public static readonly ApplicationError InvalidCredentials = new("auth.invalid_credentials", "The supplied credentials are invalid.");
+    public static readonly ApplicationError InvalidRefreshToken = new("auth.invalid_refresh_token", "Invalid refresh token");
+    public static readonly ApplicationError LockedOut = new("auth.locked_out", "The user has had too many failed login attempts and is now locked out.");
 }

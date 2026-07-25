@@ -3,7 +3,7 @@ import { Tag } from "../cache";
 export type Error = {
     code: string;
     description: string;
-    type: ErrorType;
+    numericType: ErrorType;
 }
 
 export enum ErrorType {

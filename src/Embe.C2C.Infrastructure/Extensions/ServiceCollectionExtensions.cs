@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 8;
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.MaxValue;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(3650);
             options.Lockout.MaxFailedAccessAttempts = 5;
         })
             .AddEntityFrameworkStores<C2CContext>()

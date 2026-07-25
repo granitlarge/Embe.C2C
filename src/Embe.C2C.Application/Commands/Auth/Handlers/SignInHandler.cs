@@ -21,6 +21,6 @@ public class SignInHandler
     protected override async Task<CommandResult<ErrorOr<Credentials>>> InternalHandleAsync(SignInCommand command, CancellationToken cancellationToken = default)
     {
         var result = await _authService.SignInAsync(command.Email, command.Password, cancellationToken);
-        return new CommandResult<ErrorOr<Credentials>>(result.IsSuccess, result);
+        return new CommandResult<ErrorOr<Credentials>>(true, result);
     }
 }

@@ -46,7 +46,22 @@ export default function LoginForm({ className }: LoginFormProps) {
             const error = await signIn(userName!, password!);
             if (error !== undefined) {
 
-                throw new Error("not implemented");
+                const isInvalidCredentials = error.some(e => e.code === "auth.invalid_credentials");
+                const isLockedOut = error.some(e => e.code === "auth.locked_out");
+
+                if (isInvalidCredentials) {
+
+                    setError("there is no account with that e-mail/password combination");
+
+                } else if (isLockedOut) {
+
+                    setError("your account has been locked, reset your password to continue");
+
+                } else {
+
+                    setError("an unknown error occurred");
+
+                }
 
             } else {
 
@@ -82,7 +97,7 @@ export default function LoginForm({ className }: LoginFormProps) {
                     setPassword(pw);
                     clearErrors();
                 }} />
-            {error && <span className="error-message">{error}</span>}
+            {error && <span className="text-center mx-auto text-(--error-fc) text-(length:--secondary-fs)">{error}</span>}
             <Button onClick={login} intent="save">login</Button>
             <Link className="absolute right-2 top-2" href={"/public/register"}>register</Link>
         </Surface>
