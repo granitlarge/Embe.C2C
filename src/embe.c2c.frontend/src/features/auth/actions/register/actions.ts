@@ -4,10 +4,12 @@ import { RegisterRequest, RegisterUserFailureReason } from "./types";
 import { Mutate } from "@/src/shared/apis/api";
 import { Credentials } from "@/src/shared/types/application/types";
 import { saveAccessToken, saveRefreshToken } from "@/src/shared/security/functions";
+import { ApiResponse } from "@/src/shared/apis/type";
+import { Error } from "@/src/shared/apis/type";
 
-export async function register(request: RegisterRequest): Promise<RegisterUserFailureReason | undefined> {
+export async function register(request: RegisterRequest): Promise<Error[] | undefined> {
 
-    const response = await Mutate<Credentials, RegisterUserFailureReason>
+    const response = await Mutate<Credentials>
         (
             `${process.env.API_URL}/api/user/register`,
             {
@@ -27,6 +29,6 @@ export async function register(request: RegisterRequest): Promise<RegisterUserFa
         ]);
     }
 
-    return response.success ? undefined : response.reason;
+    return response.success ? undefined : response.errors;
 
 }

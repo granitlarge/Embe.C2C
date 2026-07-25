@@ -4,9 +4,11 @@ import { Credentials } from "@/src/shared/types/application/types";
 import { SignInError } from "./types";
 import { saveAccessToken, saveRefreshToken } from "@/src/shared/security/functions";
 import { Mutate } from "@/src/shared/apis/api";
-export async function signIn(email: string, password: string): Promise<SignInError | undefined> {
+import { Error } from "@/src/shared/apis/type";
 
-    const response = await Mutate<Credentials, SignInError>
+export async function signIn(email: string, password: string): Promise<Error[] | undefined> {
+
+    const response = await Mutate<Credentials>
         (
             `${process.env.API_URL}/api/auth/signin`, {
             method: "POST",
@@ -23,6 +25,6 @@ export async function signIn(email: string, password: string): Promise<SignInErr
         ]);
     }
 
-    return response.success ? undefined : response.reason;
+    return response.success ? undefined : response.errors;
 
 }

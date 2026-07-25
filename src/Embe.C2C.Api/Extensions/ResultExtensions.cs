@@ -9,7 +9,7 @@ public static class ResultExtensions
     {
         if (result.IsSuccess)
         {
-            return Results.Ok(new { success = true });
+            return Results.Ok(new { success = true, value = result.Value });
         }
         else
         {

@@ -7,7 +7,7 @@ import { ReadDto } from "@/src/shared/types/dtos/types";
 import { getAuthenticatedUser } from "@/src/shared/user";
 import { Read, Mutate } from "@/src/shared/apis/api";
 
-export async function generateCandidates(): Promise<ApiResponse<ReadDto<Candidate, CandidatePermission>[], FailureReason>> {
+export async function generateCandidates(): Promise<ApiResponse<ReadDto<Candidate, CandidatePermission>[]>> {
 
     const user = await getAuthenticatedUser();
     const response = await Read<ReadDto<Candidate, CandidatePermission>[]>
@@ -25,7 +25,7 @@ export async function generateCandidates(): Promise<ApiResponse<ReadDto<Candidat
 
 }
 
-export async function judge(candidateId: Guid, isPositive: boolean): Promise<ApiResponse<ReadDto<Matching | undefined, MatchingPermission>, FailureReason>> {
+export async function judge(candidateId: Guid, isPositive: boolean): Promise<ApiResponse<ReadDto<Matching | undefined, MatchingPermission>>> {
     const response = await Mutate<ReadDto<Matching | undefined, MatchingPermission>>(
         `${process.env.API_URL}/api/candidate/judge`,
         {
@@ -39,7 +39,7 @@ export async function judge(candidateId: Guid, isPositive: boolean): Promise<Api
     return response;
 }
 
-export async function getAllSearchProfiles(page: number, pageSize: number): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>[], FailureReason>> {
+export async function getAllSearchProfiles(page: number, pageSize: number): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>[]>> {
 
     const response = await Read<ReadDto<SearchProfile, SearchProfilePermission>[]>
         (

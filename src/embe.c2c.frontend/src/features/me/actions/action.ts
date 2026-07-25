@@ -17,10 +17,10 @@ export async function updateProfile
         location?: Location,
         imagesToKeep?: { id: string, order: number }[],
         bio?: string
-    ): Promise<ApiResponse<ReadDto<User, UserPermission>, FailureReason>> {
+    ): Promise<ApiResponse<ReadDto<User, UserPermission>>> {
 
     const body = JSON.stringify({ userId, alias, birthDate, gender, location, imagesToKeep, bio });
-    const response = Mutate<ReadDto<User, UserPermission>, FailureReason>(
+    const response = Mutate<ReadDto<User, UserPermission>>(
         `${process.env.API_URL}/api/user`,
         {
             method: "PUT",
@@ -37,7 +37,7 @@ export async function updateProfile
 
 export async function addImages(
     images: { image: ImageData, base64Data: string }[]
-): Promise<ApiResponse<ReadDto<User, UserPermission>, FailureReason>> {
+): Promise<ApiResponse<ReadDto<User, UserPermission>>> {
 
     var body = JSON.stringify({
         images: images.map((i, index) => {
@@ -51,7 +51,7 @@ export async function addImages(
         })
     });
 
-    const response = Mutate<ReadDto<User, UserPermission>, FailureReason>(
+    const response = Mutate<ReadDto<User, UserPermission>>(
         `${process.env.API_URL}/api/user/upload-images`,
         {
             method: "POST",

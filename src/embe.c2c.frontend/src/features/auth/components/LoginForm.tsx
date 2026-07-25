@@ -46,13 +46,7 @@ export default function LoginForm({ className }: LoginFormProps) {
             const error = await signIn(userName!, password!);
             if (error !== undefined) {
 
-                switch (error) {
-                    case SignInError.InvalidCredentials:
-                        setError("invalid credentials");
-                        break;
-                    default:
-                        setError("an unknown error occurred");
-                }
+                throw new Error("not implemented");
 
             } else {
 

@@ -1,5 +1,6 @@
 "use server";
-import type { ApiResponse, FailureReason, ReadRequest, MutationRequest } from "./type";
+
+import type { ApiResponse, ReadRequest, MutationRequest } from "./type";
 import { redirect } from "next/navigation";
 import { ApiError } from "../api-errors";
 import { getAccessToken } from "../security/functions";
@@ -61,9 +62,9 @@ async function SendUnauthenticatedRequest<T>(request: Request): Promise<T> {
     throw error;
 }
 
-export async function Read<T>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T, FailureReason>>;
-export async function Read<T_Value, T_Error>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T_Value, T_Error>>;
-export async function Read<T_Value, T_Error = FailureReason>(input: URL | RequestInfo, init: ReadRequest, authenticate = true): Promise<ApiResponse<T_Value, T_Error>> {
+export async function Read<T>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T>>;
+export async function Read<T_Value>(input: URL | RequestInfo, init: ReadRequest, authenticate?: boolean): Promise<ApiResponse<T_Value>>;
+export async function Read<T_Value>(input: URL | RequestInfo, init: ReadRequest, authenticate = true): Promise<ApiResponse<T_Value>> {
 
     init.next = {
         ...init.next,
@@ -73,10 +74,10 @@ export async function Read<T_Value, T_Error = FailureReason>(input: URL | Reques
     const request = new Request(input, init);
 
     if (authenticate) {
-        return await SendAuthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
+        return await SendAuthenticatedRequest<ApiResponse<T_Value>>(request);
     }
 
-    return await SendUnauthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
+    return await SendUnauthenticatedRequest<ApiResponse<T_Value>>(request);
 
 }
 
@@ -85,27 +86,27 @@ export async function Mutate<T_Value>
         input: URL | RequestInfo,
         init?: MutationRequest,
         authenticate?: boolean
-    ): Promise<ApiResponse<T_Value, FailureReason>>;
+    ): Promise<ApiResponse<T_Value>>;
 
-export async function Mutate<T_Value, T_Error>
+export async function Mutate<T_Value>
     (
         input: URL | RequestInfo,
         init?: MutationRequest,
         authenticate?: boolean
 
-    ): Promise<ApiResponse<T_Value, T_Error>>;
+    ): Promise<ApiResponse<T_Value>>;
 
-export async function Mutate<T_Value, T_Error = FailureReason>(
+export async function Mutate<T_Value>(
     input: URL | RequestInfo,
     init?: MutationRequest,
     authenticate = true
-): Promise<ApiResponse<T_Value, T_Error>> {
+): Promise<ApiResponse<T_Value>> {
 
     const request = new Request(input, init);
 
     if (authenticate) {
-        return await SendAuthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
+        return await SendAuthenticatedRequest<ApiResponse<T_Value>>(request);
     }
 
-    return await SendUnauthenticatedRequest<ApiResponse<T_Value, T_Error>>(request);
+    return await SendUnauthenticatedRequest<ApiResponse<T_Value>>(request);
 }

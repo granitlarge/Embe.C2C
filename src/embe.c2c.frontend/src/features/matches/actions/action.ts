@@ -7,7 +7,7 @@ import { Matching, MatchingPermission, Message, MessagePermission } from "@/src/
 import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
 import { getAuthenticatedUser } from "@/src/shared/user";
 
-export async function getMatchings(page: number, size: number): Promise<ApiResponse<ReadDto<Matching, MatchingPermission>[], FailureReason>> {
+export async function getMatchings(page: number, size: number): Promise<ApiResponse<ReadDto<Matching, MatchingPermission>[]>> {
     const user = await getAuthenticatedUser();
     const response = await Read<ReadDto<Matching, MatchingPermission>[]>
         (
@@ -22,7 +22,7 @@ export async function getMatchings(page: number, size: number): Promise<ApiRespo
     return response;
 }
 
-export async function getMatching(matchId: Guid): Promise<ApiResponse<ReadDto<Matching, MatchingPermission>, FailureReason>> {
+export async function getMatching(matchId: Guid): Promise<ApiResponse<ReadDto<Matching, MatchingPermission>>> {
     const user = await getAuthenticatedUser();
     const response = await Read<ReadDto<Matching, MatchingPermission>>
         (
@@ -37,7 +37,7 @@ export async function getMatching(matchId: Guid): Promise<ApiResponse<ReadDto<Ma
     return response;
 }
 
-export async function getMessages(matchingId: Guid, page: number, size: number): Promise<ApiResponse<ReadDto<Message, MessagePermission>[], FailureReason>> {
+export async function getMessages(matchingId: Guid, page: number, size: number): Promise<ApiResponse<ReadDto<Message, MessagePermission>[]>> {
     const response = await Read<ReadDto<Message, MessagePermission>[]>
         (
             `${process.env.API_URL}/api/messages?matchingId=${matchingId}&page=${page}&size=${size}`,
@@ -51,7 +51,7 @@ export async function getMessages(matchingId: Guid, page: number, size: number):
     return response;
 }
 
-export async function createMessage(createMessage: CreateMessage): Promise<ApiResponse<ReadDto<Message, MessagePermission>, FailureReason>> {
+export async function createMessage(createMessage: CreateMessage): Promise<ApiResponse<ReadDto<Message, MessagePermission>>> {
     const response = await Mutate<ReadDto<Message, MessagePermission>>
         (
             `${process.env.API_URL}/api/messages`,
@@ -66,7 +66,7 @@ export async function createMessage(createMessage: CreateMessage): Promise<ApiRe
     return response;
 }
 
-export async function deleteMessage(messageId: Guid): Promise<ApiResponse<void, FailureReason>> {
+export async function deleteMessage(messageId: Guid): Promise<ApiResponse<void>> {
     const response = await Mutate<void>
         (
             `${process.env.API_URL}/api/messages/${messageId}`,
@@ -77,7 +77,7 @@ export async function deleteMessage(messageId: Guid): Promise<ApiResponse<void, 
     return response;
 }
 
-export async function updateMessage(messageId: Guid, newContent: string): Promise<ApiResponse<ReadDto<Message, MessagePermission>, FailureReason>> {
+export async function updateMessage(messageId: Guid, newContent: string): Promise<ApiResponse<ReadDto<Message, MessagePermission>>> {
     const response = await Mutate<ReadDto<Message, MessagePermission>>
         (
             `${process.env.API_URL}/api/messages`,
@@ -92,7 +92,7 @@ export async function updateMessage(messageId: Guid, newContent: string): Promis
     return response;
 }
 
-export async function markMessageAsSeen(...messageIds: Guid[]): Promise<ApiResponse<void, FailureReason>> {
+export async function markMessageAsSeen(...messageIds: Guid[]): Promise<ApiResponse<void>> {
     if (messageIds.length === 0) {
         return { success: true };
     }
@@ -110,7 +110,7 @@ export async function markMessageAsSeen(...messageIds: Guid[]): Promise<ApiRespo
     return response;
 }
 
-export async function getMessage(messageId: Guid): Promise<ApiResponse<ReadDto<Message, MessagePermission>, FailureReason>> {
+export async function getMessage(messageId: Guid): Promise<ApiResponse<ReadDto<Message, MessagePermission>>> {
     const response = await Read<ReadDto<Message, MessagePermission>>
         (
             `${process.env.API_URL}/api/messages/${messageId}`,
@@ -124,7 +124,7 @@ export async function getMessage(messageId: Guid): Promise<ApiResponse<ReadDto<M
     return response;
 }
 
-export async function unmatch(matchId: Guid): Promise<ApiResponse<void, FailureReason>> {
+export async function unmatch(matchId: Guid): Promise<ApiResponse<void>> {
     const response = await Mutate<void>(
         `${process.env.API_URL}/api/matching/${matchId}`,
         {

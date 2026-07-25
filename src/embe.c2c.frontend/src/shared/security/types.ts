@@ -9,4 +9,4 @@ export type RefreshToken = Token & {
     id: string;
 }
 
-export type RefreshAccessTokenResponse = ApiResponse<{ accessToken: Token }, FailureReason>;
+export type RefreshAccessTokenResponse = ApiResponse<{ accessToken: Token }>;

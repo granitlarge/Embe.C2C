@@ -5,7 +5,7 @@ import { User, UserPermission } from "../../types/domain/aggregates";
 import { ReadDto } from "../../types/dtos/types";
 import { getAuthenticatedUser } from "../../user";
 
-export async function getUser(userId: Guid): Promise<ApiResponse<ReadDto<User, UserPermission>, FailureReason>> {
+export async function getUser(userId: Guid): Promise<ApiResponse<ReadDto<User, UserPermission>>> {
     const response = await Read<ReadDto<User, UserPermission>>
         (
             `${process.env.API_URL}/api/user/${userId}`,
@@ -19,7 +19,7 @@ export async function getUser(userId: Guid): Promise<ApiResponse<ReadDto<User, U
     return response;
 }
 
-export async function getHasSearchProfile(): Promise<ApiResponse<boolean, FailureReason>> {
+export async function getHasSearchProfile(): Promise<ApiResponse<boolean>> {
     const authenticatedUser = await getAuthenticatedUser();
     const response = await Read<boolean>
         (

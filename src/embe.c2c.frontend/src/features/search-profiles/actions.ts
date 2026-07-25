@@ -8,8 +8,8 @@ import { getAuthenticatedUser } from "@/src/shared/user";
 import { Guid, NullGuid } from "@/src/shared/cache";
 import { Mutate, Read } from "@/src/shared/apis/api";
 
-export async function createSearchProfile(body: SearchProfileWriteDto): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>> {
-    const response = await Mutate<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>(
+export async function createSearchProfile(body: SearchProfileWriteDto): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>>> {
+    const response = await Mutate<ReadDto<SearchProfile, SearchProfilePermission>>(
         `${process.env.API_URL}/api/search-profile`,
         {
             method: "POST",
@@ -22,8 +22,8 @@ export async function createSearchProfile(body: SearchProfileWriteDto): Promise<
     return response;
 }
 
-export async function updateSearchProfile(body: SearchProfileWriteDto): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>> {
-    const response = await Mutate<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>(
+export async function updateSearchProfile(body: SearchProfileWriteDto): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>>> {
+    const response = await Mutate<ReadDto<SearchProfile, SearchProfilePermission>>(
         `${process.env.API_URL}/api/search-profile`,
         {
             method: "PUT",
@@ -36,9 +36,9 @@ export async function updateSearchProfile(body: SearchProfileWriteDto): Promise<
     return response;
 }
 
-export async function getSearchProfile(id: Guid): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>> {
+export async function getSearchProfile(id: Guid): Promise<ApiResponse<ReadDto<SearchProfile, SearchProfilePermission>>> {
     const user = await getAuthenticatedUser();
-    const response = await Read<ReadDto<SearchProfile, SearchProfilePermission>, FailureReason>(`${process.env.API_URL}/api/search-profile/${id}`, {
+    const response = await Read<ReadDto<SearchProfile, SearchProfilePermission>>(`${process.env.API_URL}/api/search-profile/${id}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -50,8 +50,8 @@ export async function getSearchProfile(id: Guid): Promise<ApiResponse<ReadDto<Se
     return response;
 }
 
-export async function deleteSearchProfile(id: Guid): Promise<ApiResponse<void, FailureReason>> {
-    const response = await Mutate<void, FailureReason>(`${process.env.API_URL}/api/search-profile/${id}`, {
+export async function deleteSearchProfile(id: Guid): Promise<ApiResponse<void>> {
+    const response = await Mutate<void>(`${process.env.API_URL}/api/search-profile/${id}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",

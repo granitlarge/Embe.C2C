@@ -17,16 +17,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
     const user = await getAuthenticatedUser();
     const response = await getMatching(matchId);
     if (!response.success) {
-        switch (response.reason) {
-            case FailureReason.NotFound:
-                redirect("public/not-found");
-            case FailureReason.Forbidden:
-                redirect("public/forbidden");
-            case FailureReason.DomainError:
-            case FailureReason.Unknown:
-            default:
-                redirect("public/error");
-        }
+        throw new Error("not implemented");
     }
 
     const matchDto = response.value;

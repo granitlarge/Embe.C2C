@@ -13,7 +13,7 @@ async function getUserNotificationTag(): Promise<Tag> {
     return tag;
 }
 
-export async function getNotifications(): Promise<ApiResponse<ReadDto<Notification, NotificationPermission>[], FailureReason>> {
+export async function getNotifications(): Promise<ApiResponse<ReadDto<Notification, NotificationPermission>[]>> {
     const response = await Read<ReadDto<Notification, NotificationPermission>[]>
         (
             `${process.env.API_URL}/api/notification`,
@@ -28,8 +28,8 @@ export async function getNotifications(): Promise<ApiResponse<ReadDto<Notificati
     return response;
 }
 
-export async function markAsRead(notificationId: string, isRead: boolean): Promise<ApiResponse<void, FailureReason>> {
-    const response = await Mutate<void, FailureReason>
+export async function markAsRead(notificationId: string, isRead: boolean): Promise<ApiResponse<void>> {
+    const response = await Mutate<void>
         (
             new Request(`${process.env.API_URL}/api/notification/mark-as-read`, {
                 method: "POST",
@@ -43,8 +43,8 @@ export async function markAsRead(notificationId: string, isRead: boolean): Promi
     return response;
 }
 
-export async function hasUnread(): Promise<ApiResponse<boolean, FailureReason>> {
-    const response = await Read<boolean, FailureReason>
+export async function hasUnread(): Promise<ApiResponse<boolean>> {
+    const response = await Read<boolean>
         (
             `${process.env.API_URL}/api/notification/has-unread`,
             {

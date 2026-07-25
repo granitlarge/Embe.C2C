@@ -1,21 +1,21 @@
 "use server";
 
 import { Read } from "@/src/shared/apis/api";
-import { ApiResponse, FailureReason,  } from "@/src/shared/apis/type";
+import { ApiResponse, } from "@/src/shared/apis/type";
 
-export async function accountExists(email: string): Promise<ApiResponse<boolean, FailureReason>> {
+export async function accountExists(email: string): Promise<ApiResponse<boolean>> {
 
     const result = await Read<boolean>
-    (
-        `${process.env.API_URL}/api/auth/account-exists?email=${encodeURIComponent(email)}`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
+        (
+            `${process.env.API_URL}/api/auth/account-exists?email=${encodeURIComponent(email)}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
             },
-        },
-        false
-    );
+            false
+        );
 
     return result;
 
