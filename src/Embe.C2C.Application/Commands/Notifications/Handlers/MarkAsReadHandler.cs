@@ -1,5 +1,6 @@
 using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using ErrorOr;
@@ -28,11 +29,11 @@ public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, ErrorOr<Succe
         var notification = await _notificationRepository.GetByIdAsync(command.NotificationId, cancellationToken);
         if (notification is null)
         {
-            return new CommandResult<ErrorOr<Success>>(false, Error.NotFound("notification_not_found", "Notification not found."));
+            return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
         notification.MarkAsRead(command.IsRead);
 
-        return new CommandResult<ErrorOr<Success>>(Save: true, Result.Success);
+        return new(Save: true, Result.Success);
     }
 }

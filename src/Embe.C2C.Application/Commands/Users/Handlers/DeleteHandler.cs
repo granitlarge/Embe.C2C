@@ -1,7 +1,7 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Authorizations;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
@@ -39,22 +39,22 @@ public class DeleteHandler : CommandHandler<DeleteCommand, ErrorOr<Success>>
 
     protected override async Task<CommandResult<ErrorOr<Success>>> InternalHandleAsync(DeleteCommand command, CancellationToken cancellationToken = default)
     {
-        var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
+        var (permissions, _) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Delete))
         {
-            return new CommandResult<ErrorOr<Success>>(false, Error.Forbidden("forbidden", "User is not authorized to delete this profile."));
+            return new(false, ApplicationErrors.Forbidden.ToForbiddenErrorOr());
         }
 
         var user = await _userRepo.GetByIdAsync(command.UserId, cancellationToken);
         if (user is null)
         {
-            return new CommandResult<ErrorOr<Success>>(false, Error.NotFound("not_found", $"User with ID {command.UserId} not found."));
+            return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
         var deleteIdentityUserResult = await _authService.DeleteUserAsync(user.IdentityUserId, cancellationToken);
         if (!deleteIdentityUserResult.IsSuccess)
         {
-            return new CommandResult<ErrorOr<Success>>(false, deleteIdentityUserResult.Errors);
+            return new(false, deleteIdentityUserResult.Errors);
         }
 
         var accounts = await _accountRepo.GetByUserIdAsync(command.UserId, cancellationToken);
@@ -66,6 +66,6 @@ public class DeleteHandler : CommandHandler<DeleteCommand, ErrorOr<Success>>
             _accountRepo.Set.Remove(account);
         }
 
-        return new CommandResult<ErrorOr<Success>>(true, ErrorOr.Result.Success);
+        return new(true, Result.Success);
     }
 }

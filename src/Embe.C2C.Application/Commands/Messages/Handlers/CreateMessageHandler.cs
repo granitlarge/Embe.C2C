@@ -3,6 +3,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
@@ -55,7 +56,7 @@ public class CreateMessageHandler
         var permissions = await _matchingAuthorizationService.GetPermissionsAsync(command.MatchingId, cancellationToken);
         if (!permissions.Contains(MatchingPermission.Chat))
         {
-            return new CommandResult<ErrorOr<ReadDto<MessageDto, MessagePermission>>>(false, Error.Forbidden("Authenticated user does not have permission to send messages in this matching."));
+            return new(false, ApplicationErrors.Forbidden.ToForbiddenErrorOr());
         }
 
         var messageContent = MessageContent.Create(command.Content);
@@ -68,25 +69,25 @@ public class CreateMessageHandler
         var user = await _userRepo.GetByIdAsync(_authenticatedUser.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
         if (user is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<MessageDto, MessagePermission>>>(false, Error.NotFound("Authenticated user not found."));
+            return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
         var matching = await _matchingRepo.GetByIdAsync(command.MatchingId, cancellationToken);
         if (matching is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<MessageDto, MessagePermission>>>(false, Error.NotFound("Matching not found."));
+            return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
         var receiver = await _userRepo.GetByIdAsync(matching.GetOtherUserId(_authenticatedUser.UserId)!.Value, cancellationToken);
         if (receiver is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<MessageDto, MessagePermission>>>(false, Error.NotFound("Receiver user not found."));
+            return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
         var replyToMessage = replyToMessageId.HasValue ? await _messageRepo.GetByIdAsync(replyToMessageId.Value, cancellationToken) : null;
         if (replyToMessageId.HasValue && replyToMessage is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<MessageDto, MessagePermission>>>(false, Error.NotFound("Reply-to message not found."));
+            return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
         var blocking1 = await _blockingRepo.GetByUserIdsAsync(user.Id, receiver.Id, cancellationToken);
@@ -96,7 +97,7 @@ public class CreateMessageHandler
         var message = _matchingService.SendMessage(user, matching, messageContent.Value, communicationPolicy, replyToMessage);
         if (message.IsError)
         {
-            return new CommandResult<ErrorOr<ReadDto<MessageDto, MessagePermission>>>(false, message.Errors);
+            return new(false, message.Errors);
         }
 
         _messageRepo.Set.Add(message.Value);
@@ -105,6 +106,6 @@ public class CreateMessageHandler
             throw new InvalidOperationException("The message should be viewable to the sender right after sending it.");
 
         var result = ErrorOrFactory.From(readDto);
-        return new CommandResult<ErrorOr<ReadDto<MessageDto, MessagePermission>>>(true, result);
+        return new(true, result);
     }
 }

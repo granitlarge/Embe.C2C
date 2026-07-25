@@ -15,19 +15,14 @@ public enum ApplicationErrorType
 
 public static class ApplicationErrorExtensions
 {
-    public static Error ToValidationErrorOr(this ApplicationError domainErrorNew, Dictionary<string, object>? metadata = null)
+    public static Error ToForbiddenErrorOr(this ApplicationError applicationError, Dictionary<string, object>? metadata = null)
     {
-        return Error.Custom((int)ApplicationErrorType.Validation, domainErrorNew.Code, domainErrorNew.Message, metadata);
+        return Error.Forbidden(applicationError.Code, applicationError.Message, metadata);
     }
 
-    public static Error ToDomainRuleErrorOr(this ApplicationError domainError, Dictionary<string, object>? metadata = null)
+    public static Error ToNotFoundErrorOr(this ApplicationError applicationError, Dictionary<string, object>? metadata = null)
     {
-        return Error.Custom((int)ApplicationErrorType.DomainRule, domainError.Code, domainError.Message, metadata);
-    }
-
-    public static Error ToUnexpectedErrorOr(this ApplicationError domainError, Dictionary<string, object>? metadata = null)
-    {
-        return Error.Custom((int)ApplicationErrorType.Unexpected, domainError.Code, domainError.Message, metadata);
+        return Error.NotFound(applicationError.Code, applicationError.Message, metadata);
     }
 }
 
@@ -46,12 +41,14 @@ public static class DomainErrorExtensions
         return Error.Custom((int)applicationErrorType, error.Code, error.Description);
     }
 
+    public static IEnumerable<Error> ToApplicationError(this IEnumerable<Error> errors)
+    {
+        return errors.Select(e => e.ToApplicationError());
+    }
+
     public static ErrorOr<T> ToApplicationError<T>(this ErrorOr<T> error)
     {
-        if (error.IsError)
-        {
-            return error.ToApplicationError();
-        }
-        return error;
+        return error.ToApplicationError();
     }
+
 }

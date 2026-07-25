@@ -4,11 +4,11 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
-using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
@@ -57,7 +57,7 @@ public class CreateSearchProfileHandler
             return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
                 false,
-                Error.Forbidden("forbidden", "Authenticated user does not exist in the system.")
+                ApplicationErrors.Forbidden.ToForbiddenErrorOr()
             );
         }
 
@@ -116,7 +116,7 @@ public class CreateSearchProfileHandler
             return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
             (
                 false,
-                Error.Forbidden("forbidden", "Authenticated user does not have permission to view the search profile.")
+                ApplicationErrors.Forbidden.ToForbiddenErrorOr()
             );
         }
 

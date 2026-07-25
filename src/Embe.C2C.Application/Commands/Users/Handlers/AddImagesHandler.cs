@@ -1,4 +1,3 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
@@ -6,6 +5,7 @@ using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
@@ -52,10 +52,10 @@ public class AddImagesHandler
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>
+            return new 
             (
                 false,
-                Error.NotFound("not_found", "user does not exist")
+                ApplicationErrors.NotFound.ToNotFoundErrorOr()
             );
         }
 
@@ -96,7 +96,7 @@ public class AddImagesHandler
 
                 if (imageDetails.IsError)
                 {
-                    return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>
+                    return new
                     (
                         false,
                         imageDetails.Errors
@@ -112,7 +112,7 @@ public class AddImagesHandler
             var dto = await user.Enrich(user).ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken) ??
                 throw new InvalidOperationException("User can't read his own data wtf???");
 
-            return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>
+            return new
             (
                 true,
                 dto

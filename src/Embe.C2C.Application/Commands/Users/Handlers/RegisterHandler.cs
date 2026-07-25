@@ -4,7 +4,6 @@ using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
 namespace Embe.C2C.Application.Commands.Users.Handlers;
@@ -33,7 +32,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
         var registerUserResult = await _authService.RegisterUserAsync(command.Email, command.Password, cancellationToken);
         if (!registerUserResult.IsSuccess)
         {
-            return new CommandResult<ErrorOr<Credentials>>
+            return new
             (
                 false,
                 ErrorOrFactory.From<Credentials>(registerUserResult.Errors)
@@ -47,7 +46,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
 
         if (errors.Count != 0)
         {
-            return new CommandResult<ErrorOr<Credentials>>
+            return new
             (
                 false,
                 ErrorOrFactory.From<Credentials>(errors)
@@ -62,7 +61,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
 
         if (errors.Count != 0)
         {
-            return new CommandResult<ErrorOr<Credentials>>
+            return new
             (
                 false,
                 ErrorOrFactory.From<Credentials>(errors)
@@ -80,7 +79,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
             throw new NotImplementedException();
         }
 
-        return new CommandResult<ErrorOr<Credentials>>
+        return new
         (
             true,
             ErrorOrFactory.From(signInResult.Value!)

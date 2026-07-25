@@ -3,6 +3,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
@@ -49,10 +50,10 @@ public class UpdateHandler
         var (permissions, variant) = await _authorizationPolicy.GetAsync(command.UserId, cancellationToken);
         if (!permissions.Contains(UserPermission.Update))
         {
-            return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>?>>
+            return new
             (
                 false,
-                Error.Failure("forbidden", "User is not authorized to update this profile.")
+                ApplicationErrors.Forbidden.ToForbiddenErrorOr()
             );
         }
 
@@ -70,13 +71,13 @@ public class UpdateHandler
         var bio = string.IsNullOrWhiteSpace(command.Bio) ? null : command.Bio;
         if (errors.Count != 0)
         {
-            return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>?>>(false, errors);
+            return new(false, errors);
         }
 
         var user = await _userRepo.GetByIdAsync(command.UserId, cancellationToken);
         if (user == null)
         {
-            return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>?>>(false, Error.Failure("not_found", "User not found."));
+            return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
         var isClearingLocation = command.Location == null && user.Location != null;
@@ -126,6 +127,6 @@ public class UpdateHandler
         var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
         var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
 
-        return new CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>?>>(true, readDto);
+        return new(true, readDto);
     }
 }

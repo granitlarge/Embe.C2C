@@ -55,7 +55,7 @@ public class GenerateCandidatesHandler
         var userHasCandidates = await _candidateRepository.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
         if (!userHasCandidates)
         {
-            return new CommandResult<ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>(false, Error.NotFound("not_found", "No candidates found for the authenticated user."));
+            return new(true, []);
         }
 
         var candidates = await _candidateRepository.GetByUserIdAsync(userId, cancellationToken);
@@ -96,6 +96,6 @@ public class GenerateCandidatesHandler
                 dtos.Add(candidateDto);
         }
 
-        return new CommandResult<ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>(true, dtos);
+        return new(true, dtos);
     }
 }

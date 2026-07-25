@@ -4,6 +4,7 @@ using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
@@ -54,30 +55,30 @@ public class UpdateSearchProfileHandler
         var user = await _userRepo.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            return new
             (
                 false,
-                Error.Forbidden("forbidden", "Authenticated user does not exist in the system.")
+                ApplicationErrors.Forbidden.ToForbiddenErrorOr()
             );
         }
 
         var searchProfile = await _searchProfileRepository.GetByIdAsync(command.Id, cancellationToken);
         if (searchProfile is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            return new
             (
                 false,
-                Error.NotFound("not found", "Search profile not found.")
+                ApplicationErrors.NotFound.ToNotFoundErrorOr()
             );
         }
 
         var (permissions, _) = await _searchProfileAuthorizationService.GetAsync(command.Id, cancellationToken);
         if (!permissions.Contains(SearchProfilePermission.Modify))
         {
-            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            return new
             (
                 false,
-                Error.Forbidden("forbidden", "User does not have permission to update the search profile.")
+                ApplicationErrors.Forbidden.ToForbiddenErrorOr()
             );
         }
 
@@ -117,14 +118,14 @@ public class UpdateSearchProfileHandler
         var dto = await searchProfile.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
         if (dto is null)
         {
-            return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+            return new
             (
                 false,
-                Error.Forbidden("forbidden", "Authenticated user does not have permission to view the search profile after updating it.")
+                ApplicationErrors.Forbidden.ToForbiddenErrorOr()
             );
         }
 
-        return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
+        return new
         (
             true,
             ErrorOrFactory.From(dto)
