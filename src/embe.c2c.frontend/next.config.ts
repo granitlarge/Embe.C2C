@@ -13,19 +13,14 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "relationshipfindersa.blob.core.windows.net",
-        pathname: "/images/pending/**",
-      },
-      {
-        protocol: "https",
-        hostname: "relationshipfindersa.blob.core.windows.net",
-        pathname: "/images/accepted/**",
+        pathname: "/images/**",
       }
     ],
   },
   allowedDevOrigins: ['192.168.8.7', 'frontend-embe.c2c.aspire.dev.localhost'],
   experimental: {
     serverActions: {
-      bodySizeLimit: "100mb"
+      bodySizeLimit: "30mb"
     }
   },
   async redirects() {
