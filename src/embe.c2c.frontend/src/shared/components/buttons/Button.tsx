@@ -86,14 +86,10 @@ export default function Button({ onClick, intent = "none", ...props }: ButtonPro
                         style={{
                             width: buttonDimensionsRef.current.width,
                             height: buttonDimensionsRef.current.height,
-                            paddingLeft: buttonDimensionsRef.current.padding.left,
-                            paddingRight: buttonDimensionsRef.current.padding.right,
-                            paddingTop: buttonDimensionsRef.current.padding.top,
-                            paddingBottom: buttonDimensionsRef.current.padding.bottom
                         }}
                     >
                         <Loader
-                            className="mx-auto my-auto animate-spin w-(--primary-fs) h-(--primary-fs)"
+                            className="animate-spin w-(--primary-fs) h-(--primary-fs)"
                         />
                     </div> : props.children
             }
