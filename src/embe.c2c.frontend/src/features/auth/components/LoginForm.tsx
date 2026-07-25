@@ -9,6 +9,7 @@ import { SignInError } from "../actions/sign-in/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
+import { Routes } from "@/src/shared/routes";
 
 export type LoginFormProps = {
     className?: string;
@@ -66,7 +67,7 @@ export default function LoginForm({ className }: LoginFormProps) {
             } else {
 
                 router.refresh();
-                router.replace("/protected/search");
+                router.replace(Routes.protected.search);
 
             }
 
@@ -79,7 +80,7 @@ export default function LoginForm({ className }: LoginFormProps) {
         setPasswordError(undefined);
         setError(undefined);
     }
-    const passwordLabel = <>password<Link href="/public/forgot-password" title="Forgot Password?">?</Link></>;
+    const passwordLabel = <>password<Link href={Routes.public.forgotPassword} title="Forgot Password?">?</Link></>;
     return (
         <Surface className={`form w-[600px] max-w-full ${classNames} relative`} variant="secondary">
             <TextInput
@@ -99,7 +100,7 @@ export default function LoginForm({ className }: LoginFormProps) {
                 }} />
             {error && <span className="text-center mx-auto text-(--error-fc) text-(length:--secondary-fs)">{error}</span>}
             <Button onClick={login} intent="save">login</Button>
-            <Link className="absolute right-2 top-2" href={"/public/register"}>register</Link>
+            <Link className="absolute right-2 top-2" href={Routes.public.register}>register</Link>
         </Surface>
     )
 

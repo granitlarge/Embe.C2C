@@ -21,6 +21,7 @@ import { useRouter } from "nextjs-toploader/app";
 import LocationInput from "@/src/shared/components/inputs/location-input/LocationInput";
 import { Location } from "@/src/shared/types/domain/value-objects"
 import { updateProfile } from "../../me/actions/action";
+import { Routes } from "@/src/shared/routes";
 
 export type SearchProfileFormProps = {
     className?: string;
@@ -189,7 +190,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 }
 
                 router.refresh();
-                router.replace("/protected/search-profile/" + createSearchProfileResponse.value?.data.id);
+                router.replace(Routes.protected.searchProfile(createSearchProfileResponse.value?.data.id));
 
             }
 
@@ -202,7 +203,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
         if (!deleteResponse.success) {
             throw new Error("not implemented");
         }
-        router.push("/protected/search");
+        router.push(Routes.protected.search);
     }
 
     function onCancel() {

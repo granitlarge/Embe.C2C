@@ -4,6 +4,7 @@ import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { User as UserIcon, } from "@deemlol/next-icons";
 import Image from "@/src/shared/components/images/Image";
+import { Routes } from "@/src/shared/routes";
 
 export type UserCompactProps = Omit<SurfaceProps<typeof Link>, "as" | "href" | "children"> & {
     className?: string;
@@ -20,7 +21,7 @@ export function UserCompact({ className, dto, ...props }: UserCompactProps) {
         <>
             {
                 user?.id &&
-                <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={`/protected/user/${user?.id}`} {...props} variant="inherit">
+                <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={Routes.protected.user(user?.id)} {...props} variant="inherit">
                     {user?.alias && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs) font-bold">{user?.alias}</span>}
                     {
                         profilePicture?.imageDetails?.url &&

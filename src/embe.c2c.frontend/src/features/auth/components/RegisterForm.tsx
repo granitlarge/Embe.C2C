@@ -15,6 +15,7 @@ import Surface from "@/src/shared/components/surfaces/Surface";
 import BasicProfileForm, { BasicProfileFormData, BasicProfileFormError } from "./BasicProfileForm";
 import { getValidBirthdateRange } from "@/src/shared/time";
 import { useRouter } from "nextjs-toploader/app";
+import { Routes } from "@/src/shared/routes";
 
 type Step =
     "email" |
@@ -72,7 +73,7 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
 function AccountExistsStep({ hidden }: { hidden: boolean }) {
     const router = useRouter();
     function onClick() {
-        router.push("/public/login");
+        router.push(Routes.public.login);
     }
     return (
         <Button intent="navigate" className={`${hidden ? "hidden" : ""}`} onClick={onClick}>login</Button>
@@ -294,7 +295,7 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         if (response == undefined) {
 
             router.refresh();
-            router.push("/protected/search");
+            router.push(Routes.protected.search);
 
         } else {
 

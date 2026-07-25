@@ -1,5 +1,6 @@
 import { signOut } from "@/src/features/auth/actions/sign-out/actions";
 import Button from "@/src/shared/components/buttons/Button"
+import { Routes } from "@/src/shared/routes";
 import { redirect } from "next/navigation";
 
 export type SettingsPageProps = {
@@ -10,7 +11,7 @@ export default async function SettingsPage({ }: SettingsPageProps) {
     async function logout() {
         "use server";
         await signOut();
-        redirect("/public/login", "push");
+        redirect(Routes.public.login, "push");
     }
 
     return (

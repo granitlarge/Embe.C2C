@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ApiError } from "../api-errors";
 import { getAccessToken } from "../security/functions";
 import { Tag } from "../cache";
+import { Routes } from "../routes";
 
 async function parseResponse<T>(response: Response): Promise<T | undefined> {
 
@@ -27,7 +28,7 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
 
     let accessToken = await getAccessToken();
     if (!accessToken) {
-        return redirect("/public/login", "push");
+        return redirect(Routes.public.login, "push");
     }
 
     request.headers.set("Authorization", `Bearer ${accessToken}`);
@@ -39,7 +40,7 @@ async function SendAuthenticatedRequest<T>(request: Request): Promise<T> {
     }
 
     if (response.status === 401) {
-        return redirect("/public/login", "push");
+        return redirect(Routes.public.login, "push");
     }
 
     const parsedErrorResponse = await parseResponse<T>(response);

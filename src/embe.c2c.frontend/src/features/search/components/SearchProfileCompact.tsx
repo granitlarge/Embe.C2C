@@ -7,6 +7,7 @@ import * as enums from "@/src/shared/enums";
 import { EngagementBoundedness, EngagementMedium, Gender, RelationshipType } from "@/src/shared/types/domain/value-objects";
 import { ArrowRight, Calendar, Clock, Globe, Handshake, Heart, Mars, Radius, Transgender, Users, Venus } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
+import { Routes } from "@/src/shared/routes";
 
 function Chip({ children }: { children: React.ReactNode }) {
     return (
@@ -39,7 +40,7 @@ export default function SearchProfileCompact({ searchProfile: searchProfileDto }
 
     return (
         <Surface as="button" variant="secondary" padding="md" className="relative w-full flex flex-col gap-3" onClick={() => {
-            router.push(`/protected/search-profile/${searchProfile.id}`);
+            router.push(Routes.protected.searchProfile(searchProfile.id));
         }}>
             <>
                 {

@@ -18,6 +18,7 @@ import { Ellipsis } from "lucide-react";
 import Button from "@/src/shared/components/buttons/Button";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
+import { Routes } from "@/src/shared/routes";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
@@ -36,14 +37,14 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
             throw new Error("not implemented");
         }
         router.refresh();
-        router.push("/protected/matches");
+        router.push(Routes.protected.matches);
     }
 
     return (
         <header className="flex flex-row items-center">
             {
                 partner &&
-                <Link href={`/protected/user/${partner.id}`} className="no-underline text-(--primary-fc)">
+                <Link href={Routes.protected.user(partner.id)} className="no-underline text-(--primary-fc)">
                     <h1 className="truncate">{partner?.alias}</h1>
                 </Link>
             }

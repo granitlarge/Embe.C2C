@@ -18,12 +18,10 @@ public class DomainEventHandler
 (
     INotificationRepository notificationRepository,
     IUserRepository userRepo,
-    IRepository context,
     IMatchingRepository matchingRepo
 ) : IntegrationEventCollector
 {
     private readonly INotificationRepository _notificationRepository = notificationRepository;
-    private readonly IRepository _context = context;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
 

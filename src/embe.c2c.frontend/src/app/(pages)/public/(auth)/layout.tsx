@@ -1,3 +1,4 @@
+import { Routes } from "@/src/shared/routes";
 import { getAuthenticatedUser } from "@/src/shared/user"
 import { redirect } from "next/navigation";
 
@@ -7,7 +8,7 @@ export default async function AuthLayout({
 
     const user = await getAuthenticatedUser()
     if (user) {
-        redirect("/protected/discover");
+        redirect(Routes.protected.discover);
     }
 
     return (

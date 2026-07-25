@@ -12,6 +12,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { Candidate, CandidatePermission, SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
 import Button from "@/src/shared/components/buttons/Button";
+import { Routes } from "@/src/shared/routes";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;
@@ -26,7 +27,7 @@ function Header({ hasSearchProfiles }: HeaderProps) {
                 <h1 className="truncate">search</h1>
                 {
                     hasSearchProfiles &&
-                    <Button className="ml-auto max-w-max" onClick={() => router.push("/protected/search-profile")} intent="none">
+                    <Button className="ml-auto max-w-max" onClick={() => router.push(Routes.protected.searchProfiles)} intent="none">
                         <SlidersHorizontal className="w-6 h-6" />
                     </Button>
                 }
@@ -96,7 +97,7 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
                 !hasSearchProfiles &&
                 <div className="grow-1 flex flex-col justify-center items-center">
                     <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">find people that match your vibe by</span>
-                    <Link className="text-(length:--primary-fs) font-bold" href="/protected/search-profile/new">creating a search profile</Link>
+                    <Link className="text-(length:--primary-fs) font-bold" href={Routes.protected.createSearchProfile}>creating a search profile</Link>
                 </div>
             }
             <MainNav className="grow-0" />

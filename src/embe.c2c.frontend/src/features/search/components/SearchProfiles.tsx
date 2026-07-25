@@ -10,6 +10,7 @@ import Surface from "@/src/shared/components/surfaces/Surface";
 import Button from "@/src/shared/components/buttons/Button";
 import { Plus } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
+import { Routes } from "@/src/shared/routes";
 
 export type SearchProfilesProps = {
     className?: string;
@@ -40,7 +41,7 @@ export default function SearchProfiles({ className, searchProfiles: initialSearc
                 <Button
                     className="max-w-max max-h-max ml-auto flex flex-row gap-1 items-center justify-between"
                     intent="create"
-                    onClick={() => { router.push("/protected/search-profile/new") }}
+                    onClick={() => { router.push(Routes.protected.createSearchProfile) }}
                 >
                     <Plus className="w-(--primary-fs) h-(--primary-fs)" />
                     <span>create</span>

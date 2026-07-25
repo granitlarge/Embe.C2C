@@ -1,3 +1,5 @@
+import { Routes } from "./routes";
+
 export function getMatchingUrl(matchingId: string): string {
-    return `/protected/matches/${matchingId}`;
+    return Routes.protected.match(matchingId);
 }

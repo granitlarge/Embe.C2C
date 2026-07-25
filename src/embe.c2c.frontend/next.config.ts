@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { Routes } from "./src/shared/routes";
 
 const nextConfig: NextConfig = {
   images: {
@@ -31,7 +32,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        destination: "/protected/search",
+        destination: Routes.protected.search,
         permanent: false
       }
     ]

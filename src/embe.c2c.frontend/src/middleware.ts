@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { RefreshAccessTokenResponse, Token } from "./shared/security/types";
 import * as jwtdecode from "jwt-decode";
 import { AccessTokenName, RefreshTokenName, TokenCookieOptions } from "./shared/security/constants";
+import { Routes } from "./shared/routes";
 
 export async function middleware(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith("/protected")) {
@@ -9,7 +10,7 @@ export async function middleware(request: NextRequest) {
         if (!accessToken) {
             const newAccessToken = await refreshAccessToken(request);
             if (!newAccessToken) {
-                const response = NextResponse.redirect(new URL("/public/login", request.url));
+                const response = NextResponse.redirect(new URL(Routes.public.login, request.url));
                 response.cookies.set(AccessTokenName, "", { ...TokenCookieOptions, expires: new Date(0) } as any);
                 response.cookies.set(RefreshTokenName, "", { ...TokenCookieOptions, expires: new Date(0) } as any);
                 return response;

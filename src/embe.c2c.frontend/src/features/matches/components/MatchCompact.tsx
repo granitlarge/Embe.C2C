@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AuthenticatedUser } from "@/src/shared/user";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import MessageCompact from "./MessageBrief";
+import { Routes } from "@/src/shared/routes";
 
 export type MatchCompactProps = {
     dto: ReadDto<Matching, MatchingPermission>;
@@ -29,7 +30,7 @@ export function MatchCompact({ dto, className, user }: MatchCompactProps) {
                 <div className="flex flex-col items-end gap-2 w-full">
                     {match.createdAt && <span className="text-(--secondary-fc) text-(length:--secondary-fs) mb-auto" suppressHydrationWarning>{formatTimeAgo(match.createdAt)}</span>}
                     {
-                        <Surface as={Link} className="flex flex-col w-full grow-1 no-underline mb-auto" href={`/protected/matches/${match.id}`} padding="none" variant="inherit">
+                        <Surface as={Link} className="flex flex-col w-full grow-1 no-underline mb-auto" href={Routes.protected.match(match.id)} padding="none" variant="inherit">
                             <Surface className={`grow-1 fs-group-primary w-full flex flex-col justify-center`} padding="none" variant="inherit">
                                 {
                                     dto.data.lastMessage && <MessageCompact className="grow-1" messageDto={dto.data.lastMessage} user={user} /> ||
