@@ -133,9 +133,15 @@ public class BlobStorageImageService : IImageService
         }
 
         var originalUrl = bc.Uri.ToString();
-        var largeUrl = await ResizeImageAsync(ImageSize.Large);
-        var mediumUrl = await ResizeImageAsync(ImageSize.Medium);
-        var smallUrl = await ResizeImageAsync(ImageSize.Small);
+        var urls = await Task.WhenAll([
+            ResizeImageAsync(ImageSize.Large),
+            ResizeImageAsync(ImageSize.Medium),
+            ResizeImageAsync(ImageSize.Small)
+        ]);
+
+        var largeUrl = urls[0];
+        var mediumUrl = urls[1];
+        var smallUrl = urls[2];
 
         return new UploadImageResult(originalUrl, largeUrl, mediumUrl, smallUrl, imageName);
 

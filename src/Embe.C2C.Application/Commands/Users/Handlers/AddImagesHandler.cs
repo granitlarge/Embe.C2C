@@ -62,14 +62,13 @@ public class AddImagesHandler
         var uploadedImageUrls = new List<string>();
         try
         {
-
-            foreach (var image in command.Images)
+            await Task.WhenAll(command.Images.Select(async image =>
             {
                 var data = Convert.FromBase64String(image.Base64EncodedImageData);
                 var safetyScore = await _contentSafetyService.GetSafetyScoreAsync(data, cancellationToken);
                 if (safetyScore > .001m)
                 {
-                    continue;
+                    return;
                 }
 
                 var uploadImageResult = await _imageService.UploadImageAsync
@@ -82,10 +81,13 @@ public class AddImagesHandler
                     cancellationToken
                 );
 
-                uploadedImageUrls.Add(uploadImageResult.OriginalUrl);
-                uploadedImageUrls.Add(uploadImageResult.LargeUrl);
-                uploadedImageUrls.Add(uploadImageResult.MediumUrl);
-                uploadedImageUrls.Add(uploadImageResult.SmallUrl);
+                lock (uploadedImageUrls)
+                {
+                    uploadedImageUrls.Add(uploadImageResult.OriginalUrl);
+                    uploadedImageUrls.Add(uploadImageResult.LargeUrl);
+                    uploadedImageUrls.Add(uploadImageResult.MediumUrl);
+                    uploadedImageUrls.Add(uploadImageResult.SmallUrl);
+                }
 
                 var imageDetails = Domain.ValueObjects.ImageDetails.Create
                 (
@@ -96,21 +98,20 @@ public class AddImagesHandler
 
                 if (imageDetails.IsError)
                 {
-                    return new
+                    throw new InvalidOperationException("Failed to create image");
+                }
+
+                lock (user)
+                {
+                    user.AddImage
                     (
-                        false,
-                        imageDetails.Errors
+                        imageDetails.Value
                     );
                 }
 
-                user.AddImage
-                (
-                    imageDetails.Value
-                );
-            }
+            }));
 
-            var dto = await user.Enrich(user).ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken) ??
-                throw new InvalidOperationException("User can't read his own data wtf???");
+            var dto = await user.Enrich(user).ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken) ?? throw new InvalidOperationException("User can't read his own data wtf???");
 
             return new
             (
