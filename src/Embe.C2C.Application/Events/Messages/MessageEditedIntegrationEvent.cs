@@ -1,9 +1,9 @@
 namespace Embe.C2C.Application.Events.Messages;
 
-public record MessageDeleted
+public record MessageEditedIntegrationEvent
 (
     Guid ConversationId,
     Guid AuthorUserId,
     Guid RecipientUserId,
     Guid MessageId
-) : IntegrationEvent(IntegrationEventType.MessageDeleted);
+) : IntegrationEvent(IntegrationEventType.MessageEdited);

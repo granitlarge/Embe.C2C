@@ -6,15 +6,11 @@ public abstract class MatchingNotification : Notification
     (
         Guid recipientUserId,
         Guid matchingId,
-        Guid partnerUserId,
-        string partnerUserName,
-        string? partnerProfileImageUrl
+        Guid partnerUserId
     ) : base(recipientUserId)
     {
         MatchingId = matchingId;
         PartnerUserId = partnerUserId;
-        PartnerUserName = partnerUserName;
-        PartnerProfileImageUrl = partnerProfileImageUrl;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -26,6 +22,4 @@ public abstract class MatchingNotification : Notification
 
     public Guid MatchingId { get; }
     public Guid PartnerUserId { get; }
-    public string PartnerUserName { get; }
-    public string? PartnerProfileImageUrl { get; }
 }

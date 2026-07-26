@@ -1,8 +1,6 @@
 using Embe.C2C.Domain.Aggregates.Candidates;
 using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
-using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Errors.Aggregates;
 using ErrorOr;
 
 namespace Embe.C2C.Domain.Services;
@@ -18,7 +16,6 @@ public class CandidateService : DomainService
 
     public ErrorOr<Matching?> Judge
     (
-        User judge,
         Candidate candidate,
         Candidate oppositeCandidate,
         bool isPositive
@@ -31,10 +28,10 @@ public class CandidateService : DomainService
 
         var matching = Matching.Create
         (
-            judge.Id,
-            oppositeCandidate.CandidateUserId,
-            oppositeCandidate.UserSearchProfileId,
-            oppositeCandidate.CandidateSearchProfileId
+            candidate.UserId,
+            candidate.CandidateUserId,
+            candidate.UserSearchProfileId,
+            candidate.CandidateSearchProfileId
         );
 
         if (matching.IsError)
@@ -42,7 +39,7 @@ public class CandidateService : DomainService
             return matching.Errors;
         }
 
-        _domainEventStore.AddDomainEvent(new MatchingCreatedEvent(judge.Id, matching.Value));
+        _domainEventStore.AddDomainEvent(new MatchingCreatedDomainEvent(candidate.UserId, matching.Value));
 
         return matching.Value;
     }

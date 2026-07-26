@@ -2,7 +2,6 @@ using Embe.C2C.Domain.Aggregates.Matchings;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,8 +22,5 @@ public class MatchingNotificationConfiguration : IEntityTypeConfiguration<Matchi
             .WithMany()
             .HasForeignKey(n => n.PartnerUserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.Property(n => n.PartnerUserName);
-        builder.Property(n => n.PartnerProfileImageUrl);
     }
 }

@@ -5,9 +5,13 @@ import { createContext, ReactNode, RefObject, useEffect, useRef, useState } from
 import { getAccessToken, refreshAccessToken } from "../security/functions";
 import { useApplicationStore } from "../stores/provider";
 import { Guid } from "../cache";
-import { ImageStatus } from "../types/domain/value-objects";
 import { ReadDto } from "../types/dtos/types";
-import { User, UserPermission } from "../types/domain/aggregates";
+import { Matching, MatchingCreatedNotification, MatchingPermission, NotificationType, User, UserPermission } from "../types/domain/aggregates";
+import { getMatching } from "@/src/features/matches/actions/action";
+import { Notification } from "../types/domain/aggregates";
+import { getNotification, markAsRead } from "../actions/notifications/action";
+import { usePathname } from "next/navigation";
+import { Routes } from "../routes";
 
 export interface SignalRProviderProps {
     children: ReactNode;
@@ -18,13 +22,28 @@ export const SignalRProvider = ({
     children
 }: SignalRProviderProps) => {
 
+    const pathname = usePathname();
+
     const user = useApplicationStore(s => s.user);
     const setUser = useApplicationStore(s => s.setUser);
+    const notifications = useApplicationStore(s => s.notifications);
+    const setNotifications = useApplicationStore(s => s.setNotifications);
+    const matchings = useApplicationStore(s => s.matchings);
+    const setMatchings = useApplicationStore(s => s.setMatchings);
 
+    const pathnameRef = useRef(pathname);
     const userRef = useRef(user);
     const setUserRef = useRef(setUser);
+    const notificationsRef = useRef(notifications);
+    const setNotificationsRef = useRef(setNotifications);
+    const matchingsRef = useRef(matchings);
+    const setMatchingsRef = useRef(setMatchings);
 
     const [connection, setConnection] = useState<HubConnection | undefined>(undefined);
+
+    useEffect(() => {
+        pathnameRef.current = pathname;
+    }, [pathname])
 
     useEffect(() => {
         userRef.current = user;
@@ -33,6 +52,22 @@ export const SignalRProvider = ({
     useEffect(() => {
         setUserRef.current = setUser;
     }, [setUser]);
+
+    useEffect(() => {
+        notificationsRef.current = notifications;
+    }, [notifications])
+
+    useEffect(() => {
+        setNotificationsRef.current = setNotifications;
+    }, [setNotifications])
+
+    useEffect(() => {
+        matchingsRef.current = matchings;
+    }, [matchings])
+
+    useEffect(() => {
+        setMatchingsRef.current = setMatchings;
+    }, [setMatchings])
 
     useEffect(() => {
         const connection = createConnection();
@@ -45,8 +80,23 @@ export const SignalRProvider = ({
 
     useEffect(() => {
         const removeUserHandlers = addUserHandlers(connection, userRef, setUserRef);
+        const removeMatchingHandlers = addMatchingHandlers(
+            connection,
+            notificationsRef,
+            setNotificationsRef,
+            matchingsRef,
+            setMatchingsRef
+        )
+        const removeNotificationHandlers = addNotificationHandlers(
+            connection,
+            pathnameRef,
+            notificationsRef,
+            setNotificationsRef,
+        );
         return () => {
             removeUserHandlers();
+            removeMatchingHandlers();
+            removeNotificationHandlers();
         };
     }, [connection])
 
@@ -88,5 +138,89 @@ function addUserHandlers(
     return () => {
 
     }
+
+}
+
+function addMatchingHandlers(
+    connection: HubConnection | undefined,
+    notificationsRef: RefObject<ReadDto<Notification, NotificationPermission>[]>,
+    setNotificationsRef: RefObject<(newNotifications: ReadDto<Notification, NotificationPermission>[]) => void>,
+    matchingsRef: RefObject<ReadDto<Matching, MatchingPermission>[]>,
+    setMatchingsRef: RefObject<(newMatchings: ReadDto<Matching, MatchingPermission>[]) => void>
+) {
+
+    const onMatchingCreated = async (matchingId: Guid) => {
+        console.log("SignalR.MatchingCreated");
+        const getMatchingResponse = await getMatching(matchingId);
+        if (!getMatchingResponse.success)
+            return;
+        const matchings = matchingsRef.current;
+        const setMatchings = setMatchingsRef.current;
+
+        setMatchings(matchings.concat(getMatchingResponse.value!));
+    }
+
+    const onMatchingRemoved = (matchingId: Guid) => {
+        console.log("SignalR.MatchingRemoved");
+        const notifications = notificationsRef.current;
+        const setNotifications = setNotificationsRef.current;
+        const matchings = matchingsRef.current;
+        const setMatchings = setMatchingsRef.current;
+        setMatchings(matchings.filter(m => m.data.id !== matchingId));
+        setNotifications(notifications.filter(f =>
+            f.data.type !== NotificationType.MatchingCreated ||
+            (f.data as MatchingCreatedNotification).matchingId !== matchingId
+        ));
+    }
+
+    connection?.on("MatchingCreated", onMatchingCreated);
+    connection?.on("MatchingRemoved", onMatchingRemoved);
+
+    return () => {
+
+        connection?.off("MatchingCreated", onMatchingCreated);
+        connection?.off("MatchingRemoved", onMatchingRemoved);
+
+    }
+
+}
+
+function addNotificationHandlers(
+    connection: HubConnection | undefined,
+    pathnameRef: RefObject<string>,
+    notificationsRef: RefObject<ReadDto<Notification, NotificationPermission>[]>,
+    setNotificationsRef: RefObject<(newNotifications: ReadDto<Notification, NotificationPermission>[]) => void>
+): () => void {
+
+    const onNotificationCreated = async (notificationId: Guid) => {
+
+        console.log("SignalR.NotificationCreated");
+
+        const notifications = notificationsRef.current;
+        const setNotifications = setNotificationsRef.current;
+
+        const getNotificationResponse = await getNotification(notificationId);
+        if (!getNotificationResponse.success || !getNotificationResponse.value) {
+            return;
+        }
+
+        switch (getNotificationResponse.value.data.type) {
+            case NotificationType.MatchingCreated:
+                {
+                    if (pathnameRef.current == Routes.protected.matches) {
+                        await markAsRead(notificationId, true);
+                    }
+                }
+        }
+
+        setNotifications(notifications.concat(getNotificationResponse.value!))
+
+    };
+
+    connection?.on("NotificationCreated", onNotificationCreated);
+
+    return () => {
+        connection?.off("NotificationCreated", onNotificationCreated);
+    };
 
 }

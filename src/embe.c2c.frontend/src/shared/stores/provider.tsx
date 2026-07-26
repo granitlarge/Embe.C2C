@@ -3,7 +3,7 @@
 import { ReactNode, createContext, useRef, useContext } from 'react'
 import { useStore } from 'zustand'
 import { ApplicationStore, createApplicationStore } from './store'
-import { User, UserPermission } from '../types/domain/aggregates'
+import { Matching, MatchingPermission, User, UserPermission } from '../types/domain/aggregates'
 import { ReadDto } from '../types/dtos/types'
 import { Notification } from '../types/domain/aggregates'
 
@@ -16,19 +16,22 @@ export const ApplicationStoreContext = createContext<ApplicationStoreApi | undef
 export interface ApplicationStoreProviderProps {
   user?: ReadDto<User, UserPermission>
   notifications?: ReadDto<Notification, NotificationPermission>[]
+  matchings?: ReadDto<Matching, MatchingPermission>[]
   children: ReactNode;
 }
 
 export const ApplicationStoreProvider = ({
   user,
   notifications,
+  matchings, 
   children,
 }: ApplicationStoreProviderProps) => {
   const storeRef = useRef<ApplicationStoreApi>(null)
   if (!storeRef.current) {
     storeRef.current = createApplicationStore({
       user: user,
-      notifications: notifications ?? []
+      notifications: notifications ?? [],
+      matchings: matchings ?? []
     })
   }
 

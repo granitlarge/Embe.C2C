@@ -112,18 +112,18 @@ export type Notification = {
     createdAt: string;
 }
 
+export enum NotificationPermission {
+    View = 1,
+    Delete = 2,
+    MarkAsRead = 3,
+}
+
 export type MatchingCreatedNotification = Notification & {
     matchingId: Guid;
-    partnerUserId: Guid;
-    partnerUserName: string;
-    partnerProfileImageUrl: string;
 }
 
 export type MatchingRemovedNotification = Notification & {
     matchingId: Guid;
-    partnerUserId: Guid;
-    partnerUserName: string;
-    partnerProfileImageUrl: string;
 }
 
 export type Transaction = {

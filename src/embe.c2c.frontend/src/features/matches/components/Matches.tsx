@@ -2,21 +2,19 @@
 
 import { AuthenticatedUser } from "@/src/shared/user";
 import { MatchCompact } from "./MatchCompact";
-import { Matching, MatchingPermission } from "@/src/shared/types/domain/aggregates";
-import { useState } from "react";
 import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
 import { getMatchings } from "../actions/action";
-import { ReadDto } from "@/src/shared/types/dtos/types";
-import { useRouter } from "nextjs-toploader/app";
+import { useApplicationStore } from "@/src/shared/stores/provider";
+import { usePathname } from "next/navigation";
 
 export type MatchesProps = {
     user: AuthenticatedUser
-    initialMatches: ReadDto<Matching, MatchingPermission>[];
     className?: string;
 };
-export function Matches({ user, initialMatches, className }: MatchesProps) {
+export function Matches({ user, className }: MatchesProps) {
 
-    const [matches, setMatches] = useState<ReadDto<Matching, MatchingPermission>[]>(initialMatches);
+    const matches = useApplicationStore(s => s.matchings);
+    const setMatches = useApplicationStore(s => s.setMatchings);
 
     const page = matches.length > 0 ? 2 : 1;
     const pageSize = matches.length > 0 ? matches.length : 50;
@@ -30,7 +28,7 @@ export function Matches({ user, initialMatches, className }: MatchesProps) {
     async function loadMore(): Promise<boolean> {
         const response = await getMatchings(page, pageSize);
         const newMatches = response.value || [];
-        setMatches(prev => [...prev, ...newMatches]);
+        setMatches([...matches, ...newMatches]);
         return newMatches.length > 0;
     }
 

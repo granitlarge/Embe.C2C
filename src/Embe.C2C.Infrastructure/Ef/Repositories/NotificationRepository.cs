@@ -1,4 +1,6 @@
 using Embe.C2C.Application.Abstractions.Repos;
+using Embe.C2C.Application.Authorizations.FactStores;
+using Embe.C2C.Application.Authorizations.FactStores.Notifications.Facts;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -33,5 +35,14 @@ public class NotificationRepository(C2CContext context) : INotificationRepositor
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<AuthorizationFact>> GetAllAuthorizationFactsAsync(Guid currentUser, Guid notificationId, CancellationToken cancellationToken)
+    {
+        var fact = await _context.Notifications.AnyAsync(n => n.Id == notificationId && n.RecipientUserId == currentUser, cancellationToken);
+        return
+        [
+            new IsOwner(notificationId, fact),
+        ];
     }
 }

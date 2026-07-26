@@ -1,6 +1,6 @@
 namespace Embe.C2C.Application.Events.Messages;
 
-public record MessageCreated
+public record MessageCreatedIntegrationEvent
 (
     Guid MatchingId,
     Guid AuthorUserId,

@@ -1,6 +1,6 @@
 namespace Embe.C2C.Domain.Aggregates.Matchings.Events;
 
-public record MatchingCreatedEvent
+public record MatchingCreatedDomainEvent
 (
     Guid LastJudgeUserId,
     Matching Matching

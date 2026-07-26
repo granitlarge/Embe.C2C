@@ -2,6 +2,7 @@ using Embe.C2C.Api.Extensions;
 using Embe.C2C.Application.Commands.Notifications;
 using Embe.C2C.Application.Commands.Notifications.Handlers;
 using Embe.C2C.Application.Queries;
+using Embe.C2C.Application.Queries.Notifications;
 using Embe.C2C.Application.Queries.Notifications.Handlers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,7 @@ public static class NotificationEndPoints
     {
         var group = app.MapGroup("/api/notification").RequireAuthorization();
 
+        group.MapGet("{id:guid}", GetNotification);
         group.MapGet("", GetNotifications)
             .WithName("GetNotifications");
 
@@ -21,6 +23,17 @@ public static class NotificationEndPoints
 
         group.MapGet("/has-unread", HasUnread)
             .WithName("HasUnreadNotifications");
+    }
+
+    private static async Task<IResult> GetNotification
+    (
+        [FromRoute] Guid id,
+        [FromServices] GetNotificationHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await handler.HandleAsync(new GetNotificationQuery(id), cancellationToken);
+        return result.ToResult();
     }
 
     private static async Task<IResult> GetNotifications

@@ -3,8 +3,6 @@ namespace Embe.C2C.Application.Events;
 public enum IntegrationEventType
 {
     NotificationCreated,
-    NotificationUpdated,
-    NotificationDeleted,
 
     MessageCreated,
     MessageEdited,
@@ -14,7 +12,10 @@ public enum IntegrationEventType
 
     ImageRemoved,
     ImageMoved,
-    ImageResized
+    ImageResized,
+
+    MatchingRemoved,
+    MatchingCreated
 }
 
 public record IntegrationEvent(IntegrationEventType Type)

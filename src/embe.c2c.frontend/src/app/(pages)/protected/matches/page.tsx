@@ -1,7 +1,10 @@
 import { getMatchings } from "@/src/features/matches/actions/action";
 import { Matches } from "@/src/features/matches/components/Matches";
+import { getNotifications } from "@/src/shared/actions/notifications/action";
 import MainNav from "@/src/shared/components/nav/MainNav";
+import { SignalRProvider } from "@/src/shared/providers/signal-r";
 import { Routes } from "@/src/shared/routes";
+import { ApplicationStoreProvider } from "@/src/shared/stores/provider";
 import { getAuthenticatedUser } from "@/src/shared/user";
 import { redirect } from "next/navigation";
 
@@ -13,14 +16,25 @@ export default async function MatchesPage() {
     redirect(Routes.public.login);
   }
 
-  const response = await getMatchings(1, 50);
-  const matches = response.value || [];
+  const getMatchingsPromise = getMatchings(1, 50);
+  const getNotificationsPromise = getNotifications();
+
+  await Promise.all([getMatchingsPromise, getNotificationsPromise]);
+
+  const getMatchingsResponse = await getMatchingsPromise;
+  const getNotificationsResponse = await getNotificationsPromise;
 
   return (
     <div className="flex flex-col gap-3 grow-1">
-      <h1>matches</h1>
-      <Matches className="grow-1" user={user} initialMatches={matches} />
-      <MainNav className="grow-0"/>
+      <ApplicationStoreProvider matchings={getMatchingsResponse.value} user={undefined} notifications={getNotificationsResponse.value}>
+        <SignalRProvider>
+
+          <h1>matches</h1>
+          <Matches className="grow-1" user={user}  />
+          <MainNav className="grow-0" />
+
+        </SignalRProvider>
+      </ApplicationStoreProvider>
     </div>
   );
 }

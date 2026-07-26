@@ -4,6 +4,7 @@ using Embe.C2C.Application.Authorizations.FactGenerators;
 using Embe.C2C.Application.Authorizations.FactStores.Candidates;
 using Embe.C2C.Application.Authorizations.FactStores.Matches;
 using Embe.C2C.Application.Authorizations.FactStores.Messages;
+using Embe.C2C.Application.Authorizations.FactStores.Notifications;
 using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles;
 using Embe.C2C.Application.Authorizations.FactStores.Users;
 using Embe.C2C.Application.Dtos;
@@ -52,6 +53,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Queries.Notifications.Handlers.GetNotificationsHandler>();
         services.AddScoped<Queries.Notifications.Handlers.HasUnreadHandler>();
+        services.AddScoped<Queries.Notifications.Handlers.GetNotificationHandler>();
 
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingsHandler>();
         services.AddScoped<Queries.Matchings.Handlers.GetMatchingByIdHandler>();
@@ -78,18 +80,21 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MessageAuthorizationFactStore>();
         services.AddScoped<SearchProfileAuthorizationFactStore>();
         services.AddScoped<CandidateAuthorizationFactStore>();
+        services.AddScoped<NotificationAuthorizationFactStore>();
 
         services.AddScoped<UserFactGenerator>();
         services.AddScoped<MatchingFactGenerator>();
         services.AddScoped<MessageFactGenerator>();
         services.AddScoped<SearchProfileFactGenerator>();
         services.AddScoped<CandidateAuthorizationFactGenerator>();
+        services.AddScoped<NotificationAuthorizationFactGenerator>();
 
         services.AddScoped<MatchingAuthorizationService>();
         services.AddScoped<UserAuthorizationService>();
         services.AddScoped<MessageAuthorizationService>();
         services.AddScoped<SearchProfileAuthorizationService>();
         services.AddScoped<CandidateAuthorizationService>();
+        services.AddScoped<NotificationAuthorizationService>();
 
         services.AddScoped<DomainEventHandler>();
         services.AddScoped<IntegrationEventHandler>();
@@ -106,6 +111,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MatchingDtoMapper>();
         services.AddScoped<SearchProfileDtoMapper>();
         services.AddScoped<CandidateDtoMapper>();
+        services.AddScoped<NotificationDtoMapper>();
 
         services.AddScoped<IFileUrlGenerator, FileUrlGenerator>((services) =>
         {

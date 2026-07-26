@@ -1,16 +1,14 @@
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Images;
+using Embe.C2C.Application.Events.Matchings;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
-using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Messages.Events;
-using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Users.Events;
-using NotificationUpdatedEvent = Embe.C2C.Domain.Aggregates.Notifications.Events.NotificationUpdatedEvent;
 
 namespace Embe.C2C.Application.EventHandlers;
 
@@ -22,6 +20,7 @@ public class DomainEventHandler
 ) : IntegrationEventCollector
 {
     private readonly INotificationRepository _notificationRepository = notificationRepository;
+
     private readonly IUserRepository _userRepo = userRepo;
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
 
@@ -33,17 +32,11 @@ public class DomainEventHandler
             case UserCreatedEvent userCreatedEvent:
                 await HandleUserCreatedEventAsync(userCreatedEvent, cancellationToken);
                 break;
-            case MatchingCreatedEvent matchingCreatedEvent:
+            case MatchingCreatedDomainEvent matchingCreatedEvent:
                 await HandleMatchingCreatedEventAsync(matchingCreatedEvent, cancellationToken);
                 break;
             case MatchingRemovedEvent matchingRemovedEvent:
                 await HandleMatchingRemovedEventAsync(matchingRemovedEvent, cancellationToken);
-                break;
-            case NotificationUpdatedEvent notificationUpdatedEvent:
-                await HandleNotificationUpdatedEventAsync(notificationUpdatedEvent, cancellationToken);
-                break;
-            case NotificationRemovedEvent notificationRemovedEvent:
-                await HandleNotificationRemovedEventAsync(notificationRemovedEvent, cancellationToken);
                 break;
 
             case MessageCreatedEvent messageCreatedEvent:
@@ -82,37 +75,31 @@ public class DomainEventHandler
         return;
     }
 
-    private async Task HandleMatchingCreatedEventAsync
+    private Task HandleMatchingCreatedEventAsync
     (
-        MatchingCreatedEvent matchingCreatedEvent,
+        MatchingCreatedDomainEvent matchingCreatedEvent,
         CancellationToken cancellationToken
     )
     {
         var matching = matchingCreatedEvent.Matching;
         var matcheeUserId = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
         var matcherUserId = matchingCreatedEvent.LastJudgeUserId;
-        var matcherUser = await _userRepo.GetByIdAsync(matcherUserId, cancellationToken);
-
-        if (matcherUser is null)
-        {
-            // Matcher has been deleted -> no matching.
-            return;
-        }
 
         var notification = new MatchingCreated
         (
             matcheeUserId,
             matching.Id,
-            matcherUserId,
-            matcherUser.Alias.Value,
-            matcherUser.ProfilePicture?.ImageDetails.Name
+            matcherUserId
         );
 
         _notificationRepository.Set.Add(notification);
 
-        var notificationDto = notification.ToDto();
-        var integrationEvent = new NotificationCreatedEvent(notificationDto);
-        AddIntegrationEvent(integrationEvent);
+        var notificationCreatedIntegrationEvent = new NotificationCreatedIntegrationEvent(matcheeUserId, notification.Id);
+        var matchingCreatedIntegrationEvent = new MatchingCreatedIntegrationEvent(matchingCreatedEvent.Matching.Id, matcheeUserId);
+        AddIntegrationEvent(notificationCreatedIntegrationEvent);
+        AddIntegrationEvent(matchingCreatedIntegrationEvent);
+
+        return Task.CompletedTask;
     }
 
     private async Task HandleMatchingRemovedEventAsync
@@ -123,47 +110,7 @@ public class DomainEventHandler
     {
         var matching = matchingRemovedEvent.Matching;
         var matchRemoveeUserId = matchingRemovedEvent.RemoverUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
-        var matchRemoverUserId = matchingRemovedEvent.RemoverUserId;
-        var matcherUser = await _userRepo.GetByIdAsync(matchRemoveeUserId, cancellationToken);
-
-        if (matcherUser is null)
-        {
-            return;
-        }
-
-        var notification = new MatchingCreated
-        (
-            matchRemoveeUserId,
-            matching.Id,
-            matchRemoverUserId,
-            matcherUser.Alias.Value,
-            matcherUser.ProfilePicture?.ImageDetails.Name
-        );
-
-        _notificationRepository.Set.Add(notification);
-        AddIntegrationEvent(new NotificationCreatedEvent(notification.ToDto()));
-    }
-
-    private Task HandleNotificationUpdatedEventAsync
-    (
-        NotificationUpdatedEvent notificationUpdatedEvent,
-        CancellationToken cancellationToken
-    )
-    {
-        var notification = notificationUpdatedEvent.Notification;
-        AddIntegrationEvent(new Events.Notifications.NotificationUpdatedEvent(notification.ToDto()));
-        return Task.CompletedTask;
-    }
-
-    private Task HandleNotificationRemovedEventAsync
-    (
-        NotificationRemovedEvent notificationRemovedEvent,
-        CancellationToken cancellationToken
-    )
-    {
-        var notification = notificationRemovedEvent.Notification;
-        AddIntegrationEvent(new NotificationDeletedEvent(notification.Id));
-        return Task.CompletedTask;
+        AddIntegrationEvent(new MatchingRemovedIntegrationEvent(matching.Id, matchRemoveeUserId));
     }
 
     private async Task HandleMessageCreatedEventAsync
@@ -179,7 +126,7 @@ public class DomainEventHandler
             return;
         var recipientUserId = matching.UserId1 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageCreatedEvent.Message.Id;
-        var messageCreated = new MessageCreated(matchingId, authorUserId, recipientUserId, messageId);
+        var messageCreated = new MessageCreatedIntegrationEvent(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageCreated);
     }
 
@@ -196,7 +143,7 @@ public class DomainEventHandler
             return;
         var recipientUserId = matching.UserId1 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageEditedEvent.Message.Id;
-        var messageEdited = new MessageEdited(matchingId, authorUserId, recipientUserId, messageId);
+        var messageEdited = new MessageEditedIntegrationEvent(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageEdited);
     }
 
@@ -213,7 +160,7 @@ public class DomainEventHandler
             return;
         var recipientUserId = matching.UserId1 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageRemovedEvent.Message.Id;
-        var messageDeleted = new MessageDeleted(matchingId, authorUserId, recipientUserId, messageId);
+        var messageDeleted = new MessageDeletedIntegrationEvent(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageDeleted);
     }
 
@@ -230,7 +177,7 @@ public class DomainEventHandler
             return;
         var recipientUserId = matching.UserId2 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageSeenEvent.Message.Id;
-        var messageSeen = new MessageSeen(matchingId, authorUserId, recipientUserId, messageId);
+        var messageSeen = new MessageSeenIntegrationEvent(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageSeen);
     }
 
@@ -247,7 +194,7 @@ public class DomainEventHandler
             return;
         var recipientUserId = matching.UserId2 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageUnseenEvent.Message.Id;
-        var messageUnseen = new MessageUnseen(matchingId, authorUserId, recipientUserId, messageId);
+        var messageUnseen = new MessageUnseenIntegrationEvent(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageUnseen);
     }
 

@@ -36,7 +36,7 @@ public class IntegrationEventHandler
 
         switch (integrationEvent)
         {
-            case NotificationCreatedEvent notificationCreatedEvent:
+            case NotificationCreatedIntegrationEvent notificationCreatedEvent:
                 await HandleNotificationCreatedEventAsync(notificationCreatedEvent, cancellationToken);
                 break;
             case ImageRemovedEvent imageRemovedEvent:
@@ -49,7 +49,7 @@ public class IntegrationEventHandler
 
     private async Task HandleNotificationCreatedEventAsync
     (
-        NotificationCreatedEvent notificationCreatedEvent,
+        NotificationCreatedIntegrationEvent notificationCreatedEvent,
         CancellationToken cancellationToken = default
     )
     {
@@ -58,7 +58,7 @@ public class IntegrationEventHandler
 
     private async Task HandleMessageCreatedEventAsync
     (
-        MessageCreated messageCreatedEvent,
+        MessageCreatedIntegrationEvent messageCreatedEvent,
         CancellationToken cancellationToken = default
     )
     {
@@ -67,7 +67,7 @@ public class IntegrationEventHandler
 
     private async Task HandleMessageEditedEventAsync
     (
-        MessageEdited messageEditedEvent,
+        MessageEditedIntegrationEvent messageEditedEvent,
         CancellationToken cancellationToken = default
     )
     {
@@ -76,7 +76,7 @@ public class IntegrationEventHandler
 
     private async Task HandleMessageDeletedEventAsync
     (
-        MessageDeleted messageDeletedEvent,
+        MessageDeletedIntegrationEvent messageDeletedEvent,
         CancellationToken cancellationToken = default
     )
     {
@@ -85,7 +85,7 @@ public class IntegrationEventHandler
 
     private async Task HandleMessageSeenEventAsync
     (
-        MessageSeen messageSeenEvent,
+        MessageSeenIntegrationEvent messageSeenEvent,
         CancellationToken cancellationToken = default
     )
     {

@@ -6,16 +6,12 @@ public class MatchingCreated : MatchingNotification
     (
         Guid recipientUserId,
         Guid matchingId,
-        Guid partnerUserId,
-        string partnerUserName,
-        string? partnerProfileImageUrl
+        Guid partnerUserId
     ) : base
     (
         recipientUserId,
         matchingId,
-        partnerUserId,
-        partnerUserName,
-        partnerProfileImageUrl
+        partnerUserId
     )
     {
     }

@@ -124,7 +124,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Error
             );
         }
 
-        var matching = _judgementService.Judge(user, candidate, oppositeCandidate, command.IsPositive);
+        var matching = _judgementService.Judge(candidate, oppositeCandidate, command.IsPositive);
         if (matching.IsError)
         {
             return new
