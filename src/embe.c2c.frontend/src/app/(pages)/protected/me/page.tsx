@@ -1,9 +1,12 @@
 import { getMe } from "@/src/features/auth/actions/action";
 import Me from "@/src/features/me/components/Me";
 import { getNotifications } from "@/src/shared/actions/notifications/action";
+import Link from "@/src/shared/components/Links/Link";
 import MainNav from "@/src/shared/components/nav/MainNav";
 import { SignalRProvider } from "@/src/shared/providers/signal-r";
+import { Routes } from "@/src/shared/routes";
 import { ApplicationStoreProvider } from "@/src/shared/stores/provider";
+import { Settings } from "@deemlol/next-icons";
 
 export default async function MePage() {
 
@@ -24,7 +27,12 @@ export default async function MePage() {
             <ApplicationStoreProvider user={getCurrentUserResponse.value} notifications={getNotificationsResponse.value}>
                 <SignalRProvider>
 
-                    <h1>me</h1>
+                    <div className="flex justify-between items-center">
+                        <h1>me</h1>
+                        <Link className="text-(--primary-fc)" href={Routes.protected.settings}>
+                            <Settings />
+                        </Link>
+                    </div>
                     <Me className="grow-1 overflow-y-scroll scrollbar-none" />
                     <MainNav className="grow-0" />
 

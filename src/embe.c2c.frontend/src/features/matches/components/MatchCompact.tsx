@@ -2,11 +2,11 @@ import Surface from "@/src/shared/components/surfaces/Surface";
 import { formatTimeAgo } from "@/src/shared/time";
 import { Matching, MatchingPermission } from "@/src/shared/types/domain/aggregates";
 import { UserCompact } from "./UserCompact";
-import Link from "next/link";
 import { AuthenticatedUser } from "@/src/shared/user";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import MessageCompact from "./MessageBrief";
 import { Routes } from "@/src/shared/routes";
+import Link from "@/src/shared/components/Links/Link";
 
 export type MatchCompactProps = {
     dto: ReadDto<Matching, MatchingPermission>;

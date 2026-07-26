@@ -22,7 +22,7 @@ export const Routes = {
         createSearchProfile: "/protected/search-profile/new",
         searchProfile: (searchProfileId: string) => `/protected/search-profile/${searchProfileId}`,
 
-        settings: "/protected/settings",
+        settings: "/protected/me/settings",
 
         user: (userId: string) => `/protected/user/${userId}`
 

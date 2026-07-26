@@ -5,12 +5,12 @@ import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { Routes } from "@/src/shared/routes";
 import { jwtDecode } from "jwt-decode";
-import Link from "next/link";
 import { useState } from "react";
 import * as z from 'zod';
 import { resetPassword } from "../actions/action";
 import { useRouter } from "nextjs-toploader/app";
 import { PasswordValidationRules } from "@/src/shared/validation";
+import Link from "@/src/shared/components/Links/Link";
 
 
 export type ResetPasswordFormProps = {
