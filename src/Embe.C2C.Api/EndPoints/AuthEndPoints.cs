@@ -23,6 +23,11 @@ public static class AuthEndPoints
         {
             AuthenticationSchemes = "Refresh"
         });
+        group.MapPost("/forgot-password", ForgotPassword);
+        group.MapPost("/reset-password", ResetPassword).RequireAuthorization(new AuthorizeAttribute
+        {
+            AuthenticationSchemes = "ResetPassword"
+        });
     }
 
     private static async Task<IResult> AccountExists([FromQuery] string email, [FromServices] AccountExistsHandler handler, CancellationToken cancellationToken = default)
@@ -45,6 +50,18 @@ public static class AuthEndPoints
     }
 
     private static async Task<IResult> Refresh([FromBody] RefreshCommand command, [FromServices] RefreshHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> ForgotPassword([FromBody] SendResetPasswordEmailCommand command, [FromServices] SendResetPasswordEmailHandler handler, CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> ResetPassword([FromBody] ResetPasswordCommand command, [FromServices] ResetPasswordHandler handler, CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();

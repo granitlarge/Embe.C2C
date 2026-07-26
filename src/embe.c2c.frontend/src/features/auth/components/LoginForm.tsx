@@ -5,11 +5,11 @@ import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import { useState } from "react";
 import * as z from "zod";
 import { signIn } from "../actions/sign-in/actions";
-import { SignInError } from "../actions/sign-in/types";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
 import { Routes } from "@/src/shared/routes";
+import { getErrorMessage } from "@/src/shared/error-message";
 
 export type LoginFormProps = {
     className?: string;
@@ -45,24 +45,10 @@ export default function LoginForm({ className }: LoginFormProps) {
         } else {
 
             const error = await signIn(userName!, password!);
-            if (error !== undefined) {
+            if (error?.[0] !== undefined) {
 
-                const isInvalidCredentials = error.some(e => e.code === "auth.invalid_credentials");
-                const isLockedOut = error.some(e => e.code === "auth.locked_out");
-
-                if (isInvalidCredentials) {
-
-                    setError("there is no account with that e-mail/password combination");
-
-                } else if (isLockedOut) {
-
-                    setError("your account has been locked, reset your password to continue");
-
-                } else {
-
-                    setError("an unknown error occurred");
-
-                }
+                console.log(error);
+                setError(getErrorMessage(error[0]))
 
             } else {
 

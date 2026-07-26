@@ -4,6 +4,7 @@ using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Entities;
 using Embe.C2C.Domain.Errors.Aggregates;
+using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,6 +49,11 @@ public class UserRepository(C2CContext context) : IUserRepository
             sameFact,
             positivelyJudgedFact
         ];
+    }
+
+    public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return _context.DomainUsers.SingleOrDefaultAsync(du => du.Email == Email.Create(email).Value, cancellationToken);
     }
 
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)

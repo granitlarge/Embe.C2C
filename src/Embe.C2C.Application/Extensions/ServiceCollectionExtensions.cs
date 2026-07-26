@@ -33,6 +33,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Auth.Handlers.SignInHandler>();
         services.AddScoped<Commands.Auth.Handlers.SignOutHandler>();
         services.AddScoped<Commands.Auth.Handlers.RefreshHandler>();
+        services.AddScoped<Commands.Auth.Handlers.ResetPasswordHandler>();
+        services.AddScoped<Commands.Auth.Handlers.SendResetPasswordEmailHandler>();
 
         services.AddScoped<Commands.Messages.Handlers.CreateMessageHandler>();
         services.AddScoped<Commands.Messages.Handlers.DeleteMessageHandler>();

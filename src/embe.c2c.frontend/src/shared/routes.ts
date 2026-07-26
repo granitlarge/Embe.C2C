@@ -2,7 +2,8 @@ export const Routes = {
     public: {
         login: "/public/login",
         register: "/public/register",
-        forgotPassword:"/public/forgot-password"
+        forgotPassword: "/public/forgot-password",
+        resetPassword: "/public/reset-password"
     },
     protected: {
 

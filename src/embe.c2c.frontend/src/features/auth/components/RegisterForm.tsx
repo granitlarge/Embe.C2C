@@ -16,6 +16,7 @@ import BasicProfileForm, { BasicProfileFormData, BasicProfileFormError } from ".
 import { getValidBirthdateRange } from "@/src/shared/time";
 import { useRouter } from "nextjs-toploader/app";
 import { Routes } from "@/src/shared/routes";
+import { PasswordValidationRules } from "@/src/shared/validation";
 
 type Step =
     "email" |
@@ -97,12 +98,7 @@ function PasswordStep({
 
     const validationSchema = z.object({
         password: z.string(),
-        confirmPassword: z
-            .string()
-            .min(8, { message: "password must be at least 8 characters long" })
-            .refine((value) => /[A-Z]/.test(value), { message: "password must contain at least one uppercase letter" })
-            .refine((value) => /[a-z]/.test(value), { message: "password must contain at least one lowercase letter" })
-            .refine((value) => /[0-9]/.test(value), { message: "password must contain at least one number" })
+        confirmPassword: PasswordValidationRules
     }).refine((data) => data.password === data.confirmPassword, {
         message: "passwords do not match",
     });

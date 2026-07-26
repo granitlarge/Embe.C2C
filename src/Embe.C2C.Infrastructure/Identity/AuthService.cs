@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using System.Text.Encodings.Web;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Errors;
@@ -22,26 +23,28 @@ public class AuthService
     UserManager<MyIdentityUser> userManager
 ) : IAuthService
 {
+
     private readonly Ef.Contexts.C2CContext _context = context;
     private readonly UserManager<MyIdentityUser> _userManager = userManager;
     private readonly IAuthenticatedUserService _userService = userService;
     private readonly Settings _settings = settings;
     private static readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan _refreshTokenLifetime = TimeSpan.FromDays(7);
+    private static readonly TimeSpan _resetPasswordTokenLifetime = TimeSpan.FromMinutes(15);
 
     public async Task<ErrorOr<Credentials>> RefreshAsync(string refreshTokenValue, CancellationToken cancellationToken = default)
     {
         var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtSettings.RefreshTokenSecret));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Jwt.RefreshTokenSecret));
+
         try
         {
-
             var principal = tokenHandler.ValidateToken(refreshTokenValue, new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = _settings.JwtSettings.Issuer,
+                ValidIssuer = _settings.Jwt.Issuer,
                 ValidateAudience = true,
-                ValidAudience = _settings.JwtSettings.Audience,
+                ValidAudience = _settings.Jwt.Audience,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = symmetricKey,
                 ValidateLifetime = true,
@@ -198,7 +201,7 @@ public class AuthService
 
     private AccessToken GenerateAccessToken(RefreshToken refreshToken, IdentityUser identityUser, User user)
     {
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtSettings.AccessTokenSecret));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Jwt.AccessTokenSecret));
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
@@ -210,8 +213,8 @@ public class AuthService
 
         var jwtSecurityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken
         (
-            issuer: _settings.JwtSettings.Issuer,
-            audience: _settings.JwtSettings.Audience,
+            issuer: _settings.Jwt.Issuer,
+            audience: _settings.Jwt.Audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(_accessTokenLifetime),
             signingCredentials: credentials
@@ -224,7 +227,7 @@ public class AuthService
     private RefreshToken GenerateRefreshToken(IdentityUser identityUser, User user)
     {
         var tokenId = Guid.CreateVersion7();
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtSettings.RefreshTokenSecret));
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Jwt.RefreshTokenSecret));
         var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
@@ -236,8 +239,8 @@ public class AuthService
 
         var jwtSecurityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken
         (
-            issuer: _settings.JwtSettings.Issuer,
-            audience: _settings.JwtSettings.Audience,
+            issuer: _settings.Jwt.Issuer,
+            audience: _settings.Jwt.Audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(_refreshTokenLifetime),
             signingCredentials: credentials
@@ -245,6 +248,32 @@ public class AuthService
 
         var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
         return new RefreshToken(tokenId, token, DateTimeOffset.UtcNow.Add(_refreshTokenLifetime));
+    }
+
+    private string GenerateResetPasswordToken(IdentityUser identityUser, User user)
+    {
+        var tokenId = Guid.CreateVersion7();
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Jwt.ResetPasswordTokenSecret));
+        var credentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
+        var claims = new[]
+        {
+            new Claim("sub", user.Id.ToString()),
+            new Claim("identityUserId", identityUser.Id),
+            new Claim("userId", user.Id.ToString()),
+            new Claim("tokenId", tokenId.ToString()),
+        };
+
+        var jwtSecurityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken
+        (
+            issuer: _settings.Jwt.Issuer,
+            audience: _settings.Jwt.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.Add(_resetPasswordTokenLifetime),
+            signingCredentials: credentials
+        );
+
+        var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        return token;
     }
 
     public async Task<ErrorOr<bool>> InvalidateRefreshTokenAsync(string refreshTokenValue, CancellationToken cancellationToken)
@@ -306,9 +335,15 @@ public class AuthService
         }
     }
 
-    public async Task<ErrorOr<Success>> ResetPasswordAsync(string identityUserId, string newPassword, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<Success>> ResetPasswordAsync
+    (
+        string newPassword,
+        CancellationToken cancellationToken = default
+    )
     {
-        var user = await _userManager.FindByIdAsync(identityUserId);
+        var userId = _userService.UserId ?? throw new InvalidOperationException("No authenticated user");
+        var domainUser = await _context.DomainUsers.Select(du => new { du.Id, du.IdentityUserId }).SingleAsync(du => du.Id == userId, cancellationToken);
+        var user = await _userManager.FindByIdAsync(domainUser.IdentityUserId);
         if (user is null)
         {
             return ApplicationErrors.NotFound.ToNotFoundErrorOr();
@@ -318,6 +353,7 @@ public class AuthService
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         if (result.Succeeded)
         {
+            await ClearRefreshTokens(userId, cancellationToken);
             await _userManager.ResetAccessFailedCountAsync(user);
             return Result.Success;
         }
@@ -344,5 +380,32 @@ public class AuthService
         {
             return ErrorOrFactory.From<Success>(result.Errors.ToApplicationErrors().ToValidationErrorOr());
         }
+    }
+
+    private async Task ClearRefreshTokens(Guid userId, CancellationToken cancellationToken)
+    {
+        var refreshTokens = await _context.RefreshTokens.Where(rt => rt.UserId == userId).ToListAsync(cancellationToken);
+        _context.RefreshTokens.RemoveRange(refreshTokens);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static Uri BuildResetPasswordUrl(string resetPasswordUrl, string token)
+    {
+        var uriBuilder = new UriBuilder(resetPasswordUrl);
+        var queryHasParameters = uriBuilder.Query.Split("&").Any(e => e != "");
+        var tokenQueryParameter = $"token={UrlEncoder.Create().Encode(token)}";
+        uriBuilder.Query += queryHasParameters ? "&" : "" + tokenQueryParameter;
+        return uriBuilder.Uri;
+    }
+
+    public async Task<string> GeneratePasswordResetLinkAsync(string email, CancellationToken cancellationToken)
+    {
+        var user = await _context.DomainUsers.SingleOrDefaultAsync(du => du.Email == Email.Create(email).Value, cancellationToken: cancellationToken) ?? throw new InvalidOperationException("user does not exist");
+        var identityUser = (await _userManager.FindByIdAsync(user.IdentityUserId))!;
+
+        var token = GenerateResetPasswordToken(identityUser, user);
+
+        var resetPasswordUrl = BuildResetPasswordUrl(_settings.Site.ResetPasswordUrl, token);
+        return resetPasswordUrl.ToString();
     }
 }

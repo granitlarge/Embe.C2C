@@ -2,6 +2,7 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
+using Embe.C2C.Application.Abstractions.Settings;
 using Embe.C2C.Infrastructure.AspNetCore;
 using Embe.C2C.Infrastructure.Azure;
 using Embe.C2C.Infrastructure.Ef.Contexts;
@@ -27,6 +28,7 @@ public static class ServiceCollectionExtensions
     )
     {
         services.AddScoped<Settings>();
+        services.AddScoped<ISettings, Settings>();
         services.AddIdentityCore<MyIdentityUser>(options =>
         {
             options.Password.RequireDigit = true;
@@ -63,10 +65,12 @@ public static class ServiceCollectionExtensions
         if (environment.IsDevelopment())
         {
             services.AddScoped<IContentSafetyService, NullContentSafetyService>();
+            services.AddScoped<IEmailService, NullEmailService>();
         }
         else
         {
             services.AddScoped<IContentSafetyService, AzureAIContentSafetyService>();
+            services.AddScoped<IEmailService, AzureCommunicationServicesEmailService>();
         }
 
         services.AddSingleton((serviceProvider) =>

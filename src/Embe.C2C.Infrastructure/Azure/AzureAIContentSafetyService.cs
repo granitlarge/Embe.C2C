@@ -19,8 +19,8 @@ public class AzureAIContentSafetyService : IContentSafetyService
 
     public AzureAIContentSafetyService(Settings settings)
     {
-        var url = settings.AzureAIContentSafetySettings.Url;
-        var apiKey = settings.AzureAIContentSafetySettings.ApiKey;
+        var url = settings.AzureAIContentSafety.Url;
+        var apiKey = settings.AzureAIContentSafety.ApiKey;
         _contentSafetyClient = new ContentSafetyClient(new Uri(url), new AzureKeyCredential(apiKey));
         _blocklistClient = new BlocklistClient(new Uri(url), new AzureKeyCredential(apiKey));
     }
