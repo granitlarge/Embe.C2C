@@ -198,10 +198,23 @@ function addNotificationHandlers(
 
     };
 
+    const onNotificationRemoved = async (notificationId: Guid) => {
+
+        console.log("SignalR.NotificationRemoved");
+
+        const notifications = notificationsRef.current;
+        const setNotifications = setNotificationsRef.current;
+
+        setNotifications(notifications.filter(n => n.data.id !== notificationId));
+
+    };
+
     connection?.on("NotificationCreated", onNotificationCreated);
+    connection?.on("NotificationRemoved", onNotificationRemoved);
 
     return () => {
         connection?.off("NotificationCreated", onNotificationCreated);
+        connection?.off("NotificationRemoved", onNotificationRemoved);
     };
 
 }

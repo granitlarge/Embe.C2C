@@ -22,12 +22,22 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
             MessageUnseenIntegrationEvent messageUnseen => SendMessageUnseenNotificationAsync(messageUnseen, cancellationToken),
 
             NotificationCreatedIntegrationEvent notificationCreated => SendNotificationCreatedAsync(notificationCreated, cancellationToken),
+            NotificationRemovedIntegrationEvent notificationRemoved => SendNotificationRemovedAsync(notificationRemoved, cancellationToken),
 
             MatchingCreatedIntegrationEvent matchingCreated => SendMatchingCreatedNotificationAsync(matchingCreated, cancellationToken),
-            MatchingRemovedIntegrationEvent matchingRemoved=> SendMatchingRemovedNotificationAsync(matchingRemoved, cancellationToken),
+            MatchingRemovedIntegrationEvent matchingRemoved => SendMatchingRemovedNotificationAsync(matchingRemoved, cancellationToken),
 
             _ => Task.CompletedTask
         };
+    }
+
+    private async Task SendNotificationRemovedAsync(NotificationRemovedIntegrationEvent notificationRemoved, CancellationToken cancellationToken)
+    {
+        var hubContext = await _pool.GetHubContextAsync(cancellationToken);
+        await hubContext
+                .Clients
+                .User(notificationRemoved.RecipientUserId.ToString())
+                .SendAsync("NotificationRemoved", notificationRemoved.NotificationId, cancellationToken);
     }
 
     private async Task SendNotificationCreatedAsync(NotificationCreatedIntegrationEvent notificationCreated, CancellationToken cancellationToken)

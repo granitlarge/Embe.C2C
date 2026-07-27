@@ -7,6 +7,7 @@ using Embe.C2C.Application.Events.Notifications;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Messages.Events;
+using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 
@@ -58,12 +59,21 @@ public class DomainEventHandler
             case UserImageRemovedEvent userImageRemovedEvent:
                 await HandleUserImageRemovedEventAsync(userImageRemovedEvent, cancellationToken);
                 break;
+            
+            case NotificationRemovedEvent notificationRemovedEvent:
+                await HandleNotificationRemovedEventAsync(notificationRemovedEvent, cancellationToken);
+                break;
 
             default:
                 break;
 
         }
 
+    }
+
+    private async Task HandleNotificationRemovedEventAsync(NotificationRemovedEvent notificationRemovedEvent, CancellationToken cancellationToken)
+    {
+        AddIntegrationEvent(new NotificationRemovedIntegrationEvent(notificationRemovedEvent.Notification.Id, notificationRemovedEvent.Notification.RecipientUserId));
     }
 
     private async Task HandleUserCreatedEventAsync

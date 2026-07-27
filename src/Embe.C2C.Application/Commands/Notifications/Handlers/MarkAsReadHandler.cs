@@ -32,7 +32,8 @@ public class MarkAsReadHandler : CommandHandler<MarkAsReadCommand, ErrorOr<Succe
             return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
         }
 
-        notification.MarkAsRead(command.IsRead);
+        notification.Remove();
+        _notificationRepository.Set.Remove(notification);
 
         return new(Save: true, Result.Success);
     }

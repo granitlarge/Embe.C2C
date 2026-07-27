@@ -25,11 +25,8 @@ public class BlobStorageImageService : IImageService
     public async Task DeleteImageAsync(string name, CancellationToken cancellationToken = default)
     {
         var blobContainerClient = await GetBlobContainerClientAsync(cancellationToken);
-        foreach (var imageSize in Enum.GetValues<ImageSize>())
-        {
-            var blobClient = blobContainerClient.GetBlobClient(GetBlobName(name, imageSize));
-            await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
-        }
+        var deleteTasks = Enum.GetValues<ImageSize>().Select(imageSize => blobContainerClient.GetBlobClient(GetBlobName(name, imageSize)).DeleteIfExistsAsync(cancellationToken: cancellationToken));
+        await Task.WhenAll(deleteTasks);
     }
 
     public async Task DeleteImageByUrlAsync(string url, CancellationToken cancellationToken = default)
