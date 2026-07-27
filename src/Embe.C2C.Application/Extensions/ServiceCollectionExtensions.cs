@@ -116,6 +116,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<NotificationDtoMapper>();
 
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<EmailComposerService>();
 
         services.AddScoped<IFileUrlGenerator, FileUrlGenerator>((services) =>
         {
