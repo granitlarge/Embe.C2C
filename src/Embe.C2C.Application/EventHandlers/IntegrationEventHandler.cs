@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
@@ -14,31 +15,56 @@ public class IntegrationEventHandler
     INotificationService notificationService,
     IImageService imageService,
     IWorkItemService workItemService,
-    IRealTimeUpdateService realTimeUpdateService
+    IRealTimeUpdateService realTimeUpdateService,
+    ILoggerFactory loggerFactory
 )
 {
     private readonly INotificationService _notificationService = notificationService;
     private readonly IRealTimeUpdateService _realTimeUpdateService = realTimeUpdateService;
     private readonly IImageService _imageService = imageService;
     private readonly IWorkItemService _workItemService = workItemService;
+    private readonly ILogger<IntegrationEventHandler> _logger = loggerFactory.Create<IntegrationEventHandler>();
 
     public async Task HandleAsync(IntegrationEventCollector eventCollector, CancellationToken cancellationToken = default)
     {
+        await _logger.TraceAsync(nameof(HandleAsync));
         var events = eventCollector.CollectedEvents;
         foreach (var @event in events.OrderBy(e => e.Timestamp))
         {
-            await HandleAsync(@event, cancellationToken);
+            try
+            {
+                await HandleAsync(@event, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                await _logger.ErrorAsync(e.ToString());
+            }
         }
     }
 
     private async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
     {
+        await _logger.TraceAsync(nameof(HandleAsync));
         if (integrationEvent is NotificationIntegrationEvent notificationIntegrationEvent)
         {
-            await _notificationService.SendAsync(notificationIntegrationEvent, cancellationToken);
+            try
+            {
+                await _notificationService.SendAsync(notificationIntegrationEvent, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                await _logger.ErrorAsync(e.ToString());
+            }
         }
 
-        await _realTimeUpdateService.SendAsync(integrationEvent, cancellationToken);
+        try
+        {
+            await _realTimeUpdateService.SendAsync(integrationEvent, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            await _logger.ErrorAsync(e.ToString());
+        }
 
         switch (integrationEvent)
         {
@@ -104,14 +130,15 @@ public class IntegrationEventHandler
         CancellationToken cancellationToken
     )
     {
-        Console.WriteLine($"Deleting image '{imageRemovedEvent.ImageId}'.");
+        await _logger.TraceAsync(nameof(HandleImageRemovedEventAsync));
+
         try
         {
             await _imageService.DeleteImageAsync(imageRemovedEvent.ImageName, cancellationToken);
         }
         catch (Exception e)
         {
-            Console.WriteLine("Failed to delete image, sending to work-item service {0}.", e);
+            await _logger.ErrorAsync(e.ToString());
             var urls = await Task.WhenAll(Enum.GetValues<ImageSize>().Select(imageSize => _imageService.GetImageUrlAsync(imageRemovedEvent.ImageName, imageSize, cancellationToken)));
             await Task.WhenAll(urls.Select(url => _workItemService.PerformAsync(new DeleteImage(url), cancellationToken)));
         }

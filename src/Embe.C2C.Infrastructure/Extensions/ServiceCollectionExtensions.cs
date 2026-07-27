@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
@@ -66,6 +67,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IAdminAreaRepository, AdminAreaRepository>();
         services.AddScoped<ICandidateRepository, CandidateRepository>();
+
+        services.AddScoped<ILoggerFactory, LoggerFactory>();
 
         if (environment.IsDevelopment())
         {
