@@ -6,7 +6,7 @@ import { getAccessToken, refreshAccessToken } from "../security/functions";
 import { useApplicationStore } from "../stores/provider";
 import { Guid } from "../cache";
 import { ReadDto } from "../types/dtos/types";
-import { Candidate, CandidatePermission, Matching, MatchingCreatedNotification, MatchingPermission, NotificationType, User, UserPermission } from "../types/domain/aggregates";
+import { Candidate, CandidatePermission, Matching, MatchingCreatedNotification, MatchingPermission, MessageCreatedNotification, NotificationType, User, UserPermission } from "../types/domain/aggregates";
 import { getMatching, getMessage } from "@/src/features/matches/actions/action";
 import { Notification } from "../types/domain/aggregates";
 import { getNotification } from "../actions/notifications/action";
@@ -277,6 +277,8 @@ function addMatchingHandlers(
         console.log("SignalR.MessageDeleted");
         const matchings = matchingsRef.current;
         const setMatchings = setMatchingsRef.current;
+        const notifications = notificationsRef.current;
+        const setNotifications = setNotificationsRef.current;
 
         if (!matchings.some(m => m.data.id === matchingId))
             return;
@@ -293,6 +295,8 @@ function addMatchingHandlers(
                 }
             }
         }));
+
+        setNotifications(notifications.filter(n => n.data.type !== NotificationType.MessageCreated || (n.data as MessageCreatedNotification)?.messageId !== messageId));
 
         routerRef.current.refresh();
 
