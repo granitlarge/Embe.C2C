@@ -284,14 +284,29 @@ function addMatchingHandlers(
             return;
 
         setMatchings(matchings.map(m => {
-            if (m.data.id !== matchingId)
+            if (m.data.id !== matchingId) {
                 return m;
+            }
+
+            const messagesThatReferenceDeletedMessage = (m.data.messages ?? []).filter(m => m.data.replyToMessageId === messageId).map(m => m.data.id);
 
             return {
                 ...m,
                 data: {
                     ...m.data,
-                    messages: (m.data.messages ?? []).filter(mes => mes.data.id !== messageId)
+                    messages: (m.data.messages ?? []).filter(mes => mes.data.id !== messageId).map(mes => {
+                        if (messagesThatReferenceDeletedMessage.includes(mes.data.id)) {
+                            return {
+                                ...mes,
+                                data: {
+                                    ...mes.data,
+                                    replyToMessage: undefined,
+                                    replyToMessageId: undefined
+                                }
+                            }
+                        }
+                        return mes;
+                    })
                 }
             }
         }));

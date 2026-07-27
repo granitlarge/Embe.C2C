@@ -20,10 +20,6 @@ import { Routes } from "@/src/shared/routes";
 import { useApplicationStore } from "@/src/shared/stores/provider";
 import { markAsRead } from "@/src/shared/actions/notifications/action";
 
-function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
-    return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
-}
-
 type MatchHeaderProps = {
     partner?: User,
     matchId: Guid
@@ -185,33 +181,28 @@ export default function Match({ matchId, user, className }: MatchProps) {
             }
 
             const response = await updateMessage(editingId, content);
-            if (response.success) {
+            if (!response.success)
+                throw new Error("not immplemented");
 
-                setMatchings(matchings.map(m => {
-                    if (m.data.id !== match.data.id)
-                        return m;
-                    return {
-                        ...m,
-                        data: {
-                            ...m.data,
-                            messages: (m.data.messages ?? []).map(mes => {
-                                if (mes.data.id !== response.value?.data.id)
-                                    return mes;
-                                return response.value!;
-                            })
-                        }
+            setMatchings(matchings.map(m => {
+                if (m.data.id !== match.data.id)
+                    return m;
+                return {
+                    ...m,
+                    data: {
+                        ...m.data,
+                        messages: (m.data.messages ?? []).map(mes => {
+                            if (mes.data.id !== response.value?.data.id)
+                                return mes;
+                            return response.value!;
+                        })
                     }
-                }))
+                }
+            }))
 
-                setMessageCrafterConfig(defaultMessageCrafterConfig);
+            setMessageCrafterConfig(defaultMessageCrafterConfig);
 
-                router.refresh();
-
-            } else {
-
-                throw new Error("Not Implemented");
-
-            }
+            router.refresh();
 
         } else {
 
@@ -223,28 +214,23 @@ export default function Match({ matchId, user, className }: MatchProps) {
 
             const response = await createMessage(message);
 
-            if (response.success) {
+            if (!response.success)
+                throw new Error("not implemented");
 
-                setMatchings(matchings.map(m => {
-                    if (m.data.id !== match.data.id)
-                        return m;
-                    return {
-                        ...m,
-                        data: {
-                            ...m.data,
-                            messages: (m.data.messages ?? []).concat(response.value!)
-                        }
+            setMatchings(matchings.map(m => {
+                if (m.data.id !== match.data.id)
+                    return m;
+                return {
+                    ...m,
+                    data: {
+                        ...m.data,
+                        messages: (m.data.messages ?? []).concat(response.value!)
                     }
-                }))
+                }
+            }))
 
-                setMessageCrafterConfig(defaultMessageCrafterConfig);
-                router.refresh();
-
-            } else {
-
-                throw new Error("Not Implemented");
-
-            }
+            setMessageCrafterConfig(defaultMessageCrafterConfig);
+            router.refresh();
 
         }
 
@@ -278,41 +264,40 @@ export default function Match({ matchId, user, className }: MatchProps) {
     }
 
     async function markAsSeen(...messageIds: Guid[]) {
+
         if (messageIds.length === 0) {
             return;
         }
 
         const response = await markMessageAsSeen(...messageIds);
-        if (response.success) {
+        if (!response.success)
+            throw new Error("not implemented");
 
-            setMatchings(matchings.map(m => {
-                if (m.data.id !== match.data.id)
-                    return m;
-                return {
-                    ...m,
-                    data: {
-                        ...m.data,
-                        messages: (m.data.messages ?? []).map(mes => {
-                            if (!messageIds.includes(mes.data.id)) {
-                                return mes;
+        setMatchings(matchings.map(m => {
+            if (m.data.id !== match.data.id)
+                return m;
+            return {
+                ...m,
+                data: {
+                    ...m.data,
+                    messages: (m.data.messages ?? []).map(mes => {
+                        if (!messageIds.includes(mes.data.id)) {
+                            return mes;
+                        }
+                        return {
+                            ...mes,
+                            data: {
+                                ...mes.data,
+                                seenAt: new Date().toISOString()
                             }
-                            return {
-                                ...mes,
-                                data: {
-                                    ...mes.data,
-                                    seenAt: new Date().toISOString()
-                                }
-                            }
-                        })
-                    }
+                        }
+                    })
                 }
-            }));
+            }
+        }));
 
-            router.refresh();
+        router.refresh();
 
-        } else {
-            throw new Error("Not Implemented");
-        }
     }
 
     function onReport(messageId: Guid) {
@@ -352,26 +337,44 @@ export default function Match({ matchId, user, className }: MatchProps) {
     }
 
     async function onDelete(messageId: Guid) {
+
         const response = await deleteMessage(messageId);
-        if (response.success) {
-            if (messageCrafterConfig.mode === "edit" && messageCrafterConfig.editingId === messageId) {
-                setMessageCrafterConfig(defaultMessageCrafterConfig);
-            }
-            setMatchings(matchings.map(m => {
-                if (m.data.id !== match.data.id)
-                    return m;
-                return {
-                    ...m,
-                    data: {
-                        ...m.data,
-                        messages: (m.data.messages ?? []).filter(mes => mes.data.id !== messageId)
-                    }
-                }
-            }))
-            router.refresh();
-        } else {
-            throw new Error("Not Implemented");
+        if (!response.success) {
+            throw new Error("not implemented");
         }
+
+        if (messageCrafterConfig.mode === "edit" && messageCrafterConfig.editingId === messageId) {
+            setMessageCrafterConfig(defaultMessageCrafterConfig);
+        }
+
+        const messagesThatReferenceDeletedMessage = messages.filter(m => m.data.replyToMessageId === messageId).map(m => m.data.id);
+        setMatchings(matchings.map(m => {
+            if (m.data.id !== match.data.id) {
+                return m;
+            }
+            return {
+                ...m,
+                data: {
+                    ...m.data,
+                    messages: (m.data.messages ?? []).filter(mes => mes.data.id !== messageId).map(mes => {
+                        if (messagesThatReferenceDeletedMessage.includes(mes.data.id!)) {
+                            return {
+                                ...mes,
+                                data: {
+                                    ...mes.data,
+                                    replyToMessage: undefined,
+                                    replyToMessageId: undefined
+                                }
+                            }
+                        }
+                        return mes;
+                    })
+                }
+            }
+        }))
+
+        router.refresh();
+
     }
 
     const items = messages.map(message => {
@@ -403,7 +406,7 @@ export default function Match({ matchId, user, className }: MatchProps) {
                         <>
                             {
                                 isReplyDeleted ?
-                                    <span className="text-(--secondary-fc) text-(length:--secondary-fs) italic mx-auto">replied message was deleted</span>
+                                    <span className="text-(--secondary-fc) text-(length:--secondary-fs) italic mx-auto">replied-to message was deleted</span>
                                     :
                                     <Message className={`${isOwn ? "surface-secondary mr-auto" : "surface-message ml-auto"}`} dto={message.data.replyToMessage!} isOwn={!isOwn} />
                             }
