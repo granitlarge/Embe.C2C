@@ -77,8 +77,6 @@ public class GenerateCandidatesHandler
 
             dtos.Add(new GeneratedCandidate(candidate.Id, userDto, candidate.UserSearchProfileId, candidateSearchProfileDto));
             */
-            await _logger.TraceAsync("CANDIDATE.USER IS NULL:" + (candidate.User is null));
-            await _logger.TraceAsync("CANDIDATE.CandidateUser IS NULL:" + (candidate.CandidateUser is null));
             var candidateDto = await _candidateDtoMapper.ToDtoAsync(candidate, queryingUser, cancellationToken);
             if (candidateDto != null)
             {

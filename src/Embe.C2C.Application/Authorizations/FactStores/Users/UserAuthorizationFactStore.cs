@@ -12,21 +12,13 @@ public class UserAuthorizationFactStore
 {
     private readonly UserFactGenerator _factGenerator = factGenerator;
 
-    public void SetCandidateUserFact(Guid userId, bool isCandidate)
+    public async Task<CandidateUserFact> GetCandidateUserFactAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var fact = new CandidateUserFact(userId, isCandidate);
-        SetFact(fact);
-    }
-
-    public void SetIsPositivelyJudgedByUserFact(Guid userId, bool isPositivelyJudgedByUser)
-    {
-        var fact = new IsPositivelyJudgedByUser(userId, isPositivelyJudgedByUser);
-        SetFact(fact);
-    }
-
-    public CandidateUserFact? GetCandidateUserFact(Guid userId)
-    {
-        return GetFact<CandidateUserFact>(userId);
+        var fact = GetFact<CandidateUserFact>(userId);
+        if (fact is not null)
+            return fact;
+        await LoadUserFactsAsync(userId, cancellationToken);
+        return GetFact<CandidateUserFact>(userId) ?? throw new InvalidOperationException("CandidateUserFact should have been loaded.");
     }
 
     public async ValueTask<BlockedByUserFact> GetBlockedByUserFactAsync(Guid userId, CancellationToken cancellationToken = default)

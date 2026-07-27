@@ -74,7 +74,6 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
         }
     }
 
-    console.log("CANDIDATES:", candidates);
 
     return (
         <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">

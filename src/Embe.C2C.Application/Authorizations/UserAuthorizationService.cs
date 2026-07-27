@@ -46,7 +46,7 @@ public class UserAuthorizationService
     {
         var blockedByUserFact = await _facts.GetBlockedByUserFactAsync(userId, cancellationToken);
         var blockingUserFact = await _facts.GetBlockingUserFactAsync(userId, cancellationToken);
-        var candidateUserFact = _facts.GetCandidateUserFact(userId);
+        var candidateUserFact = await _facts.GetCandidateUserFactAsync(userId, cancellationToken);
         var sameUserFact = _facts.GetSameUserFact(userId);
         var matchedUserFact = await _facts.GetMatchedUserFactAsync(userId, cancellationToken);
         var isPositivelyJudgedByUserFact = await _facts.GetIsPositivelyJudgedByUserFactAsync(userId, cancellationToken);

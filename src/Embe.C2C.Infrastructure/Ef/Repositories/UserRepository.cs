@@ -31,7 +31,8 @@ public class UserRepository(C2CContext context) : IUserRepository
                 IsBlocking = u.Blocked!.Any(bu => bu.BlockedUserId == targetUserId),
                 IsBlockedBy = u.BlockedBy!.Any(bu => bu.BlockerUserId == targetUserId),
                 IsMatched = u.Matchings1!.Any(m => m.UserId2 == targetUserId) || u.Matchings2!.Any(m => m.UserId1 == targetUserId),
-                IsPositivelyJudged = u.CandidateCandidates!.Any(c => c.UserId == targetUserId && c.Judgement == true)
+                IsPositivelyJudged = u.CandidateCandidates!.Any(c => c.UserId == targetUserId && c.Judgement == true),
+                IsCandidate = u.CandidateUsers!.Any(u => u.CandidateUserId == targetUserId)
             })
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -40,6 +41,7 @@ public class UserRepository(C2CContext context) : IUserRepository
         var matchedFact = new MatchedUserFact(targetUserId, facts?.IsMatched ?? false);
         var sameFact = new SameUserFact(targetUserId, targetUserId == currentUserId);
         var positivelyJudgedFact = new IsPositivelyJudgedByUser(targetUserId, facts?.IsPositivelyJudged ?? false);
+        var isCandidate = new CandidateUserFact(targetUserId, facts?.IsCandidate ?? false);
 
         return
         [
@@ -47,7 +49,8 @@ public class UserRepository(C2CContext context) : IUserRepository
             blockingFact,
             matchedFact,
             sameFact,
-            positivelyJudgedFact
+            positivelyJudgedFact,
+            isCandidate
         ];
     }
 

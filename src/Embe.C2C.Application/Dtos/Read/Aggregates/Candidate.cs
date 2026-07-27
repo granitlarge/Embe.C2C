@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Candidates;
@@ -26,17 +27,20 @@ public class CandidateDtoMapper
     private readonly UserDtoMapper _userDtoMapper;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
     private readonly CandidateAuthorizationService _candidateAuthorizationService;
+    private readonly ILogger<CandidateDtoMapper> _logger;
 
     public CandidateDtoMapper
     (
         UserDtoMapper userDtoMapper,
         SearchProfileDtoMapper searchProfileDtoMapper,
-        CandidateAuthorizationService candidateAuthorizationService
+        CandidateAuthorizationService candidateAuthorizationService,
+        ILoggerFactory loggerFactory
     )
     {
         _userDtoMapper = userDtoMapper;
         _searchProfileDtoMapper = searchProfileDtoMapper;
         _candidateAuthorizationService = candidateAuthorizationService;
+        _logger = loggerFactory.Create<CandidateDtoMapper>();
     }
 
     public async Task<ReadDto<CandidateDto, CandidatePermission>?> ToDtoAsync

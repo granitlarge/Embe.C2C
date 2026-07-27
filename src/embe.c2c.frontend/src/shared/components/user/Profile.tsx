@@ -42,7 +42,6 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
         className
     ].filter(Boolean).join(" ")
 
-    console.log("CANDIDATE: ", candidate);
     const images = [...(candidate.images ?? [])];
     return (
         <Surface className={`w-full flex flex-col gap-3 ${classNames}`} padding="md" variant="secondary">
