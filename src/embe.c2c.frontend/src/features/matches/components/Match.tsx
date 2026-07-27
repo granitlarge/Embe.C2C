@@ -19,6 +19,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { Routes } from "@/src/shared/routes";
 import { useApplicationStore } from "@/src/shared/stores/provider";
 import { markAsRead } from "@/src/shared/actions/notifications/action";
+import BackButton from "@/src/shared/components/buttons/BackButton";
 
 type MatchHeaderProps = {
     partner?: User,
@@ -37,7 +38,9 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
     }
 
     return (
-        <header className="flex flex-row items-center">
+        <header className="flex flex-row items-center justify-between">
+            <BackButton />
+
             {
                 partner &&
                 <Link href={Routes.protected.user(partner.id)} className="no-underline text-(--primary-fc)">
@@ -47,7 +50,7 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
 
             <DropdownMenu.Root modal={false}>
                 <DropdownMenu.Trigger asChild>
-                    <Button className="bg-transparent max-w-max ml-auto p-0">
+                    <Button className="bg-transparent max-w-max p-0">
                         <Ellipsis />
                     </Button>
                 </DropdownMenu.Trigger>

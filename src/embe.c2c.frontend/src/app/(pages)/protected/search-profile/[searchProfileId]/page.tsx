@@ -2,7 +2,7 @@ import { getMe } from "@/src/features/auth/actions/action";
 import { getSearchProfile } from "@/src/features/search-profiles/actions";
 import SearchProfileForm from "@/src/features/search-profiles/components/SearchProfileForm";
 import { Guid } from "@/src/shared/cache";
-import MainNav from "@/src/shared/components/nav/MainNav";
+import BackButton from "@/src/shared/components/buttons/BackButton";
 
 export type EditSearchProfilePageProps = {
     params: Promise<{
@@ -23,11 +23,16 @@ export default async function EditSearchProfilePage({ params }: EditSearchProfil
     }
     return (
         <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
-            <h1>search-profile</h1>
-            <SearchProfileForm 
+            <div className="flex flex-row justify-between">
+                <div className="flex flex-row gap-3 items-center justify-center">
+                    <BackButton />
+                </div>
+                <h1>search-profile</h1>
+            </div>
+            <SearchProfileForm
                 user={getMeResponse.value.data}
                 searchProfile={getSearchProfileResponse.value.data}
-                className="grow-1 overflow-y-scroll scrollbar-none" 
+                className="grow-1 overflow-y-scroll scrollbar-none"
             />
         </div>
     );

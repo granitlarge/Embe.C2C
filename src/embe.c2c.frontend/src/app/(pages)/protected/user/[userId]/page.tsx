@@ -1,5 +1,6 @@
 import { getUser } from "@/src/shared/actions/user/action";
 import { Guid } from "@/src/shared/cache";
+import BackButton from "@/src/shared/components/buttons/BackButton";
 import MainNav from "@/src/shared/components/nav/MainNav";
 import Profile from "@/src/shared/components/user/Profile";
 
@@ -18,7 +19,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
     return (
         <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none" >
-            <h1>{getProfileResponse.value?.data.alias}</h1>
+            <div className="flex justify-between items-center">
+                <BackButton />
+                <h1>{getProfileResponse.value?.data.alias}</h1>
+            </div>
             <Profile className="grow-1 overflow-y-scroll scrollbar-none" candidate={getProfileResponse.value?.data!} />
         </div>
     );
