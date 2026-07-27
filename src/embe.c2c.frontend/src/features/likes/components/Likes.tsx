@@ -2,19 +2,19 @@
 
 import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
 import { ReadDto } from "@/src/shared/types/dtos/types";
-import { useState } from "react";
 import { UserCompact } from "../../matches/components/UserCompact";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { getPositiveJudgements } from "../actions";
 import { Candidate, CandidatePermission } from "@/src/shared/types/domain/aggregates";
+import { useApplicationStore } from "@/src/shared/stores/provider";
 
 export type LikesProps = {
-    initialLikes: ReadDto<Candidate, CandidatePermission>[];
     className?: string;
 }
-export default function Likes({ initialLikes, className }: LikesProps) {
+export default function Likes({ className }: LikesProps) {
 
-    const [likes, setLikes] = useState(initialLikes);
+    const likes = useApplicationStore(s => s.positiveJudgements);
+    const setLikes = useApplicationStore(s => s.setPositiveJudgements);
     const classNames = [className].filter(Boolean).join(" ");
 
     const page = likes.length > 0 ? 2 : 1;
@@ -46,7 +46,7 @@ export default function Likes({ initialLikes, className }: LikesProps) {
         }
 
         const newLikes = response.value!;
-        setLikes(prev => [...prev, ...newLikes]);
+        setLikes([...likes, ...newLikes]);
 
         return response.value!.length == size;
 

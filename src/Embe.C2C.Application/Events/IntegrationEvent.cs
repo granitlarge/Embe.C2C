@@ -18,6 +18,7 @@ public enum IntegrationEventType
     MatchingRemoved,
     MatchingCreated,
 
+    PositivelyJudged,
 }
 
 public record IntegrationEvent(IntegrationEventType Type)

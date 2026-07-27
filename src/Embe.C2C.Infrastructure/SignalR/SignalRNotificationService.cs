@@ -1,4 +1,5 @@
 using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Events.Candidates;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Matchings;
 using Embe.C2C.Application.Events.Messages;
@@ -27,8 +28,19 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
             MatchingCreatedIntegrationEvent matchingCreated => SendMatchingCreatedNotificationAsync(matchingCreated, cancellationToken),
             MatchingRemovedIntegrationEvent matchingRemoved => SendMatchingRemovedNotificationAsync(matchingRemoved, cancellationToken),
 
+            PositivelyJudgedIntegrationEvent positivelyJudged => SendPositivelyJudgedNotificationAsync(positivelyJudged, cancellationToken),
+
             _ => Task.CompletedTask
         };
+    }
+
+    private async Task SendPositivelyJudgedNotificationAsync(PositivelyJudgedIntegrationEvent positivelyJudged, CancellationToken cancellationToken)
+    {
+        var hubContext = await _pool.GetHubContextAsync(cancellationToken);
+        await hubContext
+                .Clients
+                .User(positivelyJudged.RecipientUserId.ToString())
+                .SendAsync("PositivelyJudged", positivelyJudged.CandidateId, cancellationToken);
     }
 
     private async Task SendNotificationRemovedAsync(NotificationRemovedIntegrationEvent notificationRemoved, CancellationToken cancellationToken)

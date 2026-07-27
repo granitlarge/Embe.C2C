@@ -15,7 +15,13 @@ public class CandidateRepository(C2CContext context) : ICandidateRepository
 
     public Task<Candidate?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return _context.Candidates.SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
+        return _context.Candidates
+            .AsSplitQuery()
+            .Include(c => c.User)
+            .Include(c => c.CandidateUser)
+            .Include(c => c.UserSearchProfile)
+            .Include(c => c.CandidateSearchProfile)
+            .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
     }
 
     public Task<Candidate?> GetByParametersAsync(Guid userId, Guid candidateUserId, Guid userSearchProfileId, Guid candidateSearchProfileId, CancellationToken cancellationToken)

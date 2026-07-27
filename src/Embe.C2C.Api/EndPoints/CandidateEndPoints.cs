@@ -15,6 +15,7 @@ public static class CandidateEndPoints
         group.MapGet("/positive", GetPositiveJudgements);
         group.MapPost("/judge", Judge);
         group.MapGet("/", Get);
+        group.MapGet("/{candidateId:Guid}", GetById);
     }
 
     private async static Task<IResult> GetPositiveJudgements
@@ -47,6 +48,17 @@ public static class CandidateEndPoints
     )
     {
         var result = await handler.HandleAsync(GenerateCandidatesCommand.Instance, cancellationToken);
+        return result.ToResult();
+    }
+
+    private async static Task<IResult> GetById
+    (
+        [FromRoute] Guid candidateId,
+        [FromServices] GetCandidateByIdHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await handler.HandleAsync(new Application.Queries.Candidates.GetCandidateByIdQuery(candidateId), cancellationToken);
         return result.ToResult();
     }
 }

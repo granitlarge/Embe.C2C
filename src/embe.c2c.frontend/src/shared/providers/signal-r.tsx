@@ -6,12 +6,13 @@ import { getAccessToken, refreshAccessToken } from "../security/functions";
 import { useApplicationStore } from "../stores/provider";
 import { Guid } from "../cache";
 import { ReadDto } from "../types/dtos/types";
-import { Matching, MatchingCreatedNotification, MatchingPermission, NotificationType, User, UserPermission } from "../types/domain/aggregates";
+import { Candidate, CandidatePermission, Matching, MatchingCreatedNotification, MatchingPermission, NotificationType, User, UserPermission } from "../types/domain/aggregates";
 import { getMatching, getMessage } from "@/src/features/matches/actions/action";
 import { Notification } from "../types/domain/aggregates";
 import { getNotification } from "../actions/notifications/action";
 import { useRouter } from "nextjs-toploader/app";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { getCandidate } from "../actions/candidates/action";
 
 export interface SignalRProviderProps {
     children: ReactNode;
@@ -26,18 +27,29 @@ export const SignalRProvider = ({
 
     const user = useApplicationStore(s => s.user);
     const setUser = useApplicationStore(s => s.setUser);
+
     const notifications = useApplicationStore(s => s.notifications);
     const setNotifications = useApplicationStore(s => s.setNotifications);
+
     const matchings = useApplicationStore(s => s.matchings);
     const setMatchings = useApplicationStore(s => s.setMatchings);
 
+    const positiveJudgements = useApplicationStore(s => s.positiveJudgements);
+    const setPositiveJudgements = useApplicationStore(s => s.setPositiveJudgements);
+
     const routerRef = useRef(router);
+
     const userRef = useRef(user);
     const setUserRef = useRef(setUser);
+
     const notificationsRef = useRef(notifications);
     const setNotificationsRef = useRef(setNotifications);
+
     const matchingsRef = useRef(matchings);
     const setMatchingsRef = useRef(setMatchings);
+
+    const positiveJudgementsRef = useRef(positiveJudgements);
+    const setPositiveJudgementsRef = useRef(setPositiveJudgements);
 
     const [connection, setConnection] = useState<HubConnection | undefined>(undefined);
 
@@ -70,6 +82,14 @@ export const SignalRProvider = ({
     }, [setMatchings])
 
     useEffect(() => {
+        positiveJudgementsRef.current = positiveJudgements;
+    }, [positiveJudgements])
+
+    useEffect(() => {
+        setPositiveJudgementsRef.current = setPositiveJudgements;
+    }, [setPositiveJudgements]);
+
+    useEffect(() => {
         const connection = createConnection();
         setConnection(connection);
         connection.start().catch(e => console.error(e));
@@ -94,10 +114,17 @@ export const SignalRProvider = ({
             notificationsRef,
             setNotificationsRef,
         );
+        const removePositiveJudgementsHandlers = addPositiveJudgementsHandlers(
+            connection,
+            routerRef,
+            positiveJudgementsRef,
+            setPositiveJudgementsRef
+        );
         return () => {
             removeUserHandlers();
             removeMatchingHandlers();
             removeNotificationHandlers();
+            removePositiveJudgementsHandlers();
         };
     }, [connection])
 
@@ -405,5 +432,35 @@ function addNotificationHandlers(
         connection?.off("NotificationCreated", onNotificationCreated);
         connection?.off("NotificationRemoved", onNotificationRemoved);
     };
+
+}
+
+function addPositiveJudgementsHandlers(connection: HubConnection | undefined,
+    routerRef: RefObject<AppRouterInstance>,
+    positiveJudgementsRef: RefObject<ReadDto<Candidate, CandidatePermission>[]>,
+    setPositiveJudgementsRef: RefObject<(newCandidates: ReadDto<Candidate, CandidatePermission>[]) => void>
+): () => void {
+
+    const onPositivelyJudged = async (candidateId: Guid) => {
+
+        console.log("SignalR.PositivelyJudged");
+        const candidate = await getCandidate(candidateId);
+
+        if (!candidate.success || !candidate.value) {
+            return;
+        }
+
+        const positiveJudgements = positiveJudgementsRef.current;
+        const setPositiveJudgements = setPositiveJudgementsRef.current;
+
+        setPositiveJudgements(positiveJudgements.concat(candidate.value));
+        routerRef.current.refresh();
+    }
+
+    connection?.on("PositivelyJudged", onPositivelyJudged);
+
+    return () => {
+        connection?.off("PositivelyJudged", onPositivelyJudged);
+    }
 
 }

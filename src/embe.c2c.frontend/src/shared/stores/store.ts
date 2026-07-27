@@ -1,5 +1,5 @@
 import { createStore } from 'zustand/vanilla'
-import { Matching, MatchingPermission, Message, MessagePermission, User, UserPermission } from '../types/domain/aggregates'
+import { Candidate, CandidatePermission, Matching, MatchingPermission, Message, MessagePermission, User, UserPermission } from '../types/domain/aggregates'
 import { ReadDto } from '../types/dtos/types'
 import { Notification } from '../types/domain/aggregates'
 
@@ -21,6 +21,11 @@ export function prepareMatchings(matchings: ReadDto<Matching, MatchingPermission
     })
 }
 
+export function preparePositiveJudgements(candidates: ReadDto<Candidate, CandidatePermission>[]) {
+    candidates.sort((a, b) => new Date(a.data.updatedAt!).getTime() - new Date(b.data.updatedAt!).getTime());
+    return candidates;
+}
+
 export function prepareNotifications(notifications: ReadDto<Notification, NotificationPermission>[]) {
     return notifications;
 }
@@ -29,16 +34,18 @@ export type ApplicationState = {
     user: ReadDto<User, UserPermission> | undefined;
     notifications: ReadDto<Notification, NotificationPermission>[];
     matchings: ReadDto<Matching, MatchingPermission>[];
+    positiveJudgements: ReadDto<Candidate, CandidatePermission>[];
 }
 
 export type ApplicationActions = {
     setUser: (newUser: ReadDto<User, UserPermission> | undefined) => void;
     setNotifications: (newNotifications: ReadDto<Notification, NotificationPermission>[]) => void;
     setMatchings: (newMatchings: ReadDto<Matching, MatchingPermission>[]) => void;
+    setPositiveJudgements: (newPositiveJudgements: ReadDto<Candidate, CandidatePermission>[]) => void;
 }
 
 export type ApplicationStore = ApplicationState & ApplicationActions
-export const defaultInitState: ApplicationState = { user: undefined, notifications: [], matchings: [] }
+export const defaultInitState: ApplicationState = { user: undefined, notifications: [], matchings: [], positiveJudgements: [] }
 
 export const createApplicationStore = (initState: ApplicationState = defaultInitState) => {
     return createStore<ApplicationStore>()((set) => ({
@@ -52,5 +59,9 @@ export const createApplicationStore = (initState: ApplicationState = defaultInit
             ...prev,
             matchings: prepareMatchings(newMatchings)
         })),
+        setPositiveJudgements: (newPositiveJudgements: ReadDto<Candidate, CandidatePermission>[]) => set((prev) => ({
+            ...prev,
+            positiveJudgements: preparePositiveJudgements(newPositiveJudgements)
+        }))
     }))
 }

@@ -18,24 +18,21 @@ export default async function LikesPage() {
         !getPositiveJudgementsResponse.success || !getPositiveJudgementsResponse.value ||
         !getNotificationsResponse.success || !getNotificationsResponse.value
     ) {
-        throw new Error("Failed to fetch positive judgements");
+        throw new Error("not implemented");
     }
-
-    const positiveJudgements = getPositiveJudgementsResponse.value!;
 
     return (
 
         <ApplicationStoreProvider
             notifications={getNotificationsResponse.value}
+            positiveJudgements={getPositiveJudgementsResponse.value}
         >
             <SignalRProvider>
 
                 <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
 
                     <h1>likes</h1>
-
-                    <Likes className="grow-1 overflow-y-scroll scrollbar-none" initialLikes={positiveJudgements} />
-
+                    <Likes className="grow-1 overflow-y-scroll scrollbar-none" />
                     <MainNav className="grow-0" />
 
                 </div>

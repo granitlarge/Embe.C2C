@@ -2,8 +2,8 @@
 
 import { ReactNode, createContext, useRef, useContext } from 'react'
 import { useStore } from 'zustand'
-import { ApplicationStore, createApplicationStore, prepareMatchings, prepareNotifications } from './store'
-import { Matching, MatchingPermission, User, UserPermission } from '../types/domain/aggregates'
+import { ApplicationStore, createApplicationStore, prepareMatchings, prepareNotifications, preparePositiveJudgements } from './store'
+import { Candidate, CandidatePermission, Matching, MatchingPermission, User, UserPermission } from '../types/domain/aggregates'
 import { ReadDto } from '../types/dtos/types'
 import { Notification } from '../types/domain/aggregates'
 
@@ -17,6 +17,7 @@ export interface ApplicationStoreProviderProps {
   user?: ReadDto<User, UserPermission>
   notifications?: ReadDto<Notification, NotificationPermission>[]
   matchings?: ReadDto<Matching, MatchingPermission>[]
+  positiveJudgements?: ReadDto<Candidate, CandidatePermission>[]
   children: ReactNode;
 }
 
@@ -24,6 +25,7 @@ export const ApplicationStoreProvider = ({
   user,
   notifications,
   matchings, 
+  positiveJudgements,
   children,
 }: ApplicationStoreProviderProps) => {
   const storeRef = useRef<ApplicationStoreApi>(null)
@@ -31,7 +33,8 @@ export const ApplicationStoreProvider = ({
     storeRef.current = createApplicationStore({
       user: user,
       notifications: prepareNotifications(notifications ?? []),
-      matchings: prepareMatchings(matchings ?? [])
+      matchings: prepareMatchings(matchings ?? []),
+      positiveJudgements: preparePositiveJudgements(positiveJudgements ?? [])
     })
   }
 

@@ -1,10 +1,12 @@
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Events;
+using Embe.C2C.Application.Events.Candidates;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Matchings;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
 using Embe.C2C.Domain;
+using Embe.C2C.Domain.Aggregates.Candidates.Events;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Messages.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Events;
@@ -17,13 +19,11 @@ namespace Embe.C2C.Application.EventHandlers;
 public class DomainEventHandler
 (
     INotificationRepository notificationRepository,
-    IUserRepository userRepo,
     IMatchingRepository matchingRepo
 ) : IntegrationEventCollector
 {
     private readonly INotificationRepository _notificationRepository = notificationRepository;
 
-    private readonly IUserRepository _userRepo = userRepo;
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
 
     public async Task HandleAsync(DomainEvent domainEvent, CancellationToken cancellationToken = default)
@@ -64,12 +64,21 @@ public class DomainEventHandler
             case NotificationRemovedEvent notificationRemovedEvent:
                 await HandleNotificationRemovedEventAsync(notificationRemovedEvent, cancellationToken);
                 break;
+            
+            case PositivelyJudgedDomainEvent positivelyJudgedEvent:
+                await HandlePositivelyJudgedEventAsync(positivelyJudgedEvent, cancellationToken);
+                break;
 
             default:
                 break;
 
         }
 
+    }
+
+    private async Task HandlePositivelyJudgedEventAsync(PositivelyJudgedDomainEvent positivelyJudgedEvent, CancellationToken cancellationToken)
+    {
+        AddIntegrationEvent(new PositivelyJudgedIntegrationEvent(positivelyJudgedEvent.Candidate.Id, positivelyJudgedEvent.Candidate.CandidateUserId));
     }
 
     private async Task HandleNotificationRemovedEventAsync(NotificationRemovedEvent notificationRemovedEvent, CancellationToken cancellationToken)
