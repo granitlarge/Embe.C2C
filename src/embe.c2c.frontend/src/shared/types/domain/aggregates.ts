@@ -84,7 +84,7 @@ export enum MessagePermission {
 export enum NotificationType {
     MatchingCreated = 0,
     MessageCreated = 1,
-    PositiveJudgementCreated = 2
+    PositivelyJudged = 2
 }
 
 export type Notification = {

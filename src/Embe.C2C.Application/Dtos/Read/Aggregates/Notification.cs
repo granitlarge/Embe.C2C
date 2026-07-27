@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Notifications;
+using Embe.C2C.Domain.Aggregates.Notifications.Candidates;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Notifications.Messages;
 
@@ -10,11 +11,13 @@ public enum NotificationType
 {
     MatchingCreated = 0,
     MessageCreated = 1,
+    PositivelyJudged = 2,
 }
 
 [JsonPolymorphic]
 [JsonDerivedType(typeof(MatchingCreatedNotificationDto))]
 [JsonDerivedType(typeof(MessageCreatedNotificationDto))]
+[JsonDerivedType(typeof(PositivelyJudgedNotificationDto))]
 public abstract record NotificationDto
 (
     NotificationType Type,
@@ -48,6 +51,17 @@ public record MessageCreatedNotificationDto
     Guid? MessageId
 ) : NotificationDto(NotificationType.MessageCreated, Id, RecipientUserId, IsRead, ReadAt, CreatedAt, UpdatedAt);
 
+public record PositivelyJudgedNotificationDto
+(
+    Guid? Id,
+    Guid? RecipientUserId,
+    bool? IsRead,
+    DateTimeOffset? ReadAt,
+    DateTimeOffset? CreatedAt,
+    DateTimeOffset? UpdatedAt,
+    Guid? CandidateId
+) : NotificationDto(NotificationType.PositivelyJudged, Id, RecipientUserId, IsRead, ReadAt, CreatedAt, UpdatedAt);
+
 public class NotificationDtoMapper
 {
     public NotificationDto ToDto<T>
@@ -77,6 +91,16 @@ public class NotificationDtoMapper
                 variant.IncludeCreatedAt ? messageCreated.CreatedAt : null,
                 variant.IncludeUpdatedAt ? messageCreated.UpdatedAt : null,
                 variant.IncludeMessageId ? messageCreated.MessageId : null
+            ),
+            PositivelyJudgedNotification positivelyJudged => new PositivelyJudgedNotificationDto
+            (
+                variant.IncludeId ? positivelyJudged.Id : null,
+                variant.IncludeRecipientUserId ? positivelyJudged.RecipientUserId : null,
+                variant.IncludeIsRead ? positivelyJudged.IsRead : null,
+                variant.IncludeReadAt ? positivelyJudged.ReadAt : null,
+                variant.IncludeCreatedAt ? positivelyJudged.CreatedAt : null,
+                variant.IncludeUpdatedAt ? positivelyJudged.UpdatedAt : null,
+                variant.IncludeCandidateId ? positivelyJudged.CandidateId : null
             ),
             _ => throw new NotImplementedException()
         };

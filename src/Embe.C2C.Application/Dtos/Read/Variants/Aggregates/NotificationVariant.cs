@@ -11,7 +11,8 @@ public record NotificationVariant
         includeCreatedAt: true,
         includeUpdatedAt: true,
         includeMatchingId: true,
-        includeMessageId: true
+        includeMessageId: true,
+        includeCandidateId: true
     );
 
     public static readonly NotificationVariant Empty = new
@@ -23,7 +24,8 @@ public record NotificationVariant
         includeCreatedAt: false,
         includeUpdatedAt: false,
         includeMatchingId: false,
-        includeMessageId: false
+        includeMessageId: false,
+        includeCandidateId: false
     );
 
     private NotificationVariant
@@ -37,7 +39,9 @@ public record NotificationVariant
 
         bool includeMatchingId,
 
-        bool includeMessageId
+        bool includeMessageId,
+
+        bool includeCandidateId
     )
     {
         IncludeId = includeId;
@@ -50,6 +54,8 @@ public record NotificationVariant
         IncludeMatchingId = includeMatchingId;
 
         IncludeMessageId = includeMessageId;
+
+        IncludeCandidateId = includeCandidateId;
     }
 
     public bool IncludeId { get; }
@@ -62,4 +68,6 @@ public record NotificationVariant
     public bool IncludeMatchingId { get; }
 
     public bool IncludeMessageId { get; }
+
+    public bool IncludeCandidateId { get; }
 }

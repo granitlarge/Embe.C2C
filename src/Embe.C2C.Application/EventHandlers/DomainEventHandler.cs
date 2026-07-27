@@ -9,6 +9,7 @@ using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Candidates.Events;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Messages.Events;
+using Embe.C2C.Domain.Aggregates.Notifications.Candidates;
 using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Notifications.Messages;
@@ -79,6 +80,9 @@ public class DomainEventHandler
     private async Task HandlePositivelyJudgedEventAsync(PositivelyJudgedDomainEvent positivelyJudgedEvent, CancellationToken cancellationToken)
     {
         AddIntegrationEvent(new PositivelyJudgedIntegrationEvent(positivelyJudgedEvent.Candidate.Id, positivelyJudgedEvent.Candidate.CandidateUserId));
+        var notification = PositivelyJudgedNotification.Create(positivelyJudgedEvent.Candidate.Id, positivelyJudgedEvent.Candidate.CandidateUserId);
+        _notificationRepository.Set.Add(notification);
+        AddIntegrationEvent(new NotificationCreatedIntegrationEvent(notification.RecipientUserId, notification.Id));
     }
 
     private async Task HandleNotificationRemovedEventAsync(NotificationRemovedEvent notificationRemovedEvent, CancellationToken cancellationToken)

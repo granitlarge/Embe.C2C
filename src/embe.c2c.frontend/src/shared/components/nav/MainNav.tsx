@@ -24,14 +24,52 @@ export default function MainNav({
 
     const hasUnseenMatches = notifications.some(n => n.data.type === NotificationType.MatchingCreated && n.data.isRead === false);
     const hasUnseenMessages = notifications.some(n => n.data.type === NotificationType.MessageCreated && n.data.isRead === false);
-    const hasUnseenLikes = notifications.some(n => n.data.type === NotificationType.PositiveJudgementCreated && n.data.isRead === false)
+    const hasUnseenLikes = notifications.some(n => n.data.type === NotificationType.PositivelyJudged && n.data.isRead === false)
 
     useEffect(() => {
 
 
         async function markUnreadNotificationsAsRead() {
 
-            await markUnreadMatchCreatedNotificationsAsRead();
+            const markUnreadMatchCreatedNotificationsAsReadPromise = markUnreadMatchCreatedNotificationsAsRead();
+            const markUnreadLikesAsReadPromise = markUnreadLikesAsRead();
+
+            await Promise.all([markUnreadLikesAsReadPromise, markUnreadMatchCreatedNotificationsAsReadPromise]);
+
+            async function markUnreadLikesAsRead(){
+
+                if (pathname !== Routes.protected.likes) {
+                    return
+                }
+
+                const unseenLikesNotifications = notifications.filter(n => n.data.type === NotificationType.PositivelyJudged && n.data.isRead === false);
+                if (unseenLikesNotifications.length === 0) {
+                    return;
+                }
+
+                try {
+
+                    await Promise.all(unseenLikesNotifications.map(umn => markAsRead(umn.data.id!, true)));
+                    setNotifications(notifications.map(n => {
+                        const umn = unseenLikesNotifications.find(umn => umn.data.id === n.data.id);
+                        if (!umn) return n;
+                        return {
+                            ...umn,
+                            data: {
+                                ...umn.data,
+                                isRead: true,
+                                readAt: new Date().toISOString(),
+                            }
+                        }
+                    }));
+
+                } catch (e) {
+
+                    console.error(e);
+
+                }
+
+            }
 
             async function markUnreadMatchCreatedNotificationsAsRead() {
 
