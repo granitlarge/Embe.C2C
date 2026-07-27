@@ -1,4 +1,3 @@
-using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
@@ -6,6 +5,7 @@ using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
+using Embe.C2C.Application.Services;
 
 namespace Embe.C2C.Application.EventHandlers;
 
@@ -13,10 +13,12 @@ public class IntegrationEventHandler
 (
     INotificationService notificationService,
     IImageService imageService,
-    IWorkItemService workItemService
+    IWorkItemService workItemService,
+    IRealTimeUpdateService realTimeUpdateService
 )
 {
     private readonly INotificationService _notificationService = notificationService;
+    private readonly IRealTimeUpdateService _realTimeUpdateService = realTimeUpdateService;
     private readonly IImageService _imageService = imageService;
     private readonly IWorkItemService _workItemService = workItemService;
 
@@ -31,8 +33,12 @@ public class IntegrationEventHandler
 
     private async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
     {
-        // Notify clients about the event using the notification service
-        await _notificationService.SendNotificationAsync(integrationEvent, cancellationToken);
+        if (integrationEvent is NotificationIntegrationEvent notificationIntegrationEvent)
+        {
+            await _notificationService.SendAsync(notificationIntegrationEvent, cancellationToken);
+        }
+
+        await _realTimeUpdateService.SendAsync(integrationEvent, cancellationToken);
 
         switch (integrationEvent)
         {

@@ -11,6 +11,7 @@ using Embe.C2C.Application.Dtos;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.EventHandlers;
+using Embe.C2C.Application.Services;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -113,6 +114,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<SearchProfileDtoMapper>();
         services.AddScoped<CandidateDtoMapper>();
         services.AddScoped<NotificationDtoMapper>();
+
+        services.AddScoped<INotificationService, NotificationService>();
 
         services.AddScoped<IFileUrlGenerator, FileUrlGenerator>((services) =>
         {

@@ -1,20 +1,22 @@
-using Embe.C2C.Application.Abstractions.Services;
+using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Candidates;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Matchings;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
+using Embe.C2C.Application.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Embe.C2C.Infrastructure.SignalR;
 
-public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INotificationService
+public class SignalRNotificationService(SignalRServiceHubContextPool pool) : IRealTimeNotificationService, IRealTimeUpdateService
 {
     private readonly SignalRServiceHubContextPool _pool = pool;
 
-    public Task SendNotificationAsync<T>(T notification, CancellationToken cancellationToken = default)
+    public Task SendAsync<T>(T update, CancellationToken cancellationToken = default)
+        where T : IntegrationEvent
     {
-        return notification switch
+        return update switch
         {
             MessageCreatedIntegrationEvent messageCreated => SendMessageCreatedNotificationAsync(messageCreated, cancellationToken),
             MessageEditedIntegrationEvent messageEdited => SendMessageEditedNotificationAsync(messageEdited, cancellationToken),
@@ -22,15 +24,22 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
             MessageSeenIntegrationEvent messageSeen => SendMessageSeenNotificationAsync(messageSeen, cancellationToken),
             MessageUnseenIntegrationEvent messageUnseen => SendMessageUnseenNotificationAsync(messageUnseen, cancellationToken),
 
-            NotificationCreatedIntegrationEvent notificationCreated => SendNotificationCreatedAsync(notificationCreated, cancellationToken),
-            NotificationRemovedIntegrationEvent notificationRemoved => SendNotificationRemovedAsync(notificationRemoved, cancellationToken),
-
             MatchingCreatedIntegrationEvent matchingCreated => SendMatchingCreatedNotificationAsync(matchingCreated, cancellationToken),
             MatchingRemovedIntegrationEvent matchingRemoved => SendMatchingRemovedNotificationAsync(matchingRemoved, cancellationToken),
 
             PositivelyJudgedIntegrationEvent positivelyJudged => SendPositivelyJudgedNotificationAsync(positivelyJudged, cancellationToken),
 
             _ => Task.CompletedTask
+        };
+    }
+
+    Task<bool> IRealTimeNotificationService.SendAsync<T>(T notification, CancellationToken cancellationToken)
+    {
+        return notification switch
+        {
+            NotificationCreatedIntegrationEvent notificationCreated => SendNotificationCreatedAsync(notificationCreated, cancellationToken),
+            NotificationRemovedIntegrationEvent notificationRemoved => SendNotificationRemovedAsync(notificationRemoved, cancellationToken),
+            _ => Task.FromResult(false)
         };
     }
 
@@ -43,22 +52,34 @@ public class SignalRNotificationService(SignalRServiceHubContextPool pool) : INo
                 .SendAsync("PositivelyJudged", positivelyJudged.CandidateId, cancellationToken);
     }
 
-    private async Task SendNotificationRemovedAsync(NotificationRemovedIntegrationEvent notificationRemoved, CancellationToken cancellationToken)
+    private async Task<bool> SendNotificationRemovedAsync(NotificationRemovedIntegrationEvent notificationRemoved, CancellationToken cancellationToken)
     {
         var hubContext = await _pool.GetHubContextAsync(cancellationToken);
+        if (!await hubContext.ClientManager.UserExistsAsync(notificationRemoved.RecipientUserId.ToString(), cancellationToken))
+        {
+            return false;
+        }
+
         await hubContext
                 .Clients
                 .User(notificationRemoved.RecipientUserId.ToString())
                 .SendAsync("NotificationRemoved", notificationRemoved.NotificationId, cancellationToken);
+
+        return true;
     }
 
-    private async Task SendNotificationCreatedAsync(NotificationCreatedIntegrationEvent notificationCreated, CancellationToken cancellationToken)
+    private async Task<bool> SendNotificationCreatedAsync(NotificationCreatedIntegrationEvent notificationCreated, CancellationToken cancellationToken)
     {
         var hubContext = await _pool.GetHubContextAsync(cancellationToken);
+        if (!await hubContext.ClientManager.UserExistsAsync(notificationCreated.RecipientUserId.ToString(), cancellationToken))
+        {
+            return false;
+        }
         await hubContext
                 .Clients
                 .User(notificationCreated.RecipientUserId.ToString())
                 .SendAsync("NotificationCreated", notificationCreated.NotificationId, cancellationToken);
+        return true;
     }
 
     #region messages
