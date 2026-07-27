@@ -2,7 +2,7 @@ namespace Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 
 public record NotificationVariant
 {
-    public static readonly NotificationVariant Full = new    
+    public static readonly NotificationVariant Full = new
     (
         includeId: true,
         includeRecipientUserId: true,
@@ -10,7 +10,8 @@ public record NotificationVariant
         includeReadAt: true,
         includeCreatedAt: true,
         includeUpdatedAt: true,
-        includeMmatchingId: true
+        includeMatchingId: true,
+        includeMessageId: true
     );
 
     public static readonly NotificationVariant Empty = new
@@ -21,7 +22,8 @@ public record NotificationVariant
         includeReadAt: false,
         includeCreatedAt: false,
         includeUpdatedAt: false,
-        includeMmatchingId: false
+        includeMatchingId: false,
+        includeMessageId: false
     );
 
     private NotificationVariant
@@ -33,7 +35,9 @@ public record NotificationVariant
         bool includeCreatedAt,
         bool includeUpdatedAt,
 
-        bool includeMmatchingId
+        bool includeMatchingId,
+
+        bool includeMessageId
     )
     {
         IncludeId = includeId;
@@ -43,7 +47,9 @@ public record NotificationVariant
         IncludeCreatedAt = includeCreatedAt;
         IncludeUpdatedAt = includeUpdatedAt;
 
-        IncludeMatchingId = includeMmatchingId;
+        IncludeMatchingId = includeMatchingId;
+
+        IncludeMessageId = includeMessageId;
     }
 
     public bool IncludeId { get; }
@@ -52,5 +58,8 @@ public record NotificationVariant
     public bool IncludeReadAt { get; }
     public bool IncludeCreatedAt { get; }
     public bool IncludeUpdatedAt { get; }
+
     public bool IncludeMatchingId { get; }
+
+    public bool IncludeMessageId { get; }
 }

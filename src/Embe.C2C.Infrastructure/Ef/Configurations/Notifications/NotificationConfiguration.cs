@@ -13,7 +13,7 @@ public class NotificationConfiguration : AggregateConfiguration<Notification>
     {
         builder.HasKey(n => n.Id);
         builder.HasDiscriminator<string>("NotificationType")
-            .HasValue<MatchingCreated>("MatchingCreated");
+            .HasValue<MatchingCreatedNotification>("MatchingCreated");
 
         builder.HasOne<User>()
              .WithMany()

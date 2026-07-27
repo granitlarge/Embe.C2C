@@ -194,11 +194,11 @@ function addNotificationHandlers(
             return;
         }
 
-        setNotifications(notifications.concat(getNotificationResponse.value!))
+        setNotifications(notifications.concat(getNotificationResponse.value))
 
     };
 
-    const onNotificationRemoved = async (notificationId: Guid) => {
+    const onNotificationRemoved = (notificationId: Guid) => {
 
         console.log("SignalR.NotificationRemoved");
 

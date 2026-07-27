@@ -23,10 +23,11 @@ export default function MainNav({
     const setNotifications = useApplicationStore(s => s.setNotifications);
 
     const hasUnseenMatches = notifications.some(n => n.data.type === NotificationType.MatchingCreated && n.data.isRead === false);
-    const hasUnseenMessages = false;
+    const hasUnseenMessages = notifications.some(n => n.data.type === NotificationType.MessageCreated && n.data.isRead === false);
     const hasUnseenLikes = false;
 
     useEffect(() => {
+
 
         async function markUnreadNotificationsAsRead() {
 

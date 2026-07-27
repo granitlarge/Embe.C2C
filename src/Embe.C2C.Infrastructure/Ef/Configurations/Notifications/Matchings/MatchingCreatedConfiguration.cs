@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Embe.C2C.Infrastructure.Ef.Configurations.Notifications.Matchings;
 
-public class MatchingCreatedConfiguration : IEntityTypeConfiguration<MatchingCreated>
+public class MatchingCreatedConfiguration : IEntityTypeConfiguration<MatchingCreatedNotification>
 {
-    public void Configure(EntityTypeBuilder<MatchingCreated> builder)
+    public void Configure(EntityTypeBuilder<MatchingCreatedNotification> builder)
     {
         builder.HasBaseType<MatchingNotification>();
     }

@@ -1,8 +1,10 @@
+using System.Text.RegularExpressions;
+
 namespace Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 
-public class MatchingCreated : MatchingNotification
+public class MatchingCreatedNotification : MatchingNotification
 {
-    public MatchingCreated
+    public MatchingCreatedNotification
     (
         Guid recipientUserId,
         Guid matchingId,
@@ -14,10 +16,21 @@ public class MatchingCreated : MatchingNotification
         partnerUserId
     )
     {
+
     }
 
-    private MatchingCreated() : base()
+    private MatchingCreatedNotification() : base()
     {
 
+    }
+
+    public static MatchingCreatedNotification Create
+    (
+        Guid recipientUserId,
+        Guid matchingId,
+        Guid partnerUserId
+    )
+    {
+        return new MatchingCreatedNotification(recipientUserId, matchingId, partnerUserId);
     }
 }

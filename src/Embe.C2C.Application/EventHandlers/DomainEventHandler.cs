@@ -9,6 +9,7 @@ using Embe.C2C.Domain.Aggregates.Matchings.Events;
 using Embe.C2C.Domain.Aggregates.Messages.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
+using Embe.C2C.Domain.Aggregates.Notifications.Messages;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 
 namespace Embe.C2C.Application.EventHandlers;
@@ -95,7 +96,7 @@ public class DomainEventHandler
         var matcheeUserId = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
         var matcherUserId = matchingCreatedEvent.LastJudgeUserId;
 
-        var notification = new MatchingCreated
+        var notification = new MatchingCreatedNotification
         (
             matcheeUserId,
             matching.Id,
@@ -134,10 +135,15 @@ public class DomainEventHandler
         var matching = await _matchingRepo.GetByIdAsync(matchingId, cancellationToken);
         if (matching is null)
             return;
+
         var recipientUserId = matching.UserId1 == authorUserId ? matching.UserId2 : matching.UserId1;
         var messageId = messageCreatedEvent.Message.Id;
         var messageCreated = new MessageCreatedIntegrationEvent(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageCreated);
+
+        var notification = MessageCreatedNotification.Create(messageCreatedEvent.Message.Id, recipientUserId);
+        _notificationRepository.Set.Add(notification);
+        AddIntegrationEvent(new NotificationCreatedIntegrationEvent(notification.RecipientUserId, notification.Id));
     }
 
     private async Task HandleMessageEditedEventAsync
