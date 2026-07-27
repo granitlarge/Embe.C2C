@@ -1,6 +1,6 @@
 import { getMatchingUrl } from "@/src/shared/route";
 import { formatTimeAgo } from "@/src/shared/time";
-import { MatchingCreatedNotification, MatchingRemovedNotification, NotificationType, Notification as NotificationTypeDef } from "@/src/shared/types/domain/aggregates";
+import { MatchingCreatedNotification,  NotificationType, Notification as NotificationTypeDef } from "@/src/shared/types/domain/aggregates";
 import { MailOpen, Mail } from "lucide-react";
 import { Trash2 } from "@deemlol/next-icons";
 import Link from "@/src/shared/components/Links/Link";
@@ -21,20 +21,7 @@ function getNotificationContent(notification: NotificationTypeDef): Notification
     let linkUrl: string | undefined = undefined;
 
     switch (notification.type) {
-        case NotificationType.MatchingCreated: {
-            const matchingCreatedNotification = notification as MatchingCreatedNotification;
-            title = "new match!";
-            content = `you matched with ${matchingCreatedNotification.partnerUserName}`;
-            imageUrl = matchingCreatedNotification.partnerProfileImageUrl;
-            linkUrl = getMatchingUrl(matchingCreatedNotification.matchingId);
-            break;
-        }
-        case NotificationType.MatchingRemoved: {
-            const matchingRemovedNotification = notification as MatchingRemovedNotification;
-            title = "match removed";
-            content = `your match with ${matchingRemovedNotification.partnerUserName} has been removed`;
-            break;
-        }
+
     }
 
     return { title, content, imageUrl, linkUrl };
@@ -50,7 +37,7 @@ export type NotificationProps = {
 
 export default function Notification({ markAsRead, remove, markAsUnread, notification }: NotificationProps) {
 
-    const timeAgo = formatTimeAgo(notification.createdAt);
+    const timeAgo = formatTimeAgo(notification.createdAt!);
     const { title, content, imageUrl, linkUrl } = getNotificationContent(notification);
 
     const classNames = [

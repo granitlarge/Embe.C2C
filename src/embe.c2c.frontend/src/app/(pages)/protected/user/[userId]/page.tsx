@@ -20,7 +20,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none" >
             <h1>{getProfileResponse.value?.data.alias}</h1>
             <Profile className="grow-1 overflow-y-scroll scrollbar-none" candidate={getProfileResponse.value?.data!} />
-            <MainNav className="grow-0" />
         </div>
     );
 

@@ -39,22 +39,6 @@ export type Blocking = {
     blockedAt: string;
 }
 
-export type Contact = {
-    id: Guid;
-    userId1: Guid;
-    userId2: Guid;
-    createdAt: string;
-}
-
-export type ContactRequest = {
-    id: Guid;
-    requestorUserId: Guid;
-    recipientUserId: Guid;
-    isAccepted: boolean | null;
-    respondedAt: string | null;
-    requestedAt: string;
-}
-
 export type Matching = {
     id: Guid;
     userId1: Guid;
@@ -98,18 +82,16 @@ export enum MessagePermission {
 }
 
 export enum NotificationType {
-    MatchingCreated = 0,
-    MatchingRemoved = 1,
-    PositiveJudgementReceived = 2,
+    MatchingCreated = 0
 }
 
 export type Notification = {
     type: NotificationType;
-    id: Guid;
-    recipientUserId: Guid;
-    isRead: boolean;
-    readAt: string | null;
-    createdAt: string;
+    id?: Guid;
+    recipientUserId?: Guid;
+    isRead?: boolean;
+    readAt?: string;
+    createdAt?: string;
 }
 
 export enum NotificationPermission {
@@ -119,10 +101,6 @@ export enum NotificationPermission {
 }
 
 export type MatchingCreatedNotification = Notification & {
-    matchingId: Guid;
-}
-
-export type MatchingRemovedNotification = Notification & {
     matchingId: Guid;
 }
 

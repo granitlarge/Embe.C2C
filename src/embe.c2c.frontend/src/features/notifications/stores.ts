@@ -9,7 +9,7 @@ export type NotificationStore = {
 };
 
 function sort(notifications: Notification[]) {
-    return notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return notifications.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
 }
 
 const useNotificationStore = create<NotificationStore>((set) => ({

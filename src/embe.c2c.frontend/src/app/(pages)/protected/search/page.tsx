@@ -1,7 +1,8 @@
 import { generateCandidates, getAllSearchProfiles } from "@/src/features/search/actions/action";
 import Search from "@/src/features/search/components/Search";
 import { getHasSearchProfile } from "@/src/shared/actions/user/action";
-import { getNextConfigRuntime } from "next/dist/server/config-shared";
+import { SignalRProvider } from "@/src/shared/providers/signal-r";
+import { ApplicationStoreProvider } from "@/src/shared/stores/provider";
 
 export type SearchPageProps = {
 
@@ -28,11 +29,15 @@ export default async function SearchPage({ }: SearchPageProps) {
     }
 
     return (
-        <Search
-            searchProfiles={getAllSearchProfilesResponse.value ?? []}
-            className="grow-1 overflow-y-scroll scrollbar-none"
-            candidates={getCandidatesResponse.value || []}
-            hasSearchProfiles={hasSearchProfiles} 
-        />
+        <ApplicationStoreProvider>
+            <SignalRProvider>
+                <Search
+                    searchProfiles={getAllSearchProfilesResponse.value ?? []}
+                    className="grow-1 overflow-y-scroll scrollbar-none"
+                    candidates={getCandidatesResponse.value || []}
+                    hasSearchProfiles={hasSearchProfiles}
+                />
+            </SignalRProvider>
+        </ApplicationStoreProvider>
     )
 }

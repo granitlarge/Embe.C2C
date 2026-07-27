@@ -68,9 +68,9 @@ export default function NotificationsModal({ hidden, closed }: NotificationsModa
                             <Notification
                                 key={notification.id}
                                 notification={notification}
-                                remove={() => remove(notification.id)}
-                                markAsUnread={() => markAsUnread(notification.id)}
-                                markAsRead={() => markAsRead(notification.id)}
+                                remove={() => remove(notification.id!)}
+                                markAsUnread={() => markAsUnread(notification.id!)}
+                                markAsRead={() => markAsRead(notification.id!)}
                             />
                         ))
             }

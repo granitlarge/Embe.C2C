@@ -9,9 +9,7 @@ import { ReadDto } from "../types/dtos/types";
 import { Matching, MatchingCreatedNotification, MatchingPermission, NotificationType, User, UserPermission } from "../types/domain/aggregates";
 import { getMatching } from "@/src/features/matches/actions/action";
 import { Notification } from "../types/domain/aggregates";
-import { getNotification, markAsRead } from "../actions/notifications/action";
-import { usePathname } from "next/navigation";
-import { Routes } from "../routes";
+import { getNotification } from "../actions/notifications/action";
 
 export interface SignalRProviderProps {
     children: ReactNode;
@@ -22,7 +20,6 @@ export const SignalRProvider = ({
     children
 }: SignalRProviderProps) => {
 
-    const pathname = usePathname();
 
     const user = useApplicationStore(s => s.user);
     const setUser = useApplicationStore(s => s.setUser);
@@ -31,7 +28,6 @@ export const SignalRProvider = ({
     const matchings = useApplicationStore(s => s.matchings);
     const setMatchings = useApplicationStore(s => s.setMatchings);
 
-    const pathnameRef = useRef(pathname);
     const userRef = useRef(user);
     const setUserRef = useRef(setUser);
     const notificationsRef = useRef(notifications);
@@ -40,10 +36,6 @@ export const SignalRProvider = ({
     const setMatchingsRef = useRef(setMatchings);
 
     const [connection, setConnection] = useState<HubConnection | undefined>(undefined);
-
-    useEffect(() => {
-        pathnameRef.current = pathname;
-    }, [pathname])
 
     useEffect(() => {
         userRef.current = user;
@@ -89,7 +81,6 @@ export const SignalRProvider = ({
         )
         const removeNotificationHandlers = addNotificationHandlers(
             connection,
-            pathnameRef,
             notificationsRef,
             setNotificationsRef,
         );
@@ -187,7 +178,6 @@ function addMatchingHandlers(
 
 function addNotificationHandlers(
     connection: HubConnection | undefined,
-    pathnameRef: RefObject<string>,
     notificationsRef: RefObject<ReadDto<Notification, NotificationPermission>[]>,
     setNotificationsRef: RefObject<(newNotifications: ReadDto<Notification, NotificationPermission>[]) => void>
 ): () => void {
@@ -202,15 +192,6 @@ function addNotificationHandlers(
         const getNotificationResponse = await getNotification(notificationId);
         if (!getNotificationResponse.success || !getNotificationResponse.value) {
             return;
-        }
-
-        switch (getNotificationResponse.value.data.type) {
-            case NotificationType.MatchingCreated:
-                {
-                    if (pathnameRef.current == Routes.protected.matches) {
-                        await markAsRead(notificationId, true);
-                    }
-                }
         }
 
         setNotifications(notifications.concat(getNotificationResponse.value!))

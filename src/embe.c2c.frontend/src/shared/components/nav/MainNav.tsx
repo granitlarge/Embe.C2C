@@ -4,20 +4,74 @@ import { Users, Heart, MessageCircle, User } from "lucide-react";
 import Surface from "../surfaces/Surface";
 import Link from "../Links/Link";
 import { Routes } from "../../routes";
+import { useApplicationStore } from "../../stores/provider";
+import { NotificationType } from "../../types/domain/aggregates";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { markAsRead } from "../../actions/notifications/action";
 
 export type MainNavProps = {
     className?: string;
-    hasUnseenLikes?: boolean;
-    hasUnseenMatches?: boolean;
-    hasUnseenMessages?: boolean;
 }
 
 export default function MainNav({
-    className,
-    hasUnseenLikes,
-    hasUnseenMatches,
-    hasUnseenMessages
+    className
 }: MainNavProps) {
+
+    const pathname = usePathname();
+    const notifications = useApplicationStore(s => s.notifications);
+    const setNotifications = useApplicationStore(s => s.setNotifications);
+
+    const hasUnseenMatches = notifications.some(n => n.data.type === NotificationType.MatchingCreated && n.data.isRead === false);
+    const hasUnseenMessages = false;
+    const hasUnseenLikes = false;
+
+    useEffect(() => {
+
+        async function markUnreadNotificationsAsRead() {
+
+            await markUnreadMatchCreatedNotificationsAsRead();
+
+            async function markUnreadMatchCreatedNotificationsAsRead() {
+
+                if (pathname !== Routes.protected.matches) {
+                    return
+                }
+
+                const unseenMatchNotifications = notifications.filter(n => n.data.type === NotificationType.MatchingCreated && n.data.isRead === false);
+                if (unseenMatchNotifications.length === 0) {
+                    return;
+                }
+
+                try {
+
+                    await Promise.all(unseenMatchNotifications.map(umn => markAsRead(umn.data.id!, true)));
+                    setNotifications(notifications.map(n => {
+                        const umn = unseenMatchNotifications.find(umn => umn.data.id === n.data.id);
+                        if (!umn) return n;
+                        return {
+                            ...umn,
+                            data: {
+                                ...umn.data,
+                                isRead: true,
+                                readAt: new Date().toISOString(),
+                            }
+                        }
+                    }));
+
+                } catch (e) {
+
+                    console.error(e);
+
+                }
+
+            }
+
+        }
+
+        markUnreadNotificationsAsRead();
+
+    }, [pathname, notifications, setNotifications])
 
     const iconSize = 24;
     const linkClassNames = `flex flex-col items-center justify-center text-(--primary-fc) text-(length:--primary-fs) no-underline`;
@@ -31,13 +85,13 @@ export default function MainNav({
             <ul className="flex items-center justify-center gap-5">
                 <li>
                     <Link href={Routes.protected.discover} className={linkClassNames}>
-                        <Users size={iconSize} className="inline" />
+                        <Users size={iconSize} className={iconClassNames} />
                         <span className={linkTextClassNames}>discover</span>
                     </Link>
                 </li>
                 <li>
                     <Link href={Routes.protected.search} className={linkClassNames}>
-                        <Users size={iconSize} className="inline" />
+                        <Users size={iconSize} className={iconClassNames} />
                         <span className={linkTextClassNames}>search</span>
                     </Link>
                 </li>
@@ -45,7 +99,7 @@ export default function MainNav({
                     <Link href={Routes.protected.likes} className={linkClassNames}>
                         <div className="relative">
                             <Heart size={iconSize} className={iconClassNames} />
-                            {hasUnseenLikes && <span className="absolute top-[1px] -right-[2px] block h-2 w-2 rounded-full bg-(--primary)"></span>}
+                            {hasUnseenLikes && <span className="absolute top-[1px] -right-[2px] block h-2 w-2 rounded-full bg-(--important-fc)"></span>}
                         </div>
                         <span className={linkTextClassNames}>likes</span>
                     </Link>
@@ -54,7 +108,7 @@ export default function MainNav({
                     <Link href={Routes.protected.matches} className={linkClassNames}>
                         <div className="relative">
                             <MessageCircle size={iconSize} className={iconClassNames} />
-                            {(hasUnseenMatches || hasUnseenMessages) && <span className="absolute top-[2px] -right-[0px] block h-2 w-2 rounded-full bg-(--primary)"></span>}
+                            {(hasUnseenMatches || hasUnseenMessages) && <span className="absolute -top-[2px] -right-[4px] block h-2 w-2 rounded-full bg-(--important-fc)"></span>}
                         </div>
                         <span className={linkTextClassNames}>matches</span>
                     </Link>
