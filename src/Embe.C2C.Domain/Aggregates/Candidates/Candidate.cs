@@ -1,7 +1,6 @@
 using Embe.C2C.Domain.Aggregates.Candidates.Events;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Domain.Aggregates.Candidates;
 

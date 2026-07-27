@@ -6,7 +6,6 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
@@ -123,10 +122,7 @@ public class UpdateHandler
         }
 
         var queryingUser = await _userRepo.GetByIdAsync(actorId, cancellationToken);
-        var enrichedUser = user.Enrich(queryingUser);
-        var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
-        var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
-
+        var readDto = await _userDtoMapper.ToDtoAsync(user, queryingUser, cancellationToken);
         return new(true, readDto);
     }
 }

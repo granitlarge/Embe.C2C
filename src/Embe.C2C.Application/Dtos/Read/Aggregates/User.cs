@@ -1,9 +1,11 @@
 using System.Collections.Immutable;
+using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Dtos.Read.ValueObjects;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
-using Embe.C2C.Application.Enrichment.Aggregates;
+using Embe.C2C.Application.Extensions.Domain.Aggregates;
+using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Dtos.Read.Aggregates;
@@ -27,30 +29,34 @@ public record UserDto
 public class UserDtoMapper
 {
     private readonly ImageDtoMapper _imageDtoMapper;
+    private readonly UserAuthorizationService _userAuthorizationService;
 
-    public UserDtoMapper(ImageDtoMapper imageDtoMapper)
+    public UserDtoMapper(ImageDtoMapper imageDtoMapper, UserAuthorizationService userAuthorizationService)
     {
         _imageDtoMapper = imageDtoMapper;
+        _userAuthorizationService = userAuthorizationService;
     }
 
-    public async Task<UserDto?> ToDtoAsync
+    public async Task<ReadDto<UserDto, UserPermission>?> ToDtoAsync
     (
-        UserEnriched userEnriched,
-        UserVariant variant,
+        User user,
+        User? queryingUser,
         CancellationToken cancellationToken = default
     )
     {
+        var userEnriched = user.Enrich(queryingUser);
+        var (permissions, variant) = await _userAuthorizationService.GetAsync(user.Id, cancellationToken);
+
         if (variant == UserVariant.Empty)
         {
             return null;
         }
 
-        var user = userEnriched.User;
         var images = await Task.WhenAll(user.Images
             .Where(i => variant.IncludeImages)
             .Select(image => _imageDtoMapper.ToDtoAsync(image, cancellationToken)));
 
-        return new UserDto
+        var dto = new UserDto
         (
             user.Id,
             variant.IncludeEmail ? user.Email.Value : null,
@@ -65,5 +71,7 @@ public class UserDtoMapper
             variant.IncludeDistanceToQueryingUser ? userEnriched.DistanceKmToQueryingUser : null,
             variant.IncludeBio ? user.Bio : null
         );
+
+        return new ReadDto<UserDto, UserPermission>(dto, permissions);
     }
 }

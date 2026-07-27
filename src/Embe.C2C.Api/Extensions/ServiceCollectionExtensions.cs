@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
 
         services.ConfigureHttpJsonOptions(options =>
         {
+            options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
             options.SerializerOptions.RespectNullableAnnotations = true;
             options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
         });

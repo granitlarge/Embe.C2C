@@ -42,7 +42,7 @@ public class GetAllSearchProfilesHandler
         var dtos = new List<ReadDto<SearchProfileDto, SearchProfilePermission>>();
         foreach (var searchProfile in searchProfiles)
         {
-            var dto = await searchProfile.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
+            var dto = await _searchProfileDtoMapper.ToDtoAsync(searchProfile, cancellationToken);
             if (dto != null)
                 dtos.Add(dto);
         }

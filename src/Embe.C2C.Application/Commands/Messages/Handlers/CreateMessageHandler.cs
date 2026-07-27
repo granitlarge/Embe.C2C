@@ -22,7 +22,6 @@ public class CreateMessageHandler
     IUserRepository userRepo,
     DomainEventStore domainEventStore,
     MatchingAuthorizationService matchingAuthorizationService,
-    MessageAuthorizationService messageAuthorizationService,
     IAuthenticatedUserService authenticatedUser,
     MatchingService matchingService,
     IRepository context,
@@ -42,7 +41,6 @@ public class CreateMessageHandler
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly MatchingAuthorizationService _matchingAuthorizationService = matchingAuthorizationService;
-    private readonly MessageAuthorizationService _messageAuthorizationService = messageAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUser = authenticatedUser;
     private readonly MatchingService _matchingService = matchingService;
     private readonly MessageDtoMapper _messageDtoMapper = messageDtoMapper;
@@ -102,8 +100,7 @@ public class CreateMessageHandler
 
         _messageRepo.Set.Add(message.Value);
 
-        var readDto = await message.Value.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken) ??
-            throw new InvalidOperationException("The message should be viewable to the sender right after sending it.");
+        var readDto = await _messageDtoMapper.ToDtoAsync(message.Value, cancellationToken) ?? throw new InvalidOperationException("The message should be viewable to the sender right after sending it.");
 
         var result = ErrorOrFactory.From(readDto);
         return new(true, result);

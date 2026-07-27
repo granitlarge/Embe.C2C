@@ -1,7 +1,6 @@
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Messages;
-using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Dtos.Read.Aggregates;
 
@@ -21,22 +20,33 @@ public record MessageDto
 
 public class MessageDtoMapper
 {
-    public MessageDtoMapper()
-    {
+    private readonly MessageAuthorizationService _messageAuthorizationService;
 
+    public MessageDtoMapper(MessageAuthorizationService messageAuthorizationService)
+    {
+        _messageAuthorizationService = messageAuthorizationService;
     }
 
-    public MessageDto? ToDto
+    public async Task<ReadDto<MessageDto, MessagePermission>?> ToDtoAsync
     (
         Message message,
-        MessageVariant variant,
-        ReadDto<MessageDto, MessagePermission>? replyToMessageDto = null
+        CancellationToken cancellationToken
     )
     {
-        if (variant == MessageVariant.Empty)
-            return null;
 
-        return new MessageDto
+        var (permissions, variant) = await _messageAuthorizationService.GetAsync(message, cancellationToken);
+        if (!permissions.Contains(MessagePermission.View))
+        {
+            return null;
+        }
+
+        var replyDto = message.ReplyToMessage != null ? await ToDtoAsync(message.ReplyToMessage, cancellationToken) : null;
+        if (variant == MessageVariant.Empty)
+        {
+            return null;
+        }
+
+        var dto = new MessageDto
         (
             message.Id,
             message.MatchingId,
@@ -47,7 +57,10 @@ public class MessageDtoMapper
             variant.IncludeSeenAt ? message.SeenAt : null,
             variant.IncludeCreatedAt ? message.CreatedAt : null,
             variant.IncludeEditedAt ? message.EditedAt : null,
-            variant.IncludeReplyToMessage ? replyToMessageDto : null
+            variant.IncludeReplyToMessage ? replyDto : null
         );
+
+        return new ReadDto<MessageDto, MessagePermission>(dto, permissions);
+
     }
 }

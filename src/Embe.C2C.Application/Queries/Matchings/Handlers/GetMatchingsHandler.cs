@@ -58,22 +58,7 @@ public class GetMatchingsHandler
         var dtos = new List<ReadDto<MatchingDto, MatchingPermission>>();
         foreach (var matching in matchings)
         {
-            var readDto = await matching.ToDtoAsync
-            (
-                queryingUser,
-                matching.User1,
-                matching.User2,
-                _matchingAuthorizationService,
-                _matchingDtoMapper,
-                _userAuthorizationService,
-                _userDtoMapper,
-                _messageAuthorizationService,
-                _messageDtoMapper,
-                _searchProfileAuthorizationService,
-                _searchProfileDtoMapper,
-                cancellationToken
-            );
-
+            var readDto = await _matchingDtoMapper.ToDtoAsync(matching, queryingUser, cancellationToken);
             if (readDto is not null)
             {
                 dtos.Add(readDto);

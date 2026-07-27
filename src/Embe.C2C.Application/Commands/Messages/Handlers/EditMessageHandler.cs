@@ -6,7 +6,6 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
@@ -77,7 +76,7 @@ public class EditMessageHandler : CommandHandler<EditMessageCommand, ErrorOr<Rea
 
         _matchingService.EditMessage(user, message, messageContent.Value);
 
-        var readDto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
+        var readDto = await _messageDtoMapper.ToDtoAsync(message, cancellationToken);
         if (readDto == null)
         {
             return new(false, ApplicationErrors.Forbidden.ToForbiddenErrorOr());

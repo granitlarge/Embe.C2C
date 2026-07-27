@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Errors.Aggregates;
@@ -26,17 +27,22 @@ public record SearchProfileDto
 
 public class SearchProfileDtoMapper
 {
-    public SearchProfileDtoMapper()
-    {
 
+    private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
+
+    public SearchProfileDtoMapper(SearchProfileAuthorizationService searchProfileAuthorizationService)
+    {
+        _searchProfileAuthorizationService = searchProfileAuthorizationService;
     }
 
-    public SearchProfileDto? ToDto(SearchProfile searchProfile, SearchProfileVariant variant)
+    public async Task<ReadDto<SearchProfileDto, SearchProfilePermission>?> ToDtoAsync(SearchProfile searchProfile, CancellationToken cancellationToken)
     {
+        var (permissions, variant) = await _searchProfileAuthorizationService.GetAsync(searchProfile, cancellationToken);
+
         if (variant == SearchProfileVariant.Empty)
             return null;
 
-        return new SearchProfileDto
+        var dto = new SearchProfileDto
         (
             searchProfile.Id,
             searchProfile.UserId,
@@ -52,5 +58,8 @@ public class SearchProfileDtoMapper
             variant.IncludeCreatedAt ? searchProfile.CreatedAt : null,
             variant.IncludeUpdatedAt ? searchProfile.UpdatedAt : null
         );
+
+        return new ReadDto<SearchProfileDto, SearchProfilePermission>(dto, permissions);
     }
+
 }

@@ -38,7 +38,7 @@ public class GetMessageByIdHandler
             return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
-        var dto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
+        var dto = await _messageDtoMapper.ToDtoAsync(message, cancellationToken);
         if (dto is null)
         {
             return ApplicationErrors.NotFound.ToNotFoundErrorOr();

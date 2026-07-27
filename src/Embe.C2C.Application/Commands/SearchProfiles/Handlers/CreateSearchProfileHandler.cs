@@ -25,7 +25,6 @@ public class CreateSearchProfileHandler
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
-    SearchProfileAuthorizationService searchProfileAuthorizationService,
     SearchProfileDtoMapper searchProfileDtoMapper,
     SearchProfileService searchProfileService
 
@@ -40,7 +39,6 @@ public class CreateSearchProfileHandler
     private readonly ISearchProfileRepository _searchProfileRepository = searchProfileRepository;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
-    private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
     private readonly SearchProfileService _searchProfileService = searchProfileService;
 
@@ -110,7 +108,7 @@ public class CreateSearchProfileHandler
         _searchProfileRepository.Set.Add(searchProfile.Value);
         await _searchProfileRepository.SaveChangesAsync(cancellationToken);
 
-        var dto = await searchProfile.Value.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
+        var dto = await _searchProfileDtoMapper.ToDtoAsync(searchProfile.Value, cancellationToken);
         if (dto is null)
         {
             return new CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>

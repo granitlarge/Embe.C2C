@@ -1,6 +1,7 @@
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Candidates;
+using Embe.C2C.Domain.Aggregates.Users;
 
 namespace Embe.C2C.Application.Dtos.Read.Aggregates;
 
@@ -22,26 +23,40 @@ public record CandidateDto
 
 public class CandidateDtoMapper
 {
-    public CandidateDtoMapper()
-    {
+    private readonly UserDtoMapper _userDtoMapper;
+    private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
+    private readonly CandidateAuthorizationService _candidateAuthorizationService;
 
-    }
-
-    public CandidateDto? ToDto
+    public CandidateDtoMapper
     (
-        Candidate candidate,
-        CandidateVariant variant,
-        ReadDto<UserDto, UserPermission>? userDto,
-        ReadDto<UserDto, UserPermission>? candidateDto,
-        ReadDto<SearchProfileDto, SearchProfilePermission>? userSearchProfileDto,
-        ReadDto<SearchProfileDto, SearchProfilePermission>? candidateSearchProfileDto
+        UserDtoMapper userDtoMapper,
+        SearchProfileDtoMapper searchProfileDtoMapper,
+        CandidateAuthorizationService candidateAuthorizationService
     )
     {
+        _userDtoMapper = userDtoMapper;
+        _searchProfileDtoMapper = searchProfileDtoMapper;
+        _candidateAuthorizationService = candidateAuthorizationService;
+    }
+
+    public async Task<ReadDto<CandidateDto, CandidatePermission>?> ToDtoAsync
+    (
+        Candidate candidate,
+        User? queryingUser,
+        CancellationToken cancellationToken
+    )
+    {
+        var candidateCandidateDto = candidate.CandidateUser != null ? await _userDtoMapper.ToDtoAsync(candidate.CandidateUser, queryingUser, cancellationToken) : null;
+        var candidateUserDto = candidate.User != null ? await _userDtoMapper.ToDtoAsync(candidate.User, queryingUser, cancellationToken) : null;
+        var userSearchProfileDto = candidate.UserSearchProfile != null ? await _searchProfileDtoMapper.ToDtoAsync(candidate.UserSearchProfile, cancellationToken) : null;
+        var candidateSearchProfileDto = candidate.CandidateSearchProfile != null ? await _searchProfileDtoMapper.ToDtoAsync(candidate.CandidateSearchProfile, cancellationToken) : null;
+
+        var (permissions, variant) = _candidateAuthorizationService.Get(candidate);
 
         if (variant == CandidateVariant.Empty)
             return null;
 
-        return new CandidateDto
+        var dto = new CandidateDto
         (
             candidate.Id,
             candidate.UserId,
@@ -51,11 +66,14 @@ public class CandidateDtoMapper
             variant.IncludeCreatedAt ? candidate.CreatedAt : null,
             variant.IncludeUpdatedAt ? candidate.UpdatedAt : null,
             variant.IncludeJudgement ? candidate.Judgement : null,
-            userDto,
-            candidateDto,
+            candidateUserDto,
+            candidateCandidateDto,
             userSearchProfileDto,
             candidateSearchProfileDto
         );
+
+        var readDto = new ReadDto<CandidateDto, CandidatePermission>(dto, permissions);
+        return readDto;
 
     }
 }

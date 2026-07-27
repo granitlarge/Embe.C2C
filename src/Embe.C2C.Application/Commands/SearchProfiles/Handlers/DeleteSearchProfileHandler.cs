@@ -15,7 +15,6 @@ public class DeleteSearchProfileHandler
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
-    IAuthenticatedUserService authenticatedUserService,
     SearchProfileAuthorizationService searchProfileAuthorizationService
 ) : CommandHandler<DeleteSearchProfileCommand, ErrorOr<Success>>
     (
@@ -26,7 +25,6 @@ public class DeleteSearchProfileHandler
     )
 {
     private readonly ISearchProfileRepository _searchProfileRepository = searchProfileRepository;
-    private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
 
     protected async override Task<CommandResult<ErrorOr<Success>>> InternalHandleAsync(DeleteSearchProfileCommand command, CancellationToken cancellationToken = default)

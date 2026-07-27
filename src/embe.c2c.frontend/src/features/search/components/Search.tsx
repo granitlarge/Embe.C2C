@@ -74,6 +74,8 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
         }
     }
 
+    console.log("CANDIDATES:", candidates);
+
     return (
         <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
             <Header hasSearchProfiles={hasSearchProfiles} />
@@ -83,7 +85,7 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
                     {
                         candidates[0] &&
                         <JudgeOverlay className={`${classNames} flex flex-col`} onJudge={judgeCallback}>
-                            <Profile className="grow-1" userSearchProfile={searchProfiles.find(sp => sp.data.id === candidates[0].data.userSearchProfileId)?.data} candidate={candidates[0].data.user?.data!} candidateSearchProfile={candidates[0].data.candidateSearchProfile.data} />
+                            <Profile className="grow-1" userSearchProfile={searchProfiles.find(sp => sp.data.id === candidates[0].data.userSearchProfileId)?.data} candidate={candidates[0].data.candidate?.data!} candidateSearchProfile={candidates[0].data.candidateSearchProfile.data} />
                         </JudgeOverlay>
                     } {
                         !candidates[0] &&

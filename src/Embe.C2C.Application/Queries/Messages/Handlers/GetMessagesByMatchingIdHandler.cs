@@ -32,9 +32,11 @@ public class GetMessagesByMatchingIdHandler
         var dtos = new List<ReadDto<MessageDto, MessagePermission>>();
         foreach (var message in messages)
         {
-            var readDto = await message.ToDtoAsync(_messageAuthorizationService, _messageDtoMapper, cancellationToken);
+            var readDto = await _messageDtoMapper.ToDtoAsync(message, cancellationToken);
             if (readDto != null)
+            {
                 dtos.Add(readDto);
+            }
         }
 
         return dtos;

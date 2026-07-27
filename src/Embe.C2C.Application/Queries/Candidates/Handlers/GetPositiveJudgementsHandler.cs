@@ -63,18 +63,7 @@ public class GetPositiveJudgementsHandler : TransactionalQueryHandler
         var dtos = new List<ReadDto<CandidateDto, CandidatePermission>>();
         foreach (var candidate in candidates)
         {
-            var dto = await candidate.ToDtoAsync
-            (
-                queryingUser,
-                _userAuthorizationService,
-                _userDtoMapper,
-                _searchProfileAuthorizationService,
-                _searchProfileDtoMapper,
-                _candidateAuthorizationService,
-                _candidateDtoMapper,
-                cancellationToken
-            );
-
+            var dto = await _candidateDtoMapper.ToDtoAsync(candidate, queryingUser, cancellationToken);
             if (dto is not null)
             {
                 dtos.Add(dto);

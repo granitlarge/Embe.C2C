@@ -5,7 +5,6 @@ using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using ErrorOr;
@@ -14,20 +13,13 @@ namespace Embe.C2C.Application.Commands.Candidates.Handlers;
 
 public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>
 {
-    private readonly ICandidateRepository _candidateRepository;
-    private readonly IMatchingRepository _matchingRepo;
-    private readonly IUserRepository _userRepo;
-    private readonly CandidateAuthorizationService _candidateAuthorizationService;
-    private readonly UserAuthorizationService _userAuthorizationService;
-    private readonly CandidateService _judgementService;
     private readonly IAuthenticatedUserService _userService;
-    private readonly MatchingAuthorizationService _matchingAuthorizationService;
+    private readonly CandidateAuthorizationService _candidateAuthorizationService;
+    private readonly ICandidateRepository _candidateRepository;
+    private readonly IUserRepository _userRepo;
+    private readonly IMatchingRepository _matchingRepo;
+    private readonly CandidateService _judgementService;
     private readonly MatchingDtoMapper _matchingDtoMapper;
-    private readonly UserDtoMapper _userDtoMapper;
-    private readonly MessageAuthorizationService _messageAuthorizationService;
-    private readonly MessageDtoMapper _messageDtoMapper;
-    private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService;
-    private readonly SearchProfileDtoMapper _searchProfileDtoMapper;
 
     public JudgeCandidateHandler
     (
@@ -35,36 +27,22 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Error
         IMatchingRepository matchingRepo,
         IUserRepository userRepo,
         IRepository context,
-        UserAuthorizationService userAuthorizationService,
         CandidateService judgementService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IAuthenticatedUserService userService,
-        MatchingAuthorizationService matchingAuthorizationPolicy,
         DomainEventStore domainEventStore,
-        MatchingDtoMapper matchingDtoMapper,
-        UserDtoMapper userDtoMapper,
-        MessageAuthorizationService messageAuthorizationService,
-        MessageDtoMapper messageDtoMapper,
-        SearchProfileAuthorizationService searchProfileAuthorizationService,
-        SearchProfileDtoMapper searchProfileDtoMapper,
-        CandidateAuthorizationService candidateAuthorizationService
+        CandidateAuthorizationService candidateAuthorizationService,
+        MatchingDtoMapper matchingDtoMapper
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
-        _userAuthorizationService = userAuthorizationService;
-        _judgementService = judgementService;
         _userService = userService;
-        _matchingAuthorizationService = matchingAuthorizationPolicy;
-        _matchingDtoMapper = matchingDtoMapper;
-        _userDtoMapper = userDtoMapper;
-        _messageAuthorizationService = messageAuthorizationService;
-        _messageDtoMapper = messageDtoMapper;
-        _searchProfileAuthorizationService = searchProfileAuthorizationService;
-        _searchProfileDtoMapper = searchProfileDtoMapper;
         _candidateAuthorizationService = candidateAuthorizationService;
+        _candidateRepository = candidateRepository;
         _userRepo = userRepo;
         _matchingRepo = matchingRepo;
-        _candidateRepository = candidateRepository;
+        _judgementService = judgementService;
+        _matchingDtoMapper = matchingDtoMapper;
     }
 
     protected override async Task<CommandResult<ErrorOr<ReadDto<MatchingDto, MatchingPermission>?>>> InternalHandleAsync
@@ -153,22 +131,7 @@ public class JudgeCandidateHandler : CommandHandler<JudgeCandidateCommand, Error
         }
 
         var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
-        var readDto = await matching.Value.ToDtoAsync
-        (
-            queryingUser,
-            user,
-            candidateUser,
-            _matchingAuthorizationService,
-            _matchingDtoMapper,
-            _userAuthorizationService,
-            _userDtoMapper,
-            _messageAuthorizationService,
-            _messageDtoMapper,
-            _searchProfileAuthorizationService,
-            _searchProfileDtoMapper,
-            cancellationToken
-        );
-
+        var readDto = await _matchingDtoMapper.ToDtoAsync(matching.Value, queryingUser, cancellationToken);
         return new(true, readDto);
     }
 }

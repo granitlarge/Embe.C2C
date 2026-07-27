@@ -24,7 +24,6 @@ public class AddImagesHandler
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
     IWorkItemService workItemService,
-    UserAuthorizationService userAuthorizationService,
     UserDtoMapper userDtoMapper
 ) : CommandHandler<AddImagesCommand, ErrorOr<ReadDto<UserDto, UserPermission>>>
 (
@@ -39,7 +38,6 @@ public class AddImagesHandler
     private readonly IImageService _imageService = imageService;
     private readonly IContentSafetyService _contentSafetyService = contentSafetyService;
     private readonly IWorkItemService _workItemService = workItemService;
-    private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
 
     protected override async Task<CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>> InternalHandleAsync
@@ -111,8 +109,7 @@ public class AddImagesHandler
 
             }));
 
-            var dto = await user.Enrich(user).ToDtoAsync(_userAuthorizationService, _userDtoMapper, cancellationToken) ?? throw new InvalidOperationException("User can't read his own data wtf???");
-
+            var dto = await _userDtoMapper.ToDtoAsync(user, user, cancellationToken) ?? throw new InvalidOperationException("user can't read his own data wtf???");
             return new
             (
                 true,

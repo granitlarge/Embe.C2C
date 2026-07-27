@@ -4,7 +4,6 @@ using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Errors;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using ErrorOr;
 
 namespace Embe.C2C.Application.Queries.Candidates.Handlers;
@@ -41,6 +40,7 @@ public class GetCandidateByIdHandler
         CancellationToken cancellationToken = default
     )
     {
+        Console.WriteLine(nameof(GetCandidateByIdHandler));
         var permissions = await _candidateAuthorizationService.GetPermissionsAsync(query.CandidateId, cancellationToken);
         if (!permissions.Contains(CandidatePermission.View))
         {
@@ -57,18 +57,7 @@ public class GetCandidateByIdHandler
             await _userRepository.GetByIdAsync(_authenticatedUserService.UserId.Value, cancellationToken) : null;
 
 
-        var dto = await candidate.ToDtoAsync
-        (
-            queryingUser,
-            _userAuthorizationService,
-            _userDtoMapper,
-            _searchProfileAuthorizationService,
-            _searchProfileDtoMapper,
-            _candidateAuthorizationService,
-            _candidateDtoMapper,
-            cancellationToken
-        );
-
+        var dto = await _candidateDtoMapper.ToDtoAsync(candidate, queryingUser, cancellationToken);
         if (dto is null)
         {
             return ApplicationErrors.Forbidden.ToForbiddenErrorOr();

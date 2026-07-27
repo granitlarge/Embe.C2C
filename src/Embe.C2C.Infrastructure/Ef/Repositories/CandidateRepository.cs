@@ -71,6 +71,7 @@ public class CandidateRepository(C2CContext context) : ICandidateRepository
     {
         return _context
             .Candidates
+            .AsSplitQuery()
             .Where(c => c.UserId == userId)
             .Include(c => c.CandidateUser)
             .Include(c => c.CandidateSearchProfile)

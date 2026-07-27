@@ -3,6 +3,7 @@ using Azure.Storage.Blobs.Models;
 using Embe.C2C.Api.EndPoints;
 using Embe.C2C.Api.Extensions;
 using Embe.C2C.Infrastructure;
+using Embe.C2C.Infrastructure.Ef;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,7 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<C2CContext>();
+
     await context.Database.MigrateAsync();
 
     #region setup cors on azurite
@@ -51,6 +53,7 @@ if (app.Environment.IsDevelopment())
     });
 
     await blobServiceClient.SetPropertiesAsync(props.Value);
+    await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
     #endregion
 }
 

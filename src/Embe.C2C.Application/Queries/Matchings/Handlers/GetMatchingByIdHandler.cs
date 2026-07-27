@@ -73,22 +73,7 @@ public class GetMatchingByIdHandler : TransactionalQueryHandler<GetMatchingByIdQ
         }
 
         var queryingUser = await _userRepo.GetByIdAsync(_authenticatedUserService.UserId ?? throw new InvalidOperationException("user is not authenticated"), cancellationToken);
-        var readDto = await matching.ToDtoAsync
-        (
-            queryingUser,
-            matching.User1,
-            matching.User2,
-            _matchingAuthorizationService,
-            _matchingDtoMapper,
-            _userAuthorizationService,
-            _userDtoMapper,
-            _messageAuthorizationService,
-            _messageDtoMapper,
-            _searchProfileAuthorizationService,
-            _searchProfileDtoMapper,
-            cancellationToken
-        );
-
+        var readDto = await _matchingDtoMapper.ToDtoAsync(matching, queryingUser, cancellationToken);
         if (readDto == null)
         {
             return ApplicationErrors.Forbidden.ToForbiddenErrorOr();

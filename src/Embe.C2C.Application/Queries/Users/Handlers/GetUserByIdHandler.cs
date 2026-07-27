@@ -44,9 +44,7 @@ public class GetUserByIdHandler
             return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
-        var enrichedUser = user.Enrich(queryingUser);
-        var dto = await _userDtoMapper.ToDtoAsync(enrichedUser, variant, cancellationToken);
-        var readDto = new ReadDto<UserDto, UserPermission>(dto!, permissions);
+        var readDto = await _userDtoMapper.ToDtoAsync(user, queryingUser, cancellationToken);
         return readDto;
     }
 }

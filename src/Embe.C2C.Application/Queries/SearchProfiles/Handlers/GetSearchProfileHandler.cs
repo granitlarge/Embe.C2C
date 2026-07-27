@@ -38,7 +38,7 @@ public class GetSearchProfileHandler
             return ApplicationErrors.NotFound.ToNotFoundErrorOr();
         }
 
-        var dto = await searchProfile.ToDtoAsync(_searchProfileAuthorizationService, _searchProfileDtoMapper, cancellationToken);
+        var dto = await _searchProfileDtoMapper.ToDtoAsync(searchProfile, cancellationToken);
         if (dto is null)
         {
             return ApplicationErrors.Forbidden.ToForbiddenErrorOr();

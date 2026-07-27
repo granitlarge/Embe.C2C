@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Xml;
+using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
@@ -6,6 +9,7 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
+using Embe.C2C.Domain.Aggregates.Candidates;
 using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Candidates.Handlers;
@@ -15,16 +19,12 @@ public class GenerateCandidatesHandler
     ICandidateRepository candidateRepository,
     IUserRepository userRepo,
     IAuthenticatedUserService authenticatedUserService,
-    UserAuthorizationService userAuthorizationService,
     IRepository context,
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
     DomainEventStore domainEventStore,
-    UserDtoMapper userDtoMapper,
-    SearchProfileAuthorizationService searchProfileAuthorizationService,
-    SearchProfileDtoMapper searchProfileDtoMapper,
     CandidateDtoMapper candidateDtoMapper,
-    CandidateAuthorizationService candidateAuthorizationService
+    ILoggerFactory loggerFactory
 ) : CommandHandler<GenerateCandidatesCommand, ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>
 (
     domainEventStore,
@@ -36,12 +36,8 @@ public class GenerateCandidatesHandler
     private readonly ICandidateRepository _candidateRepository = candidateRepository;
     private readonly IUserRepository _userRepo = userRepo;
     private readonly CandidateDtoMapper _candidateDtoMapper = candidateDtoMapper;
-    private readonly CandidateAuthorizationService _candidateAuthorizationService = candidateAuthorizationService;
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
-    private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;
-    private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
-    private readonly SearchProfileAuthorizationService _searchProfileAuthorizationService = searchProfileAuthorizationService;
-    private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
+    private readonly ILogger<GenerateCandidatesHandler> _logger = loggerFactory.Create<GenerateCandidatesHandler>();
 
     protected override async Task<CommandResult<ErrorOr<List<ReadDto<CandidateDto, CandidatePermission>>>>> InternalHandleAsync
     (
@@ -49,6 +45,7 @@ public class GenerateCandidatesHandler
         CancellationToken cancellationToken = default
     )
     {
+        Console.WriteLine(nameof(GenerateCandidatesHandler));
         var userId = _authenticatedUserService.UserId ?? throw new InvalidOperationException("User is not authenticated.");
         var queryingUser = await _userRepo.GetByIdAsync(userId, cancellationToken);
         var userHasCandidates = await _candidateRepository.GenerateCandidatesForUserIdAsync(userId, cancellationToken);
@@ -58,6 +55,7 @@ public class GenerateCandidatesHandler
         }
 
         var candidates = await _candidateRepository.GetByUserIdAsync(userId, cancellationToken);
+
         var dtos = new List<ReadDto<CandidateDto, CandidatePermission>>();
         foreach (var candidate in candidates)
         {
@@ -79,20 +77,13 @@ public class GenerateCandidatesHandler
 
             dtos.Add(new GeneratedCandidate(candidate.Id, userDto, candidate.UserSearchProfileId, candidateSearchProfileDto));
             */
-            var candidateDto = await candidate.ToDtoAsync
-            (
-                queryingUser,
-                _userAuthorizationService,
-                _userDtoMapper,
-                _searchProfileAuthorizationService,
-                _searchProfileDtoMapper,
-                _candidateAuthorizationService,
-                _candidateDtoMapper,
-                cancellationToken
-            );
-
+            await _logger.TraceAsync("CANDIDATE.USER IS NULL:" + (candidate.User is null));
+            await _logger.TraceAsync("CANDIDATE.CandidateUser IS NULL:" + (candidate.CandidateUser is null));
+            var candidateDto = await _candidateDtoMapper.ToDtoAsync(candidate, queryingUser, cancellationToken);
             if (candidateDto != null)
+            {
                 dtos.Add(candidateDto);
+            }
         }
 
         return new(true, dtos);
