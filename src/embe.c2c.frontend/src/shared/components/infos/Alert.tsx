@@ -12,7 +12,7 @@ export default function Alert({ children }: AlertProps) {
 
     return (
         <span>
-            <Button className="max-w-max max-h-max flex justify-center items-center" onClick={() => setOpen(prev => !prev)}>
+            <Button className="max-w-max max-h-max flex justify-center items-center p-0" onClick={() => setOpen(prev => !prev)}>
                 <AlertTriangle className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc) text-(--warning-fc)" />
             </Button>
             {

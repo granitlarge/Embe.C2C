@@ -251,7 +251,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
 
             <Surface className="flex flex-col gap-2 grow-1 overflow-y-scroll scrollbar-none" variant="secondary" padding="sm">
                 <InfoSurface show={true} >
-                    <p>A search-profile is a set of criteria that define the type of relationship you're looking for.</p>
+                    <p>A search-profile is a set of criteria that define the kind of relationship & person you're looking for.</p>
                 </InfoSurface>
                 <DropDownInput
                     optionClassName="lowercase"
