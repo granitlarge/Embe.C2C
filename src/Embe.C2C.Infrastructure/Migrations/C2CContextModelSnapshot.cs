@@ -286,7 +286,6 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<bool>("Active")

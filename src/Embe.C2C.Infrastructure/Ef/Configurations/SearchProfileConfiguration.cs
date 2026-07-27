@@ -1,6 +1,5 @@
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
 using Embe.C2C.Domain.Entities.SearchProfiles;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +12,8 @@ public class SearchProfileConfiguration : AggregateConfiguration<SearchProfile>
     public override void Configure(EntityTypeBuilder<SearchProfile> builder)
     {
         builder.HasKey(sp => sp.Id);
+        builder.Property(sp => sp.Id).ValueGeneratedNever();
+
         builder.HasOne(sp => sp.User)
             .WithMany(u => u.SearchProfiles)
             .HasForeignKey(sp => sp.UserId)

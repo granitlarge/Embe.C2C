@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -206,7 +207,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                         name: "FK_DomainUsers_AspNetUsers_IdentityUserId",
                         column: x => x.IdentityUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -261,30 +263,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Candidates",
-                columns: table => new
-                {
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CandidateUserId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Candidates", x => new { x.UserId, x.CandidateUserId });
-                    table.ForeignKey(
-                        name: "FK_Candidates_DomainUsers_CandidateUserId",
-                        column: x => x.CandidateUserId,
-                        principalTable: "DomainUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Candidates_DomainUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "DomainUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Image",
                 columns: table => new
                 {
@@ -303,62 +281,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Image_DomainUsers_OwnerUserId",
                         column: x => x.OwnerUserId,
-                        principalTable: "DomainUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Judgements",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    JudgeUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    JudgeeUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsPositive = table.Column<bool>(type: "boolean", nullable: false),
-                    EditedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Judgements", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Judgements_DomainUsers_JudgeUserId",
-                        column: x => x.JudgeUserId,
-                        principalTable: "DomainUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Judgements_DomainUsers_JudgeeUserId",
-                        column: x => x.JudgeeUserId,
-                        principalTable: "DomainUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Matchings",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId2 = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Matchings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Matchings_DomainUsers_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "DomainUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Matchings_DomainUsers_UserId2",
-                        column: x => x.UserId2,
                         principalTable: "DomainUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -389,11 +311,15 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
+                    RelationshipType = table.Column<int>(type: "integer", nullable: false),
                     AgeRangeMin = table.Column<int>(type: "integer", nullable: true),
                     AgeRangeMax = table.Column<int>(type: "integer", nullable: true),
                     MaximumDistance = table.Column<double>(type: "double precision", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Engagement_Boundedness = table.Column<int>(type: "integer", nullable: false),
                     Engagement_EndDate = table.Column<DateOnly>(type: "date", nullable: true),
                     Engagement_Frequency = table.Column<int>(type: "integer", nullable: false),
@@ -441,39 +367,43 @@ namespace Embe.C2C.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notifications",
+                name: "Candidates",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RecipientUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ReadAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    NotificationType = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
-                    MatchingId = table.Column<Guid>(type: "uuid", nullable: true),
-                    PartnerUserId = table.Column<Guid>(type: "uuid", nullable: true),
-                    PartnerUserName = table.Column<string>(type: "text", nullable: true),
-                    PartnerProfileImageUrl = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CandidateUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserSearchProfileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CandidateSearchProfileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Judgement = table.Column<bool>(type: "boolean", nullable: true),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.PrimaryKey("PK_Candidates", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Notifications_DomainUsers_PartnerUserId",
-                        column: x => x.PartnerUserId,
+                        name: "FK_Candidates_DomainUsers_CandidateUserId",
+                        column: x => x.CandidateUserId,
                         principalTable: "DomainUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Notifications_DomainUsers_RecipientUserId",
-                        column: x => x.RecipientUserId,
+                        name: "FK_Candidates_DomainUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "DomainUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Notifications_Matchings_MatchingId",
-                        column: x => x.MatchingId,
-                        principalTable: "Matchings",
+                        name: "FK_Candidates_SearchProfiles_CandidateSearchProfileId",
+                        column: x => x.CandidateSearchProfileId,
+                        principalTable: "SearchProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Candidates_SearchProfiles_UserSearchProfileId",
+                        column: x => x.UserSearchProfileId,
+                        principalTable: "SearchProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -499,27 +429,45 @@ namespace Embe.C2C.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Conversation",
+                name: "Matchings",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    MatchingId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId1 = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId2 = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId1SearchProfileId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId2SearchProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     LastMessageId = table.Column<Guid>(type: "uuid", nullable: true),
-                    MessageCount = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Conversation", x => x.Id);
+                    table.PrimaryKey("PK_Matchings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Conversation_Matchings_MatchingId",
-                        column: x => x.MatchingId,
-                        principalTable: "Matchings",
+                        name: "FK_Matchings_DomainUsers_UserId1",
+                        column: x => x.UserId1,
+                        principalTable: "DomainUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Matchings_DomainUsers_UserId2",
+                        column: x => x.UserId2,
+                        principalTable: "DomainUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Matchings_SearchProfiles_UserId1SearchProfileId",
+                        column: x => x.UserId1SearchProfileId,
+                        principalTable: "SearchProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Matchings_SearchProfiles_UserId2SearchProfileId",
+                        column: x => x.UserId2SearchProfileId,
+                        principalTable: "SearchProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -527,7 +475,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ConversationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MatchingId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReplyToMessageId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsReply = table.Column<bool>(type: "boolean", nullable: false),
                     AuthorUserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -541,20 +489,64 @@ namespace Embe.C2C.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Messages_Conversation_ConversationId",
-                        column: x => x.ConversationId,
-                        principalTable: "Conversation",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Messages_DomainUsers_AuthorUserId",
                         column: x => x.AuthorUserId,
                         principalTable: "DomainUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Messages_Matchings_MatchingId",
+                        column: x => x.MatchingId,
+                        principalTable: "Matchings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Messages_Messages_ReplyToMessageId",
                         column: x => x.ReplyToMessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RecipientUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReadAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    NotificationType = table.Column<string>(type: "character varying(34)", maxLength: 34, nullable: false),
+                    CandidateId = table.Column<Guid>(type: "uuid", nullable: true),
+                    MatchingId = table.Column<Guid>(type: "uuid", nullable: true),
+                    PartnerUserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    MessageId = table.Column<Guid>(type: "uuid", nullable: true),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_DomainUsers_PartnerUserId",
+                        column: x => x.PartnerUserId,
+                        principalTable: "DomainUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notifications_DomainUsers_RecipientUserId",
+                        column: x => x.RecipientUserId,
+                        principalTable: "DomainUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Matchings_MatchingId",
+                        column: x => x.MatchingId,
+                        principalTable: "Matchings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Messages_MessageId",
+                        column: x => x.MessageId,
                         principalTable: "Messages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -609,6 +601,12 @@ namespace Embe.C2C.Infrastructure.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Email",
+                table: "AspNetUsers",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -625,21 +623,25 @@ namespace Embe.C2C.Infrastructure.Migrations
                 column: "BlockerUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Candidates_CandidateSearchProfileId",
+                table: "Candidates",
+                column: "CandidateSearchProfileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Candidates_CandidateUserId",
                 table: "Candidates",
                 column: "CandidateUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Conversation_LastMessageId",
-                table: "Conversation",
-                column: "LastMessageId",
+                name: "IX_Candidates_UserId_CandidateUserId_UserSearchProfileId_Candi~",
+                table: "Candidates",
+                columns: new[] { "UserId", "CandidateUserId", "UserSearchProfileId", "CandidateSearchProfileId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Conversation_MatchingId",
-                table: "Conversation",
-                column: "MatchingId",
-                unique: true);
+                name: "IX_Candidates_UserSearchProfileId",
+                table: "Candidates",
+                column: "UserSearchProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DomainUsers_Coordinates",
@@ -660,19 +662,21 @@ namespace Embe.C2C.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Image_ImageDetails_Name",
+                table: "Image",
+                column: "ImageDetails_Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Image_OwnerUserId",
                 table: "Image",
                 column: "OwnerUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Judgements_JudgeeUserId",
-                table: "Judgements",
-                column: "JudgeeUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Judgements_JudgeUserId",
-                table: "Judgements",
-                column: "JudgeUserId");
+                name: "IX_Matchings_LastMessageId",
+                table: "Matchings",
+                column: "LastMessageId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Matchings_UserId1",
@@ -680,9 +684,19 @@ namespace Embe.C2C.Infrastructure.Migrations
                 column: "UserId1");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Matchings_UserId1SearchProfileId",
+                table: "Matchings",
+                column: "UserId1SearchProfileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Matchings_UserId2",
                 table: "Matchings",
                 column: "UserId2");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Matchings_UserId2SearchProfileId",
+                table: "Matchings",
+                column: "UserId2SearchProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_AuthorUserId",
@@ -690,9 +704,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                 column: "AuthorUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_ConversationId",
+                name: "IX_Messages_MatchingId",
                 table: "Messages",
-                column: "ConversationId");
+                column: "MatchingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ReplyToMessageId",
@@ -703,6 +717,11 @@ namespace Embe.C2C.Infrastructure.Migrations
                 name: "IX_Notifications_MatchingId",
                 table: "Notifications",
                 column: "MatchingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_MessageId",
+                table: "Notifications",
+                column: "MessageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_PartnerUserId",
@@ -740,11 +759,12 @@ namespace Embe.C2C.Infrastructure.Migrations
                 column: "AccountId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Conversation_Messages_LastMessageId",
-                table: "Conversation",
+                name: "FK_Matchings_Messages_LastMessageId",
+                table: "Matchings",
                 column: "LastMessageId",
                 principalTable: "Messages",
-                principalColumn: "Id");
+                principalColumn: "Id",
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />
@@ -763,12 +783,20 @@ namespace Embe.C2C.Infrastructure.Migrations
                 table: "Messages");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Conversation_Matchings_MatchingId",
-                table: "Conversation");
+                name: "FK_SearchProfiles_DomainUsers_UserId",
+                table: "SearchProfiles");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Conversation_Messages_LastMessageId",
-                table: "Conversation");
+                name: "FK_Matchings_SearchProfiles_UserId1SearchProfileId",
+                table: "Matchings");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Matchings_SearchProfiles_UserId2SearchProfileId",
+                table: "Matchings");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Matchings_Messages_LastMessageId",
+                table: "Matchings");
 
             migrationBuilder.DropTable(
                 name: "AdminAreas");
@@ -798,9 +826,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                 name: "Image");
 
             migrationBuilder.DropTable(
-                name: "Judgements");
-
-            migrationBuilder.DropTable(
                 name: "Notifications");
 
             migrationBuilder.DropTable(
@@ -816,9 +841,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "SearchProfiles");
-
-            migrationBuilder.DropTable(
                 name: "Accounts");
 
             migrationBuilder.DropTable(
@@ -828,13 +850,13 @@ namespace Embe.C2C.Infrastructure.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Matchings");
+                name: "SearchProfiles");
 
             migrationBuilder.DropTable(
                 name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "Conversation");
+                name: "Matchings");
         }
     }
 }

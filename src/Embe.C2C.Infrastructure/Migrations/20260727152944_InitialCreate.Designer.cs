@@ -14,15 +14,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    [Migration("20260710230332_SearchProfileActive")]
-    partial class SearchProfileActive
+    [Migration("20260727152944_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
@@ -121,11 +121,17 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Guid>("CandidateUserId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool?>("Judgement")
+                        .HasColumnType("boolean");
+
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -147,38 +153,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("Candidates");
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Judgements.Judgement", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CandidateId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("EditedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsPositive")
-                        .HasColumnType("boolean");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CandidateId")
-                        .IsUnique();
-
-                    b.ToTable("Judgements");
-                });
-
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Matchings.Matching", b =>
                 {
                     b.Property<Guid>("Id")
@@ -187,6 +161,9 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("LastMessageId")
+                        .HasColumnType("uuid");
 
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
@@ -207,6 +184,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LastMessageId")
+                        .IsUnique();
 
                     b.HasIndex("UserId1");
 
@@ -232,9 +212,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ConversationId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -243,6 +220,9 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Property<bool>("IsReply")
                         .HasColumnType("boolean");
+
+                    b.Property<Guid>("MatchingId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("ReplyToMessageId")
                         .HasColumnType("uuid");
@@ -260,7 +240,7 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.HasIndex("AuthorUserId");
 
-                    b.HasIndex("ConversationId");
+                    b.HasIndex("MatchingId");
 
                     b.HasIndex("ReplyToMessageId");
 
@@ -278,8 +258,8 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                     b.Property<string>("NotificationType")
                         .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("character varying(21)");
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)");
 
                     b.Property<DateTimeOffset?>("ReadAt")
                         .HasColumnType("timestamp with time zone");
@@ -309,7 +289,6 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<bool>("Active")
@@ -496,47 +475,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("DomainUsers");
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Entities.Conversation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("LastMessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("MatchingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("MessageCount")
-                        .HasColumnType("bigint");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId1")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId2")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LastMessageId")
-                        .IsUnique();
-
-                    b.HasIndex("MatchingId")
-                        .IsUnique();
-
-                    b.ToTable("Conversation");
-                });
-
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.AdminArea", b =>
                 {
                     b.Property<string>("Id")
@@ -649,6 +587,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -792,6 +733,16 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Candidates.PositivelyJudgedNotification", b =>
+                {
+                    b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Notification");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uuid");
+
+                    b.HasDiscriminator().HasValue("PositivelyJudgedNotification");
+                });
+
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification", b =>
                 {
                     b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Notification");
@@ -799,15 +750,8 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Guid>("MatchingId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("PartnerProfileImageUrl")
-                        .HasColumnType("text");
-
                     b.Property<Guid>("PartnerUserId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("PartnerUserName")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasIndex("MatchingId");
 
@@ -816,18 +760,30 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue("MatchingNotification");
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingCreated", b =>
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Messages.MessageNotification", b =>
+                {
+                    b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Notification");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("MessageId");
+
+                    b.HasDiscriminator().HasValue("MessageNotification");
+                });
+
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingCreatedNotification", b =>
                 {
                     b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification");
 
                     b.HasDiscriminator().HasValue("MatchingCreated");
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingRemoved", b =>
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Messages.MessageCreatedNotification", b =>
                 {
-                    b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Matchings.MatchingNotification");
+                    b.HasBaseType("Embe.C2C.Domain.Aggregates.Notifications.Messages.MessageNotification");
 
-                    b.HasDiscriminator().HasValue("MatchingRemoved");
+                    b.HasDiscriminator().HasValue("MessageCreatedNotification");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Accounts.Account", b =>
@@ -889,19 +845,13 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Navigation("UserSearchProfile");
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Judgements.Judgement", b =>
-                {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Candidates.Candidate", "Candidate")
-                        .WithOne("Judgement")
-                        .HasForeignKey("Embe.C2C.Domain.Aggregates.Judgements.Judgement", "CandidateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Candidate");
-                });
-
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Matchings.Matching", b =>
                 {
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Messages.Message", "LastMessage")
+                        .WithOne()
+                        .HasForeignKey("Embe.C2C.Domain.Aggregates.Matchings.Matching", "LastMessageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "User1")
                         .WithMany("Matchings1")
                         .HasForeignKey("UserId1")
@@ -911,7 +861,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "User1SearchProfile")
                         .WithMany("MatchingsUserId1")
                         .HasForeignKey("UserId1SearchProfileId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", "User2")
                         .WithMany("Matchings2")
@@ -922,7 +872,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", "User2SearchProfile")
                         .WithMany("MatchingsUserId2")
                         .HasForeignKey("UserId2SearchProfileId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("LastMessage");
 
                     b.Navigation("User1");
 
@@ -941,9 +893,9 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Embe.C2C.Domain.Entities.Conversation", "Conversation")
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Matchings.Matching", "Matching")
                         .WithMany("Messages")
-                        .HasForeignKey("ConversationId")
+                        .HasForeignKey("MatchingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -952,7 +904,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .HasForeignKey("ReplyToMessageId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("Conversation");
+                    b.Navigation("Matching");
 
                     b.Navigation("ReplyToMessage");
                 });
@@ -977,7 +929,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.OwnsMany("Embe.C2C.Domain.Entities.SearchProfiles.SearchProfileGender", "_genders", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
                             b1.Property<int>("Gender")
@@ -1021,7 +972,7 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.HasOne("Embe.C2C.Infrastructure.Identity.MyIdentityUser", null)
                         .WithOne()
                         .HasForeignKey("Embe.C2C.Domain.Aggregates.Users.User", "IdentityUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.OwnsMany("Embe.C2C.Domain.Entities.Image", "_images", b1 =>
@@ -1071,6 +1022,9 @@ namespace Embe.C2C.Infrastructure.Migrations
 
                                     b2.HasKey("ImageId");
 
+                                    b2.HasIndex("Name")
+                                        .IsUnique();
+
                                     b2.ToTable("Image");
 
                                     b2.WithOwner()
@@ -1082,23 +1036,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                         });
 
                     b.Navigation("_images");
-                });
-
-            modelBuilder.Entity("Embe.C2C.Domain.Entities.Conversation", b =>
-                {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Messages.Message", "LastMessage")
-                        .WithOne()
-                        .HasForeignKey("Embe.C2C.Domain.Entities.Conversation", "LastMessageId");
-
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Matchings.Matching", "Matching")
-                        .WithOne("Conversation")
-                        .HasForeignKey("Embe.C2C.Domain.Entities.Conversation", "MatchingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LastMessage");
-
-                    b.Navigation("Matching");
                 });
 
             modelBuilder.Entity("Embe.C2C.Infrastructure.Ef.Entities.AdminArea", b =>
@@ -1184,15 +1121,18 @@ namespace Embe.C2C.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Candidates.Candidate", b =>
+            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Messages.MessageNotification", b =>
                 {
-                    b.Navigation("Judgement");
+                    b.HasOne("Embe.C2C.Domain.Aggregates.Messages.Message", null)
+                        .WithMany()
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Matchings.Matching", b =>
                 {
-                    b.Navigation("Conversation")
-                        .IsRequired();
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("Embe.C2C.Domain.Aggregates.SearchProfiles.SearchProfile", b =>
@@ -1217,11 +1157,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Navigation("Matchings2");
 
                     b.Navigation("SearchProfiles");
-                });
-
-            modelBuilder.Entity("Embe.C2C.Domain.Entities.Conversation", b =>
-                {
-                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }
