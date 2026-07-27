@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Embe.C2C.Application.Dtos.Read.Variants.Aggregates;
 using Embe.C2C.Domain.Aggregates.Notifications;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
@@ -11,6 +12,9 @@ public enum NotificationType
     MessageCreated = 1,
 }
 
+[JsonPolymorphic]
+[JsonDerivedType(typeof(MatchingCreatedNotificationDto))]
+[JsonDerivedType(typeof(MessageCreatedNotificationDto))]
 public abstract record NotificationDto
 (
     NotificationType Type,

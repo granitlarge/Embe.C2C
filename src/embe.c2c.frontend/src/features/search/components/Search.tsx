@@ -63,7 +63,6 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
     async function judge(isPositive: boolean) {
         const response = await api.judge(candidates[0].data.id, isPositive);
         if (!response.success) {
-            console.log(response);
             throw new Error("Not implemented");
         } else {
             router.refresh();

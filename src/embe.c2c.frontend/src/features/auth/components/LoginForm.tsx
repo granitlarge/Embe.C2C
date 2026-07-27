@@ -47,7 +47,6 @@ export default function LoginForm({ className }: LoginFormProps) {
             const error = await signIn(userName!, password!);
             if (error?.[0] !== undefined) {
 
-                console.log(error);
                 setError(getErrorMessage(error[0]))
 
             } else {

@@ -7,9 +7,11 @@ import { useApplicationStore } from "../stores/provider";
 import { Guid } from "../cache";
 import { ReadDto } from "../types/dtos/types";
 import { Matching, MatchingCreatedNotification, MatchingPermission, NotificationType, User, UserPermission } from "../types/domain/aggregates";
-import { getMatching } from "@/src/features/matches/actions/action";
+import { getMatching, getMessage } from "@/src/features/matches/actions/action";
 import { Notification } from "../types/domain/aggregates";
 import { getNotification } from "../actions/notifications/action";
+import { useRouter } from "nextjs-toploader/app";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export interface SignalRProviderProps {
     children: ReactNode;
@@ -20,6 +22,7 @@ export const SignalRProvider = ({
     children
 }: SignalRProviderProps) => {
 
+    const router = useRouter();
 
     const user = useApplicationStore(s => s.user);
     const setUser = useApplicationStore(s => s.setUser);
@@ -28,6 +31,7 @@ export const SignalRProvider = ({
     const matchings = useApplicationStore(s => s.matchings);
     const setMatchings = useApplicationStore(s => s.setMatchings);
 
+    const routerRef = useRef(router);
     const userRef = useRef(user);
     const setUserRef = useRef(setUser);
     const notificationsRef = useRef(notifications);
@@ -36,6 +40,10 @@ export const SignalRProvider = ({
     const setMatchingsRef = useRef(setMatchings);
 
     const [connection, setConnection] = useState<HubConnection | undefined>(undefined);
+
+    useEffect(() => {
+        routerRef.current = router;
+    }, [router]);
 
     useEffect(() => {
         userRef.current = user;
@@ -71,16 +79,18 @@ export const SignalRProvider = ({
     }, []);
 
     useEffect(() => {
-        const removeUserHandlers = addUserHandlers(connection, userRef, setUserRef);
+        const removeUserHandlers = addUserHandlers(connection, routerRef, userRef, setUserRef);
         const removeMatchingHandlers = addMatchingHandlers(
             connection,
+            routerRef,
             notificationsRef,
             setNotificationsRef,
             matchingsRef,
             setMatchingsRef
-        )
+        );
         const removeNotificationHandlers = addNotificationHandlers(
             connection,
+            routerRef,
             notificationsRef,
             setNotificationsRef,
         );
@@ -122,6 +132,7 @@ function createConnection(): HubConnection {
 
 function addUserHandlers(
     connection: HubConnection | undefined,
+    routerRef: RefObject<AppRouterInstance>,
     userRef: RefObject<ReadDto<User, UserPermission> | undefined>,
     setUserRef: RefObject<(newUser: ReadDto<User, UserPermission> | undefined) => void>
 ): () => void {
@@ -134,6 +145,7 @@ function addUserHandlers(
 
 function addMatchingHandlers(
     connection: HubConnection | undefined,
+    routerRef: RefObject<AppRouterInstance>,
     notificationsRef: RefObject<ReadDto<Notification, NotificationPermission>[]>,
     setNotificationsRef: RefObject<(newNotifications: ReadDto<Notification, NotificationPermission>[]) => void>,
     matchingsRef: RefObject<ReadDto<Matching, MatchingPermission>[]>,
@@ -149,6 +161,7 @@ function addMatchingHandlers(
         const setMatchings = setMatchingsRef.current;
 
         setMatchings(matchings.concat(getMatchingResponse.value!));
+        routerRef.current.refresh();
     }
 
     const onMatchingRemoved = (matchingId: Guid) => {
@@ -164,20 +177,194 @@ function addMatchingHandlers(
         ));
     }
 
+    const onMessageAddedHandler = async (messageId: Guid, matchingId: Guid) => {
+
+        console.log("SignalR.MessageAdded");
+        const matchings = matchingsRef.current;
+        const setMatchings = setMatchingsRef.current;
+
+        if (!matchings.some(m => m.data.id === matchingId))
+            return;
+
+        const getMessageResponse = await getMessage(messageId);
+        if (!getMessageResponse.success || !getMessageResponse.value) {
+            throw new Error("Not Implemented");
+        }
+
+        const newMessage = getMessageResponse.value;
+        setMatchings(matchings.map(m => {
+            if (m.data.id !== matchingId) {
+                return m;
+            }
+            return {
+                ...m,
+                data: {
+                    ...m.data,
+                    lastMessage: newMessage,
+                    messages: (m.data.messages ?? []).concat(newMessage),
+                }
+            }
+        }))
+
+        routerRef.current.refresh();
+
+    };
+
+    const onMessageEditedHandler = async (messageId: Guid, matchingId: Guid) => {
+
+        console.log("SignalR.MessageEdited");
+        const matchings = matchingsRef.current;
+        const setMatchings = setMatchingsRef.current;
+
+        if (!matchings.some(m => m.data.id === matchingId))
+            return;
+
+        const getMessageResponse = await getMessage(messageId);
+        if (!getMessageResponse.success || !getMessageResponse.value) {
+            throw new Error("Not Implemented");
+        }
+
+        const editedMessage = getMessageResponse.value;
+
+        setMatchings(matchings.map(m => {
+            if (m.data.id !== matchingId)
+                return m;
+            return {
+                ...m,
+                data: {
+                    ...m.data,
+                    messages: (m.data.messages ?? []).map(mes => {
+                        if (mes.data.id !== messageId)
+                            return mes;
+                        return editedMessage;
+                    })
+                }
+            }
+        }))
+
+        routerRef.current.refresh();
+
+    };
+
+    const onMessageDeletedHandler = (messageId: Guid, matchingId: Guid) => {
+        console.log("SignalR.MessageDeleted");
+        const matchings = matchingsRef.current;
+        const setMatchings = setMatchingsRef.current;
+
+        if (!matchings.some(m => m.data.id === matchingId))
+            return;
+
+        setMatchings(matchings.map(m => {
+            if (m.data.id !== matchingId)
+                return m;
+
+            return {
+                ...m,
+                data: {
+                    ...m.data,
+                    messages: (m.data.messages ?? []).filter(mes => mes.data.id !== messageId)
+                }
+            }
+        }));
+
+        routerRef.current.refresh();
+
+    };
+
+    const onMessagesSeenHandler = (messageIds: Guid[], matchingId: Guid) => {
+        console.log("SignalR.MessageSeen");
+        const matchings = matchingsRef.current;
+        const setMatchings = setMatchingsRef.current;
+
+        if (!matchings.some(m => m.data.id === matchingId))
+            return;
+
+        setMatchings(matchings.map(match => {
+            if (match.data.id !== matchingId)
+                return match;
+            return {
+                ...match,
+                data: {
+                    ...match.data,
+                    messages: (match.data.messages ?? []).map(mes => {
+                        if (!messageIds.includes(mes.data.id))
+                            return mes;
+                        return {
+                            ...mes,
+                            data: {
+                                ...mes.data,
+                                seenAt: new Date().toISOString()
+                            }
+                        };
+                    })
+                }
+            }
+        }))
+
+        routerRef.current.refresh();
+
+    };
+
+    const onMessagesUnseenHandler = (messageIds: Guid[], matchingId: Guid) => {
+        console.log("SignalR.MessageUnseen");
+        const matchings = matchingsRef.current;
+        const setMatchings = setMatchingsRef.current;
+
+        if (!matchings.some(m => m.data.id === matchingId))
+            return;
+
+        setMatchings(matchings.map(match => {
+            if (match.data.id !== matchingId)
+                return match;
+            return {
+                ...match,
+                data: {
+                    ...match.data,
+                    messages: (match.data.messages ?? []).map(mes => {
+                        if (!messageIds.includes(mes.data.id))
+                            return mes;
+                        return {
+                            ...mes,
+                            data: {
+                                ...mes.data,
+                                seenAt: undefined
+                            }
+                        };
+                    })
+                }
+            }
+        }))
+
+        routerRef.current.refresh();
+
+    }
+
     connection?.on("MatchingCreated", onMatchingCreated);
     connection?.on("MatchingRemoved", onMatchingRemoved);
+
+    connection?.on("MessageAdded", onMessageAddedHandler);
+    connection?.on("MessageEdited", onMessageEditedHandler);
+    connection?.on("MessageDeleted", onMessageDeletedHandler);
+    connection?.on("MessagesSeen", onMessagesSeenHandler);
+    connection?.on("MessagesUnseen", onMessagesUnseenHandler);
 
     return () => {
 
         connection?.off("MatchingCreated", onMatchingCreated);
         connection?.off("MatchingRemoved", onMatchingRemoved);
 
+        connection?.off("MessageAdded", onMessageAddedHandler);
+        connection?.off("MessageEdited", onMessageEditedHandler);
+        connection?.off("MessageDeleted", onMessageDeletedHandler);
+        connection?.off("MessagesSeen", onMessagesSeenHandler);
+        connection?.off("MessagesUnseen", onMessagesUnseenHandler);
     }
 
 }
 
 function addNotificationHandlers(
     connection: HubConnection | undefined,
+    routerRef: RefObject<AppRouterInstance>,
     notificationsRef: RefObject<ReadDto<Notification, NotificationPermission>[]>,
     setNotificationsRef: RefObject<(newNotifications: ReadDto<Notification, NotificationPermission>[]) => void>
 ): () => void {
@@ -195,6 +382,7 @@ function addNotificationHandlers(
         }
 
         setNotifications(notifications.concat(getNotificationResponse.value))
+        routerRef.current.refresh();
 
     };
 
@@ -206,6 +394,7 @@ function addNotificationHandlers(
         const setNotifications = setNotificationsRef.current;
 
         setNotifications(notifications.filter(n => n.data.id !== notificationId));
+        routerRef.current.refresh();
 
     };
 

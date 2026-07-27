@@ -1,9 +1,10 @@
 import { getMatching } from "@/src/features/matches/actions/action";
 import Match from "@/src/features/matches/components/Match";
-import { FailureReason } from "@/src/shared/apis/type";
+import { getNotifications } from "@/src/shared/actions/notifications/action";
 import { Guid } from "@/src/shared/cache";
+import { SignalRProvider } from "@/src/shared/providers/signal-r";
+import { ApplicationStoreProvider } from "@/src/shared/stores/provider";
 import { getAuthenticatedUser } from "@/src/shared/user";
-import { redirect } from "next/navigation";
 
 export type MatchPageProps = {
     params: Promise<{
@@ -15,18 +16,31 @@ export default async function MatchPage({ params }: MatchPageProps) {
     const { matchId } = await params;
 
     const user = await getAuthenticatedUser();
-    const response = await getMatching(matchId);
-    if (!response.success) {
+    const getNotificationsPromise = getNotifications();
+    const getMatchingsPromise = getMatching(matchId);
+    await Promise.all([getNotificationsPromise, getMatchingsPromise]);
+
+    const getNotificationsResponse = await getNotificationsPromise;
+    const getMatchingResponse = await getMatchingsPromise;
+
+    if (
+        !getNotificationsResponse.success || !getNotificationsResponse.value ||
+        !getMatchingResponse.success || !getMatchingResponse.value
+    ) {
         throw new Error("not implemented");
     }
 
-    const matchDto = response.value;
+    const matchDto = getMatchingResponse.value;
     const match = matchDto?.data;
 
     return (
-        <div className="flex flex-col h-full">
-            <Match className="grow-1 overflow-scroll scrollbar-none" match={response.value!} user={user!} />
-        </div>
+        <ApplicationStoreProvider matchings={[getMatchingResponse.value]} notifications={getNotificationsResponse.value}>
+            <SignalRProvider>
+                <div className="flex flex-col h-full">
+                    <Match className="grow-1 overflow-scroll scrollbar-none" matchId={matchId} user={user!} />
+                </div>
+            </SignalRProvider>
+        </ApplicationStoreProvider>
     )
 
 }

@@ -14,7 +14,6 @@ export type LikesProps = {
 }
 export default function Likes({ initialLikes, className }: LikesProps) {
 
-    console.log(initialLikes);
     const [likes, setLikes] = useState(initialLikes);
     const classNames = [className].filter(Boolean).join(" ");
 

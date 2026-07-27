@@ -2,7 +2,7 @@
 
 import { ReactNode, createContext, useRef, useContext } from 'react'
 import { useStore } from 'zustand'
-import { ApplicationStore, createApplicationStore } from './store'
+import { ApplicationStore, createApplicationStore, prepareMatchings, prepareNotifications } from './store'
 import { Matching, MatchingPermission, User, UserPermission } from '../types/domain/aggregates'
 import { ReadDto } from '../types/dtos/types'
 import { Notification } from '../types/domain/aggregates'
@@ -30,8 +30,8 @@ export const ApplicationStoreProvider = ({
   if (!storeRef.current) {
     storeRef.current = createApplicationStore({
       user: user,
-      notifications: notifications ?? [],
-      matchings: matchings ?? []
+      notifications: prepareNotifications(notifications ?? []),
+      matchings: prepareMatchings(matchings ?? [])
     })
   }
 

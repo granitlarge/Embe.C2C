@@ -105,6 +105,10 @@ export type MatchingCreatedNotification = Notification & {
     matchingId: Guid;
 }
 
+export type MessageCreatedNotification = Notification & {
+    messageId: Guid;
+}
+
 export type Transaction = {
     id: Guid;
     accountId: Guid;

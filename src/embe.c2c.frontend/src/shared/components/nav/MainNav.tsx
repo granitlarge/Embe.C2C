@@ -21,6 +21,7 @@ export default function MainNav({
     const pathname = usePathname();
     const notifications = useApplicationStore(s => s.notifications);
     const setNotifications = useApplicationStore(s => s.setNotifications);
+    console.log("MainNav notifications: ", notifications);
 
     const hasUnseenMatches = notifications.some(n => n.data.type === NotificationType.MatchingCreated && n.data.isRead === false);
     const hasUnseenMessages = notifications.some(n => n.data.type === NotificationType.MessageCreated && n.data.isRead === false);

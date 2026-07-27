@@ -1,7 +1,29 @@
 import { createStore } from 'zustand/vanilla'
-import { Matching, MatchingPermission, User, UserPermission } from '../types/domain/aggregates'
+import { Matching, MatchingPermission, Message, MessagePermission, User, UserPermission } from '../types/domain/aggregates'
 import { ReadDto } from '../types/dtos/types'
 import { Notification } from '../types/domain/aggregates'
+
+function sortMessages(messages: ReadDto<Message, MessagePermission>[]) {
+    return messages.sort((a, b) => new Date(a.data.createdAt ?? new Date().toISOString()).getTime() - new Date(b.data.createdAt ?? new Date().toISOString()).getTime());
+}
+
+export function prepareMatchings(matchings: ReadDto<Matching, MatchingPermission>[]) {
+    matchings.sort((a, b) => new Date(a.data.createdAt ?? new Date().toISOString()).getTime() - new Date(b.data.createdAt ?? new Date().toISOString()).getTime());
+    matchings.forEach(m => sortMessages(m.data.messages ?? []));
+    return matchings.map(m => {
+        return {
+            ...m,
+            data: {
+                ...m.data,
+                lastMessage: (m.data.messages?.length ?? 0) > 0 ? m.data.messages![m.data.messages!.length - 1] : undefined
+            }
+        }
+    })
+}
+
+export function prepareNotifications(notifications: ReadDto<Notification, NotificationPermission>[]) {
+    return notifications;
+}
 
 export type ApplicationState = {
     user: ReadDto<User, UserPermission> | undefined;
@@ -24,11 +46,11 @@ export const createApplicationStore = (initState: ApplicationState = defaultInit
         setUser: (newUser: ReadDto<User, UserPermission> | undefined) => set((prev) => ({ ...prev, user: newUser })),
         setNotifications: (newNotifications: ReadDto<Notification, NotificationPermission>[]) => set((prev) => ({
             ...prev,
-            notifications: newNotifications
+            notifications: prepareNotifications(newNotifications)
         })),
         setMatchings: (newMatchings: ReadDto<Matching, MatchingPermission>[]) => set((prev) => ({
             ...prev,
-            matchings: newMatchings
+            matchings: prepareMatchings(newMatchings)
         })),
     }))
 }

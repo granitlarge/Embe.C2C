@@ -5,7 +5,6 @@ import { MatchCompact } from "./MatchCompact";
 import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
 import { getMatchings } from "../actions/action";
 import { useApplicationStore } from "@/src/shared/stores/provider";
-import { usePathname } from "next/navigation";
 
 export type MatchesProps = {
     user: AuthenticatedUser

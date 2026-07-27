@@ -39,7 +39,6 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
 
             const treeifiedError = z.treeifyError(validationResult.error);
-            console.log(treeifiedError);
             const properties = treeifiedError.properties;
             const errors = treeifiedError.errors;
 

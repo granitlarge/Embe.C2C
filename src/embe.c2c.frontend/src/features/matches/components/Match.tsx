@@ -1,17 +1,15 @@
 "use client";
 
 import { InfiniteScroll } from "@/src/shared/components/scroll/infinite-scroll/InfiniteScroll";
-import { Matching, MatchingPermission, MessagePermission, User } from "@/src/shared/types/domain/aggregates"
+import { MessageCreatedNotification, MessagePermission, NotificationType, User } from "@/src/shared/types/domain/aggregates"
 import { AuthenticatedUser } from "@/src/shared/user";
 import Message from "./Message";
-import { useEffect, useRef, useState } from "react";
-import { createMessage, deleteMessage, getMessage, getMessages, markMessageAsSeen, unmatch, updateMessage } from "../actions/action";
+import { useEffect, useState } from "react";
+import { createMessage, deleteMessage, getMessages, markMessageAsSeen, unmatch, updateMessage } from "../actions/action";
 import { Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
 import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
 import { Guid } from "@/src/shared/cache";
 import Surface from "@/src/shared/components/surfaces/Surface";
-import { getOrCreateConnectionOld } from "@/src/shared/signal-r";
-import { HubConnection } from "@microsoft/signalr";
 import { MessageCrafter } from "./MessageCrafter";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { Ellipsis } from "lucide-react";
@@ -19,6 +17,8 @@ import Button from "@/src/shared/components/buttons/Button";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
 import { Routes } from "@/src/shared/routes";
+import { useApplicationStore } from "@/src/shared/stores/provider";
+import { markAsRead } from "@/src/shared/actions/notifications/action";
 
 function sortMessages(messages: ReadDto<MessageTypeDef, MessagePermission>[]): ReadDto<MessageTypeDef, MessagePermission>[] {
     return messages.sort((a, b) => new Date(a.data.createdAt ?? 0).getTime() - new Date(b.data.createdAt ?? 0).getTime());
@@ -81,21 +81,32 @@ function MatchHeader({ partner, matchId }: MatchHeaderProps) {
 }
 
 export type MatchProps = {
-    match: ReadDto<Matching, MatchingPermission>,
+    matchId: Guid
     user: AuthenticatedUser,
     className?: string;
 }
-export default function Match({ match, user, className }: MatchProps) {
+export default function Match({ matchId, user, className }: MatchProps) {
 
     const router = useRouter();
-    const matchRef = useRef(match);
-    const partner = match.data.userId1 === user.userId ? match.data.user2?.data : match.data.user1?.data;
-    const connection = useRef<HubConnection | null>(null);
 
-    const [partnerIsTyping, setPartnerIsTyping] = useState(false);
-    const [messages, setMessages] = useState(sortMessages(match.data?.messages || []));
-    const page = messages.length > 0 ? 2 : 1;
-    const pageSize = messages.length > 0 ? messages.length : 50;
+    const matchings = useApplicationStore(s => s.matchings);
+    const setMatchings = useApplicationStore(s => s.setMatchings);
+    const notifications = useApplicationStore(s => s.notifications);
+    const setNotifications = useApplicationStore(s => s.setNotifications);
+
+    if (!matchings.find(m => m.data.id === matchId)!) {
+        router.replace(Routes.protected.matches);
+        throw new Error("Match not found in ApplicationStore.");
+    }
+
+    const match = matchings.find(m => m.data.id === matchId)!;
+    const messages = match.data.messages ?? [];
+
+
+    const partner = match.data.userId1 === user.userId ? match.data.user2?.data : match.data.user1?.data;
+
+    const page = (messages.length) > 0 ? 2 : 1;
+    const pageSize = (messages.length) > 0 ? messages.length : 50;
 
     const defaultMessageCrafterConfig = {
         content: "",
@@ -111,220 +122,50 @@ export default function Match({ match, user, className }: MatchProps) {
         editingId: Guid | undefined;
     }>(defaultMessageCrafterConfig);
 
-    function onMessageDeleted(messageId: Guid) {
-
-        setMessages(prev =>
-            sortMessages(
-                prev.filter(dto => dto.data.id !== messageId)
-                    .map(dto => {
-                        if (dto.data.replyToMessageId === messageId) {
-                            return {
-                                ...dto,
-                                data: {
-                                    ...dto.data,
-                                    replyToMessageId: undefined,
-                                    replyToMessage: undefined
-                                }
-                            }
-                        } else {
-                            return dto;
-                        }
-                    })
-            ));
-
-        setMessageCrafterConfig(prev => {
-            if (prev.mode === "reply" && prev.replyId === messageId) {
-                return defaultMessageCrafterConfig;
-            }
-            return prev;
-        });
-
-        router.refresh();
-
-    }
-
-    function onMessagesSeen(...messageIds: Guid[]) {
-        setMessages(prev =>
-            sortMessages(
-                prev.map(dto => {
-                    if (messageIds.includes(dto.data.id)) {
-                        return {
-                            ...dto,
-                            data: {
-                                ...dto.data,
-                                seenAt: new Date().toISOString()
-                            }
-                        }
-                    } else {
-                        return dto;
-                    }
-                })
-            ));
-
-        router.refresh();
-    }
-
-    function onMessagesUnseen(...messageIds: Guid[]) {
-        setMessages(prev =>
-            sortMessages(
-                prev.map(dto => {
-                    if (messageIds.includes(dto.data.id)) {
-                        return {
-                            ...dto,
-                            data: {
-                                ...dto.data,
-                                seenAt: undefined
-                            }
-                        }
-                    } else {
-                        return dto;
-                    }
-                })
-            ));
-        router.refresh();
-    }
-
     useEffect(() => {
-        matchRef.current = match;
-    }, [match]);
+
+        const unreadMessagesNotifications = notifications.filter(n =>
+            n.data.type === NotificationType.MessageCreated &&
+            match.data.messages?.some(mes => mes.data.id === (n.data as MessageCreatedNotification)?.messageId) &&
+            n.data.isRead === false
+        );
+
+        markNotificationsAsRead(...unreadMessagesNotifications.map(umn => umn.data.id!));
+
+    }, [notifications]);
 
     useEffect(() => {
 
-        connection.current = getOrCreateConnectionOld();
-
-        const onMessageAddedHandler = async (messageId: Guid, matchingId: Guid) => {
-
-            if (matchingId !== matchRef.current.data.id) {
-                return;
-            }
-
-            const getMessageResponse = await getMessage(messageId);
-            if (!getMessageResponse.success) {
-                throw new Error("Not Implemented");
-            }
-
-            const newMessage = getMessageResponse.value!;
-            setMessages(prev => {
-                const otherMessages = prev.filter(m => m.data.id !== newMessage.data.id);
-                return sortMessages([...otherMessages, newMessage]);
-            });
-
-            router.refresh();
-
-        };
-
-        const onMessageEditedHandler = async (messageId: Guid, matchingId: Guid) => {
-
-            if (matchingId !== matchRef.current.data.id) {
-                return;
-            }
-
-            const getMessageResponse = await getMessage(messageId);
-            if (!getMessageResponse.success) {
-                throw new Error("Not Implemented");
-            }
-
-            const editedMessage = getMessageResponse.value!;
-
-            setMessages(prev => {
-                const otherMessages = prev.filter(m => m.data.id !== editedMessage.data.id);
-                return sortMessages([...otherMessages, editedMessage]);
-            });
-
-            router.refresh();
-
-        };
-
-        const onMessageDeletedHandler = (messageId: Guid, matchingId: Guid) => {
-
-            if (matchingId !== matchRef.current.data.id) {
-                return;
-            }
-
-            onMessageDeleted(messageId);
-
-        };
-
-        const onMessagesSeenHandler = (messageIds: Guid[], matchingId: Guid) => {
-
-            if (matchingId !== matchRef.current.data.id) {
-                return;
-            }
-
-            onMessagesSeen(...messageIds);
-
-        };
-
-        const onMessagesUnseenHandler = (messageIds: Guid[], matchingId: Guid) => {
-
-            if (matchingId !== matchRef.current.data.id) {
-                return;
-            }
-
-            onMessagesUnseen(...messageIds);
-
-        }
-
-        const onStartedTypingHandler = (matchingId: Guid) => {
-
-            if (matchingId !== matchRef.current.data.id) {
-                return;
-            }
-
-            setPartnerIsTyping(true);
-
-        }
-
-        const onStoppedTypingHandler = (matchingId: Guid) => {
-
-            if (matchingId !== matchRef.current.data.id) {
-                return;
-            }
-
-            setPartnerIsTyping(false);
-
-        }
-
-        connection.current.on("MessageAdded", onMessageAddedHandler);
-        connection.current.on("MessageEdited", onMessageEditedHandler);
-        connection.current.on("MessageDeleted", onMessageDeletedHandler);
-        connection.current.on("MessagesSeen", onMessagesSeenHandler);
-        connection.current.on("MessagesUnseen", onMessagesUnseenHandler);
-        connection.current.on("StartedTyping", onStartedTypingHandler);
-        connection.current.on("StoppedTyping", onStoppedTypingHandler);
-
-        if (connection.current.state === "Disconnected") {
-            connection.current.start().catch(err => {
-                console.error("Failed to start connection:", err);
-            });
-        }
-
-        return () => {
-            connection.current?.off("MessageAdded", onMessageAddedHandler);
-            connection.current?.off("MessageEdited", onMessageEditedHandler);
-            connection.current?.off("MessageDeleted", onMessageDeletedHandler);
-            connection.current?.off("MessagesSeen", onMessagesSeenHandler);
-            connection.current?.off("MessagesUnseen", onMessagesUnseenHandler);
-            connection.current?.off("StartedTyping", onStartedTypingHandler);
-            connection.current?.off("StoppedTyping", onStoppedTypingHandler);
-        }
-
-    }, []);
-
-    useEffect(() => {
         const unseenNewMessages = messages.filter(nm => !nm.data.seenAt && nm.data.authorUserId !== user.userId);
         markAsSeen(...unseenNewMessages.map(newMessage => newMessage.data.id));
+
+        if (messageCrafterConfig.mode === "reply" && messages.every(m => m.data.id !== messageCrafterConfig.editingId)) {
+            setMessageCrafterConfig(defaultMessageCrafterConfig);
+        }
+
     }, [messages]);
 
     async function loadMessages(): Promise<boolean> {
-        const response = await getMessages(match.data.id, page, pageSize);
-        if (response.success) {
-            const newMessages = response.value || [];
-            setMessages(prev => sortMessages([...newMessages, ...prev]));
-            return newMessages.length == pageSize;
-        } else {
-            throw new Error("Not Implemented");
+        const response = await getMessages(match!.data.id, page, pageSize);
+        if (!response.success) {
+            throw new Error("not implemented");
         }
+
+        const newMessages = response.value || [];
+        setMatchings(matchings.map(m => {
+            if (m.data.id !== match.data.id)
+                return m;
+            return {
+                ...m,
+                data: {
+                    ...m.data,
+                    messages: (m.data.messages ?? []).concat(newMessages)
+                }
+            }
+        }))
+
+        router.refresh();
+        return newMessages.length == pageSize;
     }
 
     async function saveMessage() {
@@ -346,10 +187,22 @@ export default function Match({ match, user, className }: MatchProps) {
             const response = await updateMessage(editingId, content);
             if (response.success) {
 
-                setMessages(prev => {
-                    const otherMessages = prev.filter(message => message.data.id !== editingId);
-                    return sortMessages([...otherMessages, response.value!]);
-                });
+                setMatchings(matchings.map(m => {
+                    if (m.data.id !== match.data.id)
+                        return m;
+                    return {
+                        ...m,
+                        data: {
+                            ...m.data,
+                            messages: (m.data.messages ?? []).map(mes => {
+                                if (mes.data.id !== response.value?.data.id)
+                                    return mes;
+                                return response.value!;
+                            })
+                        }
+                    }
+                }))
+
                 setMessageCrafterConfig(defaultMessageCrafterConfig);
 
                 router.refresh();
@@ -364,21 +217,63 @@ export default function Match({ match, user, className }: MatchProps) {
 
             const message: CreateMessage = {
                 content: content,
-                matchingId: match.data.id,
+                matchingId: match!.data.id,
                 replyToMessageId: replyId
             }
 
             const response = await createMessage(message);
 
             if (response.success) {
-                setMessages(prev => sortMessages([...prev, response.value!]));
+
+                setMatchings(matchings.map(m => {
+                    if (m.data.id !== match.data.id)
+                        return m;
+                    return {
+                        ...m,
+                        data: {
+                            ...m.data,
+                            messages: (m.data.messages ?? []).concat(response.value!)
+                        }
+                    }
+                }))
+
                 setMessageCrafterConfig(defaultMessageCrafterConfig);
                 router.refresh();
+
             } else {
+
                 throw new Error("Not Implemented");
+
             }
 
         }
+
+    }
+
+    async function markNotificationsAsRead(...notificationIds: Guid[]) {
+
+        if (notificationIds.length === 0)
+            return;
+
+        const promises = notificationIds.map(n => markAsRead(n, true))
+        const results = await Promise.all(promises);
+        if (results.some(result => !result.success)) {
+            throw new Error("not implemented");
+        }
+
+        setNotifications(notifications.map(n => {
+            if (!notificationIds.includes(n.data.id!)) {
+                return n;
+            }
+            return {
+                ...n,
+                data: {
+                    ...n.data,
+                    isRead: true,
+                    readAt: new Date().toISOString()
+                }
+            }
+        }))
 
     }
 
@@ -386,9 +281,35 @@ export default function Match({ match, user, className }: MatchProps) {
         if (messageIds.length === 0) {
             return;
         }
+
         const response = await markMessageAsSeen(...messageIds);
         if (response.success) {
-            onMessagesSeen(...messageIds);
+
+            setMatchings(matchings.map(m => {
+                if (m.data.id !== match.data.id)
+                    return m;
+                return {
+                    ...m,
+                    data: {
+                        ...m.data,
+                        messages: (m.data.messages ?? []).map(mes => {
+                            if (!messageIds.includes(mes.data.id)) {
+                                return mes;
+                            }
+                            return {
+                                ...mes,
+                                data: {
+                                    ...mes.data,
+                                    seenAt: new Date().toISOString()
+                                }
+                            }
+                        })
+                    }
+                }
+            }));
+
+            router.refresh();
+
         } else {
             throw new Error("Not Implemented");
         }
@@ -436,7 +357,18 @@ export default function Match({ match, user, className }: MatchProps) {
             if (messageCrafterConfig.mode === "edit" && messageCrafterConfig.editingId === messageId) {
                 setMessageCrafterConfig(defaultMessageCrafterConfig);
             }
-            onMessageDeleted(messageId);
+            setMatchings(matchings.map(m => {
+                if (m.data.id !== match.data.id)
+                    return m;
+                return {
+                    ...m,
+                    data: {
+                        ...m.data,
+                        messages: (m.data.messages ?? []).filter(mes => mes.data.id !== messageId)
+                    }
+                }
+            }))
+            router.refresh();
         } else {
             throw new Error("Not Implemented");
         }
@@ -503,7 +435,9 @@ export default function Match({ match, user, className }: MatchProps) {
                 {items}
             </InfiniteScroll>
             {
+                /*
                 partnerIsTyping && <span className="text-(--primary-fc) text-(length:--primary-fs) italic">{partner?.alias} is typing...</span>
+                */
             }
             <MessageCrafter
                 saveMessage={saveMessage}
