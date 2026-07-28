@@ -23,12 +23,14 @@ export function MatchCompact({ dto, className, user }: MatchCompactProps) {
     const classNames = [className].filter(Boolean).join(" ");
 
     return (
-        <Surface padding="sm" className={`${classNames} flex flex-col`} variant="secondary">
-            {searchProfile && <span className="mx-auto text-(--primary-fc) text-(length:--primary-fs) font-bold" >{searchProfile?.data.name}</span>}
+        <Surface padding="sm" className={`${classNames} flex flex-col gap-2`} variant="secondary">
+            <div className="flex justify-between items-center">
+                {searchProfile && <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold" >{searchProfile?.data.name}</span>}
+                {match.createdAt && <span className="text-(--secondary-fc) text-(length:--secondary-fs)" suppressHydrationWarning>{formatTimeAgo(match.createdAt)}</span>}
+            </div>
             <div className="flex flex-row justify-between gap-3 w-full">
                 <UserCompact dto={otherUser} />
                 <div className="flex flex-col items-end gap-2 w-full">
-                    {match.createdAt && <span className="text-(--secondary-fc) text-(length:--secondary-fs) mb-auto" suppressHydrationWarning>{formatTimeAgo(match.createdAt)}</span>}
                     {
                         <Surface as={Link} className="flex flex-col w-full grow-1 no-underline mb-auto" href={Routes.protected.match(match.id)} padding="none" variant="inherit">
                             <Surface className={`grow-1 fs-group-primary w-full flex flex-col justify-center`} padding="none" variant="inherit">
