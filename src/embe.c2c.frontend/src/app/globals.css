@@ -274,7 +274,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 10px;
+    gap: 5px;
   }
 
   .label {
@@ -291,7 +291,7 @@
     font-size: var(--primary-fs);
     text-align: center;
     border-radius: 10px;
-    padding: .3rem;
+    padding: .15rem;
   }
 
   input::placeholder,

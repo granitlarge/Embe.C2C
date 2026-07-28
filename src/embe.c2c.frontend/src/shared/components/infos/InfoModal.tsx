@@ -9,13 +9,15 @@ export type InfoType = "info" | "important";
 export type InfoModalProps = {
     info: string;
     type: InfoType;
+    className?: string;
 }
-export default function InfoModal({ info, type }: InfoModalProps) {
+export default function InfoModal({ className, info, type }: InfoModalProps) {
 
     const [isOpen, setIsOpen] = useState(false);
 
+    const classNames = [className].filter(Boolean).join(" ");
     return (
-        <div>
+        <div className={classNames}>
             <Button className="flex items-center max-w-max p-0" onClick={() => setIsOpen(prev => !prev)}>
                 {
                     type === "info" && <Info className="w-(--primary-fs) h-(--primary-fs)" /> ||

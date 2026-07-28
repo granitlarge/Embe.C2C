@@ -13,6 +13,7 @@ import Image from "@/src/shared/components/images/Image";
 import { Guid } from "@/src/shared/cache";
 import Button from "@/src/shared/components/buttons/Button";
 import { Plus } from "@deemlol/next-icons";
+import InfoModal from "@/src/shared/components/infos/InfoModal";
 
 export type ImageData = {
     id?: Guid,
@@ -34,8 +35,9 @@ type MyImagesFormProps = {
     initialImages: ImageData[]
     onChange?: (images: ImageData[]) => void
     className?: string
+    info?: string;
 }
-function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps) {
+function MyImagesForm({ info, initialImages, onChange, className }: MyImagesFormProps) {
 
     const [modalOpen, setModalOpen] = useState(false);
     const isEmpty = initialImages.length === 0;
@@ -46,7 +48,7 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
     ].filter(Boolean).join(" ")
 
     return (
-        <div className={`max-w-max ${classNames}`}>
+        <div className={`max-w-max ${classNames} relative`}>
             <Button onClick={() => setModalOpen(prev => !prev)} className="bg-transparent text-(length:--fs-1)">
                 {
                     !isEmpty && profilePictureUrl && <Image
@@ -65,6 +67,14 @@ function MyImagesForm({ initialImages, onChange, className }: MyImagesFormProps)
                     </div>
                 }
             </Button>
+            {
+                info && isEmpty &&
+                <InfoModal
+                    info={info}
+                    type={"important"}
+                    className="absolute top-0 right-0"
+                />
+            }
 
             <LargeModal closed={() => setModalOpen(false)} hidden={!modalOpen} header="images">
                 <ImageGalleryInput<ImageData>
@@ -115,6 +125,7 @@ export default function MyInfoForm({ className, data, error, onChange }: MyInfoF
             <Surface className={`w-full flex flex-col gap-2`} padding="md" variant="secondary">
 
                 <MyImagesForm
+                    info="add images to receive more matches"
                     className="w-full shrink-0 mx-auto"
                     initialImages={data.images ?? []}
                     onChange={(images) => onChange({ ...data, images })}

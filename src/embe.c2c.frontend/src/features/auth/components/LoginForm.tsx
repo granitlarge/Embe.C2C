@@ -71,6 +71,7 @@ export default function LoginForm({ className }: LoginFormProps) {
             <TextInput
                 label="email"
                 type="email"
+                placeholder="email"
                 value={userName}
                 errorMessage={usernameError}
                 onBlur={(un: string) => {
@@ -80,6 +81,7 @@ export default function LoginForm({ className }: LoginFormProps) {
             <TextInput
                 label={passwordLabel}
                 type="password"
+                placeholder="password"
                 value={password}
                 errorMessage={passwordError}
                 onBlur={(pw: string) => {
@@ -88,7 +90,7 @@ export default function LoginForm({ className }: LoginFormProps) {
                 }} />
             {error && <span className="text-center mx-auto text-(--error-fc) text-(length:--secondary-fs)">{error}</span>}
             <Button onClick={login} intent="save">login</Button>
-            <Link className="absolute right-2 top-2" href={Routes.public.register}>register</Link>
+            <Link className="absolute right-2 top-2 font-semibold" href={Routes.public.register}>register</Link>
         </Surface>
     )
 

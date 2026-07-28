@@ -57,7 +57,7 @@ export default function LargeModal({ children, className, closed, hidden, header
                 header && 
                 <div className="flex flex-row m-1 items-center">
                     <h2 className="mx-auto text-(--primary-fc)">{header}</h2>
-                    <Button className="max-w-max max-h-max p-1" intent="navigate" onClick={() => dialog.current?.close()}>
+                    <Button className="max-w-max max-h-max p-1" intent="default" onClick={() => dialog.current?.close()}>
                         <X />
                     </Button>
                 </div>
@@ -65,7 +65,7 @@ export default function LargeModal({ children, className, closed, hidden, header
             {
                 !header &&
                 <div className="flex flex-row m-1 items-center justify-between">
-                    <Button className="max-w-max max-h-max p-1 ml-auto" intent="navigate" onClick={() => dialog.current?.close()}>
+                    <Button className="max-w-max max-h-max p-1 ml-auto" intent="default" onClick={() => dialog.current?.close()}>
                         <X />
                     </Button>
                 </div>
