@@ -22,14 +22,13 @@ export function UserCompact({ className, dto, ...props }: UserCompactProps) {
             {
                 user?.id &&
                 <Surface as={Link} className={`${classNames} no-underline flex flex-col gap-0 items-center min-w-max`} padding="none" href={Routes.protected.user(user?.id)} {...props} variant="inherit">
-                    {user?.alias && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs) font-bold">{user?.alias}</span>}
                     {
                         profilePicture?.imageDetails?.url &&
                             <Image 
                                 src={profilePicture?.imageDetails?.smallUrl ?? profilePicture?.imageDetails?.mediumUrl ?? profilePicture.imageDetails?.largeUrl ?? profilePicture?.imageDetails?.url} 
                                 alt="Profile picture" 
-                                width={250}
-                                height={250} 
+                                width={100}
+                                height={100} 
                                 className="w-20 h-20 rounded-full object-cover" 
                                 unoptimized={process.env.NODE_ENV === "development"} 
                             />
@@ -38,6 +37,7 @@ export function UserCompact({ className, dto, ...props }: UserCompactProps) {
                         !profilePicture?.imageDetails?.url &&
                         <UserIcon className="w-20 h-20 rounded-full bg-transparent flex items-center justify-center text-(--primary-fc) text-(length:--primary-fs)" />
                     }
+                    {user?.alias && <span className="max-w-[100px] text-nowrap text-center overflow-hidden text-ellipsis text-(--primary-fc) text-(length:--primary-fs) font-bold">{user?.alias}</span>}
                 </Surface>
             }
         </>
