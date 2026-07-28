@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import styles from "./LargeModal.module.css";
+import Button from "../buttons/Button";
+import { X } from "@deemlol/next-icons";
 
 export type LargeModalProps = Omit<React.DetailedHTMLProps<React.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>, "children" | "className" | "ref" | "closedby" | "hidden" | "onClick"> & {
     className?: string;
@@ -51,7 +53,23 @@ export default function LargeModal({ children, className, closed, hidden, header
             }}
             {...props}
         >
-            {header && <h2 className="mx-auto text-(--primary-fc)">{header}</h2>}
+            {
+                header && 
+                <div className="flex flex-row m-1 items-center">
+                    <h2 className="mx-auto text-(--primary-fc)">{header}</h2>
+                    <Button className="max-w-max max-h-max p-1" intent="navigate" onClick={() => dialog.current?.close()}>
+                        <X />
+                    </Button>
+                </div>
+            }
+            {
+                !header &&
+                <div className="flex flex-row m-1 items-center justify-between">
+                    <Button className="max-w-max max-h-max p-1 ml-auto" intent="navigate" onClick={() => dialog.current?.close()}>
+                        <X />
+                    </Button>
+                </div>
+            }
             {children}
         </dialog>
     );

@@ -204,7 +204,7 @@ export default function Me({ className }: MeProps) {
                 <Button onClick={onCancel} intent="cancel">cancel</Button>
             </div>
             {
-                showPreview && <LargeModal className="surface-secondary" hidden={false} closed={() => setShowPreview(false)} header={undefined}>
+                showPreview && <LargeModal header="preview" className="surface-secondary" hidden={false} closed={() => setShowPreview(false)}>
                     <Profile
                         candidate={{
                             id: user?.data?.id!,
