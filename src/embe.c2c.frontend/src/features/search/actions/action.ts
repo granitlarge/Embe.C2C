@@ -25,8 +25,8 @@ export async function generateCandidates(): Promise<ApiResponse<ReadDto<Candidat
 
 }
 
-export async function judge(candidateId: Guid, isPositive: boolean): Promise<ApiResponse<ReadDto<Matching | undefined, MatchingPermission>>> {
-    const response = await Mutate<ReadDto<Matching | undefined, MatchingPermission>>(
+export async function judge(candidateId: Guid, isPositive: boolean): Promise<ApiResponse<ReadDto<Matching, MatchingPermission> | undefined>> {
+    const response = await Mutate<ReadDto<Matching, MatchingPermission> | undefined>(
         `${process.env.API_URL}/api/candidate/judge`,
         {
             method: "POST",

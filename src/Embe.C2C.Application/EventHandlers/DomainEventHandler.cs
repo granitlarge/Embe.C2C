@@ -80,7 +80,13 @@ public class DomainEventHandler
     private async Task HandlePositivelyJudgedEventAsync(PositivelyJudgedDomainEvent positivelyJudgedEvent, CancellationToken cancellationToken)
     {
         AddIntegrationEvent(new PositivelyJudgedIntegrationEvent(positivelyJudgedEvent.Candidate.Id, positivelyJudgedEvent.Candidate.CandidateUserId));
-        var notification = PositivelyJudgedNotification.Create(positivelyJudgedEvent.Candidate.Id, positivelyJudgedEvent.Candidate.CandidateUserId);
+        var notification = PositivelyJudgedNotification.Create
+        (
+            positivelyJudgedEvent.Candidate.Id,
+            positivelyJudgedEvent.Candidate.CandidateUserId,
+            positivelyJudgedEvent.Candidate.UserId,
+            positivelyJudgedEvent.Candidate.CandidateUserId
+        );
         _notificationRepository.Set.Add(notification);
         AddIntegrationEvent(new NotificationCreatedIntegrationEvent(notification.RecipientUserId, notification.Id));
     }

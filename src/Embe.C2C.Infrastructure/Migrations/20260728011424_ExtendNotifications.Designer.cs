@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Embe.C2C.Infrastructure.Migrations
 {
     [DbContext(typeof(C2CContext))]
-    partial class C2CContextModelSnapshot : ModelSnapshot
+    [Migration("20260728011424_ExtendNotifications")]
+    partial class ExtendNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -743,12 +746,6 @@ namespace Embe.C2C.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasIndex("CandidateId");
-
-                    b.HasIndex("CandidateUserId");
-
-                    b.HasIndex("UserId");
-
                     b.HasDiscriminator().HasValue("PositivelyJudgedNotification");
                 });
 
@@ -1109,27 +1106,6 @@ namespace Embe.C2C.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.HasOne("Embe.C2C.Infrastructure.Identity.MyIdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Embe.C2C.Domain.Aggregates.Notifications.Candidates.PositivelyJudgedNotification", b =>
-                {
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Candidates.Candidate", null)
-                        .WithMany()
-                        .HasForeignKey("CandidateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("CandidateUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Embe.C2C.Domain.Aggregates.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

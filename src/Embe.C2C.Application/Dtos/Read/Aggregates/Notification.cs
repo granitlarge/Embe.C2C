@@ -37,7 +37,9 @@ public record MatchingCreatedNotificationDto
     DateTimeOffset? ReadAt,
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt,
-    Guid? MatchingId
+    Guid? MatchingId,
+    Guid? UserId1,
+    Guid? UserId2
 ) : NotificationDto(NotificationType.MatchingCreated, Id, RecipientUserId, IsRead, ReadAt, CreatedAt, UpdatedAt);
 
 public record MessageCreatedNotificationDto
@@ -59,7 +61,9 @@ public record PositivelyJudgedNotificationDto
     DateTimeOffset? ReadAt,
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt,
-    Guid? CandidateId
+    Guid? CandidateId,
+    Guid? UserId,
+    Guid? CandidateUserId
 ) : NotificationDto(NotificationType.PositivelyJudged, Id, RecipientUserId, IsRead, ReadAt, CreatedAt, UpdatedAt);
 
 public class NotificationDtoMapper
@@ -80,7 +84,9 @@ public class NotificationDtoMapper
                 variant.IncludeReadAt ? matchingCreated.ReadAt : null,
                 variant.IncludeCreatedAt ? matchingCreated.CreatedAt : null,
                 variant.IncludeUpdatedAt ? matchingCreated.UpdatedAt : null,
-                variant.IncludeMatchingId ? matchingCreated.MatchingId : null
+                variant.IncludeMatchingId ? matchingCreated.MatchingId : null,
+                variant.IncludeUserId1 ? matchingCreated.RecipientUserId : null,
+                variant.IncludeUserId2 ? matchingCreated.PartnerUserId : null
             ),
             MessageCreatedNotification messageCreated => new MessageCreatedNotificationDto
             (
@@ -100,7 +106,9 @@ public class NotificationDtoMapper
                 variant.IncludeReadAt ? positivelyJudged.ReadAt : null,
                 variant.IncludeCreatedAt ? positivelyJudged.CreatedAt : null,
                 variant.IncludeUpdatedAt ? positivelyJudged.UpdatedAt : null,
-                variant.IncludeCandidateId ? positivelyJudged.CandidateId : null
+                variant.IncludeCandidateId ? positivelyJudged.CandidateId : null,
+                variant.IncludeUserId ? positivelyJudged.UserId : null,
+                variant.IncludeCandidateUserId ? positivelyJudged.CandidateUserId : null
             ),
             _ => throw new NotImplementedException()
         };

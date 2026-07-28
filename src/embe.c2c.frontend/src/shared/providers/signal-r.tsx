@@ -6,13 +6,14 @@ import { getAccessToken, refreshAccessToken } from "../security/functions";
 import { useApplicationStore } from "../stores/provider";
 import { Guid } from "../cache";
 import { ReadDto } from "../types/dtos/types";
-import { Candidate, CandidatePermission, Matching, MatchingCreatedNotification, MatchingPermission, MessageCreatedNotification, NotificationType, User, UserPermission } from "../types/domain/aggregates";
+import { Candidate, CandidatePermission, Matching, MatchingCreatedNotification, MatchingPermission, MessageCreatedNotification, NotificationType, PositivelyJudgedNotification, User, UserPermission } from "../types/domain/aggregates";
 import { getMatching, getMessage } from "@/src/features/matches/actions/action";
 import { Notification } from "../types/domain/aggregates";
 import { getNotification } from "../actions/notifications/action";
 import { useRouter } from "nextjs-toploader/app";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { getCandidate } from "../actions/candidates/action";
+import { getAuthenticatedUser } from "../user";
 
 export interface SignalRProviderProps {
     children: ReactNode;
@@ -184,10 +185,25 @@ function addMatchingHandlers(
         const getMatchingResponse = await getMatching(matchingId);
         if (!getMatchingResponse.success)
             return;
+
+        const ownUserId = (await getAuthenticatedUser())?.userId;
         const matchings = matchingsRef.current;
         const setMatchings = setMatchingsRef.current;
+        const notifications = notificationsRef.current;
+        const setNotifications = setNotificationsRef.current;
 
         setMatchings(matchings.concat(getMatchingResponse.value!));
+        setNotifications(
+            notifications.filter(n => {
+                if (n.data.type !== NotificationType.PositivelyJudged) {
+                    return true;
+                }
+                const matching = getMatchingResponse.value?.data;
+                const asPositivelyJudged = n.data as PositivelyJudgedNotification;
+                return asPositivelyJudged.userId !== matching?.userId1 && asPositivelyJudged.userId !== matching?.userId2;
+            })
+        )
+
         routerRef.current.refresh();
     }
 

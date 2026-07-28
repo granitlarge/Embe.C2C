@@ -27,17 +27,10 @@ export default function MessageCompact({ className, messageDto, user, ...props }
             <div className="flex flex-row gap-[3px] items-center">
                 {isOwn && isSeen && <CheckCheck className="text-(--universal-primary-bg)" size={12} />}
                 {!isOwn && !isSeen && <span className="text-(--universal-primary-bg)">•</span>}
-                <span className="max-w-[170px] text-nowrap text-center overflow-hidden text-ellipsis text-(length:--primary-fs)">
-                    {
-                        isOwn ? <span className="text-(--secondary-fc) text-(length:--secondary-fs)">you: </span> : 
-                        <span className="text-(--secondary-fc) text-(length:--secondary-fs) align-middle">
-                            they: 
-                        </span>
-                    } 
-                    {
-                        message.content
-                    }
-                </span>
+                <div className="flex gap-1 items-center justify-center">
+                    <span className="text-(--secondary-fc) text-(length:--secondary-fs)">{isOwn ? "you:" : "they:"}</span>
+                    <span className="text-(--primary-fc) text-(length:--primary-fs) text-ellipsis max-w-[170px] overflow-hidden text-nowrap">{message.content}</span>
+                </div>
             </div>
             {
                 message && message.createdAt &&

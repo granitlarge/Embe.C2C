@@ -21,8 +21,8 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
             <Button
                 onClick={judgeNegative}
                 className="
-                    absolute 
-                    bottom-10
+                    fixed
+                    bottom-25
                     left-10 
                     text-(--primary-fc) 
                     max-w-max 
@@ -40,8 +40,8 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
             <Button
                 onClick={judgePositive}
                 className="
-                    absolute 
-                    bottom-10
+                   fixed 
+                    bottom-25
                     right-10 
                     text-(--primary-fc) 
                     max-w-max 

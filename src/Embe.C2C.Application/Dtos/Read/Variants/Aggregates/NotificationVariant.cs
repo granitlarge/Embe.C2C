@@ -12,7 +12,11 @@ public record NotificationVariant
         includeUpdatedAt: true,
         includeMatchingId: true,
         includeMessageId: true,
-        includeCandidateId: true
+        includeCandidateId: true,
+        includeCandidateUserId: true,
+        includeUserId: true,
+        includeUserId1: true,
+        includeUserId2: true
     );
 
     public static readonly NotificationVariant Empty = new
@@ -25,7 +29,11 @@ public record NotificationVariant
         includeUpdatedAt: false,
         includeMatchingId: false,
         includeMessageId: false,
-        includeCandidateId: false
+        includeCandidateId: false,
+        includeCandidateUserId: false,
+        includeUserId: false,
+        includeUserId1: false,
+        includeUserId2: false
     );
 
     private NotificationVariant
@@ -38,10 +46,14 @@ public record NotificationVariant
         bool includeUpdatedAt,
 
         bool includeMatchingId,
+        bool includeUserId1,
+        bool includeUserId2,
 
         bool includeMessageId,
 
-        bool includeCandidateId
+        bool includeCandidateId,
+        bool includeUserId,
+        bool includeCandidateUserId
     )
     {
         IncludeId = includeId;
@@ -52,10 +64,14 @@ public record NotificationVariant
         IncludeUpdatedAt = includeUpdatedAt;
 
         IncludeMatchingId = includeMatchingId;
+        IncludeUserId1 = includeUserId1;
+        IncludeUserId2 = includeUserId2;
 
         IncludeMessageId = includeMessageId;
 
         IncludeCandidateId = includeCandidateId;
+        IncludeUserId = includeUserId;
+        IncludeCandidateUserId = includeCandidateUserId;
     }
 
     public bool IncludeId { get; }
@@ -66,8 +82,12 @@ public record NotificationVariant
     public bool IncludeUpdatedAt { get; }
 
     public bool IncludeMatchingId { get; }
+    public bool IncludeUserId1 { get; }
+    public bool IncludeUserId2 { get; }
 
     public bool IncludeMessageId { get; }
 
     public bool IncludeCandidateId { get; }
+    public bool IncludeUserId { get; }
+    public bool IncludeCandidateUserId { get; }
 }

@@ -104,10 +104,18 @@ export enum NotificationPermission {
 
 export type MatchingCreatedNotification = Notification & {
     matchingId: Guid;
+    recipientUserId: Guid;
+    partnerUserId: Guid;
 }
 
 export type MessageCreatedNotification = Notification & {
     messageId: Guid;
+}
+
+export type PositivelyJudgedNotification = Notification & {
+    candidateId: Guid;
+    userId: Guid;
+    candidateUserId: Guid;
 }
 
 export type Transaction = {

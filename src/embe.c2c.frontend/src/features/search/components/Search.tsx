@@ -9,11 +9,12 @@ import { SlidersHorizontal } from "lucide-react";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
 import { ReadDto } from "@/src/shared/types/dtos/types";
-import { Candidate, CandidatePermission, SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
+import { Candidate, CandidatePermission, NotificationType, PositivelyJudgedNotification, SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
 import Button from "@/src/shared/components/buttons/Button";
 import { Routes } from "@/src/shared/routes";
 import { LocalStore } from "@/src/shared/local-store";
 import NotificationModal from "@/src/shared/components/modal/NotificationModal";
+import { useApplicationStore } from "@/src/shared/stores/provider";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;
@@ -46,6 +47,9 @@ export type SearchProps = {
 }
 export default function Search({ searchProfiles, candidates: initialCandidates, className, hasSearchProfiles }: SearchProps) {
 
+    const notifications = useApplicationStore(s => s.notifications);
+    const setNotifications = useApplicationStore(s => s.setNotifications);
+
     const router = useRouter();
     const classNames = [className].filter(Boolean).join(" ");
 
@@ -68,12 +72,33 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
         if (!response.success) {
             throw new Error("Not implemented");
         } else {
+
+            if (response.value !== undefined) {
+
+                const matching = response.value;
+                setNotifications(
+                    notifications.filter(n => {
+                        if (n.data.type !== NotificationType.PositivelyJudged) {
+                            return true;
+                        }
+                        const asPositivelyJudged = n.data as PositivelyJudgedNotification;
+                        return asPositivelyJudged.userId !== matching?.data.userId1 && asPositivelyJudged.userId !== matching?.data.userId2;
+                    })
+                )
+
+            }
+
             router.refresh();
             if (candidates.length === 0) {
+
                 await loadCandidates();
+
             } else {
+
                 setCandidates(prev => prev.slice(1));
+
             }
+
         }
     }
 
