@@ -120,6 +120,8 @@ public class BlobStorageImageService : IImageService
 
         using var image = new MagickImage();
         image.Read(data);
+        image.AutoOrient();
+        image.Strip();
 
         var originalWidth = image.Width;
         var originalHeight = image.Height;
@@ -159,7 +161,7 @@ public class BlobStorageImageService : IImageService
                 _ => throw new NotImplementedException()
             };
 
-            scaledImage.Resize(new MagickGeometry(0, 0, (uint)(factor * scaledImage.Width), (uint)(factor * scaledImage.Height)));
+            scaledImage.Resize((uint)(factor * scaledImage.Width), (uint)(factor * scaledImage.Height));
             using var destBlobStream = await destBlobClient.OpenWriteAsync(overwrite: true, cancellationToken: cancellationToken);
             scaledImage.Format = MagickFormat.WebP;
             await scaledImage.WriteAsync(destBlobStream, cancellationToken);
