@@ -21,12 +21,11 @@ type MyPointerEvent = {
 
 export type ImageCropperProps = {
     src: string;
-    width: number;
     aspect: number;
     onCrop?: (crop: { x: number, y: number, width: number, height: number }) => void;
     onCancel?: () => void;
 }
-export default function ImageCropper({ onCrop, onCancel, src, width, aspect }: ImageCropperProps) {
+export default function ImageCropper({ onCrop, onCancel, src, aspect }: ImageCropperProps) {
 
     const scrollSpeed = .05;
     const pointersHistoryRef = useRef(new Map<number, MyPointerEvent>());
@@ -184,31 +183,40 @@ export default function ImageCropper({ onCrop, onCancel, src, width, aspect }: I
         if (imageWidth === 1 || imageHeight === 1)
             return;
 
-        let cropperWidth = width * containerWidth / imageWidth;
-        let cropperHeight = cropperWidth / aspect;
+        const imageContainerRatio = imageWidth / containerWidth;
+        let cropperWidth = aspect;
+        let cropperHeight = 1;
+        if (imageWidth < imageHeight) {
+            cropperWidth = imageWidth / imageContainerRatio;
+            cropperHeight = imageWidth / imageContainerRatio;
+        } else {
+            cropperWidth = imageHeight / imageContainerRatio;
+            cropperHeight = imageHeight / imageContainerRatio;
+        }
 
-        cropperWidth = Math.max(Math.min(cropperWidth, containerWidth), aspect);
-        cropperHeight = Math.max(Math.min(cropperHeight, containerHeight), 1 / aspect);
+        cropperWidth = Math.max(Math.min(cropperWidth, containerWidth), aspect > 1 ? aspect : 1);
+        cropperHeight = Math.max(Math.min(cropperHeight, containerHeight), aspect > 1 ? 1 : 1 / aspect);
+
         setCropperWidth(cropperWidth);
         setCropperHeight(cropperHeight);
 
-    }, [width, aspect, imageWidth, imageHeight, containerWidth])
+    }, [aspect, imageWidth, imageHeight, containerWidth])
 
     function onScroll(windowX: number, windowY: number, direction: "in" | "out" | "none") {
         if (!viewport)
             return;
 
-        let newWidth;
-        let newHeight;
+        let newViewportWidth;
+        let newViewportHeight;
         if (direction === "in") {
-            newWidth = Math.max(viewport.width * (1 - scrollSpeed), imageWidth / imageHeight);
-            newHeight = Math.max(viewport.height * (1 - scrollSpeed), 1);
+            newViewportWidth = Math.max(viewport.width * (1 - scrollSpeed), imageWidth / imageHeight);
+            newViewportHeight = Math.max(viewport.height * (1 - scrollSpeed), 1);
         } else if (direction === "out") {
-            newWidth = Math.min(viewport.width * (1 + scrollSpeed), imageWidth);
-            newHeight = Math.min(viewport.height * (1 + scrollSpeed), imageHeight);
+            newViewportWidth = Math.min(viewport.width * (1 + scrollSpeed), imageWidth);
+            newViewportHeight = Math.min(viewport.height * (1 + scrollSpeed), imageHeight);
         } else {
-            newWidth = width * containerWidth / imageWidth;
-            newHeight = newWidth * aspect;
+            newViewportWidth = viewport.width;
+            newViewportHeight = viewport.height;
         }
 
         if (!containerRef.current)
@@ -217,10 +225,10 @@ export default function ImageCropper({ onCrop, onCancel, src, width, aspect }: I
         const centerX = containerRef.current.getBoundingClientRect().left + containerRef.current.getBoundingClientRect().width / 2;
         const centerY = containerRef.current.getBoundingClientRect().top + containerRef.current.getBoundingClientRect().height / 2;
 
-        const dx = (centerX - windowX) * newWidth / viewport.width;
-        const dy = (centerY - windowY) * newHeight / viewport.height;
+        const dx = (centerX - windowX) * newViewportWidth / viewport.width;
+        const dy = (centerY - windowY) * newViewportHeight / viewport.height;
 
-        centerViewport(windowX + dx, windowY + dy, newWidth, newHeight);
+        centerViewport(windowX + dx, windowY + dy, newViewportWidth, newViewportHeight);
     }
 
     function onMove(e: PointerEvent) {

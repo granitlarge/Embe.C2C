@@ -33,9 +33,7 @@ export default function ImageCropGallery({ onChange, images }: ImageCropGallery)
             <ImageCropper
                 onCrop={onCrop}
                 src={images[index]}
-                width={1000}
-                aspect={9 / 19.5}
-
+                aspect={1/1}
             />
             {
                 images.length > 1 &&

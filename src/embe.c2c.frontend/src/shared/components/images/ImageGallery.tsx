@@ -75,6 +75,13 @@ export default function ImageGallery({ className, imageUrls }: ImageGalleryProps
                     <PaginationDots total={imageUrls.length} current={currentImageUrlIndex} className="absolute top-2 left-1/2 transform -translate-x-1/2" />
                 </>
             }
+            {
+                imageUrls.length > 1 &&
+                <div className="absolute top-0 left-0 w-full h-full">
+                    <Button className="p-0 w-[50%] h-full" onClick={() => setCurrentImageUrlIndex((prev) => (prev - 1 + imageUrls.length) % imageUrls.length)}></Button>
+                    <Button className="p-0 w-[50%] h-full" onClick={() => setCurrentImageUrlIndex(prev => (prev + 1) % imageUrls.length)}></Button>
+                </div>
+            }
         </div>
     )
 

@@ -39,8 +39,7 @@ public interface IImageService
     Task<IUploadImageResult> UploadImageAsync
     (
         byte[] data,
-        int newWidth,
-        int newHeight,
+        double aspect,
         int cropOffsetX,
         int cropOffsetY,
         CancellationToken cancellationToken

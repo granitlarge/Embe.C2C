@@ -1,3 +1,4 @@
+using System.Reflection;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
@@ -72,8 +73,7 @@ public class AddImagesHandler
                 var uploadImageResult = await _imageService.UploadImageAsync
                 (
                     data,
-                    1000,
-                    (int)(1000 * 2.1),
+                    1,
                     (int)image.CropOffsetX,
                     (int)image.CropOffsetY,
                     cancellationToken
