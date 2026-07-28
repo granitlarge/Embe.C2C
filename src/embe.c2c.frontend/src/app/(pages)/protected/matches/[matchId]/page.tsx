@@ -3,6 +3,7 @@ import Match from "@/src/features/matches/components/Match";
 import { getNotifications } from "@/src/shared/actions/notifications/action";
 import { Guid } from "@/src/shared/cache";
 import { SignalRProvider } from "@/src/shared/providers/signal-r";
+import { SignalRHandlerProvider } from "@/src/shared/providers/signal-r-handler";
 import { ApplicationStoreProvider } from "@/src/shared/stores/provider";
 import { getAuthenticatedUser } from "@/src/shared/user";
 
@@ -35,11 +36,11 @@ export default async function MatchPage({ params }: MatchPageProps) {
 
     return (
         <ApplicationStoreProvider matchings={[getMatchingResponse.value]} notifications={getNotificationsResponse.value}>
-            <SignalRProvider>
+            <SignalRHandlerProvider>
                 <div className="flex flex-col h-full">
                     <Match className="grow-1 overflow-scroll scrollbar-none" matchId={matchId} user={user!} />
                 </div>
-            </SignalRProvider>
+            </SignalRHandlerProvider>
         </ApplicationStoreProvider>
     )
 

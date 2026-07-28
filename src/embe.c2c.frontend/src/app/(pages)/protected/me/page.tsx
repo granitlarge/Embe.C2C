@@ -4,6 +4,7 @@ import { getNotifications } from "@/src/shared/actions/notifications/action";
 import Link from "@/src/shared/components/Links/Link";
 import MainNav from "@/src/shared/components/nav/MainNav";
 import { SignalRProvider } from "@/src/shared/providers/signal-r";
+import { SignalRHandlerProvider } from "@/src/shared/providers/signal-r-handler";
 import { Routes } from "@/src/shared/routes";
 import { ApplicationStoreProvider } from "@/src/shared/stores/provider";
 import { Settings } from "@deemlol/next-icons";
@@ -25,7 +26,7 @@ export default async function MePage() {
     return (
         <div className="flex flex-col grow-1 gap-3 overflow-y-scroll scrollbar-none">
             <ApplicationStoreProvider user={getCurrentUserResponse.value} notifications={getNotificationsResponse.value}>
-                <SignalRProvider>
+                <SignalRHandlerProvider>
 
                     <div className="flex justify-between items-center">
                         <h1>me</h1>
@@ -36,7 +37,7 @@ export default async function MePage() {
                     <Me className="grow-1 overflow-y-scroll scrollbar-none" />
                     <MainNav className="grow-0" />
 
-                </SignalRProvider>
+                </SignalRHandlerProvider>
             </ApplicationStoreProvider>
         </div>
     )
