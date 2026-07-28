@@ -6,7 +6,9 @@ public record ImageWriteDto
     string MimeType,
     int Order,
     double CropOffsetX,
-    double CropOffsetY
+    double CropOffsetY,
+    double Width,
+    double Height
 );
 
 public record AddImagesCommand(ImageWriteDto[] Images);

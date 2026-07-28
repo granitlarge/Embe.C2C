@@ -105,10 +105,11 @@ public class BlobStorageImageService : IImageService
 
     public async Task<IUploadImageResult> UploadImageAsync
     (
-        byte[] data, 
-        double aspect,
+        byte[] data,
         int cropOffsetX,
         int cropOffsetY,
+        int width,
+        int height,
         CancellationToken cancellationToken
     )
     {
@@ -120,11 +121,12 @@ public class BlobStorageImageService : IImageService
         using var image = new MagickImage();
         image.Read(data);
 
-        var cropWidth = image.Width > image.Height ? image.Height : image.Width;
-        var cropHeight = cropWidth / aspect;
+        var originalWidth = image.Width;
+        var originalHeight = image.Height;
 
-        image.Crop(new MagickGeometry(cropOffsetX, cropOffsetY, cropWidth, (uint)cropHeight));
+        image.Crop(new MagickGeometry(cropOffsetX, cropOffsetY, (uint)width, (uint)height));
         image.ResetPage();
+        image.Resize(originalWidth, originalHeight);
         image.Format = MagickFormat.WebP;
 
         using (var destBlobStream = await bc.OpenWriteAsync(overwrite: true, cancellationToken: cancellationToken))

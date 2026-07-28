@@ -27,7 +27,7 @@ export type ImageCropperProps = {
 }
 export default function ImageCropper({ onCrop, onCancel, src, aspect }: ImageCropperProps) {
 
-    const scrollSpeed = .05;
+    const scrollSpeedPixels = 100;
     const pointersHistoryRef = useRef(new Map<number, MyPointerEvent>());
     const pointersRef = useRef(new Map<number, MyPointerEvent>());
 
@@ -206,14 +206,16 @@ export default function ImageCropper({ onCrop, onCancel, src, aspect }: ImageCro
         if (!viewport)
             return;
 
+        const widthScrollSpeed = scrollSpeedPixels;
+        const heightScrollSpeed = widthScrollSpeed / (imageWidth / imageHeight);
         let newViewportWidth;
         let newViewportHeight;
         if (direction === "in") {
-            newViewportWidth = Math.max(viewport.width * (1 - scrollSpeed), imageWidth / imageHeight);
-            newViewportHeight = Math.max(viewport.height * (1 - scrollSpeed), 1);
+            newViewportWidth = Math.max(viewport.width - widthScrollSpeed, imageWidth / imageHeight);
+            newViewportHeight = Math.max(viewport.height - heightScrollSpeed, 1);
         } else if (direction === "out") {
-            newViewportWidth = Math.min(viewport.width * (1 + scrollSpeed), imageWidth);
-            newViewportHeight = Math.min(viewport.height * (1 + scrollSpeed), imageHeight);
+            newViewportWidth = Math.min(viewport.width + widthScrollSpeed, imageWidth);
+            newViewportHeight = Math.min(viewport.height + heightScrollSpeed, imageHeight);
         } else {
             newViewportWidth = viewport.width;
             newViewportHeight = viewport.height;
@@ -406,10 +408,12 @@ export default function ImageCropper({ onCrop, onCancel, src, aspect }: ImageCro
 
     function onSave() {
 
-        const offsetX = (viewport?.x ?? 0) + cropperX * imageWidth / containerWidth;
-        const offsetY = (viewport?.y ?? 0) + cropperY * imageWidth / containerWidth;
+        const viewportToContainerRatio = viewport!.width / containerWidth;
 
-        onCrop?.({ x: offsetX, y: offsetY, width: 0, height: 0 });
+        const offsetX = (viewport!.x) + cropperX * viewportToContainerRatio
+        const offsetY = (viewport!.y) + cropperY * viewportToContainerRatio;
+
+        onCrop?.({ x: offsetX, y: offsetY, width: cropperWidth * viewportToContainerRatio, height: cropperHeight * viewportToContainerRatio});
 
     }
 

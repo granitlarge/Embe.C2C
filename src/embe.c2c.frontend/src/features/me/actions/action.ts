@@ -46,7 +46,9 @@ export async function addImages(
                 mimeType: i.image.mimeType,
                 order: i.image.order,
                 cropOffsetX: i.image.crop?.x,
-                cropOffsetY: i.image.crop?.y
+                cropOffsetY: i.image.crop?.y,
+                width: i.image.crop?.width,
+                height: i.image.crop?.height,
             }
         })
     });

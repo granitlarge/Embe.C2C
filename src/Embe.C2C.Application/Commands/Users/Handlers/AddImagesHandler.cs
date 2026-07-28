@@ -1,4 +1,4 @@
-using System.Reflection;
+using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
@@ -8,7 +8,6 @@ using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using ErrorOr;
 
@@ -25,7 +24,8 @@ public class AddImagesHandler
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
     IWorkItemService workItemService,
-    UserDtoMapper userDtoMapper
+    UserDtoMapper userDtoMapper,
+    ILoggerFactory loggerFactory
 ) : CommandHandler<AddImagesCommand, ErrorOr<ReadDto<UserDto, UserPermission>>>
 (
     domainEventStore,
@@ -40,6 +40,7 @@ public class AddImagesHandler
     private readonly IContentSafetyService _contentSafetyService = contentSafetyService;
     private readonly IWorkItemService _workItemService = workItemService;
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
+    private readonly ILogger<AddImagesHandler> _logger = loggerFactory.Create<AddImagesHandler>();
 
     protected override async Task<CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>> InternalHandleAsync
     (
@@ -70,12 +71,14 @@ public class AddImagesHandler
                     return;
                 }
 
+                await _logger.TraceAsync($"Uploading image: {image.Width}x{image.Height} - (X,Y) = {image.CropOffsetX},{image.CropOffsetY}");
                 var uploadImageResult = await _imageService.UploadImageAsync
                 (
                     data,
-                    1,
                     (int)image.CropOffsetX,
                     (int)image.CropOffsetY,
+                    (int)image.Width,
+                    (int)image.Height,
                     cancellationToken
                 );
 
