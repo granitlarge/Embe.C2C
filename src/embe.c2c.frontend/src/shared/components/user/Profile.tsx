@@ -53,7 +53,7 @@ export default function Profile({ candidate, candidateSearchProfile, userSearchP
                     </span>
                 </Surface>
             }
-            <ImageGallery className="" imageUrls={
+            <ImageGallery className="w-full h-[350px]" imageUrls={
                 images
                     .sort((a, b) => a.imageDetails.order - b.imageDetails.order)
                     .map(i => i.imageDetails.largeUrl ?? i.imageDetails.url) ?? []

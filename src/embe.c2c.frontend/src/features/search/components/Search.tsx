@@ -6,13 +6,14 @@ import * as api from "../actions/action";
 import Profile from "@/src/shared/components/user/Profile";
 import MainNav from "@/src/shared/components/nav/MainNav";
 import { SlidersHorizontal } from "lucide-react";
-import { GeneratedCandidate } from "../actions/type";
 import Link from "@/src/shared/components/Links/Link";
 import { useRouter } from "nextjs-toploader/app";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { Candidate, CandidatePermission, SearchProfile, SearchProfilePermission } from "@/src/shared/types/domain/aggregates";
 import Button from "@/src/shared/components/buttons/Button";
 import { Routes } from "@/src/shared/routes";
+import { LocalStore } from "@/src/shared/local-store";
+import NotificationModal from "@/src/shared/components/modal/NotificationModal";
 
 type HeaderProps = {
     hasSearchProfiles: boolean;
@@ -47,6 +48,8 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
 
     const router = useRouter();
     const classNames = [className].filter(Boolean).join(" ");
+
+    const [showNotificationsModal, setShowNotificationsModal] = useState(!LocalStore.read().data.askedForNotificationPermissions);
 
     const [candidates, setCandidates] = useState(initialCandidates);
     const judgeCallback = useCallback(judge, [candidates[0]]);
@@ -100,6 +103,12 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
                     <span className="text-(--primary-fc) text-(length:--primary-fs) font-bold">find people that match your vibe by</span>
                     <Link className="text-(length:--primary-fs) font-bold" href={Routes.protected.createSearchProfile}>creating a search profile</Link>
                 </div>
+            }
+            {
+                showNotificationsModal &&
+                <NotificationModal closed={() => {
+                    setShowNotificationsModal(false);
+                }} hidden={false} />
             }
             <MainNav className="grow-0" />
         </div>
