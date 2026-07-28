@@ -6,12 +6,19 @@ using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.Authorizations;
 using Embe.C2C.Application.Dtos.Read;
 using Embe.C2C.Application.Dtos.Read.Aggregates;
+using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Domain;
+using Embe.C2C.Domain.Entities;
 using ErrorOr;
 
 namespace Embe.C2C.Application.Commands.Users.Handlers;
+
+public record AddImagesResult
+(
+    ImageDto[] Images
+);
 
 public class AddImagesHandler
 (
@@ -24,9 +31,9 @@ public class AddImagesHandler
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
     IWorkItemService workItemService,
-    UserDtoMapper userDtoMapper,
-    ILoggerFactory loggerFactory
-) : CommandHandler<AddImagesCommand, ErrorOr<ReadDto<UserDto, UserPermission>>>
+    ILoggerFactory loggerFactory,
+    ImageDtoMapper imageDtoMapper
+) : CommandHandler<AddImagesCommand, ErrorOr<AddImagesResult>>
 (
     domainEventStore,
     context,
@@ -39,10 +46,10 @@ public class AddImagesHandler
     private readonly IImageService _imageService = imageService;
     private readonly IContentSafetyService _contentSafetyService = contentSafetyService;
     private readonly IWorkItemService _workItemService = workItemService;
-    private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
+    private readonly ImageDtoMapper _imageDtoMapper = imageDtoMapper;
     private readonly ILogger<AddImagesHandler> _logger = loggerFactory.Create<AddImagesHandler>();
 
-    protected override async Task<CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>>>> InternalHandleAsync
+    protected override async Task<CommandResult<ErrorOr<AddImagesResult>>> InternalHandleAsync
     (
         AddImagesCommand command,
         CancellationToken cancellationToken = default
@@ -60,6 +67,7 @@ public class AddImagesHandler
         }
 
         var uploadedImageUrls = new List<string>();
+        var addedImages = new List<Image>();
         try
         {
             await Task.WhenAll(command.Images.Select(async image =>
@@ -102,22 +110,24 @@ public class AddImagesHandler
                     throw new InvalidOperationException("Failed to create image");
                 }
 
+                Image addedImage;
                 lock (user)
                 {
-                    user.AddImage
+                    addedImage = user.AddImage
                     (
                         imageDetails.Value
-                    );
+                    ).Value;
+                }
+
+                lock (addedImages)
+                {
+                    addedImages.Add(addedImage);
                 }
 
             }));
 
-            var dto = await _userDtoMapper.ToDtoAsync(user, user, cancellationToken) ?? throw new InvalidOperationException("user can't read his own data wtf???");
-            return new
-            (
-                true,
-                dto
-            );
+            var result = await Task.WhenAll(addedImages.Select(image => _imageDtoMapper.ToDtoAsync(image, cancellationToken)));
+            return new(true, new AddImagesResult(result));
 
         }
         catch (Exception e1)

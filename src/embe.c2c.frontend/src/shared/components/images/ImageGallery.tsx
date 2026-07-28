@@ -58,8 +58,9 @@ export default function ImageGallery({ className, imageUrls }: ImageGalleryProps
     return (
         <div className={`${classNames} relative flex flex-col items-center justify-center`}>
             {
-                currentImageUrl &&
-                <ImageGalleryImage className="w-full h-full" src={currentImageUrl} alt={`Image ${currentImageUrlIndex + 1}`} />
+                imageUrls.filter(imageUrl => !!imageUrl).map((imageUrl, index) => (
+                    <ImageGalleryImage key={index} className={`w-full h-full ${index === currentImageUrlIndex ? "" : "hidden"}`} src={imageUrl!} alt={`Image ${currentImageUrlIndex + 1}`} />
+                ))
             }
             {
                 !currentImageUrl &&

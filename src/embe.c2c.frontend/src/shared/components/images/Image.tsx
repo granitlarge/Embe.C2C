@@ -15,21 +15,20 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
 
     const [isLoading, setIsLoading] = useState(true);
     const classNames = [
-        className,
-        isLoading ? "opacity-0" : "opacity-100"
+        className
     ].filter(Boolean).join(" ");
 
     return (
         <>
             {
                 isLoading &&
-                <div className="w-full flex items-center justify-center">
+                <div className={`${classNames} w-full h-full flex items-center justify-center`}>
                     <Loader className="animate-spin w-(--primary-fs) h-(--primary-fs)" />
                 </div>
             }
             {
                 <NextImage
-                    className={`${classNames} transition-opacity duration-300`}
+                    className={`${classNames} transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
                     onLoad={(e) => { setIsLoading(false); onLoad?.(e); }}
                     onError={(e) => { setIsLoading(false); onError?.(e); }}
                     {...props}

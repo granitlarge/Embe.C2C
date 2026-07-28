@@ -51,6 +51,8 @@ export default function Me({ className }: MeProps) {
     const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(user));
     const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(user));
 
+    console.log("ClientSideBasicFormData: ", clientSideBasicFormData)
+
     useEffect(() => {
 
         const updatedBasicFormData = getBasicFormDataFromCurrentUser(user)
@@ -124,6 +126,7 @@ export default function Me({ className }: MeProps) {
         const imageAndIndex = clientSideBasicFormData.images?.map((image, index) => ({ image, index })) ?? [];
         const imagesToKeep = imageAndIndex.filter(({ image }) => image.id !== undefined).map(({ image, index }) => ({ id: image.id!, order: index }));
         const imagesToAdd = imageAndIndex.filter(({ image }) => image.id === undefined);
+        console.log({ imagesToAdd, imagesToKeep, imageAndIndex });
 
         let addedImages: { id: Guid, order: number }[] = [];
 
@@ -141,10 +144,7 @@ export default function Me({ className }: MeProps) {
                 throw new Error("not implemented");
             }
 
-            addedImages =
-                (addImagesResult.value?.data.images ?? [])
-                    .filter(newImage => !imageAndIndex.some(existingImage => newImage.id == existingImage.image.id))
-                    .map(ni => ({ id: ni.id, order: ni.imageDetails.order }))
+            addedImages = addImagesResult.value?.images.map(i => ({ id: i.id, order: i.imageDetails.order })) ?? [];
         }
 
         const updateProfileResponse = await updateProfile

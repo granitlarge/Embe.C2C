@@ -71,7 +71,6 @@ export default function LoginForm({ className }: LoginFormProps) {
             <TextInput
                 label="email"
                 type="email"
-                placeholder="name@example.com"
                 value={userName}
                 errorMessage={usernameError}
                 onBlur={(un: string) => {
@@ -79,7 +78,11 @@ export default function LoginForm({ className }: LoginFormProps) {
                     clearErrors();
                 }} />
             <TextInput
-                label={passwordLabel} type="password" placeholder="***********" value={password} errorMessage={passwordError} onBlur={(pw: string) => {
+                label={passwordLabel}
+                type="password"
+                value={password}
+                errorMessage={passwordError}
+                onBlur={(pw: string) => {
                     setPassword(pw);
                     clearErrors();
                 }} />

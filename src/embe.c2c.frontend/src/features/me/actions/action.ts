@@ -7,6 +7,7 @@ import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { ImageData } from "../components/MyInfoForm";
+import { AddImagesResult } from "./type";
 
 export async function updateProfile
     (
@@ -37,7 +38,7 @@ export async function updateProfile
 
 export async function addImages(
     images: { image: ImageData, base64Data: string }[]
-): Promise<ApiResponse<ReadDto<User, UserPermission>>> {
+): Promise<ApiResponse<AddImagesResult>> {
 
     var body = JSON.stringify({
         images: images.map((i, index) => {
@@ -53,7 +54,7 @@ export async function addImages(
         })
     });
 
-    const response = Mutate<ReadDto<User, UserPermission>>(
+    const response = Mutate<AddImagesResult>(
         `${process.env.API_URL}/api/user/upload-images`,
         {
             method: "POST",

@@ -1,3 +1,4 @@
+using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
@@ -24,7 +25,8 @@ public class UpdateHandler
     IntegrationEventHandler integrationEventHandler,
     DomainEventStore domainEventStore,
     UserDtoMapper userDtoMapper,
-    SearchProfileService searchProfileService
+    SearchProfileService searchProfileService,
+    ILoggerFactory loggerFactory
 ) : CommandHandler<UpdateCommand, ErrorOr<ReadDto<UserDto, UserPermission>?>>
 (
     domainEventStore,
@@ -39,6 +41,7 @@ public class UpdateHandler
     private readonly UserAuthorizationService _authorizationPolicy = authorizationPolicy;
     private readonly UserDtoMapper _userDtoMapper = userDtoMapper;
     private readonly SearchProfileService _searchProfileService = searchProfileService;
+    private readonly ILogger<UpdateHandler> _logger = loggerFactory.Create<UpdateHandler>();
 
     protected override async Task<CommandResult<ErrorOr<ReadDto<UserDto, UserPermission>?>>> InternalHandleAsync
     (
@@ -110,7 +113,8 @@ public class UpdateHandler
             }
         }
 
-        var imagesToRemove = user.Images.Where(f => !command.ImagesToKeep?.Any(itk => itk.Id == f.Id) ?? true).ToList();
+        var imagesToRemove = user.Images.Where(f => !(command.ImagesToKeep?.Any(itk => itk.Id == f.Id) ?? false)).ToList();
+        await _logger.TraceAsync($"Removing {imagesToRemove.Count} images.");
         foreach (var image in imagesToRemove)
         {
             user.RemoveImage(image.Id);
