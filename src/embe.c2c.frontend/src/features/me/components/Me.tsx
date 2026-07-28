@@ -51,7 +51,6 @@ export default function Me({ className }: MeProps) {
     const [serverSideBasicFormData, setServerSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(user));
     const [clientSideBasicFormData, setClientSideBasicFormData] = useState<MyInfoFormData>(getBasicFormDataFromCurrentUser(user));
 
-    console.log("ClientSideBasicFormData: ", clientSideBasicFormData)
 
     useEffect(() => {
 
@@ -126,7 +125,6 @@ export default function Me({ className }: MeProps) {
         const imageAndIndex = clientSideBasicFormData.images?.map((image, index) => ({ image, index })) ?? [];
         const imagesToKeep = imageAndIndex.filter(({ image }) => image.id !== undefined).map(({ image, index }) => ({ id: image.id!, order: index }));
         const imagesToAdd = imageAndIndex.filter(({ image }) => image.id === undefined);
-        console.log({ imagesToAdd, imagesToKeep, imageAndIndex });
 
         let addedImages: { id: Guid, order: number }[] = [];
 
