@@ -23,7 +23,7 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
                 className="
                     fixed
                     bottom-25
-                    left-10 
+                    left-[30%]
                     text-(--primary-fc) 
                     max-w-max 
                     max-h-max 
@@ -42,7 +42,7 @@ export default function JudgeOverlay({ children, onJudge, className }: JudgeOver
                 className="
                    fixed 
                     bottom-25
-                    right-10 
+                    right-[30%]
                     text-(--primary-fc) 
                     max-w-max 
                     max-h-max 
