@@ -203,7 +203,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
         if (!deleteResponse.success) {
             throw new Error("not implemented");
         }
-        router.push(Routes.protected.search);
+        router.replace(Routes.protected.searchProfiles);
     }
 
     function onCancel() {

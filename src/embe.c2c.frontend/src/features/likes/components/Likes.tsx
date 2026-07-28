@@ -56,7 +56,7 @@ export default function Likes({ className }: LikesProps) {
         <>
             {
                 likes.length > 0 ?
-                    < InfiniteScroll
+                    <InfiniteScroll
                         className={`${classNames} flex flex-col gap-2`
                         }
                         direction="down"
