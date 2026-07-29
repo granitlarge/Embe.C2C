@@ -86,9 +86,9 @@ public static class ServiceCollectionExtensions
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var serviceManager = new ServiceManagerBuilder()
                 .WithOptions(option =>
-            {
-                option.ConnectionString = configuration.GetConnectionString("AzureSignalR") ?? configuration.GetValue<string>("AzureSignalR");
-            }).BuildServiceManager();
+                {
+                    option.ConnectionString = configuration.GetConnectionString("AzureSignalR") ?? configuration.GetValue<string>("AzureSignalR");
+                }).BuildServiceManager();
             var pool = new SignalRServiceHubContextPool(serviceManager);
             return pool;
         });

@@ -99,7 +99,6 @@ public class BlobStorageImageService : IImageService
     private async Task<BlobContainerClient> GetBlobContainerClientAsync(CancellationToken cancellationToken = default)
     {
         var blobContainerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-        await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
         return blobContainerClient;
     }
 
