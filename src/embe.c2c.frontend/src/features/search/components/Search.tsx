@@ -64,40 +64,56 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
         }
     }
 
-    async function judge(isPositive: boolean) {
-        const response = await api.judge(candidates[0].data.id, isPositive);
-        if (!response.success) {
-            throw new Error("Not implemented");
-        } else {
+   async function judge(isPositive: boolean) {
 
-            if (response.value !== undefined) {
+       const candidate = candidates[0];
+       setCandidates(prev => prev.slice(1));
 
-                const matching = response.value;
-                setNotifications(
-                    prev => 
-                    prev.filter(n => {
-                        if (n.data.type !== NotificationType.PositivelyJudged) {
-                            return true;
-                        }
-                        const asPositivelyJudged = n.data as PositivelyJudgedNotification;
-                        return asPositivelyJudged.userId !== matching?.data.userId1 && asPositivelyJudged.userId !== matching?.data.userId2;
-                    })
-                )
+       try {
 
-            }
+           const response = await api.judge(candidates[0].data.id, isPositive);
+           if (!response.success) {
 
-            router.refresh();
-            if (candidates.length === 0) {
+               setCandidates(prev => [...prev, candidate]);
 
-                await loadCandidates();
+           } else {
 
-            } else {
+               router.refresh();
 
-                setCandidates(prev => prev.slice(1));
+               if (response.value !== undefined) {
 
-            }
+                   const matching = response.value;
 
-        }
+                   setNotifications(prev =>
+                       prev.filter(n => {
+                           if (n.data.type !== NotificationType.PositivelyJudged) {
+                               return true;
+                           }
+                           const asPositivelyJudged = n.data as PositivelyJudgedNotification;
+                           return asPositivelyJudged.userId !== matching?.data.userId1 && asPositivelyJudged.userId !== matching?.data.userId2;
+                       })
+                   )
+
+               }
+
+               if (candidates.length === 0) {
+
+                   try {
+                       await loadCandidates();
+                   } catch (e) {
+
+                   }
+
+               }
+
+           }
+
+       } catch (e) {
+
+           setCandidates(prev => [...prev, candidate]);
+
+       }
+
     }
 
 
