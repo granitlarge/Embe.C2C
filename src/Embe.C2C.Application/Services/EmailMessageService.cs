@@ -50,7 +50,7 @@ public class EmailComposerService(ISettings settings, INotificationRepository no
     {
         var subject = $"{_settings.Application.Name} | you've got a new message!";
         var link = $"{_settings.Site.Url}/protected/matches";
-        var htmlContent = Emails.MatchingCreatedMessage(_settings.Application.Name, link);
+        var htmlContent = Emails.MessageCreatedMessage(_settings.Application.Name, link);
         var plainText =
         $$"""
             You've got a new message! Click the link below to check it out.
@@ -66,7 +66,7 @@ public class EmailComposerService(ISettings settings, INotificationRepository no
     {
         var subject = $"{_settings.Application.Name} | you've got a new like!";
         var link = $"{_settings.Site.Url}/protected/likes";
-        var htmlContent = Emails.MatchingCreatedMessage(_settings.Application.Name, link);
+        var htmlContent = Emails.PositivelyJudgedMessage(_settings.Application.Name, link);
         var plainText =
         $$"""
             You've got a new like! Click the link below to check it out.

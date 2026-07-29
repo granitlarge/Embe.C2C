@@ -58,6 +58,7 @@ public static class Emails
                 align-items: center;
                 vertical-align: middle;
                 text-align: center;
+                white-space: pre-line;
             }
 
             footer {
@@ -105,6 +106,17 @@ public static class Emails
         $$"""
             <p>
                 Click <a href='{{link}}'>here</a> to see the message!
+            </p>
+        """
+    );
+
+    internal static string PositivelyJudgedMessage(string applicationName, string link) => Template
+    (
+        applicationName,
+        "you've got a new like!",
+        $$"""
+            <p>
+                Click <a href='{{link}}'>here</a> to see who liked you!
             </p>
         """
     );
