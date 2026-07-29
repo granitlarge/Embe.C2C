@@ -87,6 +87,7 @@ public class SearchProfileService(DomainEventStore domainEventStore) : DomainSer
             errors.AddRange(nameChangeResult.Errors);
         }
 
+        var descriptionIsDifferent = searchProfile.Description != newDescription;
         var descriptionChangeResult = searchProfile.ChangeDescription(newDescription);
         if (descriptionChangeResult.IsError)
         {
@@ -123,6 +124,11 @@ public class SearchProfileService(DomainEventStore domainEventStore) : DomainSer
         if (errors.Count != 0)
         {
             return errors;
+        }
+
+        if (descriptionIsDifferent)
+        {
+            _domainEventStore.AddDomainEvent(new SearchProfileDescriptionChangedDomainEvent(searchProfile.Id, searchProfile.Description));
         }
 
         _domainEventStore.AddDomainEvent(new SearchProfileUpdatedDomainEvent(searchProfile));

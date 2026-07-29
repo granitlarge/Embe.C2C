@@ -75,12 +75,20 @@ public class DomainEventHandler
             case SearchProfileUpdatedDomainEvent searchProfileUpdated:
                 await HandleSearchProfileUpdatedEventAsync(searchProfileUpdated, cancellationToken);
                 break;
+            case SearchProfileDescriptionChangedDomainEvent searchProfileDescriptionChanged:
+                await HandleSearchProfileDescriptionChangedDomainEvent(searchProfileDescriptionChanged, cancellationToken);
+                break;
 
             default:
                 break;
 
         }
 
+    }
+
+    private async Task HandleSearchProfileDescriptionChangedDomainEvent(SearchProfileDescriptionChangedDomainEvent searchProfileDescriptionChanged, CancellationToken cancellationToken)
+    {
+        AddIntegrationEvent(new SearchProfileDescriptionChangedIntegrationEvent(searchProfileDescriptionChanged.SearchProfileId, searchProfileDescriptionChanged.NewDescription));
     }
 
     private async Task HandleSearchProfileUpdatedEventAsync(SearchProfileUpdatedDomainEvent searchProfileUpdated, CancellationToken cancellationToken)

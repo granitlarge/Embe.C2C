@@ -20,6 +20,7 @@ public enum IntegrationEventType
 
     PositivelyJudged,
     SearchProfileUpdated,
+    SearchProfileDescriptionChanged,
 }
 
 public record IntegrationEvent(IntegrationEventType Type)

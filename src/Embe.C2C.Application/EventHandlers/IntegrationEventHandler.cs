@@ -8,6 +8,7 @@ using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
 using Embe.C2C.Application.Events.SearchProfiles;
 using Embe.C2C.Application.Services;
+using Embe.C2C.Domain.Aggregates.SearchProfiles.Events;
 
 namespace Embe.C2C.Application.EventHandlers;
 
@@ -78,14 +79,22 @@ public class IntegrationEventHandler
             case SearchProfileUpdatedIntegrationEvent searchProfileUpdatedEvent:
                 await HandleSearchProfileUpdatedEventAsync(searchProfileUpdatedEvent, cancellationToken);
                 break;
+            case SearchProfileDescriptionChangedIntegrationEvent searchProfileDescriptionChangedEvent:
+                await HandleSearchProfileDescriptionChangedEventAsync(searchProfileDescriptionChangedEvent, cancellationToken);
+                break;
             default:
                 break;
         }
     }
 
+    private async Task HandleSearchProfileDescriptionChangedEventAsync(SearchProfileDescriptionChangedIntegrationEvent searchProfileDescriptionChangedEvent, CancellationToken cancellationToken)
+    {
+        await _workItemService.PerformAsync(new GenerateSearchProfileDescriptionEmbedding(searchProfileDescriptionChangedEvent.SearchProfileId, searchProfileDescriptionChangedEvent.NewDescription), cancellationToken);
+    }
+
     private Task HandleSearchProfileUpdatedEventAsync(SearchProfileUpdatedIntegrationEvent searchProfileUpdatedEvent, CancellationToken cancellationToken)
     {
-        return _workItemService.PerformAsync(new GenerateSearchProfileDescriptionEmbedding(searchProfileUpdatedEvent.SearchProfileId, searchProfileUpdatedEvent.Description), cancellationToken);
+        return Task.CompletedTask;
     }
 
     private async Task HandleNotificationCreatedEventAsync
