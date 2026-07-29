@@ -27,7 +27,7 @@ export function Matches({ user, className }: MatchesProps) {
     async function loadMore(): Promise<boolean> {
         const response = await getMatchings(page, pageSize);
         const newMatches = response.value || [];
-        setMatches([...matches, ...newMatches]);
+        setMatches(prev => [...prev, ...newMatches]);
         return newMatches.length > 0;
     }
 

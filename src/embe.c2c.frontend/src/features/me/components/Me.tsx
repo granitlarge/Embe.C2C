@@ -162,7 +162,7 @@ export default function Me({ className }: MeProps) {
         }
 
         const responseReadDto = updateProfileResponse.value!;
-        setUser(responseReadDto);
+        setUser(_ => responseReadDto);
         router.refresh();
     }
 

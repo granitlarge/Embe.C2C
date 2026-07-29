@@ -46,7 +46,7 @@ export default function Likes({ className }: LikesProps) {
         }
 
         const newLikes = response.value!;
-        setLikes([...likes, ...newLikes]);
+        setLikes(prev => [...prev, ...newLikes]);
 
         return response.value!.length == size;
 

@@ -151,7 +151,7 @@ export default function Match({ matchId, user, className }: MatchProps) {
         }
 
         const newMessages = response.value || [];
-        setMatchings(matchings.map(m => {
+        setMatchings(prev => prev.map(m => {
             if (m.data.id !== match.data.id)
                 return m;
             return {
@@ -187,7 +187,7 @@ export default function Match({ matchId, user, className }: MatchProps) {
             if (!response.success)
                 throw new Error("not immplemented");
 
-            setMatchings(matchings.map(m => {
+            setMatchings(prev => prev.map(m => {
                 if (m.data.id !== match.data.id)
                     return m;
                 return {
@@ -220,7 +220,7 @@ export default function Match({ matchId, user, className }: MatchProps) {
             if (!response.success)
                 throw new Error("not implemented");
 
-            setMatchings(matchings.map(m => {
+            setMatchings(prev => prev.map(m => {
                 if (m.data.id !== match.data.id)
                     return m;
                 return {
@@ -250,7 +250,7 @@ export default function Match({ matchId, user, className }: MatchProps) {
             throw new Error("not implemented");
         }
 
-        setNotifications(notifications.map(n => {
+        setNotifications(prev => prev.map(n => {
             if (!notificationIds.includes(n.data.id!)) {
                 return n;
             }
@@ -276,7 +276,7 @@ export default function Match({ matchId, user, className }: MatchProps) {
         if (!response.success)
             throw new Error("not implemented");
 
-        setMatchings(matchings.map(m => {
+        setMatchings(prev => prev.map(m => {
             if (m.data.id !== match.data.id)
                 return m;
             return {
@@ -351,7 +351,7 @@ export default function Match({ matchId, user, className }: MatchProps) {
         }
 
         const messagesThatReferenceDeletedMessage = messages.filter(m => m.data.replyToMessageId === messageId).map(m => m.data.id);
-        setMatchings(matchings.map(m => {
+        setMatchings(prev => prev.map(m => {
             if (m.data.id !== match.data.id) {
                 return m;
             }

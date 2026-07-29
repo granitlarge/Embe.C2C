@@ -61,7 +61,7 @@ export enum MatchingPermission {
 
 export type Message = {
     id: Guid;
-    conversationId: Guid;
+    matchingId: Guid;
     replyToMessageId?: Guid;
     authorUserId: Guid;
     content?: string;

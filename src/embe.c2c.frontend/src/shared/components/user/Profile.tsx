@@ -1,6 +1,6 @@
 import { Mars, Transgender, Venus } from "lucide-react";
 import { SearchProfile, User } from "../../types/domain/aggregates"
-import { Gender, ImageStatus } from "../../types/domain/value-objects";
+import { Gender } from "../../types/domain/value-objects";
 import ImageGallery from "../images/ImageGallery"
 import Surface from "../surfaces/Surface";
 import { formatDistance } from "../../distance";

@@ -30,6 +30,9 @@ export function prepareNotifications(notifications: ReadDto<Notification, Notifi
     return notifications;
 }
 
+export type Updater<T> = (prev: T) => T;
+export type SetState<T> = (updater: Updater<T>) => void
+
 export type ApplicationState = {
     user: ReadDto<User, UserPermission> | undefined;
     notifications: ReadDto<Notification, NotificationPermission>[];
@@ -38,10 +41,10 @@ export type ApplicationState = {
 }
 
 export type ApplicationActions = {
-    setUser: (newUser: ReadDto<User, UserPermission> | undefined) => void;
-    setNotifications: (newNotifications: ReadDto<Notification, NotificationPermission>[]) => void;
-    setMatchings: (newMatchings: ReadDto<Matching, MatchingPermission>[]) => void;
-    setPositiveJudgements: (newPositiveJudgements: ReadDto<Candidate, CandidatePermission>[]) => void;
+    setUser: SetState<ReadDto<User, UserPermission> | undefined>;
+    setNotifications: SetState<ReadDto<Notification, NotificationPermission>[]>;
+    setMatchings: SetState<ReadDto<Matching, MatchingPermission>[]>;
+    setPositiveJudgements: SetState<ReadDto<Candidate, CandidatePermission>[]>
 }
 
 export type ApplicationStore = ApplicationState & ApplicationActions
@@ -50,18 +53,18 @@ export const defaultInitState: ApplicationState = { user: undefined, notificatio
 export const createApplicationStore = (initState: ApplicationState = defaultInitState) => {
     return createStore<ApplicationStore>()((set) => ({
         ...initState,
-        setUser: (newUser: ReadDto<User, UserPermission> | undefined) => set((prev) => ({ ...prev, user: newUser })),
-        setNotifications: (newNotifications: ReadDto<Notification, NotificationPermission>[]) => set((prev) => ({
+        setUser: (updater: Updater<ReadDto<User, UserPermission> | undefined>) => set((prev) => ({ ...prev, user: updater(prev.user) })),
+        setNotifications: (updater: Updater<ReadDto<Notification, NotificationPermission>[]>) => set((prev) => ({
             ...prev,
-            notifications: prepareNotifications(newNotifications)
+            notifications: prepareNotifications(updater(prev.notifications))
         })),
-        setMatchings: (newMatchings: ReadDto<Matching, MatchingPermission>[]) => set((prev) => ({
+        setMatchings: (updater: Updater<ReadDto<Matching, MatchingPermission>[]>) => set((prev) => ({
             ...prev,
-            matchings: prepareMatchings(newMatchings)
+            matchings: prepareMatchings(updater(prev.matchings))
         })),
-        setPositiveJudgements: (newPositiveJudgements: ReadDto<Candidate, CandidatePermission>[]) => set((prev) => ({
+        setPositiveJudgements: (updater: Updater<ReadDto<Candidate, CandidatePermission>[]>) => set((prev) => ({
             ...prev,
-            positiveJudgements: preparePositiveJudgements(newPositiveJudgements)
+            positiveJudgements: preparePositiveJudgements(updater(prev.positiveJudgements))
         }))
     }))
 }

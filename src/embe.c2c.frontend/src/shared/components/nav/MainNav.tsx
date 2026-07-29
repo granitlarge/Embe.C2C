@@ -50,7 +50,7 @@ export default function MainNav({
                 try {
 
                     await Promise.all(unseenLikesNotifications.map(umn => markAsRead(umn.data.id!, true)));
-                    setNotifications(notifications.map(n => {
+                    setNotifications(prev => prev.map(n => {
                         const umn = unseenLikesNotifications.find(umn => umn.data.id === n.data.id);
                         if (!umn) return n;
                         return {
@@ -85,7 +85,7 @@ export default function MainNav({
                 try {
 
                     await Promise.all(unseenMatchNotifications.map(umn => markAsRead(umn.data.id!, true)));
-                    setNotifications(notifications.map(n => {
+                    setNotifications(prev => prev.map(n => {
                         const umn = unseenMatchNotifications.find(umn => umn.data.id === n.data.id);
                         if (!umn) return n;
                         return {

@@ -74,7 +74,8 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
 
                 const matching = response.value;
                 setNotifications(
-                    notifications.filter(n => {
+                    prev => 
+                    prev.filter(n => {
                         if (n.data.type !== NotificationType.PositivelyJudged) {
                             return true;
                         }
