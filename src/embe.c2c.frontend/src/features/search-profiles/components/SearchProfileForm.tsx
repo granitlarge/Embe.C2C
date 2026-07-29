@@ -253,6 +253,7 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 <InfoSurface show={true} >
                     <p>A search-profile is a set of criteria that define the kind of relationship & person you're looking for.</p>
                 </InfoSurface>
+
                 <DropDownInput
                     optionClassName="lowercase"
                     errorMessage={relationshipError}
@@ -266,6 +267,8 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 />
 
                 <DropDownInput
+                    info="the medium of a relationship describes how you'd like to interact in the relationship: virtually, in-person or a hybrid of the two"
+                    infoType="info"
                     optionClassName="lowercase"
                     errorMessage={mediumError}
                     label="medium"
@@ -276,6 +279,8 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 />
 
                 <DropDownInput
+                    info="the duration of a relationship describes how long the relationship should last"
+                    infoType="info"
                     optionClassName="lowercase"
                     errorMessage={durationError}
                     label="duration"
@@ -322,6 +327,8 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 {
                     clientSideState.duration !== EngagementBoundedness.OneTime &&
                     <DropDownInput
+                        info="the frequency of a relationship describes how often you'd like to interact with the person"
+                        infoType="info"
                         optionClassName="lowercase"
                         label="frequency"
                         errorMessage={frequencyError}
@@ -333,6 +340,8 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 }
 
                 <SelectInput
+                    info="specify the genders of the person you'd like to meet (multi-select)"
+                    infoType="info"
                     optionClassName="lowercase"
                     multiple={true}
                     value={clientSideState.genders.map(g => enums.enumerate(Gender).find(({ value }) => value === g)!.key)}
@@ -344,6 +353,8 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 />
 
                 <DualRangeInput
+                    info="specify the age range of the person you'd like to meet"
+                    infoType="info"
                     label={"age range"}
                     value={[clientSideState.ageRange[0], clientSideState.ageRange[1] ?? 120]}
                     min={minAge}
@@ -353,6 +364,8 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 />
 
                 <SingleRangeInput
+                    info="specify the maximum distance between you and the person you'd like to meet"
+                    infoType="info"
                     disabledAlertChildren={distanceLocationNotSetAlertChildren}
                     disabled={user.location === undefined}
                     value={clientSideState.maximumDistanceKm}
@@ -364,6 +377,8 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 />
 
                 <TextAreaInput
+                    info="describe the relationship you're looking for, we'll use this information to match you with individuals that look for similar things"
+                    infoType="info"
                     errorMessage={descriptionError}
                     value={clientSideState.description}
                     label="description"
@@ -376,14 +391,16 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                     errorMessage={nameError}
                     value={clientSideState.name}
                     label="name"
-                    placeholder="name your search profile..."
+                    placeholder="give your search-profile a name..."
                     onBlur={(name) => setClientSideState(prev => ({ ...prev, name }))}
                 />
+
                 <CheckboxInput
                     value={clientSideState.active}
                     label={`${clientSideState.active ? "active" : "inactive"}`}
                     onChange={(active) => setClientSideState(prev => ({ ...prev, active }))}
                 />
+
             </Surface>
 
             <div className="flex flex-row gap-2 justify-between grow-0">

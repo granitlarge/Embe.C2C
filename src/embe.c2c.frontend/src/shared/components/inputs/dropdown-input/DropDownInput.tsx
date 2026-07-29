@@ -1,3 +1,4 @@
+import InfoModal, { InfoModalProps, InfoType } from "../../infos/InfoModal";
 import ErrorMessage from "../ErrorMessage";
 
 export type Option = {
@@ -14,8 +15,10 @@ export type DropDownInputProps = {
     errorMessage?: string;
     optionClassName?: string
     className?: string
+    info?: string;
+    infoType? : InfoType
 }
-export default function DropDownInput({ className, label, options, value, onChange, placeholder, errorMessage, optionClassName }: DropDownInputProps) {
+export default function DropDownInput({ info, infoType, className, label, options, value, onChange, placeholder, errorMessage, optionClassName }: DropDownInputProps) {
     const classNames=[
         className
     ].filter(Boolean).join(" ");
@@ -24,7 +27,10 @@ export default function DropDownInput({ className, label, options, value, onChan
     ].filter(Boolean).join(" ");
     return (
         <div className={`input-wrapper ${classNames}`}>
-            {label && <label className="label">{label}</label>}
+            <div className="flex justify-center items-center gap-1">
+                {label && <label className="label m-0">{label}</label>}
+                {info && infoType && <InfoModal info={info} type={infoType} />}
+            </div>
             <select value={value ?? ""} onChange={(e) => onChange?.(e.target.value)} className="input">
                 <option className={optionClassNames} value={""} disabled>{placeholder}</option>
                 {

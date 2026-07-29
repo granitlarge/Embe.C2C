@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Surface from "../../surfaces/Surface";
 import ErrorMessage from "../ErrorMessage";
+import InfoModal, { InfoType } from "../../infos/InfoModal";
 
 export type InputProps = {
     errorMessage?: string;
@@ -14,6 +15,8 @@ export type TextInputProps = InputProps & {
     type?: string;
     placeholder?: string;
     children?: React.ReactNode;
+    info?: string;
+    infoType?: InfoType
 }
 export default function TextInput({
     label,
@@ -23,7 +26,9 @@ export default function TextInput({
     value,
     errorMessage,
     placeholder,
-    children
+    children,
+    info,
+    infoType
 }: TextInputProps) {
 
     const [actualValue, setActualValue] = useState(value ?? "");
@@ -37,7 +42,10 @@ export default function TextInput({
 
     return (
         <Surface className={`input-wrapper ${shellClassNames}`} padding="none" variant="inherit">
-            {label && <span className="label">{label}</span>}
+            <div className="flex justify-center items-center gap-1">
+                {label && <span className="label m-0">{label}</span>}
+                {info && infoType && <InfoModal info={info} type={infoType} />}
+            </div>
             <input
                 className="input"
                 placeholder={placeholder ?? ""}

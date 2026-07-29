@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./TextAreaInput.module.css";
 import ErrorMessage from "../ErrorMessage";
+import InfoModal, { InfoType } from "../../infos/InfoModal";
 
 export type TextAreaInputSize = "sm" | "md" | "lg";
 export type TextAreaInputProps = Omit<React.PropsWithoutRef<React.TextareaHTMLAttributes<HTMLTextAreaElement>>, 'onBlur'> & {
@@ -10,9 +11,11 @@ export type TextAreaInputProps = Omit<React.PropsWithoutRef<React.TextareaHTMLAt
     errorMessage?: string;
     className?: string;
     size?: TextAreaInputSize;
+    info?: string;
+    infoType?: InfoType;
 }
 
-export default function TextAreaInput({ value, onBlur, label, className, errorMessage, size, ...props }: TextAreaInputProps) {
+export default function TextAreaInput({ info, infoType, value, onBlur, label, className, errorMessage, size, ...props }: TextAreaInputProps) {
     const [actualValue, setActualValue] = useState(value ?? "");
 
     useEffect(() => {
@@ -32,7 +35,10 @@ export default function TextAreaInput({ value, onBlur, label, className, errorMe
     
     return (
         <div className={`input-wrapper ${classNames}`}>
-            {label && <label className="label">{label}</label>}
+            <div className="flex justify-center items-center gap-1">
+                {label && <label className="label m-0">{label}</label>}
+                {info && infoType && <InfoModal info={info} type={infoType} />}
+            </div>
             <textarea
                 placeholder={props.placeholder}
                 value={actualValue}

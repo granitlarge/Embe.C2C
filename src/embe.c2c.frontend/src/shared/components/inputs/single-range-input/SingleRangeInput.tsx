@@ -2,6 +2,7 @@ import * as Slider from '@radix-ui/react-slider';
 import Surface from '../../surfaces/Surface';
 import ErrorMessage from '../ErrorMessage';
 import Alert from '../../infos/Alert';
+import InfoModal, { InfoType } from '../../infos/InfoModal';
 
 export type SingleRangeInputProps = {
     label: string;
@@ -15,9 +16,11 @@ export type SingleRangeInputProps = {
     errorMessage?: string
     disabled?: boolean,
     disabledAlertChildren?: React.ReactNode
+    info?: string;
+    infoType?: InfoType;
 }
 
-export default function SingleRangeInput({ disabled, disabledAlertChildren, errorMessage, label, className, min, max, step, value, minStepsBetweenThumbs, onChange }: SingleRangeInputProps) {
+export default function SingleRangeInput({ info, infoType, disabled, disabledAlertChildren, errorMessage, label, className, min, max, step, value, minStepsBetweenThumbs, onChange }: SingleRangeInputProps) {
 
     const classNames = [
         className,
@@ -38,6 +41,10 @@ export default function SingleRangeInput({ disabled, disabledAlertChildren, erro
             {
                 <div className="flex flex-row items-center justify-center gap-1">
                     <span className="label mx-0">{label}</span>
+                    {
+                        info && infoType &&
+                        <InfoModal info={info} type={infoType} />
+                    }
                     {
                         disabled &&
                         <Alert>
