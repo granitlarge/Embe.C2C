@@ -9,7 +9,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder
     .AddPostgres("postgres")
-    .WithImage("postgis/postgis");
+    .WithDockerfile(".", "./postgres/dockerfile");
 
 var defaultConnection = postgres.AddDatabase("DefaultConnection", "c2c");
 
@@ -36,6 +36,7 @@ var api = builder
     .WithEnvironment("Cors__AllowedOrigins", "http://frontend-embe.c2c.aspire.dev.localhost:51649")
     .WithEnvironment("Application__Name", "Embe.C2C")
     .WithEnvironment("Site__Url", "http://frontend-embe.c2c.aspire.dev.localhost:51649")
+    .WithEnvironment("OpenAI__SemanticEmbedding__ApiKey", "aDummyApiKey")
     .WithReference(defaultConnection)
     .WithReference(azureServiceBus)
     .WithReference(azureStorageBlobs)

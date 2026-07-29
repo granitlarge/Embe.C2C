@@ -11,6 +11,7 @@ using Embe.C2C.Infrastructure.Browser;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Embe.C2C.Infrastructure.Ef.Repositories;
 using Embe.C2C.Infrastructure.Identity;
+using Embe.C2C.Infrastructure.OpenAI;
 using Embe.C2C.Infrastructure.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Azure.SignalR.Management;
@@ -47,7 +48,11 @@ public static class ServiceCollectionExtensions
 
         services.AddDbContext<IRepository, C2CContext>
         (
-            options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), x => x.UseNetTopologySuite())
+            options => options.UseNpgsql
+            (
+                configuration.GetConnectionString("DefaultConnection"), 
+                optionsBuilder => optionsBuilder.UseNetTopologySuite().UseVector()
+            )
         );
 
         services.AddScoped<IImageService, BlobStorageImageService>();
@@ -74,11 +79,13 @@ public static class ServiceCollectionExtensions
         {
             services.AddScoped<IContentSafetyService, NullContentSafetyService>();
             services.AddScoped<IEmailService, NullEmailService>();
+            services.AddScoped<ISemanticEmbeddingService, NullSemanticEmbeddingService>();
         }
         else
         {
             services.AddScoped<IContentSafetyService, AzureAIContentSafetyService>();
             services.AddScoped<IEmailService, AzureCommunicationServicesEmailService>();
+            services.AddScoped<ISemanticEmbeddingService, OpenAISemanticEmbeddingService>();
         }
 
         services.AddSingleton((serviceProvider) =>

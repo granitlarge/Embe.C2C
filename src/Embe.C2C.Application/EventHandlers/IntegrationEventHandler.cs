@@ -6,6 +6,7 @@ using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
+using Embe.C2C.Application.Events.SearchProfiles;
 using Embe.C2C.Application.Services;
 
 namespace Embe.C2C.Application.EventHandlers;
@@ -74,9 +75,17 @@ public class IntegrationEventHandler
             case ImageRemovedEvent imageRemovedEvent:
                 await HandleImageRemovedEventAsync(imageRemovedEvent, cancellationToken);
                 break;
+            case SearchProfileUpdatedIntegrationEvent searchProfileUpdatedEvent:
+                await HandleSearchProfileUpdatedEventAsync(searchProfileUpdatedEvent, cancellationToken);
+                break;
             default:
                 break;
         }
+    }
+
+    private Task HandleSearchProfileUpdatedEventAsync(SearchProfileUpdatedIntegrationEvent searchProfileUpdatedEvent, CancellationToken cancellationToken)
+    {
+        return _workItemService.PerformAsync(new GenerateSearchProfileDescriptionEmbedding(searchProfileUpdatedEvent.SearchProfileId, searchProfileUpdatedEvent.Description), cancellationToken);
     }
 
     private async Task HandleNotificationCreatedEventAsync

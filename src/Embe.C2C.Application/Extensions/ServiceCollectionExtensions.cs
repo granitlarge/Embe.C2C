@@ -45,10 +45,10 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<Commands.Notifications.Handlers.MarkAsReadHandler>();
 
-
         services.AddScoped<Commands.SearchProfiles.Handlers.CreateSearchProfileHandler>();
         services.AddScoped<Commands.SearchProfiles.Handlers.UpdateSearchProfileHandler>();
         services.AddScoped<Commands.SearchProfiles.Handlers.DeleteSearchProfileHandler>();
+        services.AddScoped<Commands.SearchProfiles.Handlers.CreateSearchProfileEmbeddingHandler>();
 
         services.AddScoped<Queries.Auth.Handlers.AccountExistsHandler>();
 

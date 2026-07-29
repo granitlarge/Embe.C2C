@@ -32,6 +32,7 @@ public class C2CContext
     public DbSet<SearchProfile> SearchProfiles { get; set; }
     public DbSet<AdminArea> AdminAreas { get; set; }
     public DbSet<Candidate> Candidates { get; set; }
+    public DbSet<SearchProfileEmbedding> SearchProfileEmbeddings { get; set; }
 
     public IImmutableList<DomainEvent> DomainEvents
     {
@@ -49,6 +50,7 @@ public class C2CContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasPostgresExtension("postgis");
+        modelBuilder.HasPostgresExtension("vector");
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
 

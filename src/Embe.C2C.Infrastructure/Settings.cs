@@ -11,6 +11,7 @@ public record Settings(IConfiguration Configuration) : ISettings
     public SiteSettings Site => GetSiteSettings(Configuration);
     public CorsSettings Cors => new(Configuration);
     public EmailSettings Email => new(Configuration);
+    public OpenAISemanticEmbeddingSettings OpenAISemanticEmbedding => new(Configuration);
 
     public ApplicationSettings Application => GetApplicationSettings(Configuration);
 
@@ -56,7 +57,6 @@ public record AzureAIContentSafetySettings(IConfiguration Configuration)
     public string ApiKey => Configuration[ApiKeyKey] ?? throw new MissingConfigurationKeyException(ApiKeyKey);
 }
 
-
 public record CorsSettings(IConfiguration Configuration)
 {
     private static readonly string AllowedOriginsKey = "Cors:AllowedOrigins";
@@ -68,4 +68,10 @@ public record EmailSettings(IConfiguration Configuration)
 {
     private static readonly string SenderKey = "Email:Sender";
     public string Sender => Configuration[SenderKey] ?? throw new MissingConfigurationKeyException(SenderKey);
+}
+
+public record OpenAISemanticEmbeddingSettings(IConfiguration Configuration)
+{
+    private static readonly string ApiKeyKey = "OpenAI:SemanticEmbedding:ApiKey";
+    public string ApiKey => Configuration[ApiKeyKey] ?? throw new MissingConfigurationKeyException(ApiKeyKey);
 }

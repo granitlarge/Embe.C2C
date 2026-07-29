@@ -2,7 +2,6 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Application.Authorizations.FactStores.SearchProfiles.Facts;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,8 +15,8 @@ public class SearchProfileRepository(C2CContext context) : ISearchProfileReposit
 
     public async Task<AuthorizationFact[]> GetAuthorizationFactsAsync
     (
-        Guid currentUserId, 
-        Guid searchProfileId, 
+        Guid currentUserId,
+        Guid searchProfileId,
         CancellationToken cancellationToken
     )
     {
@@ -65,5 +64,16 @@ public class SearchProfileRepository(C2CContext context) : ISearchProfileReposit
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync(cancellationToken);
+    }
+
+    public Task StoreEmbeddingAsync(Guid searchProfileId, float[] embedding, CancellationToken cancellationToken)
+    {
+        _context.SearchProfileEmbeddings.Add(new Entities.SearchProfileEmbedding
+        {
+            SearchProfileId = searchProfileId,
+            Embedding = new Pgvector.Vector(embedding)
+        });
+
+        return _context.SaveChangesAsync(cancellationToken);
     }
 }

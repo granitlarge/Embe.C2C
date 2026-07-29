@@ -5,6 +5,7 @@ using Embe.C2C.Application.Events.Images;
 using Embe.C2C.Application.Events.Matchings;
 using Embe.C2C.Application.Events.Messages;
 using Embe.C2C.Application.Events.Notifications;
+using Embe.C2C.Application.Events.SearchProfiles;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Candidates.Events;
 using Embe.C2C.Domain.Aggregates.Matchings.Events;
@@ -13,6 +14,7 @@ using Embe.C2C.Domain.Aggregates.Notifications.Candidates;
 using Embe.C2C.Domain.Aggregates.Notifications.Events;
 using Embe.C2C.Domain.Aggregates.Notifications.Matchings;
 using Embe.C2C.Domain.Aggregates.Notifications.Messages;
+using Embe.C2C.Domain.Aggregates.SearchProfiles.Events;
 using Embe.C2C.Domain.Aggregates.Users.Events;
 
 namespace Embe.C2C.Application.EventHandlers;
@@ -69,12 +71,21 @@ public class DomainEventHandler
             case PositivelyJudgedDomainEvent positivelyJudgedEvent:
                 await HandlePositivelyJudgedEventAsync(positivelyJudgedEvent, cancellationToken);
                 break;
+            
+            case SearchProfileUpdatedDomainEvent searchProfileUpdated:
+                await HandleSearchProfileUpdatedEventAsync(searchProfileUpdated, cancellationToken);
+                break;
 
             default:
                 break;
 
         }
 
+    }
+
+    private async Task HandleSearchProfileUpdatedEventAsync(SearchProfileUpdatedDomainEvent searchProfileUpdated, CancellationToken cancellationToken)
+    {
+        AddIntegrationEvent(new SearchProfileUpdatedIntegrationEvent(searchProfileUpdated.SearchProfile.Id, searchProfileUpdated.SearchProfile.Description));
     }
 
     private async Task HandlePositivelyJudgedEventAsync(PositivelyJudgedDomainEvent positivelyJudgedEvent, CancellationToken cancellationToken)

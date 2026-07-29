@@ -19,6 +19,7 @@ public enum IntegrationEventType
     MatchingCreated,
 
     PositivelyJudged,
+    SearchProfileUpdated,
 }
 
 public record IntegrationEvent(IntegrationEventType Type)

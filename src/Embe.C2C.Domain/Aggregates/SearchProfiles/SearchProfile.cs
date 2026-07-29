@@ -5,7 +5,6 @@ using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Entities.SearchProfiles;
 using Embe.C2C.Domain.Errors;
 using Embe.C2C.Domain.Errors.Aggregates;
-using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
 using ErrorOr;

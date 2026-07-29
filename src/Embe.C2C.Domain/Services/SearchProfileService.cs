@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
+using Embe.C2C.Domain.Aggregates.SearchProfiles.Events;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Errors;
 using Embe.C2C.Domain.Errors.Aggregates;
@@ -34,7 +35,7 @@ public class SearchProfileService(DomainEventStore domainEventStore) : DomainSer
             });
         }
 
-        return SearchProfile.Create
+        var searchProfile = SearchProfile.Create
         (
             owner.Id,
             name,
@@ -46,6 +47,14 @@ public class SearchProfileService(DomainEventStore domainEventStore) : DomainSer
             ageRangeMax,
             maximumDistance
         );
+
+        if (searchProfile.IsSuccess)
+        {
+            _domainEventStore.AddDomainEvent(new SearchProfileCreatedDomainEvent(searchProfile.Value));
+        }
+
+
+        return searchProfile;
     }
 
     public ErrorOr<SearchProfile> Update
@@ -111,6 +120,12 @@ public class SearchProfileService(DomainEventStore domainEventStore) : DomainSer
             searchProfile.ToggleActive();
         }
 
+        if (errors.Count != 0)
+        {
+            return errors;
+        }
+
+        _domainEventStore.AddDomainEvent(new SearchProfileUpdatedDomainEvent(searchProfile));
         return searchProfile;
     }
 }

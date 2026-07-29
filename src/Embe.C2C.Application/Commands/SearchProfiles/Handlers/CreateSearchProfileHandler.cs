@@ -1,4 +1,3 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
@@ -7,7 +6,6 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
@@ -26,8 +24,8 @@ public class CreateSearchProfileHandler
     DomainEventHandler domainEventHandler,
     IntegrationEventHandler integrationEventHandler,
     SearchProfileDtoMapper searchProfileDtoMapper,
-    SearchProfileService searchProfileService
-
+    SearchProfileService searchProfileService,
+    ISemanticEmbeddingService semanticEmbeddingService
 ) : CommandHandler<CreateSearchProfileCommand, ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
 (
     domainEventStore,
@@ -41,6 +39,7 @@ public class CreateSearchProfileHandler
     private readonly IAuthenticatedUserService _authenticatedUserService = authenticatedUserService;
     private readonly SearchProfileDtoMapper _searchProfileDtoMapper = searchProfileDtoMapper;
     private readonly SearchProfileService _searchProfileService = searchProfileService;
+    private readonly ISemanticEmbeddingService _semanticEmbeddingService = semanticEmbeddingService;
 
     protected async override Task<CommandResult<ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>> InternalHandleAsync
     (
@@ -107,6 +106,9 @@ public class CreateSearchProfileHandler
 
         _searchProfileRepository.Set.Add(searchProfile.Value);
         await _searchProfileRepository.SaveChangesAsync(cancellationToken);
+
+        var embedding = await _semanticEmbeddingService.GetAsync(searchProfile.Value.Description, cancellationToken);
+        await _searchProfileRepository.StoreEmbeddingAsync(searchProfile.Value.Id, embedding, cancellationToken);
 
         var dto = await _searchProfileDtoMapper.ToDtoAsync(searchProfile.Value, cancellationToken);
         if (dto is null)

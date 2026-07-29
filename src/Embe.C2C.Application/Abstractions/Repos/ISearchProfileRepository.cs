@@ -1,6 +1,5 @@
 using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Domain.Aggregates.SearchProfiles;
-using Embe.C2C.Domain.Errors.Aggregates;
 
 namespace Embe.C2C.Application.Abstractions.Repos;
 
@@ -14,4 +13,5 @@ public interface ISearchProfileRepository : IGenericRepository<SearchProfile, Gu
         CancellationToken cancellationToken
     );
     public Task<List<SearchProfile>> GetByUserIdAsync(Guid userId, int page, int pageSize, CancellationToken cancellationToken);
+    public Task StoreEmbeddingAsync(Guid searchProfileId, float[] embedding, CancellationToken cancellationToken);
 }

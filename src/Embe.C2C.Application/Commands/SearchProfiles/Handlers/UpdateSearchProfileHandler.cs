@@ -1,4 +1,3 @@
-using Embe.C2C.Application.Abstractions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Authorizations;
@@ -7,9 +6,7 @@ using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
-using Embe.C2C.Application.Extensions.Domain.Aggregates;
 using Embe.C2C.Domain;
-using Embe.C2C.Domain.Errors.ValueObjects;
 using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
@@ -29,7 +26,6 @@ public class UpdateSearchProfileHandler
     SearchProfileDtoMapper searchProfileDtoMapper,
     SearchProfileService searchProfileService,
     IAuthenticatedUserService authenticatedUserService
-
 ) : CommandHandler<UpdateSearchProfileCommand, ErrorOr<ReadDto<SearchProfileDto, SearchProfilePermission>>>
 (
     domainEventStore,
@@ -98,7 +94,7 @@ public class UpdateSearchProfileHandler
         var distance = command.MaximumDistanceKm is not null ? Distance.Create(command.MaximumDistanceKm.Value, LengthUnit.Kilometers).ElseDo(e => errors.AddRange(e.WithPropertyName("MaximumDistanceKm"))) : default;
         var active = command.Active;
 
-        _searchProfileService.Update
+        var updateSearchProfileResult = _searchProfileService.Update
         (
             user,
             searchProfile,
@@ -112,6 +108,11 @@ public class UpdateSearchProfileHandler
             distance.Value,
             active
         );
+
+        if (updateSearchProfileResult.IsError)
+        {
+            return new(false, updateSearchProfileResult.Errors);
+        }
 
         await _searchProfileRepository.SaveChangesAsync(cancellationToken);
 
