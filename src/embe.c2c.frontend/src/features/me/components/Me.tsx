@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import Button from "@/src/shared/components/buttons/Button";
 import { addImages, updateProfile } from "../actions/action";
 import * as z from "zod";
-import { Gender, ImageStatus } from "@/src/shared/types/domain/value-objects";
+import { Gender } from "@/src/shared/types/domain/value-objects";
 import LargeModal from "@/src/shared/components/modal/LargeModal";
 import Profile from "@/src/shared/components/user/Profile";
 import { calculateAge } from "@/src/shared/time";
@@ -147,15 +147,15 @@ export default function Me({ className }: MeProps) {
         }
 
         const updateProfileResponse = await updateProfile
-        (
-            user?.data?.id!,
-            clientSideBasicFormData.alias!,
-            clientSideBasicFormData.birthDate!,
-            clientSideBasicFormData.gender,
-            clientSideBasicFormData.location,
-            imagesToKeep.concat(addedImages),
-            clientSideBasicFormData.bio
-        );
+            (
+                user?.data?.id!,
+                clientSideBasicFormData.alias!,
+                clientSideBasicFormData.birthDate!,
+                clientSideBasicFormData.gender,
+                clientSideBasicFormData.location,
+                imagesToKeep.concat(addedImages),
+                clientSideBasicFormData.bio
+            );
 
         if (!updateProfileResponse.success) {
             throw new Error("not implemented");

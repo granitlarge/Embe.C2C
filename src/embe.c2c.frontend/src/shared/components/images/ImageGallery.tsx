@@ -35,6 +35,7 @@ function ImageGalleryImage({ src, alt, className }: ImageGalleryImageProps) {
     const classNames = [className].filter(Boolean).join(" ");
     return (
         <Image
+            loading="eager"
             src={src}
             alt={alt}
             className={`${classNames} ${styles.image} rounded-md`}
