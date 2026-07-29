@@ -19,7 +19,7 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
     ].filter(Boolean).join(" ");
 
     return (
-        <div className="relative">
+        <div className="relative max-w-[100%] max-h-[100%] overflow-hidden">
             {isLoading && (
                 <div className={`${classNames} absolute inset-0 flex items-center justify-center`}>
                     <Loader className="animate-spin w-(--primary-fs) h-(--primary-fs)" />

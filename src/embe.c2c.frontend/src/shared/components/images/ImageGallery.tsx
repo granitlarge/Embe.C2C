@@ -73,7 +73,7 @@ export default function ImageGallery({ className, imageUrls }: ImageGalleryProps
                 <>
                     <Button intent="navigate" onClick={() => setCurrentImageUrlIndex(prev => (prev - 1 + imageUrls.length) % imageUrls.length)} className="rounded-full absolute -left-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronLeft className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></Button>
                     <Button intent="navigate" onClick={() => setCurrentImageUrlIndex(prev => (prev + 1) % imageUrls.length)} className="rounded-full absolute -right-3 top-1/2 transform max-w-max -translate-y-1/2 p-0 bg-gray-300"><ChevronRight className="text-(--primary-fc) h-[calc(2*var(--primary-fs))] w-[calc(2*var(--primary-fs))]" /></Button>
-                    <PaginationDots total={imageUrls.length} current={currentImageUrlIndex} className="absolute top-8 left-1/2 transform -translate-x-1/2" />
+                    <PaginationDots total={imageUrls.length} current={currentImageUrlIndex} className="absolute top-3 left-1/2 transform -translate-x-1/2" />
                 </>
             }
             {
