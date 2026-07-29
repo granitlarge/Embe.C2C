@@ -29,7 +29,7 @@ export function UserCompact({ className, dto, ...props }: UserCompactProps) {
                                 alt="Profile picture" 
                                 width={100}
                                 height={100} 
-                                className="w-20 h-20 rounded-full object-cover" 
+                                className="w-[100px] h-[100px] rounded-full object-cover" 
                                 unoptimized={process.env.NODE_ENV === "development"} 
                             />
                     }

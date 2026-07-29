@@ -21,7 +21,7 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
     return (
         <div className="relative">
             {isLoading && (
-                <div className={`${classNames}absolute inset-0 flex items-center justify-center`}>
+                <div className={`${classNames} absolute inset-0 flex items-center justify-center`}>
                     <Loader className="animate-spin w-(--primary-fs) h-(--primary-fs)" />
                 </div>
             )}
