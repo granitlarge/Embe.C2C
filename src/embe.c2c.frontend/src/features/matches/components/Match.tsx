@@ -7,7 +7,7 @@ import Message from "./Message";
 import { useEffect, useState } from "react";
 import { createMessage, deleteMessage, getMessages, markMessageAsSeen, unmatch, updateMessage } from "../actions/action";
 import { Message as MessageTypeDef } from "@/src/shared/types/domain/aggregates";
-import { CreateMessage, ReadDto } from "@/src/shared/types/dtos/types";
+import { CreateMessage } from "@/src/shared/types/dtos/types";
 import { Guid } from "@/src/shared/cache";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { MessageCrafter } from "./MessageCrafter";
@@ -215,10 +215,18 @@ export default function Match({ matchId, user, className }: MatchProps) {
                 replyToMessageId: replyId
             }
 
-            const response = await createMessage(message);
-
-            if (!response.success)
-                throw new Error("not implemented");
+            const dummyMessage: MessageTypeDef = {
+                authorUserId: user.userId,
+                id: crypto.randomUUID() as Guid,
+                matchingId: match.data.id,
+                content: message.content,
+                createdAt: new Date().toISOString(),
+                editedAt: new Date().toISOString(),
+                isReply: message.replyToMessageId !== undefined,
+                replyToMessage: message.replyToMessageId !== undefined ? match.data.messages?.find(m => m.data.id === message.replyToMessageId) : undefined,
+                replyToMessageId: message.replyToMessageId,
+                seenAt: undefined
+            }
 
             setMatchings(prev => prev.map(m => {
                 if (m.data.id !== match.data.id)
@@ -227,11 +235,44 @@ export default function Match({ matchId, user, className }: MatchProps) {
                     ...m,
                     data: {
                         ...m.data,
-                        messages: (m.data.messages ?? []).concat(response.value!)
+                        messages: (m.data.messages ?? []).concat({ data: dummyMessage, permissions: [MessagePermission.Delete, MessagePermission.Edit, MessagePermission.View] })
                     }
                 }
             }))
 
+            try {
+
+                const response = await createMessage(message);
+                if (!response.success) {
+
+                    setMatchings(prev => prev.filter(m => m.data.id !== dummyMessage.id));
+
+                } else {
+
+                    setMatchings(prev => prev.map(m => {
+                        if (m.data.id !== match.data.id)
+                            return m;
+                        return {
+                            ...m,
+                            data: {
+                                ...m.data,
+                                messages: (m.data.messages ?? []).map(mes => {
+                                    if (mes.data.id !== dummyMessage.id)
+                                        return mes;
+                                    return response.value!;
+                                })
+                            }
+                        }
+                    }))
+
+                }
+
+            } catch (error) {
+
+                setMatchings(prev => prev.filter(m => m.data.id !== dummyMessage.id));
+
+            }
+            
             setMessageCrafterConfig(defaultMessageCrafterConfig);
             router.refresh();
 
