@@ -4,6 +4,7 @@ import { Gender, ImageStatus } from "../../types/domain/value-objects";
 import ImageGallery from "../images/ImageGallery"
 import Surface from "../surfaces/Surface";
 import { formatDistance } from "../../distance";
+import * as jsx from "../../jsx";
 
 export type ProfileShortInfoProps = {
     user: User,
@@ -12,20 +13,25 @@ export type ProfileShortInfoProps = {
 export function ProfileShortInfo({ user, className }: ProfileShortInfoProps) {
 
     const classNames = [className].filter(Boolean).join(" ");
+
+    const properties = jsx.join([
+        user.age && <span className="text-(--secondary-fc) text-(length:--primary-fs)">{user.age} y.o.</span>,
+        user.distanceKmToQueryingUser !== undefined ? <span className="text-(--secondary-fc) text-(length:--primary-fs)">{formatDistance(user.distanceKmToQueryingUser)}</span> : undefined
+    ], <span className="align-middle text-(--secondary-fc) text-(length:--secondary-fs) font-[1000]">·</span>);
+
     return (
         <Surface className={`${classNames} flex flex-col max-w-full`} padding="sm" variant="tertiary">
             <div className="flex flex-row gap-1 items-center">
                 <span className="wrap-anywhere text-(--primary-fc) text-(length:--primary-fs) font-semibold">{user.alias}</span>
                 {
                     user.gender === Gender.Male ? <Mars className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
-                        user.gender === Gender.Female ? <Venus className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
-                            user.gender === Gender.TransFemale || user.gender === Gender.TransMale ? <Transgender className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
-                                null
+                    user.gender === Gender.Female ? <Venus className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
+                    user.gender === Gender.TransFemale || user.gender === Gender.TransMale ? <Transgender className="w-(--primary-fs) h-(--primary-fs) text-(--primary-fc)" /> :
+                        null
                 }
             </div>
-            <div className="flex flex-row gap-1">
-                {user.age && <span className="text-(--secondary-fc) text-(length:--primary-fs)">{user.age} y.o.</span>}
-                {user.distanceKmToQueryingUser !== undefined ? <span className="text-(--secondary-fc) text-(length:--primary-fs)">{formatDistance(user.distanceKmToQueryingUser)}</span> : null}
+            <div className="flex flex-row gap-1 items-center">
+                {properties}
             </div>
         </Surface>
     )
