@@ -1,3 +1,4 @@
+using Embe.C2C.Application;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;

@@ -8,7 +8,7 @@ public record Settings(IConfiguration Configuration) : ISettings
 {
     public JwtSettings Jwt => new(Configuration);
     public AzureAIContentSafetySettings AzureAIContentSafety => new(Configuration);
-    public SiteSettings Site => new(Configuration);
+    public SiteSettings Site => GetSiteSettings(Configuration);
     public CorsSettings Cors => new(Configuration);
     public EmailSettings Email => new(Configuration);
 
@@ -17,10 +17,18 @@ public record Settings(IConfiguration Configuration) : ISettings
     private static ApplicationSettings GetApplicationSettings(IConfiguration configuration)
     {
         var nameKey = "Application:Name";
-
         var name = configuration[nameKey] ?? throw new MissingConfigurationKeyException(nameKey);
 
         return new ApplicationSettings(name);
+    }
+
+    private static SiteSettings GetSiteSettings(IConfiguration configuration)
+    {
+        var urlKey = "Site:Url";
+        return new SiteSettings
+        (
+            configuration[urlKey] ?? throw new MissingConfigurationKeyException(urlKey)
+        );
     }
 
 }
@@ -48,13 +56,6 @@ public record AzureAIContentSafetySettings(IConfiguration Configuration)
     public string ApiKey => Configuration[ApiKeyKey] ?? throw new MissingConfigurationKeyException(ApiKeyKey);
 }
 
-public record SiteSettings(IConfiguration Configuration)
-{
-    private static readonly string HostKey = "Site:Host";
-    private static readonly string ResetPasswordUrlKey = "Site:ResetPasswordUrl";
-    public string Host => Configuration[HostKey] ?? throw new MissingConfigurationKeyException(HostKey);
-    public string ResetPasswordUrl => Configuration[ResetPasswordUrlKey] ?? throw new MissingConfigurationKeyException(ResetPasswordUrlKey);
-}
 
 public record CorsSettings(IConfiguration Configuration)
 {

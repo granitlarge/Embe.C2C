@@ -35,7 +35,7 @@ var api = builder
     .WithEnvironment("Jwt__Secrets__ResetPasswordToken", "AccessTokenYourSuperSecretKeyForJwtTokenGeneration")
     .WithEnvironment("Cors__AllowedOrigins", "http://frontend-embe.c2c.aspire.dev.localhost:51649")
     .WithEnvironment("Application__Name", "Embe.C2C")
-    .WithEnvironment("Site__ResetPasswordUrl", "http://frontend-embe.c2c.aspire.dev.localhost:51649/public/reset-password")
+    .WithEnvironment("Site__Url", "http://frontend-embe.c2c.aspire.dev.localhost:51649")
     .WithReference(defaultConnection)
     .WithReference(azureServiceBus)
     .WithReference(azureStorageBlobs)

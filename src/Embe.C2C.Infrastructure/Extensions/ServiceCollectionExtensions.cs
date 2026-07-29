@@ -8,7 +8,6 @@ using Embe.C2C.Application.Services;
 using Embe.C2C.Infrastructure.AspNetCore;
 using Embe.C2C.Infrastructure.Azure;
 using Embe.C2C.Infrastructure.Browser;
-using Embe.C2C.Infrastructure.Ef;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Embe.C2C.Infrastructure.Ef.Repositories;
 using Embe.C2C.Infrastructure.Identity;
@@ -54,7 +53,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IImageService, BlobStorageImageService>();
         services.AddScoped<IRealTimeNotificationService, SignalRNotificationService>();
         services.AddScoped<IRealTimeUpdateService, SignalRNotificationService>();
-        services.AddScoped<IDeviceNotificationService, DeviceNotificationService>();
+        services.AddScoped<IDeviceNotificationService, NullDeviceNotificationService>();
         services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
         services.AddScoped<IWorkItemService, ServiceBusWorkItemService>();
         services.AddScoped<IAuthService, AuthService>();

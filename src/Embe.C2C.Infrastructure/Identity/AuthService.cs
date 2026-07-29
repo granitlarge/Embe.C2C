@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using Embe.C2C.Application;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Errors;
@@ -405,7 +406,7 @@ public class AuthService
 
         var token = GenerateResetPasswordToken(identityUser, user);
 
-        var resetPasswordUrl = BuildResetPasswordUrl(_settings.Site.ResetPasswordUrl, token);
+        var resetPasswordUrl = BuildResetPasswordUrl($"{_settings.Site.Url}/public/reset-password", token);
         return resetPasswordUrl.ToString();
     }
 }

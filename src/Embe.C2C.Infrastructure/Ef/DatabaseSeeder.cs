@@ -1,3 +1,4 @@
+using Embe.C2C.Application;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Services;

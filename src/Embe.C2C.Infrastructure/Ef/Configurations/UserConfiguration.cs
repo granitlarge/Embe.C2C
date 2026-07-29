@@ -1,3 +1,4 @@
+using Embe.C2C.Application;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;

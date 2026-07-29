@@ -68,10 +68,10 @@ public class NotificationService
         if (delivered)
             return;
 
-        await SendEmail(created, cancellationToken);
+        await SendEmailAsync(created, cancellationToken);
     }
 
-    private async Task SendEmail(NotificationCreatedIntegrationEvent created, CancellationToken cancellationToken)
+    private async Task SendEmailAsync(NotificationCreatedIntegrationEvent created, CancellationToken cancellationToken)
     {
 
 #warning before sending an e-mail notification, we should ensure that the user hasn't disabled e-mail notifications
@@ -79,7 +79,8 @@ public class NotificationService
         var userEmail = (await _userRepository.GetByIdAsync(created.RecipientUserId, cancellationToken))?.Email.Value;
         if (userEmail is null)
             return;
-        var (Subject, HtmlContent, PlainText) = _emailComposer.CreateMessage(created);
+
+        var (Subject, HtmlContent, PlainText) = await _emailComposer.CreateMessageAsync(created, cancellationToken);
         await _email.SendAsync(userEmail, Subject, HtmlContent, PlainText, cancellationToken);
 
     }
