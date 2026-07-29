@@ -48,6 +48,6 @@ public class AzureCommunicationServicesEmailService : IEmailService
             PlainText = plainText
         };
         var message = new EmailMessage(sender, recipients, emailContent);
-        await _emailClient.SendAsync(Completed, message, cancellationToken);
+        await _emailClient.SendAsync(Started, message, cancellationToken);
     }
 }
