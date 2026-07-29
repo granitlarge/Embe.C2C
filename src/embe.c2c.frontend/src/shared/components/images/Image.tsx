@@ -17,22 +17,27 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
     const classNames = [
         className
     ].filter(Boolean).join(" ");
+
     return (
-        <>
-            {
-                isLoading &&
-                <div className={`${classNames} flex items-center justify-center`}>
+        <div className="relative">
+            {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
                     <Loader className="animate-spin w-(--primary-fs) h-(--primary-fs)" />
                 </div>
-            }
-            {
-                <NextImage
-                    className={`${classNames} ${isLoading ? "hidden" : ""}`}
-                    onLoad={(e) => { setIsLoading(false); onLoad?.(e); }}
-                    onError={(e) => { setIsLoading(false); onError?.(e); }}
-                    {...props}
-                />
-            }
-        </>
+            )}
+
+            <NextImage
+                {...props}
+                className={`${className} transition-opacity ${isLoading ? "opacity-0" : "opacity-100"}`}
+                onLoad={(e) => {
+                    setIsLoading(false);
+                    onLoad?.(e);
+                }}
+                onError={(e) => {
+                    setIsLoading(false);
+                    onError?.(e);
+                }}
+            />
+        </div>
     )
 }
