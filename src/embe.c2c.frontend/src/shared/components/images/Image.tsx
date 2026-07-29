@@ -17,7 +17,6 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
     const classNames = [
         className
     ].filter(Boolean).join(" ");
-
     return (
         <>
             {
@@ -28,7 +27,7 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
             }
             {
                 <NextImage
-                    className={`${classNames} transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
+                    className={`${classNames} ${isLoading ? "hidden" : ""}`}
                     onLoad={(e) => { setIsLoading(false); onLoad?.(e); }}
                     onError={(e) => { setIsLoading(false); onError?.(e); }}
                     {...props}

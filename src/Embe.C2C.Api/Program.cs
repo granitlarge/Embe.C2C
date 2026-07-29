@@ -40,6 +40,8 @@ if (app.Environment.IsDevelopment())
 
     #region setup cors on azurite
     var blobServiceClient = new BlobServiceClient(app.Configuration.GetConnectionString("AzureStorageBlobs"));
+    var containerClient = blobServiceClient.GetBlobContainerClient("images");
+    await containerClient.CreateIfNotExistsAsync();
     var props = await blobServiceClient.GetPropertiesAsync();
 
     props.Value.Cors.Clear();

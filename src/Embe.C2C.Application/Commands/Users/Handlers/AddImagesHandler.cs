@@ -3,9 +3,6 @@ using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
-using Embe.C2C.Application.Authorizations;
-using Embe.C2C.Application.Dtos.Read;
-using Embe.C2C.Application.Dtos.Read.Aggregates;
 using Embe.C2C.Application.Dtos.Read.Entities;
 using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
@@ -59,7 +56,7 @@ public class AddImagesHandler
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return new 
+            return new
             (
                 false,
                 ApplicationErrors.NotFound.ToNotFoundErrorOr()
@@ -68,6 +65,7 @@ public class AddImagesHandler
 
         var uploadedImageUrls = new List<string>();
         var addedImages = new List<Image>();
+
         try
         {
             await Task.WhenAll(command.Images.Select(async image =>
