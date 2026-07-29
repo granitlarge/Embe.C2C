@@ -58,7 +58,7 @@ public static class Emails
                 align-items: center;
                 vertical-align: middle;
                 text-align: center;
-                white-space: pre-line;
+                white-space: pre-wrap;
             }
 
             footer {
