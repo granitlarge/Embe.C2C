@@ -21,14 +21,14 @@ export default function Image({ className, onLoad, onError, ...props }: ImagePro
     return (
         <div className="relative">
             {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className={`${classNames}absolute inset-0 flex items-center justify-center`}>
                     <Loader className="animate-spin w-(--primary-fs) h-(--primary-fs)" />
                 </div>
             )}
 
             <NextImage
                 {...props}
-                className={`${className} transition-opacity ${isLoading ? "opacity-0" : "opacity-100"}`}
+                className={`${classNames} transition-opacity ${isLoading ? "opacity-0" : "opacity-100"}`}
                 onLoad={(e) => {
                     setIsLoading(false);
                     onLoad?.(e);
