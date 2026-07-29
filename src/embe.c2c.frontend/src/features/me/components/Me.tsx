@@ -172,28 +172,11 @@ export default function Me({ className }: MeProps) {
     return (
 
         <Surface className={`${classNames} flex flex-col gap-2`} padding="none">
-            <MyInfoForm className="grow-1 overflow-y-scroll scrollbar-none" error={basicFormError} data={clientSideBasicFormData} onChange={async (data) => {
-
-                const allImages = data.images ?? [];
-                const oldImages = allImages.filter(image => image.id !== undefined);
-                const newImagesWithCropData = allImages.filter(image => image.id === undefined && image.crop !== undefined);
-                const newImagesWithCropDataCropped = (await Promise.all(
-                    newImagesWithCropData.map(async niwcd => ({ image: niwcd, newUrl: await cropImage(niwcd.url!, niwcd.crop!.x, niwcd.crop!.y, niwcd.crop!.width, niwcd.crop!.height) }))
-                )).map(({ image, newUrl }) => ({
-                    ...image,
-                    url: newUrl,
-                    crop: {
-                        ...image.crop,
-                        width: image.crop!.width,
-                        height: image.crop!.height,
-                        x: 0,
-                        y: 0
-                    }
-                }));
+            <MyInfoForm className="grow-1 overflow-y-scroll scrollbar-none" error={basicFormError} data={clientSideBasicFormData} onChange={(data) => {
 
                 setClientSideBasicFormData(prev => ({
                     ...prev,
-                    images: oldImages.concat(newImagesWithCropDataCropped),
+                    images: data.images?.sort((a, b) => a.order - b.order),
                     alias: data.alias,
                     birthDate: data.birthDate,
                     gender: data.gender,

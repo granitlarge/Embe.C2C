@@ -90,6 +90,7 @@ function ImageSelector({ className, onImageSelected }: ImageSelectorProps) {
                     <ImageCropGallery images={images.map(i => i.url)} onChange={(crops) => {
                         const result = images.map((image, index) => ({
                             ...image,
+                            url: crops[index].url,
                             crop: crops[index]
                         }))
                         onImageSelected?.(result);

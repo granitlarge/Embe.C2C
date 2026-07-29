@@ -1,10 +1,11 @@
 import { useRef, useState } from "react";
 import ImageCropper from "../../../images/ImageCropper";
 import { PaginationDots } from "../../../images/ImageGallery";
+import { cropImage } from "@/src/shared/image";
 
 export type ImageCropGallery = {
     images: string[];
-    onChange?: (crops: { x: number, y: number, width: number, height: number }[]) => void;
+    onChange?: (crops: { url: string, x: number, y: number, width: number, height: number }[]) => void;
 }
 export default function ImageCropGallery({ onChange, images }: ImageCropGallery) {
 
@@ -12,11 +13,28 @@ export default function ImageCropGallery({ onChange, images }: ImageCropGallery)
         throw new Error("images.length must be greater than 0.");
     }
 
-    const cropsRef = useRef([] as { x: number, y: number, width: number, height: number }[]);
+    const cropsRef = useRef([] as { url: string, x: number, y: number, width: number, height: number }[]);
     const [index, setIndex] = useState(0);
 
-    function onCrop(crop: { x: number, y: number, width: number, height: number }) {
-        cropsRef.current.push(crop);
+    async function onCrop(crop: { x: number, y: number, width: number, height: number }) {
+
+        cropsRef.current.push({
+            ...crop,
+            url: images[index]
+        });
+
+        await cropImage(images[index], crop.x, crop.y, crop.width, crop.height).then(url => {
+            if (!url)
+                return;
+            cropsRef.current[index] = {
+                x:0,
+                y:0,
+                width: cropsRef.current[index].width,
+                height: cropsRef.current[index].height,
+                url: url
+            }
+        });
+
         if (index == images.length - 1) {
             onChange?.(cropsRef.current);
             setIndex(0);

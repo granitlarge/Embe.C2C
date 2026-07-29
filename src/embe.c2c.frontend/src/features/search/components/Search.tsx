@@ -99,7 +99,9 @@ export default function Search({ searchProfiles, candidates: initialCandidates, 
                if (candidates.length === 0) {
 
                    try {
+
                        await loadCandidates();
+
                    } catch (e) {
 
                    }
