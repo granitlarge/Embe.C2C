@@ -1,13 +1,14 @@
 import * as RadixAlertDialog from "@radix-ui/react-alert-dialog"
-import Button from "../buttons/Button";
+import Button, { ButtonIntent } from "../buttons/Button";
 export type AlertDialogProps = {
     children: React.ReactNode;
     title: string;
     description: string;
     onConfirm: () => void | Promise<void>;
     onCancel: () => void | Promise<void>;
+    confirmIntent?: ButtonIntent
 }
-export default function AlertDialog({ children, title, description, onConfirm, onCancel }: AlertDialogProps) {
+export default function AlertDialog({ confirmIntent, children, title, description, onConfirm, onCancel }: AlertDialogProps) {
     return (
         <RadixAlertDialog.Root>
             <RadixAlertDialog.Trigger asChild>
@@ -26,7 +27,7 @@ export default function AlertDialog({ children, title, description, onConfirm, o
                     </div>
                     <div className="flex gap-2">
                         <RadixAlertDialog.Action asChild>
-                            <Button intent="save" onClick={onConfirm}>continue</Button>
+                            <Button intent={confirmIntent ?? "save"} onClick={onConfirm}>continue</Button>
                         </RadixAlertDialog.Action>
                         <RadixAlertDialog.Cancel asChild>
                             <Button intent="cancel" onClick={onCancel}>cancel</Button>

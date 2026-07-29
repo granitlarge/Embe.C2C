@@ -22,6 +22,7 @@ import LocationInput from "@/src/shared/components/inputs/location-input/Locatio
 import { Location } from "@/src/shared/types/domain/value-objects"
 import { updateProfile } from "../../me/actions/action";
 import { Routes } from "@/src/shared/routes";
+import AlertDialog from "@/src/shared/components/infos/AlertDialog";
 
 export type SearchProfileFormProps = {
     className?: string;
@@ -407,7 +408,15 @@ export default function SearchProfileForm({ className, searchProfile, user: init
                 <Button intent="save" onClick={onSave}>save</Button>
                 {
                     serverSideState.id &&
-                    <Button intent="destructive" onClick={onDelete}>delete</Button>
+                    <AlertDialog
+                        confirmIntent="destructive"
+                        title="are you sure?"
+                        description="are you sure you want to delete this search-profile?"
+                        onCancel={() => { }}
+                        onConfirm={onDelete}
+                    >
+                        <Button intent="destructive">delete</Button>
+                    </AlertDialog>
                 }
                 <Button intent="cancel" onClick={onCancel}>cancel</Button>
             </div>
