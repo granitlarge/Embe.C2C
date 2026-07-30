@@ -66,14 +66,22 @@ public class SearchProfileRepository(C2CContext context) : ISearchProfileReposit
         .ToListAsync(cancellationToken);
     }
 
-    public Task StoreEmbeddingAsync(Guid searchProfileId, float[] embedding, CancellationToken cancellationToken)
+    public async Task StoreEmbeddingAsync(Guid searchProfileId, float[] embedding, CancellationToken cancellationToken)
     {
-        _context.SearchProfileEmbeddings.Add(new Entities.SearchProfileEmbedding
+        var searchProfile = await _context.SearchProfileEmbeddings.FirstOrDefaultAsync(spe => spe.SearchProfileId == searchProfileId, cancellationToken);
+        if (searchProfile is null)
         {
-            SearchProfileId = searchProfileId,
-            Embedding = new Pgvector.Vector(embedding)
-        });
+            _context.SearchProfileEmbeddings.Add(new Entities.SearchProfileEmbedding
+            {
+                SearchProfileId = searchProfileId,
+                Embedding = new Pgvector.Vector(embedding)
+            });
+        }
+        else
+        {
+            searchProfile.Embedding = new Pgvector.Vector(embedding);
+        }
 
-        return _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }
