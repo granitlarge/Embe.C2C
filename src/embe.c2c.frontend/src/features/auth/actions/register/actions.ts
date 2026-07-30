@@ -1,10 +1,9 @@
 "use server";
 
-import { RegisterRequest, RegisterUserFailureReason } from "./types";
+import { RegisterRequest } from "./types";
 import { Mutate } from "@/src/shared/apis/api";
 import { Credentials } from "@/src/shared/types/application/types";
 import { saveAccessToken, saveRefreshToken } from "@/src/shared/security/functions";
-import { ApiResponse } from "@/src/shared/apis/type";
 import { Error } from "@/src/shared/apis/type";
 
 export async function register(request: RegisterRequest): Promise<Error[] | undefined> {

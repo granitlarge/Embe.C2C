@@ -36,6 +36,5 @@ public record WorkItem
 
 public interface IWorkItemService
 {
-    public Task PerformAsync<T>(T task, CancellationToken cancellationToken = default)
-    where T : WorkItem;
+    public Task PerformAsync(WorkItem workItem, CancellationToken cancellationToken = default);
 }

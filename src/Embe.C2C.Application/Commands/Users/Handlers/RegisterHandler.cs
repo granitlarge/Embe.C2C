@@ -1,5 +1,9 @@
+using System.Windows.Input;
 using Embe.C2C.Application.Abstractions.Repos;
+using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
+using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
+using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain;
@@ -12,6 +16,8 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
 {
     private readonly IUserRepository _userRepo;
     private readonly IAuthService _authService;
+    private readonly IImageService _imageService;
+    private readonly IWorkItemService _workItemService;
 
     public RegisterHandler
     (
@@ -20,11 +26,68 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
         IAuthService authService,
-        DomainEventStore domainEventStore
+        DomainEventStore domainEventStore,
+        IImageService imageService,
+        IWorkItemService workItemService
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authService = authService;
         _userRepo = userRepo;
+        _imageService = imageService;
+        _workItemService = workItemService;
+    }
+
+
+    private async Task<ErrorOr<ImageDetails[]>> UploadImagesAsync(ImageWriteDto[] dtos, CancellationToken cancellationToken)
+    {
+        var uploadedImageUrls = new List<string>();
+        var tasks = dtos.Select(async dto =>
+        {
+            var result = await _imageService.UploadImageAsync
+            (
+                Convert.FromBase64String(dto.Base64EncodedImageData),
+                (int)dto.CropOffsetX,
+                (int)dto.CropOffsetY,
+                (int)dto.Width,
+                (int)dto.Height,
+                cancellationToken
+            );
+
+            lock (uploadedImageUrls)
+            {
+                uploadedImageUrls.Add(result.OriginalUrl);
+                uploadedImageUrls.Add(result.LargeUrl);
+                uploadedImageUrls.Add(result.MediumUrl);
+                uploadedImageUrls.Add(result.SmallUrl);
+            }
+
+            return (dto, result);
+        });
+
+        try
+        {
+            var uploadImageResults = await Task.WhenAll(tasks);
+            var imageDetails = uploadImageResults.Select(i => ImageDetails.Create(i.result.Name, i.dto.MimeType, i.dto.Order));
+            foreach (var imageDetail in imageDetails)
+            {
+                if (imageDetail.IsError)
+                    return imageDetail.Errors;
+            }
+            return imageDetails.Select(id => id.Value).ToArray();
+        }
+        catch (Exception)
+        {
+            try
+            {
+                await Task.WhenAll(uploadedImageUrls.Select(i => _imageService.DeleteImageByUrlAsync(i, CancellationToken.None)));
+            }
+            catch (Exception)
+            {
+                await Task.WhenAll(uploadedImageUrls.Select(ui => _workItemService.PerformAsync(WorkItem.Create(new DeleteImage(ui), WorkItemType.DeleteImage))));
+                throw;
+            }
+            throw;
+        }
     }
 
     protected override async Task<CommandResult<ErrorOr<Credentials>>> InternalHandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
@@ -43,6 +106,8 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
         var email = Email.Create(command.Email).ElseDo(e => errors.AddRange(e.WithPropertyName(nameof(command.Email))));
         var alias = Alias.Create(command.Alias).ElseDo(e => errors.AddRange(e.WithPropertyName(nameof(command.Alias))));
         var birthDate = BirthDate.Create(command.BirthDate).ElseDo(e => errors.AddRange(e.WithPropertyName(nameof(command.BirthDate))));
+        var location = command.Location != null ? Location.Create(command.Location.Latitude, command.Location.Longitude).ElseDo(e => errors.AddRange(e.WithPropertyName(nameof(command.Location)))) : default;
+        var images = (await UploadImagesAsync(command.Images, cancellationToken)).ElseDo(e => errors.AddRange(e.WithPropertyName(nameof(command.Images))));
 
         if (errors.Count != 0)
         {
@@ -56,8 +121,18 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
         var files = new HashSet<ImageDetails>();
         var identityUserId = registerUserResult.Value!.Id;
         var user = User
-            .Register(email.Value, alias.Value, birthDate.Value, gender: null, location: null, images: null, bio: null, identityUserId)
-            .ElseDo(e => errors.AddRange(e));
+            .Register
+            (
+                email.Value,
+                alias.Value,
+                birthDate.Value,
+                gender: command.Gender,
+                location: location != default ? location.Value : null,
+                images: [.. images.Value],
+                bio: null,
+                identityUserId
+            )
+            .ElseDo(errors.AddRange);
 
         if (errors.Count != 0)
         {

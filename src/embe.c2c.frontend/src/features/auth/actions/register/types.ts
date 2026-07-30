@@ -5,8 +5,9 @@ export type RegisterRequest = {
     alias?: string;
     password: string,
     birthDate: string,
-    location: Location;
     gender: Gender;
+    location?: Location;
+    images: ImageWriteDto[];
 }
 
 export enum RegisterUserFailureReason {
@@ -15,4 +16,14 @@ export enum RegisterUserFailureReason {
     WeakPassword = 2,
     Unknown = 3,
     UnknownError = 4
+}
+
+export type ImageWriteDto = {
+    base64EncodedImageData: string,
+    mimeType: string,
+    order: number,
+    cropOffsetX: number,
+    cropOffsetY: number,
+    width: number,
+    height: number,
 }

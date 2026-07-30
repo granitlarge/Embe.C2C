@@ -55,7 +55,6 @@ if (app.Environment.IsDevelopment())
     });
 
     await blobServiceClient.SetPropertiesAsync(props.Value);
-    await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
     #endregion
 }
 

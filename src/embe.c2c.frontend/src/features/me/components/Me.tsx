@@ -17,6 +17,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { Guid, NullGuid } from "@/src/shared/cache";
 import { useApplicationStore } from "@/src/shared/stores/provider";
 import { cropImage } from "@/src/shared/image";
+import { getBase64EncodedData } from "@/src/shared/encoding";
 
 export type MeProps = {
     className?: string;
@@ -93,20 +94,6 @@ export default function Me({ className }: MeProps) {
 
     function onPreview() {
         setShowPreview(true);
-    }
-
-    async function getBase64EncodedData(url: string): Promise<string> {
-        const response = await fetch(url);
-        const bytes = await response.bytes();
-
-        let binary = "";
-        const chunkSize = 0x8000;
-
-        for (let i = 0; i < bytes.length; i += chunkSize) {
-            binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-        }
-
-        return btoa(binary);
     }
 
     async function onSave() {

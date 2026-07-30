@@ -67,14 +67,16 @@ export default function SelectInput({
                                         onChange?.([...(value || []), option.value]);
                                     } else {
                                         const newValues = (value || []).filter((v) => v !== option.value);
-                                        onChange?.(newValues);
+                                        if (newValues.length !== 0 || !required)
+                                            onChange?.(newValues);
                                     }
                                 } else {
                                     if (checked) {
                                         onChange?.([option.value]);
                                     }
                                     else {
-                                        onChange?.([]);
+                                        if (!required)
+                                            onChange?.([]);
                                     }
                                 }
                             }}

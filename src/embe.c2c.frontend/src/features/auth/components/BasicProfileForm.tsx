@@ -26,6 +26,7 @@ export type BasicProfileFormConfig = {
 }
 
 export type BasicProfileFormError = { [P in keyof BasicProfileFormData]?: string };
+export type Mode = "register" | "edit";
 
 export type BasicProfileFormProps = {
     error?: BasicProfileFormError;
@@ -34,6 +35,7 @@ export type BasicProfileFormProps = {
     children?: React.ReactNode;
     className?: string;
     config?: BasicProfileFormConfig;
+    mode?: Mode;
 }
 
 export default function BasicProfileForm({ 
@@ -42,7 +44,8 @@ export default function BasicProfileForm({
     error, 
     onChange, 
     children, 
-    config 
+    config ,
+    mode = "edit"
 }: BasicProfileFormProps & { className?: string }) {
 
     config = config || {
@@ -85,8 +88,9 @@ export default function BasicProfileForm({
             {
                 config.gender &&
                 <SelectInput
-                    info={data.gender === undefined ? "specify your gender to receive more matches" : undefined}
-                    infoType="important"
+                    required
+                    info={mode === "edit" ? data.gender === undefined ? "specify your gender to receive more matches" : undefined : undefined}
+                    infoType={mode === "edit" ? "important" : undefined}
                     errorMessage={error?.gender}
                     optionClassName="lowercase"
                     multiple={false}
@@ -99,8 +103,8 @@ export default function BasicProfileForm({
             {
                 config.location &&
                 <LocationInput
-                    info={data.location === undefined ? "specify your location to receive more matches" : undefined}
-                    infoType="important"
+                    info={mode === "edit" ? data.location === undefined ? "specify your location to receive more matches" : undefined : undefined}
+                    infoType={mode === "edit" ? "important" : undefined}
                     label="location"
                     errorMessage={error?.location}
                     value={data.location}

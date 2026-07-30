@@ -20,9 +20,9 @@ public class User : Aggregate
         Email email,
         Alias alias,
         BirthDate birthDate,
-        Gender? gender,
+        Gender gender,
         ValueObjects.Location? location,
-        ImmutableHashSet<ImageDetails>? files,
+        ImmutableHashSet<ImageDetails> images,
         string? bio,
         string identityUserId
     )
@@ -39,9 +39,9 @@ public class User : Aggregate
         UpdatedAt = CreatedAt;
 
         _images = [];
-        if (files != null)
+        if (images != null)
         {
-            foreach (var file in files)
+            foreach (var file in images)
             {
                 AddImage(file);
             }
@@ -63,7 +63,7 @@ public class User : Aggregate
     public Alias Alias { get; private set; }
     public BirthDate BirthDate { get; private set; }
     public Age Age => Age.Create(BirthDate);
-    public Gender? Gender { get; private set; }
+    public Gender Gender { get; private set; }
     public Point? Coordinates { get; private set; }
     public ValueObjects.Location? Location => Coordinates != null ? ValueObjects.Location.Create(Coordinates.Y, Coordinates.X).Value : null;
 
@@ -118,7 +118,7 @@ public class User : Aggregate
         return Result.Success;
     }
 
-    public void UpdateGender(Gender? newGender)
+    public void UpdateGender(Gender newGender)
     {
         Gender = newGender;
         UpdatedAt = DateTimeOffset.UtcNow;
@@ -150,12 +150,18 @@ public class User : Aggregate
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void RemoveImage(Guid imageId)
+    public ErrorOr<Success> RemoveImage(Guid imageId)
     {
+        if (Images.Count == 1)
+        {
+            return UserErrors.InvalidFileCount.ToRuleErrorOr();
+        }
+
         var image = _images.Single(f => f.Id == imageId);
         _images.Remove(image);
         UpdatedAt = DateTimeOffset.UtcNow;
         AddDomainEvent(new UserImageRemovedEvent(image));
+        return Result.Success;
     }
 
     public void UpdateBio(string? newBio)
@@ -178,21 +184,21 @@ public class User : Aggregate
         Email email,
         Alias alias,
         BirthDate birthDate,
-        Gender? gender,
+        Gender gender,
         ValueObjects.Location? location,
-        ImmutableHashSet<ImageDetails>? images,
+        ImmutableHashSet<ImageDetails> images,
         string? bio,
         string identityUserId
     )
     {
-        if (images != null && (images.Count > 10))
+        if (images.Count > 10 || images.Count < 1)
         {
-            UserErrors.InvalidFileCount.ToRuleErrorOr();
+            return UserErrors.InvalidFileCount.ToRuleErrorOr();
         }
 
         if (Age.Create(birthDate) < Age.Create(18).Value)
         {
-            UserErrors.AgeOutOfRange.ToRuleErrorOr();
+            return UserErrors.AgeOutOfRange.ToRuleErrorOr();
         }
 
         return new User

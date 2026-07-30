@@ -14,8 +14,7 @@ public class ServiceBusWorkItemService : IWorkItemService
         _serviceBusClient = new ServiceBusClient(connectionString);
     }
 
-    public async Task PerformAsync<T>(T task, CancellationToken cancellationToken = default)
-        where T : WorkItem
+    public async Task PerformAsync(WorkItem task, CancellationToken cancellationToken = default)
     {
         const string queueName = "work-items";
         await _serviceBusClient

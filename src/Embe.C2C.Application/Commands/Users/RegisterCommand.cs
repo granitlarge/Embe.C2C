@@ -1,22 +1,19 @@
 using System.Collections.Immutable;
+using Embe.C2C.Application.Dtos.Read.ValueObjects;
 using Embe.C2C.Application.Dtos.Write.ValueObjects;
 using Embe.C2C.Domain.ValueObjects;
 
 namespace Embe.C2C.Application.Commands.Users;
-
-public record CreateImageDto
-(
-    string Url,
-    string MimeType,
-    int Order
-);
 
 public sealed record RegisterCommand
 (
     string Email,
     string Password,
     string Alias,
-    DateOnly BirthDate
+    Gender Gender,
+    DateOnly BirthDate,
+    ImageWriteDto[] Images,
+    LocationDto? Location
 );
 
 public sealed record CreateSearchProfileDto
