@@ -2,5 +2,5 @@ namespace Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 
 public record DeleteImage(string Url) : IWorkItem
 {
-    public WorkItemType Type => WorkItemType.DeleteImage;
+    public WorkItemType WorkItemType => WorkItemType.DeleteImage;
 }

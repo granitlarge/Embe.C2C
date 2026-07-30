@@ -9,12 +9,12 @@ public enum WorkItemType
     DeleteImage
 }
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Type))]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(WorkItemType))]
 [JsonDerivedType(typeof(DeleteImage), (int)WorkItemType.DeleteImage)]
 [JsonDerivedType(typeof(GenerateSearchProfileDescriptionEmbedding), (int)WorkItemType.GenerateSearchProfileDescriptionEmbedding)]
 public interface IWorkItem
 {
-    public WorkItemType Type { get; }
+    public WorkItemType WorkItemType { get; }
 }
 
 public interface IWorkItemService
