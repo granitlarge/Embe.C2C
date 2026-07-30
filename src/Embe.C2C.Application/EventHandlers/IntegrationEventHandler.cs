@@ -89,7 +89,9 @@ public class IntegrationEventHandler
 
     private async Task HandleSearchProfileDescriptionChangedEventAsync(SearchProfileDescriptionChangedIntegrationEvent searchProfileDescriptionChangedEvent, CancellationToken cancellationToken)
     {
-        await _workItemService.PerformAsync(new GenerateSearchProfileDescriptionEmbedding(searchProfileDescriptionChangedEvent.SearchProfileId, searchProfileDescriptionChangedEvent.NewDescription), cancellationToken);
+        var payload = new GenerateSearchProfileDescriptionEmbedding(searchProfileDescriptionChangedEvent.SearchProfileId, searchProfileDescriptionChangedEvent.NewDescription);
+        var workItem = WorkItem.Create(payload, WorkItemType.GenerateSearchProfileDescriptionEmbedding);
+        await _workItemService.PerformAsync(workItem, cancellationToken);
     }
 
     private Task HandleSearchProfileUpdatedEventAsync(SearchProfileUpdatedIntegrationEvent searchProfileUpdatedEvent, CancellationToken cancellationToken)
@@ -158,7 +160,7 @@ public class IntegrationEventHandler
         {
             await _logger.ErrorAsync(e.ToString());
             var urls = await Task.WhenAll(Enum.GetValues<ImageSize>().Select(imageSize => _imageService.GetImageUrlAsync(imageRemovedEvent.ImageName, imageSize, cancellationToken)));
-            await Task.WhenAll(urls.Select(url => _workItemService.PerformAsync(new DeleteImage(url), cancellationToken)));
+            await Task.WhenAll(urls.Select(url => _workItemService.PerformAsync(WorkItem.Create(new DeleteImage(url), WorkItemType.DeleteImage), cancellationToken)));
         }
     }
 }

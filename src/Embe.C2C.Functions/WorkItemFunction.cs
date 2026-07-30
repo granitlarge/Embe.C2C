@@ -25,27 +25,45 @@ public class WorkItemFunction
         CancellationToken cancellationToken
     )
     {
-        var item = message.Body.ToObjectFromJson<IWorkItem>();
+        var item = message.Body.ToObjectFromJson<WorkItem>();
         if (item is null)
         {
             await serviceBusMessageActions.DeadLetterMessageAsync(message, cancellationToken: cancellationToken);
+            return;
         }
 
-        switch (item)
+        switch (item.Type)
         {
 
-            case GenerateSearchProfileDescriptionEmbedding command:
-                await _createSearchProfileEmbeddingHandler.HandleAsync
-                (
-                    new CreateSearchProfileEmbeddingCommand(command.SearchProfileId, command.Description),
-                    cancellationToken
-                );
-                await serviceBusMessageActions.CompleteMessageAsync(message, cancellationToken);
-                break;
-
-            case DeleteImage deleteImage:
+            case WorkItemType.GenerateSearchProfileDescriptionEmbedding:
                 {
-                    await _imageService.DeleteImageByUrlAsync(deleteImage.Url, cancellationToken);
+                    var payload = item.As<GenerateSearchProfileDescriptionEmbedding>();
+                    if (payload is null)
+                    {
+                        await serviceBusMessageActions.CompleteMessageAsync(message, cancellationToken);
+                        return;
+                    }
+
+                    await _createSearchProfileEmbeddingHandler.HandleAsync
+                    (
+                        new CreateSearchProfileEmbeddingCommand(payload.SearchProfileId, payload.Description),
+                        cancellationToken
+                    );
+
+                    await serviceBusMessageActions.CompleteMessageAsync(message, cancellationToken);
+                    break;
+                }
+
+            case WorkItemType.DeleteImage:
+                {
+                    var payload = item.As<DeleteImage>();
+                    if (payload is null)
+                    {
+                        await serviceBusMessageActions.CompleteMessageAsync(message, cancellationToken);
+                        return;
+                    }
+
+                    await _imageService.DeleteImageByUrlAsync(payload.Url, cancellationToken);
                     await serviceBusMessageActions.CompleteMessageAsync(message, cancellationToken);
                     break;
                 }

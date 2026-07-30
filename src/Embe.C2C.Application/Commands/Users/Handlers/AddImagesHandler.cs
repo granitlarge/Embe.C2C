@@ -137,7 +137,7 @@ public class AddImagesHandler
             }
             catch (Exception e2)
             {
-                await Task.WhenAll(uploadedImageUrls.Select(url => _workItemService.PerformAsync(new DeleteImage(url), cancellationToken)));
+                await Task.WhenAll(uploadedImageUrls.Select(url => _workItemService.PerformAsync(WorkItem.Create(new DeleteImage(url), WorkItemType.DeleteImage), cancellationToken)));
                 throw new AggregateException([e1, e2]);
             }
             throw;

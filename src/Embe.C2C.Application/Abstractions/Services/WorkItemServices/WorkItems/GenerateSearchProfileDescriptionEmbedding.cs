@@ -1,6 +1,3 @@
 namespace Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 
-public record GenerateSearchProfileDescriptionEmbedding(Guid SearchProfileId, string Description) : IWorkItem
-{
-    public WorkItemType WorkItemType => WorkItemType.GenerateSearchProfileDescriptionEmbedding;
-}
+public record GenerateSearchProfileDescriptionEmbedding(Guid SearchProfileId, string Description);

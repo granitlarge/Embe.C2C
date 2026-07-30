@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
 
@@ -9,16 +10,32 @@ public enum WorkItemType
     DeleteImage
 }
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(WorkItemType))]
-[JsonDerivedType(typeof(DeleteImage), (int)WorkItemType.DeleteImage)]
-[JsonDerivedType(typeof(GenerateSearchProfileDescriptionEmbedding), (int)WorkItemType.GenerateSearchProfileDescriptionEmbedding)]
-public interface IWorkItem
+public record WorkItem
 {
-    public WorkItemType WorkItemType { get; }
+    [JsonConstructor]
+    private WorkItem(string payload, WorkItemType type)
+    {
+        Type = type;
+        Payload = payload;
+    }
+
+    public string Payload { get; }
+
+    public WorkItemType Type { get; }
+
+    public T? As<T>()
+    {
+        return JsonSerializer.Deserialize<T>(Payload);
+    }
+
+    public static WorkItem Create<T>(T payload, WorkItemType type)
+    {
+        return new WorkItem(JsonSerializer.Serialize(payload), type);
+    }
 }
 
 public interface IWorkItemService
 {
     public Task PerformAsync<T>(T task, CancellationToken cancellationToken = default)
-    where T : IWorkItem;
+    where T : WorkItem;
 }

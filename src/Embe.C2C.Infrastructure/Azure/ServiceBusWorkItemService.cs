@@ -15,7 +15,7 @@ public class ServiceBusWorkItemService : IWorkItemService
     }
 
     public async Task PerformAsync<T>(T task, CancellationToken cancellationToken = default)
-        where T : IWorkItem
+        where T : WorkItem
     {
         const string queueName = "work-items";
         await _serviceBusClient
