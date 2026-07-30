@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Embe.C2C.Application;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Domain.Aggregates.Users;
@@ -5,6 +6,7 @@ using Embe.C2C.Domain.Services;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Domain.ValueObjects.Engagements;
 using Embe.C2C.Infrastructure.Ef.Contexts;
+using Embe.C2C.Infrastructure.Ef.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Embe.C2C.Infrastructure.Ef;
@@ -63,7 +65,20 @@ public static class DatabaseSeeder
             null
         ).Value, [Gender.Male], null, null, null).Value;
 
+        var embedding = new float[1536];
+        var spe1 = new SearchProfileEmbedding
+        {
+            SearchProfileId = sp1.Id,
+            Embedding = new Pgvector.Vector(embedding)
+        };
+        var spe2 = new SearchProfileEmbedding
+        {
+            SearchProfileId = sp2.Id,
+            Embedding = new Pgvector.Vector(embedding)
+        };
+
         context.SearchProfiles.AddRange([sp1, sp2]);
+        context.SearchProfileEmbeddings.AddRange([spe1, spe2]);
 
         await context.SaveChangesAsync();
 
