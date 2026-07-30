@@ -109,6 +109,8 @@ public class CandidateRepository(C2CContext context) : ICandidateRepository
         inner join "SearchProfiles" usp on u."Id" = usp."UserId"
         inner join "DomainUsers" c on (ST_Distance(u."Coordinates", c."Coordinates") <= usp."MaximumDistance" * 1000 or usp."MaximumDistance" is null)
         inner join "SearchProfiles" csp on csp."UserId" = c."Id" and (ST_Distance(u."Coordinates", c."Coordinates") <= csp."MaximumDistance" * 1000 or csp."MaximumDistance" is null)
+        inner join "SearchProfileEmbeddings" uspe on usp."Id" = uspe."SearchProfileId"
+        inner join "SearchProfileEmbeddings" cspe on csp."Id" = cspe."SearchProfileId"
         where 1=1
         and u."Id" = '{userId}'
         and c."Id" != u."Id"
@@ -152,6 +154,8 @@ public class CandidateRepository(C2CContext context) : ICandidateRepository
                         and can."CandidateUserId" = c."Id"
                         and can."UserSearchProfileId" = usp."Id" 
                         and can."CandidateSearchProfileId" = csp."Id")
+
+        order by uspe."Embedding" <=> cspe."Embedding"
         offset 0 
         limit 20
 
