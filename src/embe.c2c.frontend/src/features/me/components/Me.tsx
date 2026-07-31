@@ -18,6 +18,7 @@ import { Guid, NullGuid } from "@/src/shared/cache";
 import { useApplicationStore } from "@/src/shared/stores/provider";
 import { cropImage } from "@/src/shared/image";
 import { getBase64EncodedData } from "@/src/shared/encoding";
+import ErrorMessage from "@/src/shared/components/inputs/ErrorMessage";
 
 export type MeProps = {
     className?: string;
@@ -76,10 +77,10 @@ export default function Me({ className }: MeProps) {
             url: z.url(),
             mimeType: z.string(),
             order: z.number(),
-        })).optional(),
-        alias: z.string().min(1, "alias is required"),
-        birthDate: z.string().min(1, "birthDate is required"),
-        gender: z.enum(Gender).optional(),
+        })).min(1, { error: "you must add at least 1 image" }).max(10, { error: "you can add at most 10 images" }),
+        alias: z.string().min(1, {error: "alias is required"}),
+        birthDate: z.string().min(1, {error: "birthDate is required"}),
+        gender: z.enum(Gender, { error: "gender is required" }),
         location: z.object({
             latitude: z.number(),
             longitude: z.number()
@@ -103,7 +104,9 @@ export default function Me({ className }: MeProps) {
             const error = z.treeifyError(validationResult.error);
             setBasicFormError({
                 alias: error.properties?.alias?.errors?.[0],
-                birthDate: error.properties?.birthDate?.errors?.[0]
+                birthDate: error.properties?.birthDate?.errors?.[0],
+                gender: error.properties?.gender?.errors?.[0],
+                images: error.properties?.images?.errors?.[0]
             });
             return;
         }
@@ -172,6 +175,13 @@ export default function Me({ className }: MeProps) {
                 }));
 
             }} />
+
+            {
+                basicFormError.images && 
+                <Surface variant="secondary" className="flex flex-col items-center justify-center">
+                    <ErrorMessage message={basicFormError.images} />
+                </Surface>
+            }
             <div className="flex flex-row gap-3 justify-end">
                 {(serverSideBasicFormData.location === undefined || clientSideBasicFormData.location !== undefined) && <Button onClick={onSave} intent="save">save</Button>}
                 {
