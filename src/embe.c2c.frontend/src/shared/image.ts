@@ -23,7 +23,7 @@ export async function cropImage(src: string, x: number, y: number, width: number
                 return resolve(undefined);
             const url = URL.createObjectURL(blob);
             resolve(url);
-        }), "image/webp");
+        }));
     });
 }
 
