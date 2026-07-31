@@ -108,21 +108,32 @@ public class AddImagesHandler
                     throw new InvalidOperationException("Failed to create image");
                 }
 
-                Image addedImage;
+                ErrorOr<Image> addImageResult;
                 lock (user)
                 {
-                    addedImage = user.AddImage
+                    addImageResult = user.AddImage
                     (
                         imageDetails.Value
-                    ).Value;
+                    );
                 }
 
-                lock (addedImages)
+                if (addImageResult.IsError)
                 {
-                    addedImages.Add(addedImage);
+                    throw new InvalidOperationException("Failed to add image.");
+                }
+                else
+                {
+
+                    lock (addedImages)
+                    {
+                        addedImages.Add(addImageResult.Value);
+                    }
+
                 }
 
             }));
+
+            await _userRepository.SaveChangesAsync(cancellationToken);
 
             var result = await Task.WhenAll(addedImages.Select(image => _imageDtoMapper.ToDtoAsync(image, cancellationToken)));
             return new(true, new AddImagesResult(result));

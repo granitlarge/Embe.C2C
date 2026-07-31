@@ -96,7 +96,7 @@ public class UpdateHandler
             var searchProfilesWithDistanceFilter = await _searchProfileRepository.GetByUserIdAndHasMaximumDistanceFilter(user.Id, cancellationToken);
             foreach (var sp in searchProfilesWithDistanceFilter)
             {
-                _searchProfileService.Update
+                var updateResult = _searchProfileService.Update
                 (
                     user,
                     sp,
@@ -110,6 +110,11 @@ public class UpdateHandler
                     null,
                     sp.Active
                 );
+
+                if (updateResult.IsError)
+                {
+                    return new(false, updateResult.Errors);
+                }
             }
         }
 
@@ -117,13 +122,19 @@ public class UpdateHandler
         await _logger.TraceAsync($"Removing {imagesToRemove.Count} images.");
         foreach (var image in imagesToRemove)
         {
-            user.RemoveImage(image.Id);
+            var removeImageResult = user.RemoveImage(image.Id);
+            if (removeImageResult.IsError)
+            {
+                return new(false, removeImageResult.Errors);
+            }
         }
 
         foreach (var image in command.ImagesToKeep ?? [])
         {
             user.ChangeImageOrder(image.Id, image.Order);
         }
+
+        await _userRepo.SaveChangesAsync(cancellationToken);
 
         var queryingUser = await _userRepo.GetByIdAsync(actorId, cancellationToken);
         var readDto = await _userDtoMapper.ToDtoAsync(user, queryingUser, cancellationToken);
