@@ -1,6 +1,6 @@
 "use client";
 
-export async function cropImage(src: string, x: number, y: number, width: number, height: number) {
+export async function cropImage(src: string, type: string, x: number, y: number, width: number, height: number) {
 
     const canvas = document.createElement("canvas");
     let image: HTMLImageElement;
@@ -23,7 +23,7 @@ export async function cropImage(src: string, x: number, y: number, width: number
                 return resolve(undefined);
             const url = URL.createObjectURL(blob);
             resolve(url);
-        }));
+        }), type);
     });
 }
 

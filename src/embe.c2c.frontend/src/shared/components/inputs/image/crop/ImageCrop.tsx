@@ -4,7 +4,7 @@ import { PaginationDots } from "../../../images/ImageGallery";
 import { cropImage } from "@/src/shared/image";
 
 export type ImageCropGallery = {
-    images: string[];
+    images: { url: string, type: string }[];
     onChange?: (crops: { url: string, x: number, y: number, width: number, height: number }[]) => void;
 }
 export default function ImageCropGallery({ onChange, images }: ImageCropGallery) {
@@ -20,10 +20,10 @@ export default function ImageCropGallery({ onChange, images }: ImageCropGallery)
 
         cropsRef.current.push({
             ...crop,
-            url: images[index]
+            url: images[index].url
         });
 
-        await cropImage(images[index], crop.x, crop.y, crop.width, crop.height).then(url => {
+        await cropImage(images[index].url, images[index].type, crop.x, crop.y, crop.width, crop.height).then(url => {
             if (!url)
                 return;
             cropsRef.current[index] = {
@@ -50,7 +50,7 @@ export default function ImageCropGallery({ onChange, images }: ImageCropGallery)
 
             <ImageCropper
                 onCrop={onCrop}
-                src={images[index]}
+                src={images[index].url}
                 aspect={1/1}
             />
             {
