@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
-  "name": "embec2cfrontend",
+  "name": "relzone",
   "compatibility_date": "2026-07-19",
   "compatibility_flags": [
     "nodejs_compat"
@@ -13,7 +13,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "embec2cfrontend"
+      "service": "relzone"
     }
   ],
   "images": {
