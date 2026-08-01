@@ -205,7 +205,7 @@ function BasicProfileStep({ next: finish, hidden }: BasicProfileStepProps) {
 }
 
 export type ImageStep = {
-    finish: (imageData: ImageData[]) => void
+    finish: (imageData: ImageData[]) => Promise<void> | void
     hidden?: boolean;
 }
 export function ImageStep({ hidden, finish }: ImageStep) {
@@ -213,7 +213,7 @@ export function ImageStep({ hidden, finish }: ImageStep) {
     const [data, setData] = useState({ images: [] } as ImageGalleryInputData<ImageData>);
     const [error, setError] = useState({} as ImageGalleryInputError);
 
-    function onFinish() {
+    async function onFinish() {
 
         const validationSchema = z.object({
             images: z.array(z.object()).min(1, { error: "you must add at least 1 image" }).max(10, { error: "you can add at most 10 images" })
@@ -231,7 +231,7 @@ export function ImageStep({ hidden, finish }: ImageStep) {
 
         } else {
 
-            finish(data.images);
+            await finish(data.images);
 
         }
 
