@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { calSans } from "@/fonts";
 
 import "./globals.css";
-import { getAuthenticatedUser } from "../shared/user";
 import Surface from "../shared/components/surfaces/Surface";
 import NextTopLoader from "nextjs-toploader";
 
@@ -18,8 +17,6 @@ export type RootLayoutProps = {
 export default async function RootLayout({
   children,
 }: RootLayoutProps) {
-
-  const user = await getAuthenticatedUser();
 
   return (
 
