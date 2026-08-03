@@ -4,22 +4,16 @@ import Button from "@/src/shared/components/buttons/Button";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import Surface from "@/src/shared/components/surfaces/Surface";
 import { Routes } from "@/src/shared/routes";
-import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 import * as z from 'zod';
 import { resetPassword } from "../actions/action";
-import { useRouter } from "nextjs-toploader/app";
 import { PasswordValidationRules } from "@/src/shared/validation";
 import Link from "@/src/shared/components/Links/Link";
 
-
 export type ResetPasswordFormProps = {
-    token: string;
+    onReset: (newPassword: string) => Promise<void> | void;
 }
-export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
-
-    const router = useRouter();
-    const tokenHasExpired = (jwtDecode(token).exp ?? 0) < Date.now() / 1000;
+export default function ResetPasswordForm({ onReset }: ResetPasswordFormProps) {
 
     const [password, setPassword] = useState<string | undefined>(undefined);
     const [confirmPassword, setConfirmPassword] = useState<string | undefined>(undefined);
@@ -37,7 +31,6 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         const validationResult = validationScheme.safeParse({ password, confirmPassword });
         if (!validationResult.success) {
 
-
             const treeifiedError = z.treeifyError(validationResult.error);
             const properties = treeifiedError.properties;
             const errors = treeifiedError.errors;
@@ -50,12 +43,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
         } else {
 
-            const resetPasswordResponse = await resetPassword(token, password!);
-            if (!resetPasswordResponse.success) {
-                throw new Error("not implemented");
-            }
-
-            router.push(Routes.public.login);
+            await onReset(password!);
 
         }
 
@@ -63,32 +51,19 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
     return (
 
-        <Surface variant="secondary" className="flex flex-col gap-3 items-center justify-center">
-            {
-                !tokenHasExpired &&
-                <>
-                    <TextInput
-                        label="new password"
-                        type="password"
-                        onBlur={setPassword}
-                    />
-                    <TextInput
-                        label="confirm new password"
-                        type="password"
-                        onBlur={setConfirmPassword}
-                    />
-                    {error && <span className="text-(--error-fc) text-(length:--secondary-fs)">{error}</span>}
-                    <Button intent="save" onClick={onSubmit}>submit</Button>
-                </>
-            }
-            {
-                tokenHasExpired &&
-                <>
-                    <span className="text-(--primary-fc) text-(length:--primary-fs) text-center">
-                        The password-reset link has expired. Request a new one by clicking <Link href={Routes.public.forgotPassword}>here</Link>.
-                    </span>
-                </>
-            }
+        <Surface variant="secondary" className="flex flex-col gap-3 items-center justify-center" padding="none">
+            <TextInput
+                label="new password"
+                type="password"
+                onBlur={setPassword}
+            />
+            <TextInput
+                label="confirm new password"
+                type="password"
+                onBlur={setConfirmPassword}
+            />
+            {error && <span className="text-(--error-fc) text-(length:--secondary-fs)">{error}</span>}
+            <Button intent="save" onClick={onSubmit}>submit</Button>
         </Surface>
 
     )

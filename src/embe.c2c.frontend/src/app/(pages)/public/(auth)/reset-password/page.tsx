@@ -1,4 +1,4 @@
-import ResetPasswordForm from "@/src/features/auth/components/ResetPasswordForm"
+import ResetForgottenPasswordForm from "@/src/features/auth/components/ResetForgottenPasswordForm";
 import { Routes } from "@/src/shared/routes";
 import { redirect } from "next/navigation"
 
@@ -20,7 +20,7 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
 
             <h1>reset password</h1>
 
-            <ResetPasswordForm token={token as string} />
+            <ResetForgottenPasswordForm token={token as string} />
 
         </div>
 
