@@ -1,10 +1,8 @@
-using Embe.C2C.Application;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Authorizations.FactStores;
 using Embe.C2C.Application.Authorizations.FactStores.Users.Facts;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.Entities;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;

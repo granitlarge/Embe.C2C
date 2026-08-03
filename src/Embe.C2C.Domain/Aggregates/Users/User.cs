@@ -23,12 +23,10 @@ public class User : Aggregate
         Gender gender,
         ValueObjects.Location? location,
         ImmutableHashSet<ImageDetails> images,
-        string? bio,
-        string identityUserId
+        string? bio
     )
     {
         Id = Guid.CreateVersion7();
-        IdentityUserId = identityUserId;
         Email = email;
         Alias = alias;
         BirthDate = birthDate;
@@ -58,7 +56,6 @@ public class User : Aggregate
     }
 
     public Guid Id { get; }
-    public string IdentityUserId { get; }
     public Email Email { get; private set; }
     public Alias Alias { get; private set; }
     public BirthDate BirthDate { get; private set; }
@@ -175,7 +172,9 @@ public class User : Aggregate
         var imageIdsToRemove = _images.Select(f => f.Id).ToList();
         foreach (var imageId in imageIdsToRemove)
         {
-            RemoveImage(imageId);
+            var image = _images.Single(f => f.Id == imageId);
+            _images.Remove(image);
+            AddDomainEvent(new UserImageRemovedEvent(image));
         }
     }
 
@@ -187,8 +186,7 @@ public class User : Aggregate
         Gender gender,
         ValueObjects.Location? location,
         ImmutableHashSet<ImageDetails> images,
-        string? bio,
-        string identityUserId
+        string? bio
     )
     {
         if (images.Count > 10 || images.Count < 1)
@@ -209,8 +207,7 @@ public class User : Aggregate
             gender,
             location,
             images,
-            bio,
-            identityUserId
+            bio
         );
     }
 }

@@ -15,8 +15,7 @@ public interface IAuthService
     Task<ErrorOr<bool>> SignOutAsync(string refreshToken, CancellationToken cancellationToken = default);
     Task<ErrorOr<Credentials>> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default);
     Task<ErrorOr<bool>> InvalidateRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
-    Task<ErrorOr<IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default);
+    Task<ErrorOr<IIdentityUser>> RegisterUserAsync(Guid userId, string email, string password, CancellationToken cancellationToken = default);
     Task<ErrorOr<Success>> ResetPasswordAsync(string newPassword, CancellationToken cancellationToken = default);
-    Task<ErrorOr<Success>> DeleteUserAsync(string identityUserId, CancellationToken cancellationToken = default);
     Task<string> GeneratePasswordResetLinkAsync(string email, CancellationToken cancellationToken);
 }

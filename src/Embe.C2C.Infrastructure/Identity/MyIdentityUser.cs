@@ -5,5 +5,5 @@ namespace Embe.C2C.Infrastructure.Identity;
 
 public class MyIdentityUser : IdentityUser, IIdentityUser
 {
-
+    public Guid UserId { get; set; }
 }

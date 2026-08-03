@@ -15,7 +15,6 @@ public class DeleteHandler : CommandHandler<DeleteCommand, ErrorOr<Success>>
     private readonly IUserRepository _userRepo;
     private readonly UserAuthorizationService _authorizationPolicy;
     private readonly UserService _userService;
-    private readonly IAuthService _authService;
 
     public DeleteHandler
     (
@@ -26,13 +25,11 @@ public class DeleteHandler : CommandHandler<DeleteCommand, ErrorOr<Success>>
         UserService userService,
         DomainEventHandler domainEventHandler,
         IntegrationEventHandler integrationEventHandler,
-        IAuthService authService,
         DomainEventStore domainEventStore
     ) : base(domainEventStore, context, domainEventHandler, integrationEventHandler)
     {
         _authorizationPolicy = authorizationPolicy;
         _userService = userService;
-        _authService = authService;
         _userRepo = userRepo;
         _accountRepo = accountRepo;
     }
@@ -49,12 +46,6 @@ public class DeleteHandler : CommandHandler<DeleteCommand, ErrorOr<Success>>
         if (user is null)
         {
             return new(false, ApplicationErrors.NotFound.ToNotFoundErrorOr());
-        }
-
-        var deleteIdentityUserResult = await _authService.DeleteUserAsync(user.IdentityUserId, cancellationToken);
-        if (!deleteIdentityUserResult.IsSuccess)
-        {
-            return new(false, deleteIdentityUserResult.Errors);
         }
 
         var accounts = await _accountRepo.GetByUserIdAsync(command.UserId, cancellationToken);

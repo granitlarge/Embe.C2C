@@ -18,7 +18,7 @@ public class UserService : DomainService
     public void Delete
     (
         User user,
-        ImmutableHashSet<Aggregates.Accounts.Account> accounts
+        ImmutableHashSet<Account> accounts
     )
     {
         foreach (var account in accounts)

@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
-using Embe.C2C.Application;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Errors;
@@ -322,9 +321,9 @@ public class AuthService
         return await _context.Users.AnyAsync(u => u.Email == email, cancellationToken);
     }
 
-    public async Task<ErrorOr<IIdentityUser>> RegisterUserAsync(string email, string password, CancellationToken cancellationToken = default)
+    public async Task<ErrorOr<IIdentityUser>> RegisterUserAsync(Guid userId, string email, string password, CancellationToken cancellationToken = default)
     {
-        var identityUser = new MyIdentityUser { UserName = email, Email = email };
+        var identityUser = new MyIdentityUser { UserName = email, Email = email, UserId = userId };
         var result = await _userManager.CreateAsync(identityUser, password);
         if (result.Succeeded)
         {
@@ -343,8 +342,16 @@ public class AuthService
     )
     {
         var userId = _userService.UserId ?? throw new InvalidOperationException("No authenticated user");
-        var domainUser = await _context.DomainUsers.Select(du => new { du.Id, du.IdentityUserId }).SingleAsync(du => du.Id == userId, cancellationToken);
-        var user = await _userManager.FindByIdAsync(domainUser.IdentityUserId);
+        var identityUserId = await _context.Users.Where(u => u.UserId == userId)
+            .Select(u => u.Id)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (identityUserId == null)
+        {
+            return ApplicationErrors.NotFound.ToNotFoundErrorOr();
+        }
+
+        var user = await _userManager.FindByIdAsync(identityUserId);
         if (user is null)
         {
             return ApplicationErrors.NotFound.ToNotFoundErrorOr();
@@ -401,9 +408,8 @@ public class AuthService
 
     public async Task<string> GeneratePasswordResetLinkAsync(string email, CancellationToken cancellationToken)
     {
+        var identityUser = await _userManager.FindByEmailAsync(email) ?? throw new InvalidOperationException("identity user does not exist");
         var user = await _context.DomainUsers.SingleOrDefaultAsync(du => du.Email == Email.Create(email).Value, cancellationToken: cancellationToken) ?? throw new InvalidOperationException("user does not exist");
-        var identityUser = (await _userManager.FindByIdAsync(user.IdentityUserId))!;
-
         var token = GenerateResetPasswordToken(identityUser, user);
 
         var resetPasswordUrl = BuildResetPasswordUrl($"{_settings.Site.Url}/public/reset-password", token);

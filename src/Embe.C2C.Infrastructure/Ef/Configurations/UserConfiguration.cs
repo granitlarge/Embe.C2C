@@ -39,12 +39,6 @@ public class UserConfiguration : AggregateConfiguration<User>
         builder.HasIndex(x => x.Coordinates).HasMethod("GIST");
 
         builder.HasIndex(u => u.Email).IsUnique();
-        builder.HasIndex(u => u.IdentityUserId).IsUnique();
-
-        builder.HasOne<MyIdentityUser>()
-            .WithOne()
-            .HasForeignKey<User>(u => u.IdentityUserId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .OwnsMany<Domain.Entities.Image>("_images", image =>

@@ -1,13 +1,15 @@
 "use server";
 
 import { Mutate } from "@/src/shared/apis/api";
-import { ApiResponse, FailureReason, } from "@/src/shared/apis/type";
+import { ApiResponse, } from "@/src/shared/apis/type";
 import { Guid } from "@/src/shared/cache";
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
 import { Gender, Location } from "@/src/shared/types/domain/value-objects";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { ImageData } from "../components/MyInfoForm";
 import { AddImagesResult } from "./type";
+import { clearTokens, getRefreshToken } from "@/src/shared/security/functions";
+import { getAuthenticatedUser } from "@/src/shared/user";
 
 export async function updateProfile
     (
@@ -64,6 +66,50 @@ export async function addImages(
             }
         }
     )
+
+    return response;
+
+}
+
+export async function logout(): Promise<ApiResponse<void>> {
+
+    const response = await Mutate<void>(
+        `${process.env.API_URL}/api/auth/signout`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({refreshToken: await getRefreshToken()})
+        }
+    );
+
+    if (response.success) {
+        await clearTokens();
+    }
+
+    return response;
+
+}
+
+export async function deleteAccount(): Promise<ApiResponse<void>> {
+
+    const userId = (await getAuthenticatedUser())?.userId;
+
+    const response = await Mutate<void>(
+        `${process.env.API_URL}/api/user`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ userId: userId })
+        }
+    );
+
+    if (response.success) {
+        await clearTokens();
+    }
 
     return response;
 

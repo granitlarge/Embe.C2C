@@ -92,16 +92,6 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
 
     protected override async Task<CommandResult<ErrorOr<Credentials>>> InternalHandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
     {
-        var registerUserResult = await _authService.RegisterUserAsync(command.Email, command.Password, cancellationToken);
-        if (!registerUserResult.IsSuccess)
-        {
-            return new
-            (
-                false,
-                ErrorOrFactory.From<Credentials>(registerUserResult.Errors)
-            );
-        }
-
         var errors = new List<Error>();
         var email = Email.Create(command.Email).ElseDo(e => errors.AddRange(e.WithPropertyName(nameof(command.Email))));
         var alias = Alias.Create(command.Alias).ElseDo(e => errors.AddRange(e.WithPropertyName(nameof(command.Alias))));
@@ -119,7 +109,6 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
         }
 
         var files = new HashSet<ImageDetails>();
-        var identityUserId = registerUserResult.Value!.Id;
         var user = User
             .Register
             (
@@ -129,8 +118,7 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
                 gender: command.Gender,
                 location: location != default ? location.Value : null,
                 images: [.. images.Value],
-                bio: null,
-                identityUserId
+                bio: null
             )
             .ElseDo(errors.AddRange);
 
@@ -144,11 +132,19 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
         }
 
         _userRepo.Set.Add(user.Value);
-
         await _userRepo.SaveChangesAsync(cancellationToken);
 
-        var signInResult = await _authService.SignInAsync(email.Value.Value, command.Password, cancellationToken);
+        var registerUserResult = await _authService.RegisterUserAsync(user.Value.Id, command.Email, command.Password, cancellationToken);
+        if (!registerUserResult.IsSuccess)
+        {
+            return new
+            (
+                false,
+                ErrorOrFactory.From<Credentials>(registerUserResult.Errors)
+            );
+        }
 
+        var signInResult = await _authService.SignInAsync(email.Value.Value, command.Password, cancellationToken);
         if (!signInResult.IsSuccess)
         {
             throw new NotImplementedException();
