@@ -32,6 +32,8 @@ public static class Emails
                 justify-content: center;
                 gap: 1rem;
                 padding: 2rem;
+                max-width: 500px;
+                margin-inline: auto;
             }
 
             .surface {
@@ -117,6 +119,17 @@ public static class Emails
         $$"""
             <p>
                 Click <a href='{{link}}'>here</a> to see who liked you!
+            </p>
+        """
+    );
+
+    internal static string VerificationMessage(string applicationName, string code) => Template
+    (
+        applicationName,
+        "verify your e-mail address",
+        $$"""
+            <p>
+                Your e-mail verification code is <strong>{{code}}</strong>.
             </p>
         """
     );

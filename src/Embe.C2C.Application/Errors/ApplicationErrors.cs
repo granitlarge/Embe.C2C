@@ -32,4 +32,6 @@ public static class ApplicationErrors
     public static readonly ApplicationError InvalidCredentials = new("auth.invalid_credentials", "The supplied credentials are invalid.");
     public static readonly ApplicationError InvalidRefreshToken = new("auth.invalid_refresh_token", "Invalid refresh token");
     public static readonly ApplicationError LockedOut = new("auth.locked_out", "The user has had too many failed login attempts and is now locked out.");
+
+    public static readonly ApplicationError InvalidVerificationCode = new("auth.invalid_verification_code", "The supplied verification code is invalid");
 }

@@ -26,7 +26,7 @@ public static class AuthEndPoints
         group.MapPost("/forgot-password", ForgotPassword);
         group.MapPost("/reset-password", ResetPassword).RequireAuthorization(new AuthorizeAttribute
         {
-            AuthenticationSchemes = "ResetPassword"
+            AuthenticationSchemes = "Bearer,ResetPassword"
         });
     }
 

@@ -3,7 +3,6 @@ using Azure.Storage.Blobs.Models;
 using Embe.C2C.Api.EndPoints;
 using Embe.C2C.Api.Extensions;
 using Embe.C2C.Infrastructure;
-using Embe.C2C.Infrastructure.Ef;
 using Embe.C2C.Infrastructure.Ef.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +29,7 @@ app.MapSearchProfileEndPoints();
 app.MapOpenApiEndpoints();
 app.MapSignalREndPoints();
 app.MapCandidateEndPoints();
+app.MapVerificationEndpoints();
 
 if (app.Environment.IsDevelopment())
 {

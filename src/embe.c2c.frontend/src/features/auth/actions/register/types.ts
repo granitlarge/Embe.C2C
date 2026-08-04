@@ -8,6 +8,7 @@ export type RegisterRequest = {
     gender: Gender;
     location?: Location;
     images: ImageWriteDto[];
+    emailVerificationCode: string;
 }
 
 export enum RegisterUserFailureReason {

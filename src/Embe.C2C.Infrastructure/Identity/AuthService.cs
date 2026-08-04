@@ -9,6 +9,7 @@ using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Entities;
 using Embe.C2C.Infrastructure.Extensions;
 using ErrorOr;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +18,7 @@ namespace Embe.C2C.Infrastructure.Identity;
 
 public class AuthService
 (
+    IHttpContextAccessor httpContextAccessor,
     Settings settings,
     Ef.Contexts.C2CContext context,
     IAuthenticatedUserService userService,
@@ -24,6 +26,7 @@ public class AuthService
 ) : IAuthService
 {
 
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly Ef.Contexts.C2CContext _context = context;
     private readonly UserManager<MyIdentityUser> _userManager = userManager;
     private readonly IAuthenticatedUserService _userService = userService;
@@ -250,7 +253,7 @@ public class AuthService
         return new RefreshToken(tokenId, token, DateTimeOffset.UtcNow.Add(_refreshTokenLifetime));
     }
 
-    private string GenerateResetPasswordToken(IdentityUser identityUser, User user)
+    private string GenerateResetPasswordToken(MyIdentityUser identityUser, User user)
     {
         var tokenId = Guid.CreateVersion7();
         var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Jwt.ResetPasswordTokenSecret));
@@ -341,6 +344,12 @@ public class AuthService
         CancellationToken cancellationToken = default
     )
     {
+        var refreshTokenId = GetRefreshTokenIdFromClaims();
+        if (!refreshTokenId.HasValue)
+        {
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
+        }
+
         var userId = _userService.UserId ?? throw new InvalidOperationException("No authenticated user");
         var identityUserId = await _context.Users.Where(u => u.UserId == userId)
             .Select(u => u.Id)
@@ -361,7 +370,7 @@ public class AuthService
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         if (result.Succeeded)
         {
-            await ClearRefreshTokens(userId, cancellationToken);
+            await RemoveOtherRefreshTokensOfSameAuthenticationMethod(userId, refreshTokenId.Value, cancellationToken);
             await _userManager.ResetAccessFailedCountAsync(user);
             return Result.Success;
         }
@@ -390,13 +399,6 @@ public class AuthService
         }
     }
 
-    private async Task ClearRefreshTokens(Guid userId, CancellationToken cancellationToken)
-    {
-        var refreshTokens = await _context.RefreshTokens.Where(rt => rt.UserId == userId).ToListAsync(cancellationToken);
-        _context.RefreshTokens.RemoveRange(refreshTokens);
-        await _context.SaveChangesAsync(cancellationToken);
-    }
-
     private static Uri BuildResetPasswordUrl(string resetPasswordUrl, string token)
     {
         var uriBuilder = new UriBuilder(resetPasswordUrl);
@@ -415,4 +417,125 @@ public class AuthService
         var resetPasswordUrl = BuildResetPasswordUrl($"{_settings.Site.Url}/public/reset-password", token);
         return resetPasswordUrl.ToString();
     }
+
+    public async Task<string> GenerateVerificationCodeAsync(string id, CancellationToken cancellationToken)
+    {
+        var verificationCode = await _context.VerificationCodes.SingleOrDefaultAsync(vc => vc.Id == id, cancellationToken);
+        var code = GenerateRandom6DigitNumber();
+        if (verificationCode is null)
+        {
+            _context.VerificationCodes.Add(new VerificationCode
+            {
+                Id = id,
+                Code = code
+            });
+        }
+        else
+        {
+            verificationCode.Code = code;
+        }
+
+        return code;
+    }
+
+    public async Task<bool> VerifyVerificationCodeAsync
+    (
+        string id,
+        string verificationCode,
+        CancellationToken cancellationToken
+    )
+    {
+        var storedVerificationCode = await _context.VerificationCodes.SingleOrDefaultAsync(vc => vc.Id == id, cancellationToken);
+        if (storedVerificationCode is null)
+        {
+            return false;
+        }
+        if (storedVerificationCode.RedemptionAttempts > 2)
+        {
+            _context.Remove(storedVerificationCode);
+            return false;
+        }
+
+        if (verificationCode == storedVerificationCode.Code)
+        {
+            _context.Remove(storedVerificationCode);
+            return true;
+        }
+
+        storedVerificationCode.RedemptionAttempts++;
+        return false;
+    }
+
+    private static string GenerateRandom6DigitNumber()
+    {
+        var value = new string[6];
+        for (var i = 0; i < 6; i++)
+        {
+            value[i] = Random.Shared.Next(10).ToString();
+        }
+        return string.Join("", value);
+    }
+
+    public async Task<ErrorOr<Success>> ChangeEmailAsync
+    (
+        Guid userId,
+        Email newEmail,
+        CancellationToken cancellationToken
+    )
+    {
+        var refreshTokenId = GetRefreshTokenIdFromClaims();
+        if (!refreshTokenId.HasValue)
+        {
+            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
+        }
+
+        var user = await _context.DomainUsers.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var identityUser = await _context.Users.SingleOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+        if (user is null || identityUser is null)
+        {
+            return ApplicationErrors.NotFound.ToNotFoundErrorOr();
+        }
+
+        var newEmailAlreadyExists = await _context.DomainUsers.AnyAsync(du => du.Email == newEmail, cancellationToken) ||
+                                    await _context.Users.AnyAsync(u => u.Email == newEmail.Value, cancellationToken);
+
+        if (newEmailAlreadyExists)
+        {
+            return ApplicationErrors.DuplicateEmail.ToValidationErrorOr();
+        }
+
+        await RemoveOtherRefreshTokensOfSameAuthenticationMethod(userId, refreshTokenId.Value, cancellationToken);
+
+        user.UpdateEmail(newEmail);
+        identityUser.Email = newEmail.Value;
+        identityUser.UserName = newEmail.Value;
+        await _userManager.UpdateNormalizedEmailAsync(identityUser);
+        await _userManager.UpdateNormalizedUserNameAsync(identityUser);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success;
+    }
+
+    private Guid? GetRefreshTokenIdFromClaims()
+    {
+        var refreshTokenIdClaimValue = _httpContextAccessor.HttpContext?.User.FindFirstValue("refreshTokenId");
+        if (refreshTokenIdClaimValue is null)
+        {
+            return null;
+        }
+
+        if (!Guid.TryParse(refreshTokenIdClaimValue, out var tokenId))
+        {
+            return null;
+        }
+
+        return tokenId;
+    }
+
+    private async Task RemoveOtherRefreshTokensOfSameAuthenticationMethod(Guid userId, Guid refreshTokenId, CancellationToken cancellationToken)
+    {
+        var rtsToRemove = await _context.RefreshTokens.Where(rt => rt.UserId == userId && rt.Id == refreshTokenId).ToListAsync(cancellationToken);
+        _context.RefreshTokens.RemoveRange(rtsToRemove);
+    }
+
 }

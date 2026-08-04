@@ -19,13 +19,15 @@ import { ImageData } from "../../me/components/MyInfoForm";
 import ImageGalleryInput, { ImageGalleryInputData, ImageGalleryInputError } from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
 import { Image } from "@/src/shared/components/inputs/image/gallery/ImageGalleryInput";
 import { getBase64EncodedData } from "@/src/shared/encoding";
+import { sendVerificationEmail } from "../actions/action";
 
 type Step =
     "email" |
     "account exists" |
     "password" |
-    "profile" | 
-    "images";
+    "profile" |
+    "images" |
+    "verify";
 
 type EmailStepProps = {
     errorMessage?: string;
@@ -41,23 +43,33 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
     const [emailError, setEmailError] = useState<string | undefined>(undefined);
 
     async function onNavigate() {
+
         const result = await emailSchema.safeParseAsync(email);
         if (!result.success) {
+
             setEmailError(result.error.issues[0].message);
             return;
+
         } else {
+
             const response = await accountExists(email!);
-            if (response.success) {
-                if (response.value!) {
-                    finish(true)
-                } else {
-                    setEmail(result.data);
-                    finish(false);
-                }
-            } else {
+            if (!response.success) {
                 throw new Error("not implemented");
             }
+
+            if (response.value!) {
+
+                finish(true)
+
+            } else {
+
+                await sendVerificationEmail(email!);
+                setEmail(result.data);
+                finish(false);
+
+            }
         }
+
     }
 
     return (
@@ -72,6 +84,42 @@ function EmailStep({ finish, setEmail, value, errorMessage, hidden }: EmailStepP
         </Surface>
     )
 
+}
+
+type VerifyEmailProps = {
+    errorMessage?: string;
+    finish: (verificationCode: string) => void;
+    hidden?: boolean
+    email: string
+}
+function VerifyEmailStep({ email, hidden, errorMessage, finish }: VerifyEmailProps) {
+
+    const [verificationCode, setVerificationCode] = useState<string | undefined>(undefined);
+    const [verificationCodeErrorMessage, setVerificationCodeErrorMessage] = useState<string | undefined>(undefined);
+
+    async function onNavigate() {
+
+        const validationSchema = z.string({error: "the verification code is required to proceed"}).min(1, { error: "the verification code is required to proceed" });
+        const validationResult = validationSchema.safeParse(verificationCode);
+
+        if (!validationResult.success) {
+            setVerificationCodeErrorMessage(validationResult.error.issues[0].message);
+            return;
+        }
+
+        finish(verificationCode!);
+
+    }
+
+    return (
+        <Surface className={`form ${hidden ? "hidden" : ""}`} padding="none">
+            <p className="text-center text-(--primary-fc) text-(length:--primary-fs)">
+                We've sent a verification code to <strong>{email}</strong>. Enter it below.
+            </p>
+            <TextInput onBlur={setVerificationCode} errorMessage={errorMessage || verificationCodeErrorMessage} />
+            <Button intent="navigate" onClick={onNavigate}>next</Button>
+        </Surface>
+    )
 }
 
 function AccountExistsStep({ hidden }: { hidden: boolean }) {
@@ -156,7 +204,7 @@ function BasicProfileStep({ next: finish, hidden }: BasicProfileStepProps) {
     const validationSchema = z.object({
         alias: z.string({ message: "alias is required" }).min(1, { message: "alias is required" }),
         birthDate: z.string({ message: "birth date is required" }).min(1),
-        gender: z.enum(Gender, {error: "gender is required"})
+        gender: z.enum(Gender, { error: "gender is required" })
     });
 
     const { lower, upper } = getValidBirthdateRange(18, 120);
@@ -270,20 +318,23 @@ export default function RegisterForm({ className }: RegisterFormProps) {
     const [step, setStep] = useState<Step>("email");
     const [data, setData] = useState<{
         email?: string;
+        verificationCode?: string;
         password?: string;
         birthDate?: string;
         alias?: string;
         location?: Location;
-        gender?: Gender
+        gender?: Gender,
     }>({});
 
     const [emailError, setEmailError] = useState<string | undefined>(undefined);
+    const [verifyEmailError, setVerifyEmailError] = useState<string | undefined>(undefined);
 
     const steps: Step[] = [
         "email",
+        "verify",
         "password",
         "profile",
-        "images"
+        "images",
     ]
 
     async function navigate(step: Step) {
@@ -312,7 +363,8 @@ export default function RegisterForm({ className }: RegisterFormProps) {
             birthDate: data.birthDate!,
             gender: data.gender!,
             location: data.location,
-            images: imageWriteDtos
+            images: imageWriteDtos,
+            emailVerificationCode: data.verificationCode!
         });
 
         if (response == undefined) {
@@ -323,11 +375,23 @@ export default function RegisterForm({ className }: RegisterFormProps) {
         } else {
 
             const hasEmailAlreadyInUseError = response?.some(e => e.code === "auth.duplicate_username") ?? false;
+            const hasInvalidVerificationCodeError = response?.some(e => e.code === "auth.invalid_verification_code") ?? false;
             if (hasEmailAlreadyInUseError) {
+
                 setStep("email");
                 setEmailError("an account with that e-mail already exists");
-            }
 
+            } else if (hasInvalidVerificationCodeError) {
+
+                setStep("verify");
+                setVerifyEmailError("the verification code entered is invalid");
+
+            }
+            else {
+
+
+
+            }
         }
 
     }
@@ -339,9 +403,15 @@ export default function RegisterForm({ className }: RegisterFormProps) {
             <EmailStep
                 errorMessage={emailError}
                 hidden={step !== "email"}
-                finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("password") }}
+                finish={(accountExists) => { accountExists ? navigate("account exists") : navigate("verify") }}
                 setEmail={(email) => setData(prev => ({ ...prev, email }))}
                 value={data.email}
+            />
+            <VerifyEmailStep
+                errorMessage={verifyEmailError}
+                hidden={step !== "verify"}
+                finish={(verificationCode) => { setData(prev => ({ ...prev, verificationCode })); navigate("password"); }}
+                email={data.email!}
             />
             <PasswordStep
                 hidden={step !== "password"}

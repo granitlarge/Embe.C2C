@@ -33,6 +33,7 @@ public class C2CContext
     public DbSet<AdminArea> AdminAreas { get; set; }
     public DbSet<Candidate> Candidates { get; set; }
     public DbSet<SearchProfileEmbedding> SearchProfileEmbeddings { get; set; }
+    public DbSet<VerificationCode> VerificationCodes { get; internal set; }
 
     public IImmutableList<DomainEvent> DomainEvents
     {
@@ -45,6 +46,8 @@ public class C2CContext
                 .ToImmutableList();
         }
     }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

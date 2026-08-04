@@ -1,3 +1,4 @@
+using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
 
 namespace Embe.C2C.Application.Abstractions.Services.AuthServices;
@@ -18,4 +19,7 @@ public interface IAuthService
     Task<ErrorOr<IIdentityUser>> RegisterUserAsync(Guid userId, string email, string password, CancellationToken cancellationToken = default);
     Task<ErrorOr<Success>> ResetPasswordAsync(string newPassword, CancellationToken cancellationToken = default);
     Task<string> GeneratePasswordResetLinkAsync(string email, CancellationToken cancellationToken);
+    Task<string> GenerateVerificationCodeAsync(string id, CancellationToken cancellationToken);
+    Task<bool> VerifyVerificationCodeAsync(string id, string verificationCode, CancellationToken cancellationToken);
+    Task<ErrorOr<Success>> ChangeEmailAsync(Guid userId, Email newEmail, CancellationToken cancellationToken);
 }

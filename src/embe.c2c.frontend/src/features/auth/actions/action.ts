@@ -40,7 +40,7 @@ export async function sendResetPasswordEmail(email: string): Promise<ApiResponse
 
 }
 
-export async function resetPassword(token: string, newPassword: string): Promise<ApiResponse<void>> {
+export async function resetForgottenPassword(token: string, newPassword: string): Promise<ApiResponse<void>> {
     const response = await Mutate<void>
         (
             `${process.env.API_URL}/api/auth/reset-password`,
@@ -56,4 +56,22 @@ export async function resetPassword(token: string, newPassword: string): Promise
         )
 
     return response;
+}
+
+export async function sendVerificationEmail(email: string): Promise<ApiResponse<void>> {
+
+    const response = await Mutate<void>(
+        `${process.env.API_URL}/api/verification/email`,
+        {
+            method: "POST",
+            body: JSON.stringify({ email }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        },
+        false
+    )
+
+    return response;
+
 }

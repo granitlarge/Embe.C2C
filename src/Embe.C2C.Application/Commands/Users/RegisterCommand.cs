@@ -8,6 +8,7 @@ namespace Embe.C2C.Application.Commands.Users;
 public sealed record RegisterCommand
 (
     string Email,
+    string EmailVerificationCode,
     string Password,
     string Alias,
     Gender Gender,

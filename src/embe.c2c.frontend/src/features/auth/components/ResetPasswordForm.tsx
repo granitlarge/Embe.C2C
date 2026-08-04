@@ -3,12 +3,9 @@
 import Button from "@/src/shared/components/buttons/Button";
 import TextInput from "@/src/shared/components/inputs/text-input/TextInput";
 import Surface from "@/src/shared/components/surfaces/Surface";
-import { Routes } from "@/src/shared/routes";
 import { useState } from "react";
 import * as z from 'zod';
-import { resetPassword } from "../actions/action";
 import { PasswordValidationRules } from "@/src/shared/validation";
-import Link from "@/src/shared/components/Links/Link";
 
 export type ResetPasswordFormProps = {
     onReset: (newPassword: string) => Promise<void> | void;

@@ -80,7 +80,7 @@ export async function logout(): Promise<ApiResponse<void>> {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({refreshToken: await getRefreshToken()})
+            body: JSON.stringify({ refreshToken: await getRefreshToken() })
         }
     );
 
@@ -113,4 +113,36 @@ export async function deleteAccount(): Promise<ApiResponse<void>> {
 
     return response;
 
+}
+
+export async function resetPassword(newPassword: string) {
+
+    const response = await Mutate<void>
+        (
+            `${process.env.API_URL}/api/auth/reset-password`,
+            {
+                method: "POST",
+                body: JSON.stringify({ newPassword }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        )
+
+    return response;
+
+}
+
+export async function changeEmail(newEmail: string, verificationCode: string) : Promise<ApiResponse<void>> {
+    const response = await Mutate<void>(
+        `${process.env.API_URL}/api/user/change-email`,
+        {
+            method: "POST",
+            body: JSON.stringify({ newEmail, verificationCode }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    )
+    return response;
 }

@@ -17,7 +17,7 @@ export default function ResetForgottenPasswordForm({ token }: ResetForgottenPass
     const tokenHasExpired = (jwtDecode(token).exp ?? 0) < Date.now() / 1000;
 
     async function onReset(newPassword: string) {
-        const response = await api.resetPassword(token, newPassword);
+        const response = await api.resetForgottenPassword(token, newPassword);
         if (!response.success) {
             throw new Error("not implemented");
         }

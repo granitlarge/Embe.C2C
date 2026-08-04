@@ -1,15 +1,16 @@
-using System.Windows.Input;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Abstractions.Services;
 using Embe.C2C.Application.Abstractions.Services.AuthServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices;
 using Embe.C2C.Application.Abstractions.Services.WorkItemServices.WorkItems;
+using Embe.C2C.Application.Errors;
 using Embe.C2C.Application.EventHandlers;
 using Embe.C2C.Application.Extensions;
 using Embe.C2C.Domain;
 using Embe.C2C.Domain.Aggregates.Users;
 using Embe.C2C.Domain.ValueObjects;
 using ErrorOr;
+
 namespace Embe.C2C.Application.Commands.Users.Handlers;
 
 public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentials>>
@@ -128,6 +129,16 @@ public class RegisterHandler : CommandHandler<RegisterCommand, ErrorOr<Credentia
             (
                 false,
                 ErrorOrFactory.From<Credentials>(errors)
+            );
+        }
+
+        var isValidVerificationCode = await _authService.VerifyVerificationCodeAsync(command.Email, command.EmailVerificationCode, cancellationToken);
+        if (!isValidVerificationCode)
+        {
+            return new
+            (
+                false,
+                ApplicationErrors.InvalidVerificationCode.ToValidationErrorOr()
             );
         }
 

@@ -28,9 +28,24 @@ public class EmailComposerService(ISettings settings, INotificationRepository no
         };
     }
 
+    internal async Task<(string subject, string htmlContent, string plainText)> CreateVerificationEmailMessageAsync
+    (
+        string verificationCode,
+        CancellationToken cancellationToken
+    )
+    {
+        var subject = GetSubject("verify your e-mail");
+        var htmlContent = Emails.VerificationMessage(_settings.Application.Name, verificationCode);
+        var plainText =
+        $$"""
+            Your verification code is: {{verificationCode}}.
+        """;
+        return (subject, htmlContent, plainText);
+    }
+
     private (string Subject, string HtmlContent, string PlainText) CreateMatchingCreatedMessage(MatchingCreatedNotification matchingCreated)
     {
-        var subject = $"{_settings.Application.Name} | you've got a new match!";
+        var subject = GetSubject("you've got a new match!");
         var link = $"{_settings.Site.Url}/protected/matches";
         var htmlContent = Emails.MatchingCreatedMessage(_settings.Application.Name, link);
         var plainText =
@@ -48,7 +63,7 @@ public class EmailComposerService(ISettings settings, INotificationRepository no
         MessageCreatedNotification messageCreated
     )
     {
-        var subject = $"{_settings.Application.Name} | you've got a new message!";
+        var subject = GetSubject("you've got a new message!");
         var link = $"{_settings.Site.Url}/protected/matches";
         var htmlContent = Emails.MessageCreatedMessage(_settings.Application.Name, link);
         var plainText =
@@ -64,7 +79,7 @@ public class EmailComposerService(ISettings settings, INotificationRepository no
 
     private (string Subject, string HtmlContent, string PlainText) CreatePositivelyJudgedMessage(PositivelyJudgedNotification positivelyJudged)
     {
-        var subject = $"{_settings.Application.Name} | you've got a new like!";
+        var subject = GetSubject("you've got a new like!");
         var link = $"{_settings.Site.Url}/protected/likes";
         var htmlContent = Emails.PositivelyJudgedMessage(_settings.Application.Name, link);
         var plainText =
@@ -75,5 +90,10 @@ public class EmailComposerService(ISettings settings, INotificationRepository no
         """;
 
         return (subject, htmlContent, plainText);
+    }
+
+    private string GetSubject(string subject)
+    {
+        return $"{_settings.Application.Name} | {subject}";
     }
 }
