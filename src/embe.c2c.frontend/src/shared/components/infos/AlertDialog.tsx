@@ -9,7 +9,9 @@ export type AlertDialogProps = {
     confirmIntent?: ButtonIntent
 }
 export default function AlertDialog({ confirmIntent, children, title, description, onConfirm, onCancel }: AlertDialogProps) {
+
     return (
+
         <RadixAlertDialog.Root>
             <RadixAlertDialog.Trigger asChild>
                 {children}
@@ -36,5 +38,7 @@ export default function AlertDialog({ confirmIntent, children, title, descriptio
                 </RadixAlertDialog.Content>
             </RadixAlertDialog.Portal>
         </RadixAlertDialog.Root>
+
     )
+
 }

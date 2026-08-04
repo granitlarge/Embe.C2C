@@ -7,6 +7,7 @@ import * as api from "@/src/features/me/actions/action"
 import { useRouter } from "nextjs-toploader/app"
 import ResetPasswordForm from "../../auth/components/ResetPasswordForm";
 import ChangeEmailForm from "./ChangeEmailForm";
+import AlertDialog from "@/src/shared/components/infos/AlertDialog";
 
 export type SettingsProps = {
 
@@ -60,9 +61,15 @@ export default function Settings({ }: SettingsProps) {
                 <Button intent="default" onClick={onLogout}>
                     logout
                 </Button>
-                <Button intent="destructive" onClick={onDelete}>
-                    delete account
-                </Button>
+                <AlertDialog
+                    title="are you sure?"
+                    description="are you sure you'd like to delete your account?"
+                    onConfirm={onDelete}
+                    onCancel={() => { }}
+                    confirmIntent="destructive"
+                >
+                    <Button intent="destructive">delete account</Button>
+                </AlertDialog>
             </div>
         </div>
 
