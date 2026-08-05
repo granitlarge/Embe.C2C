@@ -45,6 +45,15 @@ public class User : Aggregate
             }
         }
 
+        Settings = new UserSettings
+        (
+            EmailNotifications: true,
+            DeviceNotifications: true,
+            NotifyOnLike: true,
+            NotifyOnMatch: true,
+            NotifyOnMessage: true
+        );
+
         AddDomainEvent(new UserCreatedEvent(this));
     }
 
@@ -72,6 +81,8 @@ public class User : Aggregate
     [NotMapped]
     public Entities.Image? ProfilePicture => _images.OrderBy(f => f.ImageDetails.Order).FirstOrDefault();
 
+    public UserSettings Settings { get; private set; }
+
     public string? Bio { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
@@ -90,6 +101,11 @@ public class User : Aggregate
     // These are all the candidates where this user is the "candidate" (the one being judged)
     public ICollection<Candidate>? CandidateCandidates { get; private set; }
     #endregion
+
+    public void UpdateSettings(UserSettings newSettings)
+    {
+        Settings = newSettings;
+    }
 
     public void UpdateEmail(Email newEmail)
     {
