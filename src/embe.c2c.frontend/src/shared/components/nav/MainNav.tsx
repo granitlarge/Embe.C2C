@@ -36,7 +36,7 @@ export default function MainNav({
 
             await Promise.all([markUnreadLikesAsReadPromise, markUnreadMatchCreatedNotificationsAsReadPromise]);
 
-            async function markUnreadLikesAsRead(){
+            async function markUnreadLikesAsRead() {
 
                 if (pathname !== Routes.protected.likes) {
                     return
@@ -125,13 +125,13 @@ export default function MainNav({
                 <li>
                     <Link href={Routes.protected.discover} className={linkClassNames}>
                         <Users size={iconSize} className={iconClassNames} />
-                        <span className={linkTextClassNames}>discover</span>
+                        <span className={`${linkTextClassNames} ${pathname === Routes.protected.discover ? "font-bold" : ""}`}>discover</span>
                     </Link>
                 </li>
                 <li>
                     <Link href={Routes.protected.search} className={linkClassNames}>
                         <Users size={iconSize} className={iconClassNames} />
-                        <span className={linkTextClassNames}>search</span>
+                        <span className={`${linkTextClassNames} ${pathname === Routes.protected.search ? "font-bold" : ""}`}>search</span>
                     </Link>
                 </li>
                 <li>
@@ -140,7 +140,7 @@ export default function MainNav({
                             <Heart size={iconSize} className={iconClassNames} />
                             {hasUnseenLikes && <span className="absolute top-[1px] -right-[2px] block h-2 w-2 rounded-full bg-(--important-fc)"></span>}
                         </div>
-                        <span className={linkTextClassNames}>likes</span>
+                        <span className={`${linkTextClassNames} ${pathname === Routes.protected.likes ? "font-bold" : ""}`}>likes</span>
                     </Link>
                 </li>
                 <li>
@@ -149,13 +149,13 @@ export default function MainNav({
                             <MessageCircle size={iconSize} className={iconClassNames} />
                             {(hasUnseenMatches || hasUnseenMessages) && <span className="absolute -top-[2px] -right-[4px] block h-2 w-2 rounded-full bg-(--important-fc)"></span>}
                         </div>
-                        <span className={linkTextClassNames}>matches</span>
+                        <span className={`${linkTextClassNames} ${pathname === Routes.protected.matches ? "font-bold" : ""}`}>matches</span>
                     </Link>
                 </li>
                 <li>
                     <Link href={Routes.protected.me} className={linkClassNames}>
                         <User size={iconSize} className={iconClassNames} />
-                        <span className={linkTextClassNames}>me</span>
+                        <span className={`${linkTextClassNames} ${pathname === Routes.protected.me ? "font-bold" : ""}`}>me</span>
                     </Link>
                 </li>
             </ul>

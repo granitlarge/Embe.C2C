@@ -11,7 +11,7 @@ export type LinkProps = Omit<NextLinkProps, ExcludedProps> & {
 export default function Link({ title, href, className, children, ...props }: LinkProps) {
 
     const classNames = [
-        className
+        className,
     ].filter(Boolean).join(" ");
 
     return (
