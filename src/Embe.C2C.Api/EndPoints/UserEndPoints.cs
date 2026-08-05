@@ -26,6 +26,7 @@ public static class UserEndPoints
         group.MapGet("/has-search-profile", HasSearchProfile).RequireAuthorization();
         group.MapPost("/upload-images", AddImages).RequireAuthorization();
         group.MapPost("/change-email", ChangeEmail).RequireAuthorization();
+        group.MapPost("/settings", UpdateSettings).RequireAuthorization();
     }
 
     private static async Task<IResult> Register([FromBody] RegisterCommand command, [FromServices] RegisterHandler handler, CancellationToken cancellationToken = default)
@@ -77,6 +78,12 @@ public static class UserEndPoints
     }
 
     private static async Task<IResult> ChangeEmail([FromBody] ChangeEmailCommand command, [FromServices] ChangeEmailHandler handler, CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToResult();
+    }
+
+    private static async Task<IResult> UpdateSettings([FromBody] UpdateSettingsCommand command, [FromServices] UpdateSettingsHandler handler, CancellationToken cancellationToken = default)
     {
         var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToResult();

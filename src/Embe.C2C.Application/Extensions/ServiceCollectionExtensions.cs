@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<Commands.Users.Handlers.UpdateHandler>();
         services.AddScoped<Commands.Users.Handlers.AddImagesHandler>();
         services.AddScoped<Commands.Users.Handlers.ChangeEmailHandler>();
+        services.AddScoped<Commands.Users.Handlers.UpdateSettingsHandler>();
 
         services.AddScoped<Commands.Candidates.Handlers.GenerateCandidatesHandler>();
         services.AddScoped<Commands.Candidates.Handlers.JudgeCandidateHandler>();

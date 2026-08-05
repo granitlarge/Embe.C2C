@@ -23,19 +23,14 @@ public record UserDto
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt,
     double? DistanceKmToQueryingUser,
-    string? Bio
+    string? Bio,
+    UserSettingsDto? Settings
 );
 
-public class UserDtoMapper
+public class UserDtoMapper(ImageDtoMapper imageDtoMapper, UserAuthorizationService userAuthorizationService)
 {
-    private readonly ImageDtoMapper _imageDtoMapper;
-    private readonly UserAuthorizationService _userAuthorizationService;
-
-    public UserDtoMapper(ImageDtoMapper imageDtoMapper, UserAuthorizationService userAuthorizationService)
-    {
-        _imageDtoMapper = imageDtoMapper;
-        _userAuthorizationService = userAuthorizationService;
-    }
+    private readonly ImageDtoMapper _imageDtoMapper = imageDtoMapper;
+    private readonly UserAuthorizationService _userAuthorizationService = userAuthorizationService;
 
     public async Task<ReadDto<UserDto, UserPermission>?> ToDtoAsync
     (
@@ -69,7 +64,8 @@ public class UserDtoMapper
             variant.IncludeCreatedAt ? user.CreatedAt : null,
             variant.IncludeUpdatedAt ? user.UpdatedAt : null,
             variant.IncludeDistanceToQueryingUser ? userEnriched.DistanceKmToQueryingUser : null,
-            variant.IncludeBio ? user.Bio : null
+            variant.IncludeBio ? user.Bio : null,
+            variant.IncludeSettings ? user.Settings.ToDo() : null
         );
 
         return new ReadDto<UserDto, UserPermission>(dto, permissions);

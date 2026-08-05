@@ -1,9 +1,6 @@
-using Embe.C2C.Application;
 using Embe.C2C.Domain.Aggregates.Users;
-using Embe.C2C.Domain.Errors.Aggregates;
 using Embe.C2C.Domain.ValueObjects;
 using Embe.C2C.Infrastructure.Ef.Configurations.AbstractionConfigurations;
-using Embe.C2C.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -55,6 +52,15 @@ public class UserConfiguration : AggregateConfiguration<User>
                 });
                 image.Property(image => image.RowVersion).IsRowVersion();
             });
+
+        builder.ComplexProperty(u => u.Settings, settings =>
+        {
+            settings.Property(s => s.DeviceNotifications).HasDefaultValue(true);
+            settings.Property(s => s.EmailNotifications).HasDefaultValue(true);
+            settings.Property(s => s.NotifyOnLike).HasDefaultValue(true);
+            settings.Property(s => s.NotifyOnMatch).HasDefaultValue(true);
+            settings.Property(s => s.NotifyOnMessage).HasDefaultValue(true);
+        });
 
         base.Configure(builder);
     }

@@ -101,3 +101,11 @@ export enum ImageStatus {
     Rejected = 2,
     Accepted = 3
 }
+
+export type UserSettings = {
+    emailNotifications: boolean;
+    deviceNotifications: boolean;
+    notifyOnLike: boolean;
+    notifyOnMatch: boolean;
+    notifyOnMessage: boolean;
+}

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Embe.C2C.Application.Abstractions.Repos;
 using Embe.C2C.Application.Events;
 using Embe.C2C.Application.Events.Candidates;
@@ -22,11 +23,12 @@ namespace Embe.C2C.Application.EventHandlers;
 public class DomainEventHandler
 (
     INotificationRepository notificationRepository,
-    IMatchingRepository matchingRepo
+    IMatchingRepository matchingRepo,
+    IUserRepository userRepository
 ) : IntegrationEventCollector
 {
     private readonly INotificationRepository _notificationRepository = notificationRepository;
-
+    private readonly IUserRepository _userRepository = userRepository;
     private readonly IMatchingRepository _matchingRepo = matchingRepo;
 
     public async Task HandleAsync(DomainEvent domainEvent, CancellationToken cancellationToken = default)
@@ -99,15 +101,19 @@ public class DomainEventHandler
     private async Task HandlePositivelyJudgedEventAsync(PositivelyJudgedDomainEvent positivelyJudgedEvent, CancellationToken cancellationToken)
     {
         AddIntegrationEvent(new PositivelyJudgedIntegrationEvent(positivelyJudgedEvent.Candidate.Id, positivelyJudgedEvent.Candidate.CandidateUserId));
-        var notification = PositivelyJudgedNotification.Create
-        (
-            positivelyJudgedEvent.Candidate.Id,
-            positivelyJudgedEvent.Candidate.CandidateUserId,
-            positivelyJudgedEvent.Candidate.UserId,
-            positivelyJudgedEvent.Candidate.CandidateUserId
-        );
-        _notificationRepository.Set.Add(notification);
-        AddIntegrationEvent(new NotificationCreatedIntegrationEvent(notification.RecipientUserId, notification.Id));
+        var candidate = await _userRepository.GetByIdAsync(positivelyJudgedEvent.Candidate.CandidateUserId, cancellationToken);
+        if (candidate?.Settings.NotifyOnLike ?? false)
+        {
+            var notification = PositivelyJudgedNotification.Create
+            (
+                positivelyJudgedEvent.Candidate.Id,
+                positivelyJudgedEvent.Candidate.CandidateUserId,
+                positivelyJudgedEvent.Candidate.UserId,
+                positivelyJudgedEvent.Candidate.CandidateUserId
+            );
+            _notificationRepository.Set.Add(notification);
+            AddIntegrationEvent(new NotificationCreatedIntegrationEvent(notification.RecipientUserId, notification.Id));
+        }
     }
 
     private async Task HandleNotificationRemovedEventAsync(NotificationRemovedEvent notificationRemovedEvent, CancellationToken cancellationToken)
@@ -124,7 +130,7 @@ public class DomainEventHandler
         return;
     }
 
-    private Task HandleMatchingCreatedEventAsync
+    private async Task HandleMatchingCreatedEventAsync
     (
         MatchingCreatedDomainEvent matchingCreatedEvent,
         CancellationToken cancellationToken
@@ -134,21 +140,23 @@ public class DomainEventHandler
         var matcheeUserId = matchingCreatedEvent.LastJudgeUserId == matching.UserId1 ? matching.UserId2 : matching.UserId1;
         var matcherUserId = matchingCreatedEvent.LastJudgeUserId;
 
-        var notification = new MatchingCreatedNotification
-        (
-            matcheeUserId,
-            matching.Id,
-            matcherUserId
-        );
+        var matchee = await _userRepository.GetByIdAsync(matcheeUserId, cancellationToken);
+        if (matchee?.Settings?.NotifyOnMatch ?? false) {
 
-        _notificationRepository.Set.Add(notification);
+            var notification = new MatchingCreatedNotification
+            (
+                matcheeUserId,
+                matching.Id,
+                matcherUserId
+            );
+            _notificationRepository.Set.Add(notification);
+            var notificationCreatedIntegrationEvent = new NotificationCreatedIntegrationEvent(matcheeUserId, notification.Id);
+            AddIntegrationEvent(notificationCreatedIntegrationEvent);
 
-        var notificationCreatedIntegrationEvent = new NotificationCreatedIntegrationEvent(matcheeUserId, notification.Id);
+        }
+
         var matchingCreatedIntegrationEvent = new MatchingCreatedIntegrationEvent(matchingCreatedEvent.Matching.Id, matcheeUserId);
-        AddIntegrationEvent(notificationCreatedIntegrationEvent);
         AddIntegrationEvent(matchingCreatedIntegrationEvent);
-
-        return Task.CompletedTask;
     }
 
     private async Task HandleMatchingRemovedEventAsync
@@ -179,9 +187,13 @@ public class DomainEventHandler
         var messageCreated = new MessageCreatedIntegrationEvent(matchingId, authorUserId, recipientUserId, messageId);
         AddIntegrationEvent(messageCreated);
 
-        var notification = MessageCreatedNotification.Create(messageCreatedEvent.Message.Id, recipientUserId);
-        _notificationRepository.Set.Add(notification);
-        AddIntegrationEvent(new NotificationCreatedIntegrationEvent(notification.RecipientUserId, notification.Id));
+        var recipient = await _userRepository.GetByIdAsync(recipientUserId, cancellationToken);
+        if (recipient?.Settings.NotifyOnMessage ?? false)
+        {
+            var notification = MessageCreatedNotification.Create(messageCreatedEvent.Message.Id, recipientUserId);
+            _notificationRepository.Set.Add(notification);
+            AddIntegrationEvent(new NotificationCreatedIntegrationEvent(notification.RecipientUserId, notification.Id));
+        }
     }
 
     private async Task HandleMessageEditedEventAsync

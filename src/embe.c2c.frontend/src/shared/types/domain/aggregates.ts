@@ -1,7 +1,7 @@
 import { Guid } from "../../cache";
 import { ReadDto } from "../dtos/types";
 import { Image } from "./entities";
-import { DatingPreferences, Engagement, Gender, Location, Money, RelationshipType, TransactionReason, TransactionType } from "./value-objects";
+import { DatingPreferences, Engagement, Gender, Location, Money, RelationshipType, TransactionReason, TransactionType, UserSettings } from "./value-objects";
 
 export type User = {
     id: Guid;
@@ -17,6 +17,7 @@ export type User = {
     updatedAt?: string;
     distanceKmToQueryingUser?: number;
     bio?: string;
+    settings?: UserSettings;
 }
 
 export enum UserPermission {

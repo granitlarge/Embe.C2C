@@ -4,7 +4,7 @@ import { Mutate } from "@/src/shared/apis/api";
 import { ApiResponse, } from "@/src/shared/apis/type";
 import { Guid } from "@/src/shared/cache";
 import { User, UserPermission } from "@/src/shared/types/domain/aggregates";
-import { Gender, Location } from "@/src/shared/types/domain/value-objects";
+import { Gender, Location, UserSettings } from "@/src/shared/types/domain/value-objects";
 import { ReadDto } from "@/src/shared/types/dtos/types";
 import { ImageData } from "../components/MyInfoForm";
 import { AddImagesResult } from "./type";
@@ -145,4 +145,21 @@ export async function changeEmail(newEmail: string, verificationCode: string) : 
         }
     )
     return response;
+}
+
+export async function updateSettings(newSettings: UserSettings): Promise<ApiResponse<ReadDto<User, UserPermission>>> {
+
+    const response = await Mutate<ReadDto<User, UserPermission>>(
+        `${process.env.API_URL}/api/user/settings`,
+        {
+            method: "POST",
+            body: JSON.stringify({ settings: newSettings }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    )
+
+    return response;
+
 }
