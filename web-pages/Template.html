@@ -19,18 +19,22 @@
     .body {
         background-color: rgb(143, 151, 240);
         font-family: 'Roboto', sans-serif;
+    }
+
+    .container {
         display: flex;
         flex-direction: column;
         justify-items: center;
         align-items: center;
         justify-content: center;
         gap: 1rem;
-        padding: 2rem;
-        font-size: 1.5rem;
-    }
-
-    h1 {
-        font-size:2.5rem;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        width: 500px;
+        max-width: 100%;
+        margin-inline: auto;
     }
 
     .surface {
@@ -39,10 +43,9 @@
         padding: .3rem;
         display: flex;
         flex-direction: column;
-        width: 90%;
+        width: 100%;
         gap: .3rem;
         align-items: center;
-        padding: 1rem;
     }
 
     h1 {
@@ -58,6 +61,7 @@
         align-items: center;
         vertical-align: middle;
         text-align: center;
+        white-space: pre-wrap;
     }
 
     footer {
@@ -69,18 +73,20 @@
 </style>
 
 <body class="body">
-    <div class="surface">
-        <header>
-            <h1>{{heading}}</h1>
-        </header>
-        <main>
-            {{htmlBody}}
-        </main>
-    </div>
-    <div class="surface">
-        <footer>
-            <strong>{{applicationName}} {{DateTime.UtcNow.Year}}</strong>
-        </footer>
+    <div class="container">
+        <div class="surface">
+            <header>
+                <h1>{{heading}}</h1>
+            </header>
+            <main>
+                {{htmlBody}}
+            </main>
+        </div>
+        <div class="surface">
+            <footer>
+                <strong>{{applicationName}} {{DateTime.UtcNow.Year}}</strong>
+            </footer>
+        </div>
     </div>
 </body>
 

@@ -28,7 +28,6 @@ export default function MainNav({
 
     useEffect(() => {
 
-
         async function markUnreadNotificationsAsRead() {
 
             const markUnreadMatchCreatedNotificationsAsReadPromise = markUnreadMatchCreatedNotificationsAsRead();
