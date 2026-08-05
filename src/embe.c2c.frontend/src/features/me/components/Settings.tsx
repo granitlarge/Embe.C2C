@@ -8,6 +8,7 @@ import { useRouter } from "nextjs-toploader/app"
 import ResetPasswordForm from "../../auth/components/ResetPasswordForm";
 import ChangeEmailForm from "./ChangeEmailForm";
 import AlertDialog from "@/src/shared/components/infos/AlertDialog";
+import NotificationSettings from "./NotificationSettings";
 
 export type SettingsProps = {
 
@@ -56,7 +57,7 @@ export default function Settings({ }: SettingsProps) {
                     </CollapsibleSection>
                 </CollapsibleSection>
                 <CollapsibleSection headingLevel={2} title="notifications">
-                    notifications
+                    <NotificationSettings />
                 </CollapsibleSection>
                 <Button intent="default" onClick={onLogout}>
                     logout

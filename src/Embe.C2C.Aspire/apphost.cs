@@ -33,9 +33,9 @@ var api = builder
     .WithEnvironment("Jwt__Secrets__AccessToken", "AccessTokenYourSuperSecretKeyForJwtTokenGeneration")
     .WithEnvironment("Jwt__Secrets__RefreshToken", "AccessTokenYourSuperSecretKeyForJwtTokenGeneration")
     .WithEnvironment("Jwt__Secrets__ResetPasswordToken", "AccessTokenYourSuperSecretKeyForJwtTokenGeneration")
-    .WithEnvironment("Cors__AllowedOrigins", "http://frontend-embe.c2c.aspire.dev.localhost:51649")
+    .WithEnvironment("Cors__AllowedOrigins", "http://frontend-embe.c2c.aspire.dev.localhost:55000")
     .WithEnvironment("Application__Name", "Embe.C2C")
-    .WithEnvironment("Site__Url", "http://frontend-embe.c2c.aspire.dev.localhost:51649")
+    .WithEnvironment("Site__Url", "http://frontend-embe.c2c.aspire.dev.localhost:55000")
     .WithEnvironment("OpenAI__SemanticEmbedding__ApiKey", "aDummyApiKey")
     .WithReference(defaultConnection)
     .WithReference(azureServiceBus)
@@ -63,7 +63,7 @@ var frontend = builder.AddNextJsApp("frontend", "../embe.c2c.frontend/")
     .WithEnvironment("API_URL", api.GetEndpoint("https"))
     .WithEnvironment("NEXT_PUBLIC_API_URL", api.GetEndpoint("https"))
     .WithExternalHttpEndpoints()
-    .WithHttpEndpoint(port: 51649);
+    .WithHttpEndpoint(port: 55000);
 #pragma warning restore ASPIREJAVASCRIPT001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 builder.Build().Run();

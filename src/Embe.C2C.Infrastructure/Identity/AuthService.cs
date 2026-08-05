@@ -345,11 +345,6 @@ public class AuthService
     )
     {
         var refreshTokenId = GetRefreshTokenIdFromClaims();
-        if (!refreshTokenId.HasValue)
-        {
-            return ApplicationErrors.Forbidden.ToForbiddenErrorOr();
-        }
-
         var userId = _userService.UserId ?? throw new InvalidOperationException("No authenticated user");
         var identityUserId = await _context.Users.Where(u => u.UserId == userId)
             .Select(u => u.Id)
@@ -370,7 +365,7 @@ public class AuthService
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         if (result.Succeeded)
         {
-            await RemoveOtherRefreshTokensOfSameAuthenticationMethod(userId, refreshTokenId.Value, cancellationToken);
+            await RemoveOtherRefreshTokensOfSameAuthenticationMethod(userId, refreshTokenId, cancellationToken);
             await _userManager.ResetAccessFailedCountAsync(user);
             return Result.Success;
         }
@@ -532,9 +527,11 @@ public class AuthService
         return tokenId;
     }
 
-    private async Task RemoveOtherRefreshTokensOfSameAuthenticationMethod(Guid userId, Guid refreshTokenId, CancellationToken cancellationToken)
+    private async Task RemoveOtherRefreshTokensOfSameAuthenticationMethod(Guid userId, Guid? refreshTokenId, CancellationToken cancellationToken)
     {
-        var rtsToRemove = await _context.RefreshTokens.Where(rt => rt.UserId == userId && rt.Id == refreshTokenId).ToListAsync(cancellationToken);
+        var rtsToRemove = await _context.RefreshTokens
+            .Where(rt => rt.UserId == userId && (refreshTokenId == null || rt.Id == refreshTokenId))
+            .ToListAsync(cancellationToken);
         _context.RefreshTokens.RemoveRange(rtsToRemove);
     }
 
